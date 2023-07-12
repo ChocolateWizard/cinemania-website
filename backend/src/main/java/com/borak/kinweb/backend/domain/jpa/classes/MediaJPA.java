@@ -21,9 +21,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  *
@@ -32,27 +31,23 @@ import java.util.Set;
 @Entity(name = "Media")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "media")
-@Access(AccessType.FIELD)
-public abstract class MediaJPA implements Serializable{
+public class MediaJPA implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;  
 
-    @Column(name = "title", length = 300, nullable = false)
     private String title;
 
-    @Column(name = "cover_image_url", length = 500, nullable = false)
+    @Column(name = "cover_image_url")
     private String coverImageUrl;
 
-    @Column(name = "description", length = 500, nullable = false)
     private String description;
 
-    @Column(name = "release_date", nullable = false)
+    @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @Column(name = "rating", nullable = false)
     private Integer rating;
 
     @ManyToMany
@@ -60,15 +55,50 @@ public abstract class MediaJPA implements Serializable{
             name = "media_genres",
             joinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id", referencedColumnName = "id"))
-    private List<GenreJPA> genres;
+    private List<GenreJPA> genres=new ArrayList<>();
+    
+//    @ManyToMany
+//    @JoinTable(
+//            name = "media_directors",
+//            joinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "director_id", referencedColumnName = "person_id"))
+//    private List<DirectorJPA> directors=new ArrayList<>();
+//    
+//    @ManyToMany
+//    @JoinTable(
+//            name = "media_writers",
+//            joinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "writer_id", referencedColumnName = "person_id"))
+//    private List<WriterJPA> writers=new ArrayList<>();
+//    
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<ActingJPA> cast=new ArrayList<>();
+    
     
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CritiqueJPA> critiques;
+    private List<CritiqueJPA> critiques=new ArrayList<>();
 
     public MediaJPA() {
     }
 
-    public MediaJPA(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres, List<CritiqueJPA> critiques) {
+    public MediaJPA(String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating) {
+        this.title = title;
+        this.coverImageUrl = coverImageUrl;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.rating = rating;
+    }
+
+    public MediaJPA(String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
+        this.title = title;
+        this.coverImageUrl = coverImageUrl;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.rating = rating;
+        this.genres = genres;
+    }
+
+    public MediaJPA(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
         this.id = id;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
@@ -76,8 +106,9 @@ public abstract class MediaJPA implements Serializable{
         this.releaseDate = releaseDate;
         this.rating = rating;
         this.genres = genres;
-        this.critiques = critiques;
     }
+    
+    
 
     public Long getId() {
         return id;
@@ -144,32 +175,10 @@ public abstract class MediaJPA implements Serializable{
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final MediaJPA other = (MediaJPA) obj;
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
     public String toString() {
-        return title + " (" + releaseDate + ')';
+        return title;
     }
-    
+
     
   
     

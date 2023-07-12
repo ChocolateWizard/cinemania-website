@@ -4,8 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.jpa.classes;
 
-
-
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.jpa.converters.GenderConverter;
 import jakarta.persistence.Access;
@@ -17,6 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -24,30 +24,108 @@ import jakarta.persistence.Table;
  */
 @Entity(name = "Person")
 @Table(name = "person")
-@Access(AccessType.FIELD)
-public class PersonJPA {
+public class PersonJPA implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected Long id;
-    
-    @Column(name = "first_name",length = 255,nullable = false)
-    protected String firstName;
-    
-    @Column(name = "last_name",length = 255,nullable = false)
-    protected String lastName;
-    
+    private Long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(name = "gender")
     @Convert(converter = GenderConverter.class)
-    protected Gender gender;
-    
-    
-    @Column(name = "profile_photo_url",length = 255,nullable = true)
-    protected String profilePhotoURL;   
-    
-    @Column(name = "is_star",nullable = false)
-    protected boolean isStar;
-    
-    
+    private Gender gender;
+
+    @Column(name = "profile_photo_url")
+    private String profilePhotoURL;
+
+    public PersonJPA() {
+    }
+
+    public PersonJPA(String firstName, String lastName, Gender gender, String profilePhotoURL) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profilePhotoURL = profilePhotoURL;
+    }
+
+    public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profilePhotoURL = profilePhotoURL;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getProfilePhotoURL() {
+        return profilePhotoURL;
+    }
+
+    public void setProfilePhotoURL(String profilePhotoURL) {
+        this.profilePhotoURL = profilePhotoURL;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 11 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PersonJPA other = (PersonJPA) obj;
+        return Objects.equals(this.id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
+    }
 
 }

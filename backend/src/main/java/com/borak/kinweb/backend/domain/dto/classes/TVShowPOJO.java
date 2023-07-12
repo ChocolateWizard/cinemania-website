@@ -6,25 +6,25 @@ package com.borak.kinweb.backend.domain.dto.classes;
 
 
 
-import com.borak.kinweb.backend.domain.enums.Gender;
-
-
 /**
  *
  * @author Mr Poyo
  */
-public class PersonDTO {
 
-    protected Long id;
+public class TVShowPOJO extends MediaPOJO {
+  
 
-    protected String firstName;
+    private Integer numberOfSeasons;
+ 
 
-    protected String lastName;
+    public Integer getNumberOfSeasons() {
+        return numberOfSeasons;
+    }
 
-    protected Gender gender;
+    public void setNumberOfSeasons(Integer numberOfSeasons) {
+        this.numberOfSeasons = numberOfSeasons;
+    }
 
-    protected String profilePhotoURL;
-
-    protected boolean isStar;
-
+    
+    
 }

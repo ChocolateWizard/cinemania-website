@@ -4,18 +4,17 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  *
  * @author Mr Poyo
  */
-public abstract class MediaDTO implements Serializable {
+public class MediaPOJO implements Serializable {
 
     private Long id;
 
@@ -29,22 +28,41 @@ public abstract class MediaDTO implements Serializable {
 
     private Integer rating;
 
-    private List<GenreDTO> genres;
+    private List<GenrePOJO> genres = new ArrayList<>();
 
-    private List<CritiqueDTO> critiques;
+    private List<CritiquePOJO> critiques = new ArrayList<>();
 
-    public MediaDTO() {
+    private MediaCastPOJO cast;
+    private MediaCrewPOJO crew;
+
+    public MediaPOJO() {
     }
 
-    public MediaDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreDTO> genres, List<CritiqueDTO> critiques) {
+    public MediaPOJO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, MediaCastPOJO cast, MediaCrewPOJO crew) {
         this.id = id;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
         this.description = description;
         this.releaseDate = releaseDate;
         this.rating = rating;
-        this.genres = genres;
-        this.critiques = critiques;
+        this.cast = cast;
+        this.crew = crew;
+    }
+
+    public MediaCastPOJO getCast() {
+        return cast;
+    }
+
+    public void setCast(MediaCastPOJO cast) {
+        this.cast = cast;
+    }
+
+    public MediaCrewPOJO getCrew() {
+        return crew;
+    }
+
+    public void setCrew(MediaCrewPOJO crew) {
+        this.crew = crew;
     }
 
     public Long getId() {
@@ -95,47 +113,20 @@ public abstract class MediaDTO implements Serializable {
         this.rating = rating;
     }
 
-    public List<GenreDTO> getGenres() {
+    public List<GenrePOJO> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<GenreDTO> genres) {
+    public void setGenres(List<GenrePOJO> genres) {
         this.genres = genres;
     }
 
-    public List<CritiqueDTO> getCritiques() {
+    public List<CritiquePOJO> getCritiques() {
         return critiques;
     }
 
-    public void setCritiques(List<CritiqueDTO> critiques) {
+    public void setCritiques(List<CritiquePOJO> critiques) {
         this.critiques = critiques;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final MediaDTO other = (MediaDTO) obj;
-        return Objects.equals(this.id, other.id);
-    }
-
-    @Override
-    public String toString() {
-        return title + " (" + releaseDate + ')';
     }
 
 }

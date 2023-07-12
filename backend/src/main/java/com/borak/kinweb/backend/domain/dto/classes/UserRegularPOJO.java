@@ -10,7 +10,7 @@ package com.borak.kinweb.backend.domain.dto.classes;
  *
  * @author Mr. Poyo
  */
-public class UserRegularDTO extends UserDTO {
+public class UserRegularPOJO extends UserPOJO {
 
   
 

@@ -4,27 +4,23 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  *
  * @author Mr Poyo
  */
+public class MoviePOJO extends MediaPOJO {
 
-public class TVShowDTO extends MediaDTO {
-  
+    private Integer length;
 
-    private Integer numberOfSeasons;
- 
-
-    public Integer getNumberOfSeasons() {
-        return numberOfSeasons;
+    public Integer getLength() {
+        return length;
     }
 
-    public void setNumberOfSeasons(Integer numberOfSeasons) {
-        this.numberOfSeasons = numberOfSeasons;
+    public void setLength(Integer length) {
+        this.length = length;
     }
 
-    
-    
 }

@@ -21,23 +21,20 @@ import java.io.Serializable;
  */
 @Entity(name = "Critique")
 @Table(name = "critique")
-@Access(AccessType.FIELD)
 public class CritiqueJPA implements Serializable {
 
     @Id   
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "a")
+    @JoinColumn(name = "user_critic_id")
     private UserCriticJPA critic;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "b")
+    @JoinColumn(name = "media_id")
     private MediaJPA media;
-
-    @Column(name = "description", length = 500, nullable = false)
+ 
     private String description;
 
-    @Column(name = "rating", nullable = false)
     private Integer rating;
 
     public CritiqueJPA() {

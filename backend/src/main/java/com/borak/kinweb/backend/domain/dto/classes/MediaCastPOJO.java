@@ -4,26 +4,23 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author Mr. Poyo
  */
-
-public class UserCriticDTO extends UserDTO{
+public class MediaCastPOJO {
     
-  
-    private List<CritiqueDTO> critiques;
-   
+    private List<ActingPOJO> actorsAndRoles = new ArrayList<>();
 
-    public List<CritiqueDTO> getCritiques() {
-        return critiques;
+    public List<ActingPOJO> getActorsAndRoles() {
+        return actorsAndRoles;
     }
 
-    public void setCritiques(List<CritiqueDTO> critiques) {
-        this.critiques = critiques;
+    public void setActorsAndRoles(List<ActingPOJO> actorsAndRoles) {
+        this.actorsAndRoles = actorsAndRoles;
     }
     
     

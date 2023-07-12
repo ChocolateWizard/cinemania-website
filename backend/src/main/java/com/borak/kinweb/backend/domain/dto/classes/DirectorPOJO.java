@@ -4,22 +4,10 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
 /**
  *
- * @author Mr Poyo
+ * @author Mr. Poyo
  */
-public class MovieDTO extends MediaDTO {
-
-    private Integer length;
-
-
-    public Integer getLength() {
-        return length;
-    }
-
-    public void setLength(Integer length) {
-        this.length = length;
-    }
-
+public class DirectorPOJO extends PersonPOJO{
+    
 }

@@ -4,11 +4,8 @@
  */
 package com.borak.kinweb.backend.domain.jpa.classes;
 
-
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.jpa.converters.GenderConverter;
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -24,9 +21,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  *
@@ -35,47 +32,47 @@ import java.util.Set;
 @Entity(name = "User")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "user")
-@Access(AccessType.FIELD)
-public abstract class UserJPA implements Serializable{
+public class UserJPA implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "first_name", length = 100, nullable = false)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name", length = 100, nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
     @Convert(converter = GenderConverter.class)
-    @Column(name = "gender", length = 1, nullable = false)
+    @Column(name = "gender")
     private Gender gender;
 
-    @Column(name = "profile_image_url", length = 500, nullable = false)
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    @Column(name = "username", length = 300, nullable = false, unique = true)
     private String username;
 
-    @Column(name = "email", length = 300, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", length = 300, nullable = false)
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id", nullable = false)
+    @JoinColumn(name = "country_id")
     private CountryJPA country;
 
     @ManyToMany
     @JoinTable(name = "user_media",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"))
-    private List<MediaJPA> library;
+    private List<MediaJPA> library=new ArrayList<>();
 
     public UserJPA() {
+    }
+
+    public UserJPA(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public UserJPA(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryJPA country, List<MediaJPA> library) {
@@ -89,8 +86,7 @@ public abstract class UserJPA implements Serializable{
         this.password = password;
         this.country = country;
         this.library = library;
-    } 
-    
+    }
 
     public Long getId() {
         return id;
@@ -174,8 +170,9 @@ public abstract class UserJPA implements Serializable{
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.id);
+        int hash = 7;
+        hash = 13 * hash + Objects.hashCode(this.username);
+        hash = 13 * hash + Objects.hashCode(this.password);
         return hash;
     }
 
@@ -191,14 +188,15 @@ public abstract class UserJPA implements Serializable{
             return false;
         }
         final UserJPA other = (UserJPA) obj;
-        return Objects.equals(this.id, other.id);
+        if (!Objects.equals(this.username, other.username)) {
+            return false;
+        }
+        return Objects.equals(this.password, other.password);
     }
 
     @Override
     public String toString() {
-        return "User{" + "firstName=" + firstName + ", lastName=" + lastName + '}';
+        return firstName + " " + lastName;
     }
-    
-    
 
 }

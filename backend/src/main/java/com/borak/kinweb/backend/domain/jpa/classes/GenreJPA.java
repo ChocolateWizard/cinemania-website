@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -25,22 +26,19 @@ import java.util.List;
  */
 @Entity(name = "Genre")
 @Table(name = "genre")
-@Access(AccessType.FIELD)
 public class GenreJPA implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 300, unique = true)
     private String name;
 
     @ManyToMany
     @JoinTable(name = "media_genres",
             joinColumns = @JoinColumn(name = "genre_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"))
-    private List<MediaJPA> medias;
+    private List<MediaJPA> medias = new ArrayList<>();
 
     public GenreJPA() {
     }
@@ -49,15 +47,13 @@ public class GenreJPA implements Serializable {
         this.id = id;
         this.name = name;
     }
-    
-    
 
     public GenreJPA(Long id, String name, List<MediaJPA> medias) {
         this.id = id;
         this.name = name;
         this.medias = medias;
-    }  
-    
+    }
+
     public Long getId() {
         return id;
     }
@@ -82,7 +78,31 @@ public class GenreJPA implements Serializable {
         this.medias = medias;
     }
 
-    
-    
-    
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 13 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GenreJPA other = (GenreJPA) obj;
+        return Objects.equals(this.name, other.name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

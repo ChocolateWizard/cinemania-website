@@ -14,47 +14,39 @@ import java.io.Serializable;
  *
  * @author Mr. Poyo
  */
-public class CritiqueDTO implements Serializable {
+public class CritiquePOJO implements Serializable {
 
-    private UserCriticJPA critic;
+    private UserCriticPOJO critic;
 
-    private MediaJPA media;
+    private MediaPOJO media;
 
     private String description;
 
     private Integer rating;
 
-    public CritiqueDTO() {
+    public CritiquePOJO() {
     }
 
-    public CritiqueDTO(UserCriticJPA critic, MediaJPA media, String description, Integer rating) {
+    public CritiquePOJO(UserCriticPOJO critic, MediaPOJO media, String description, Integer rating) {
         this.critic = critic;
         this.media = media;
         this.description = description;
         this.rating = rating;
     }
 
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
-
-    public UserCriticJPA getCritic() {
+    public UserCriticPOJO getCritic() {
         return critic;
     }
 
-    public void setCritic(UserCriticJPA critic) {
+    public void setCritic(UserCriticPOJO critic) {
         this.critic = critic;
     }
 
-    public MediaJPA getMedia() {
+    public MediaPOJO getMedia() {
         return media;
     }
 
-    public void setMedia(MediaJPA media) {
+    public void setMedia(MediaPOJO media) {
         this.media = media;
     }
 
@@ -65,6 +57,18 @@ public class CritiqueDTO implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    
+    
+    
     
     
 

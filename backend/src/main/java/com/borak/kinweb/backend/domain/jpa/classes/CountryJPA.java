@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -20,21 +21,17 @@ import java.io.Serializable;
  */
 @Entity(name = "Country")
 @Table(name = "country")
-@Access(AccessType.FIELD)
-public class CountryJPA implements Serializable{
+public class CountryJPA implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
     private String name;
 
     @Column(name = "official_state_name")
     private String officialStateName;
 
-    @Column(name = "code")
     private String code;
 
     public CountryJPA() {
@@ -44,8 +41,7 @@ public class CountryJPA implements Serializable{
         this.name = name;
         this.officialStateName = officialStateName;
         this.code = code;
-    }   
-    
+    }
 
     public CountryJPA(Long id, String name, String officialStateName, String code) {
         this.id = id;
@@ -87,11 +83,30 @@ public class CountryJPA implements Serializable{
     }
 
     @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.code);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CountryJPA other = (CountryJPA) obj;
+        return Objects.equals(this.code, other.code);
+    }
+    
+    @Override
     public String toString() {
         return name + " (" + code + ')';
     }
-
-    
-    
 
 }

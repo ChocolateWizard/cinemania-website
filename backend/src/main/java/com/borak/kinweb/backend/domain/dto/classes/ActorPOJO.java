@@ -4,16 +4,24 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import java.util.List;
-
 /**
  *
- * @author Mr Poyo
+ * @author Mr. Poyo
  */
-public class ActingRoleDTO {
+public class ActorPOJO extends PersonPOJO{
+    
+    private boolean isStar=false;
+    
+    
 
-    MediaDTO media;
-    PersonDTO actor;
-    List<String> roles;
+    public boolean isIsStar() {
+        return isStar;
+    }
 
+    public void setIsStar(boolean isStar) {
+        this.isStar = isStar;
+    }
+    
+    
+    
 }

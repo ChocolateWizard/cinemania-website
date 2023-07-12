@@ -5,13 +5,14 @@
 package com.borak.kinweb.backend.domain.jpa.classes;
 
 
+import com.borak.kinweb.backend.domain.enums.Gender;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -23,8 +24,21 @@ import java.util.Set;
 public class UserCriticJPA extends UserJPA{
     
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CritiqueJPA> critiques;
+    private List<CritiqueJPA> critiques=new ArrayList<>();
 
+    public UserCriticJPA() {
+       
+    }
+
+    public UserCriticJPA(List<CritiqueJPA> critiques, String username, String password) {
+        super(username, password);
+        this.critiques = critiques;
+    }
+
+    public UserCriticJPA(List<CritiqueJPA> critiques, Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryJPA country, List<MediaJPA> library) {
+        super(id, firstName, lastName, gender, profileImageUrl, username, email, password, country, library);
+        this.critiques = critiques;
+    } 
       
 
     public List<CritiqueJPA> getCritiques() {

@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.domain.dto.classes;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,7 +14,7 @@ import java.util.Objects;
  *
  * @author Mr Poyo
  */
-public abstract class UserDTO implements Serializable {
+public class UserPOJO implements Serializable {
 
     private Long id;
 
@@ -31,14 +32,30 @@ public abstract class UserDTO implements Serializable {
 
     private String password;
 
-    private CountryDTO country;
+    private CountryPOJO country;
 
-    private List<MediaDTO> library;
+    private List<MediaPOJO> library=new ArrayList<>();
 
-    public UserDTO() {
+    public UserPOJO() {
     }
 
-    public UserDTO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryDTO country, List<MediaDTO> library) {
+    public UserPOJO(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public UserPOJO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profileImageUrl = profileImageUrl;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
+    public UserPOJO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryPOJO country, List<MediaPOJO> library) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -50,6 +67,8 @@ public abstract class UserDTO implements Serializable {
         this.country = country;
         this.library = library;
     }
+
+    
 
     public Long getId() {
         return id;
@@ -115,26 +134,27 @@ public abstract class UserDTO implements Serializable {
         this.password = password;
     }
 
-    public CountryDTO getCountry() {
+    public CountryPOJO getCountry() {
         return country;
     }
 
-    public void setCountry(CountryDTO country) {
+    public void setCountry(CountryPOJO country) {
         this.country = country;
     }
 
-    public List<MediaDTO> getLibrary() {
+    public List<MediaPOJO> getLibrary() {
         return library;
     }
 
-    public void setLibrary(List<MediaDTO> library) {
+    public void setLibrary(List<MediaPOJO> library) {
         this.library = library;
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 79 * hash + Objects.hashCode(this.id);
+        hash = 53 * hash + Objects.hashCode(this.email);
+        hash = 53 * hash + Objects.hashCode(this.password);
         return hash;
     }
 
@@ -149,13 +169,18 @@ public abstract class UserDTO implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserDTO other = (UserDTO) obj;
-        return Objects.equals(this.id, other.id);
+        final UserPOJO other = (UserPOJO) obj;
+        if (!Objects.equals(this.email, other.email)) {
+            return false;
+        }
+        return Objects.equals(this.password, other.password);
     }
+
+    
 
     @Override
     public String toString() {
-        return "User{" + "firstName=" + firstName + ", lastName=" + lastName + '}';
+        return firstName + " " + lastName;
     }
 
 }

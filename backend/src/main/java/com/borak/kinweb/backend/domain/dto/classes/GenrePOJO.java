@@ -12,24 +12,24 @@ import java.util.List;
  *
  * @author Mr Poyo
  */
-public class GenreDTO implements Serializable {
+public class GenrePOJO implements Serializable {
 
     private Long id;
 
     private String name;
 
-    private List<MediaDTO> medias;
+    private List<MediaPOJO> medias;
 
-    public GenreDTO() {
+    public GenrePOJO() {
     }
 
-    public GenreDTO(Long id, String name, List<MediaDTO> medias) {
+    public GenrePOJO(Long id, String name, List<MediaPOJO> medias) {
         this.id = id;
         this.name = name;
         this.medias = medias;
     }
 
-    public GenreDTO(Long id, String name) {
+    public GenrePOJO(Long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -50,11 +50,11 @@ public class GenreDTO implements Serializable {
         this.name = name;
     }
 
-    public List<MediaDTO> getMedias() {
+    public List<MediaPOJO> getMedias() {
         return medias;
     }
 
-    public void setMedias(List<MediaDTO> medias) {
+    public void setMedias(List<MediaPOJO> medias) {
         this.medias = medias;
     }
     

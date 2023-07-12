@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class KinomaniaWebsiteBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KinomaniaWebsiteBackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(KinomaniaWebsiteBackendApplication.class, args);
+    }
 
 }

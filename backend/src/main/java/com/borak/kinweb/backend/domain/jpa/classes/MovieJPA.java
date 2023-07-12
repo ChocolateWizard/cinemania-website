@@ -10,8 +10,6 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
-
 
 /**
  *
@@ -20,13 +18,27 @@ import java.util.Set;
 @Entity(name = "Movie")
 @Table(name = "movie")
 @PrimaryKeyJoinColumn(name = "media_id")
-public class MovieJPA extends MediaJPA{
+public class MovieJPA extends MediaJPA {
 
-    
-    @Column(name = "length",nullable = false)
     private Integer length;
 
+    public MovieJPA() {
+    }
 
+    public MovieJPA(Integer length, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating) {
+        super(title, coverImageUrl, description, releaseDate, rating);
+        this.length = length;
+    }
+
+    public MovieJPA(Integer length, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
+        super(title, coverImageUrl, description, releaseDate, rating, genres);
+        this.length = length;
+    }
+
+    public MovieJPA(Integer length, Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
+        super(id, title, coverImageUrl, description, releaseDate, rating, genres);
+        this.length = length;
+    }
 
     public Integer getLength() {
         return length;
@@ -35,8 +47,5 @@ public class MovieJPA extends MediaJPA{
     public void setLength(Integer length) {
         this.length = length;
     }
-
-    
-  
 
 }

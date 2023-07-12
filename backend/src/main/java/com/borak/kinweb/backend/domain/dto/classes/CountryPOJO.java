@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author Mr Poyo
  */
 
-public class CountryDTO implements Serializable{
+public class CountryPOJO implements Serializable{
 
     
     private Long id;
@@ -25,17 +25,17 @@ public class CountryDTO implements Serializable{
     
     private String code;
 
-    public CountryDTO() {
+    public CountryPOJO() {
     }
 
-    public CountryDTO(String name, String officialStateName, String code) {
+    public CountryPOJO(String name, String officialStateName, String code) {
         this.name = name;
         this.officialStateName = officialStateName;
         this.code = code;
     }   
     
 
-    public CountryDTO(Long id, String name, String officialStateName, String code) {
+    public CountryPOJO(Long id, String name, String officialStateName, String code) {
         this.id = id;
         this.name = name;
         this.officialStateName = officialStateName;
