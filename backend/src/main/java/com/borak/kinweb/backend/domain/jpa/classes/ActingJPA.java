@@ -24,7 +24,7 @@ import java.util.List;
 @Entity(name = "Acting")
 @Table(name = "acting")
 @Access(AccessType.FIELD)
-public class ActingJPA {
+public class ActingJPA implements JPA{
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)

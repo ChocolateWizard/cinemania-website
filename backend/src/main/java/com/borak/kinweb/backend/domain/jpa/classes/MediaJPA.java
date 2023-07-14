@@ -31,7 +31,7 @@ import java.util.List;
 @Entity(name = "Media")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "media")
-public class MediaJPA implements Serializable{
+public class MediaJPA implements Serializable,JPA{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

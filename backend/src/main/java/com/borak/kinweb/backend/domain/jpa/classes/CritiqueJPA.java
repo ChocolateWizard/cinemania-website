@@ -21,7 +21,7 @@ import java.io.Serializable;
  */
 @Entity(name = "Critique")
 @Table(name = "critique")
-public class CritiqueJPA implements Serializable {
+public class CritiqueJPA implements Serializable,JPA {
 
     @Id   
     @ManyToOne(fetch = FetchType.LAZY)

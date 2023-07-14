@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 @Entity(name = "Person")
 @Table(name = "person")
-public class PersonJPA implements Serializable {
+public class PersonJPA implements Serializable,JPA {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
