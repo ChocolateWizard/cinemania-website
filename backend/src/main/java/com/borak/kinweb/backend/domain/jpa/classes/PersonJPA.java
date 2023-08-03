@@ -14,8 +14,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -23,12 +24,14 @@ import java.util.Objects;
  * @author Mr Poyo
  */
 @Entity(name = "Person")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "person")
-public class PersonJPA implements Serializable,JPA {
+@Access(AccessType.FIELD)
+public abstract class PersonJPA implements JPA {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -41,7 +44,7 @@ public class PersonJPA implements Serializable,JPA {
     private Gender gender;
 
     @Column(name = "profile_photo_url")
-    private String profilePhotoURL;
+    private String profilePhotoURL; 
 
     public PersonJPA() {
     }
@@ -101,27 +104,27 @@ public class PersonJPA implements Serializable,JPA {
         this.profilePhotoURL = profilePhotoURL;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 11 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final PersonJPA other = (PersonJPA) obj;
-        return Objects.equals(this.id, other.id);
-    }
+//    @Override
+//    public int hashCode() {
+//        int hash = 7;
+//        hash = 79 * hash + Objects.hashCode(this.id);
+//        return hash;
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//        if (obj == null) {
+//            return false;
+//        }
+//        if (getClass() != obj.getClass()) {
+//            return false;
+//        }
+//        final PersonJPA other = (PersonJPA) obj;
+//        return Objects.equals(this.id, other.id);
+//    }
 
     @Override
     public String toString() {

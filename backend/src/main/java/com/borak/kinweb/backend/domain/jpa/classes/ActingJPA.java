@@ -36,7 +36,41 @@ public class ActingJPA implements JPA{
     @JoinColumn(name = "actor_id")
     private ActorJPA actor;
 
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<ActingRoleJPA> roles = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy = "acting")
+    private List<ActingRoleJPA> roles = new ArrayList<>();
+
+    public ActingJPA() {
+    }
+
+    public ActingJPA(MediaJPA media, ActorJPA actor) {
+        this.media = media;
+        this.actor = actor;
+    }
+
+    public MediaJPA getMedia() {
+        return media;
+    }
+
+    public void setMedia(MediaJPA media) {
+        this.media = media;
+    }
+
+    public ActorJPA getActor() {
+        return actor;
+    }
+
+    public void setActor(ActorJPA actor) {
+        this.actor = actor;
+    }
+
+    public List<ActingRoleJPA> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<ActingRoleJPA> roles) {
+        this.roles = roles;
+    }
+    
+    
 
 }

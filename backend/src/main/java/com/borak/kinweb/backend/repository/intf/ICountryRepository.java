@@ -4,19 +4,18 @@
  */
 package com.borak.kinweb.backend.repository.intf;
 
-import com.borak.kinweb.backend.exceptions.ResponseException;
 import java.util.List;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
+
+
+
+
 
 /**
  *
  * @author Mr. Poyo
  */
-@Repository
-public interface ICountryRepository<E,PK>{
-
-  
-    public List<E> getAll() throws ResponseException;
+public interface ICountryRepository<T,ID> extends IRepository<T, ID>{
 
 
 }

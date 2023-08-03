@@ -4,13 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
-
-import com.borak.kinweb.backend.domain.pojo.classes.*;
-import com.borak.kinweb.backend.domain.jpa.classes.MediaJPA;
-import com.borak.kinweb.backend.domain.jpa.classes.UserCriticJPA;
-import java.io.Serializable;
-
 /**
  *
  * @author Mr. Poyo

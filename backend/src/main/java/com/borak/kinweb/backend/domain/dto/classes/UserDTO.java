@@ -4,9 +4,7 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
 import com.borak.kinweb.backend.domain.enums.Gender;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +54,7 @@ public class UserDTO implements DTO {
         this.password = password;
     }
 
-    public UserDTO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryDTO country, List<MediaDTO> library) {
+    public UserDTO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryDTO country) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -66,7 +64,6 @@ public class UserDTO implements DTO {
         this.email = email;
         this.password = password;
         this.country = country;
-        this.library = library;
     }
 
     

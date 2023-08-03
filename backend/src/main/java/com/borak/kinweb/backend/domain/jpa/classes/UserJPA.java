@@ -32,7 +32,7 @@ import java.util.Objects;
 @Entity(name = "User")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "user")
-public class UserJPA implements Serializable,JPA {
+public class UserJPA implements JPA {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

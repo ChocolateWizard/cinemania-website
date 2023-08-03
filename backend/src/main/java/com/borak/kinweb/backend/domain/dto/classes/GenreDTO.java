@@ -3,9 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.borak.kinweb.backend.domain.dto.classes;
-
-import com.borak.kinweb.backend.domain.pojo.classes.*;
-import java.io.Serializable;
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -19,9 +17,14 @@ public class GenreDTO implements DTO {
 
     private String name;
 
-    private List<MediaDTO> medias;
+    private List<MediaDTO> medias=new ArrayList<>();
 
     public GenreDTO() {
+    }
+    
+    public GenreDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public GenreDTO(Long id, String name, List<MediaDTO> medias) {
@@ -30,10 +33,7 @@ public class GenreDTO implements DTO {
         this.medias = medias;
     }
 
-    public GenreDTO(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    
 
     public Long getId() {
         return id;

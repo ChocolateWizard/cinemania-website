@@ -4,8 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-
-import com.borak.kinweb.backend.domain.pojo.classes.*;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,19 +12,16 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
+public class UserCriticDTO extends UserDTO {
 
-public class UserCriticDTO extends UserDTO{
-    
-  
-    private List<CritiqueDTO> critiques=new ArrayList<>();
+    private List<CritiqueDTO> critiques = new ArrayList<>();
 
     public UserCriticDTO() {
-       
+
     }
 
-    public UserCriticDTO(List<CritiqueDTO> critiques, Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryDTO country, List<MediaDTO> library) {
-        super(id, firstName, lastName, gender, profileImageUrl, username, email, password, country, library);
-        this.critiques = critiques;
+    public UserCriticDTO(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryDTO country) {
+        super(id, firstName, lastName, gender, profileImageUrl, username, email, password, country);
     }
 
     public List<CritiqueDTO> getCritiques() {
@@ -36,7 +31,5 @@ public class UserCriticDTO extends UserDTO{
     public void setCritiques(List<CritiqueDTO> critiques) {
         this.critiques = critiques;
     }
-    
-    
-    
+
 }

@@ -21,10 +21,10 @@ import java.util.Objects;
  */
 @Entity(name = "Country")
 @Table(name = "country")
-public class CountryJPA implements Serializable,JPA {
+public class CountryJPA implements JPA {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String name;

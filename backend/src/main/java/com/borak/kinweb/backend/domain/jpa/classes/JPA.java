@@ -4,10 +4,12 @@
  */
 package com.borak.kinweb.backend.domain.jpa.classes;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Mr. Poyo
  */
-public interface JPA {
+public interface JPA extends Serializable{
     
 }

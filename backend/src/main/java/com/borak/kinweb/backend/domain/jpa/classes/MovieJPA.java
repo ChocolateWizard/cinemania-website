@@ -25,18 +25,8 @@ public class MovieJPA extends MediaJPA {
     public MovieJPA() {
     }
 
-    public MovieJPA(Integer length, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating) {
-        super(title, coverImageUrl, description, releaseDate, rating);
-        this.length = length;
-    }
-
-    public MovieJPA(Integer length, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
-        super(title, coverImageUrl, description, releaseDate, rating, genres);
-        this.length = length;
-    }
-
-    public MovieJPA(Integer length, Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
-        super(id, title, coverImageUrl, description, releaseDate, rating, genres);
+    public MovieJPA(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating, Integer length) {
+        super(id, title, coverImageUrl, description, releaseDate, audienceRating, criticRating);
         this.length = length;
     }
 

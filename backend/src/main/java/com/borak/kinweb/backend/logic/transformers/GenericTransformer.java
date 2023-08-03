@@ -6,25 +6,21 @@ package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.domain.dto.classes.DTO;
 import com.borak.kinweb.backend.domain.jpa.classes.JPA;
-import com.borak.kinweb.backend.domain.pojo.classes.POJO;
 import java.util.List;
+import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 
 /**
  *
  * @author Mr. Poyo
- * @param <D>
- * @param <P>
- * @param <J>
  */
-public interface GenericTransformer<D extends DTO, P extends POJO, J extends JPA> {
+public interface GenericTransformer<D extends DTO, JD extends JDBC, JP extends JPA> {
 
-    public D pojoToDto(P pojo);
+    public D jdbcToDto(JD jdbc);
 
-    public D jpaToDto(J jpa);
+    public D jpaToDto(JP jpa);
 
-    public List<D> pojoToDto(List<P> pojoList);
+    public List<D> jdbcToDto(List<JD> jdbcList);
 
-    public List<D> jpaToDto(List<J> jpaList);
-    
-   
+    public List<D> jpaToDto(List<JP> jpaList);
+
 }

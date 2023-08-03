@@ -4,7 +4,7 @@
  */
 package com.borak.kinweb.backend.domain.jpa.classes;
 
-import com.borak.kinweb.backend.domain.enums.Gender;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -18,6 +18,8 @@ import jakarta.persistence.Table;
 @Table(name = "actor")
 @PrimaryKeyJoinColumn(name = "person_id")
 public class ActorJPA extends PersonJPA{
+    
+   
     
     @Column(name = "is_star")
     private boolean isStar=false;

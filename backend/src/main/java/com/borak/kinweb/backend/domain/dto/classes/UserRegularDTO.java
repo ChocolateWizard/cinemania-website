@@ -4,8 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
-
 
 
 /**

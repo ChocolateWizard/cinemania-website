@@ -4,17 +4,24 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
+import com.borak.kinweb.backend.domain.enums.Gender;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class ActorDTO extends PersonDTO{
-    
-    private boolean isStar=false;
-    
-    
+public class ActorDTO extends PersonDTO {
+
+    private boolean isStar;
+
+    public ActorDTO() {
+        this.isStar = false;
+    }
+
+    public ActorDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL, boolean isStar) {
+        super(id, firstName, lastName, gender, profilePhotoURL);
+        this.isStar = isStar;
+    }
 
     public boolean isIsStar() {
         return isStar;
@@ -23,7 +30,7 @@ public class ActorDTO extends PersonDTO{
     public void setIsStar(boolean isStar) {
         this.isStar = isStar;
     }
+
     
-    
-    
+
 }

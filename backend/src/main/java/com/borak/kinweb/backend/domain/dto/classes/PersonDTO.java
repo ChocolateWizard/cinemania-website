@@ -6,7 +6,6 @@ package com.borak.kinweb.backend.domain.dto.classes;
 
 
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
 import com.borak.kinweb.backend.domain.enums.Gender;
 
 
@@ -14,7 +13,7 @@ import com.borak.kinweb.backend.domain.enums.Gender;
  *
  * @author Mr Poyo
  */
-public class PersonDTO implements DTO{
+public abstract class PersonDTO implements DTO{
 
     private Long id;
 

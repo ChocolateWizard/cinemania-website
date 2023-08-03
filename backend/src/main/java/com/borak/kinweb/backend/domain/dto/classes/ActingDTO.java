@@ -4,7 +4,7 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +15,7 @@ public class ActingDTO implements DTO{
     
     private MediaDTO media;
     private ActorDTO actor;
-    private List<ActingRoleDTO> roles;
+    private List<ActingRoleDTO> roles=new ArrayList<>();
 
     public MediaDTO getMedia() {
         return media;

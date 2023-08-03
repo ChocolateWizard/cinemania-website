@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
 import java.util.List;
 
 /**
@@ -14,22 +13,21 @@ import java.util.List;
 public class ActingRoleDTO implements DTO{
 
     private ActingDTO acting;
-    private List<String> roles;
+    private Long id;
+    private String name;
 
     public ActingRoleDTO() {
     }
 
-    public ActingRoleDTO(ActingDTO acting, List<String> roles) {
+    public ActingRoleDTO(ActingDTO acting, String name) {
         this.acting = acting;
-        this.roles = roles;
+        this.name = name;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public ActingRoleDTO(ActingDTO acting, Long id, String name) {
+        this.acting = acting;
+        this.id = id;
+        this.name = name;
     }
 
     public ActingDTO getActing() {
@@ -39,6 +37,35 @@ public class ActingRoleDTO implements DTO{
     public void setActing(ActingDTO acting) {
         this.acting = acting;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "ActingRoleDTO{" + "id=" + id + ", name=" + name + '}';
+    }
+
+    
+   
+    
+
+   
+
+   
     
     
 

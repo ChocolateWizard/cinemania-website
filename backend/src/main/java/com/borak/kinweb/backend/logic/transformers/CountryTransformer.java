@@ -5,26 +5,41 @@
 package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.domain.dto.classes.CountryDTO;
-import com.borak.kinweb.backend.domain.pojo.classes.CountryPOJO;
+import com.borak.kinweb.backend.domain.jpa.classes.CountryJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.JPA;
+import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
+import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 
 /**
  *
  * @author Mr. Poyo
  */
 @Component
-public class CountryTransformer {
+public class CountryTransformer implements GenericTransformer<CountryDTO, CountryJDBC, CountryJPA> {
 
-    public CountryDTO pojoToDto(CountryPOJO pojo) {
-        return new CountryDTO(pojo.getId(), pojo.getName(), pojo.getOfficialStateName(), pojo.getCode());
+    @Override
+    public CountryDTO jdbcToDto(CountryJDBC jdbc) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    public List<CountryDTO> pojoToDto(List<CountryPOJO> pojoList) {
-        return pojoList.stream().map((pojo) -> {
-            return new CountryDTO(pojo.getId(), pojo.getName(), pojo.getOfficialStateName(), pojo.getCode());
-        }).collect(Collectors.toList());
+    @Override
+    public CountryDTO jpaToDto(CountryJPA jpa) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
+    @Override
+    public List<CountryDTO> jdbcToDto(List<CountryJDBC> jdbcList) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<CountryDTO> jpaToDto(List<CountryJPA> jpaList) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    
 
 }

@@ -4,18 +4,16 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
-import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
  * @author Mr Poyo
  */
-public class MediaDTO implements DTO {
+public abstract class MediaDTO implements DTO {
 
     private Long id;
 
@@ -26,44 +24,33 @@ public class MediaDTO implements DTO {
     private String description;
 
     private LocalDate releaseDate;
+    private DateTimeFormatter releaseDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
-    private Integer rating;
+    private Integer audienceRating;
+    
+    private Integer criticRating;
 
     private List<GenreDTO> genres = new ArrayList<>();
 
     private List<CritiqueDTO> critiques = new ArrayList<>();
 
-    private MediaCastDTO cast;
-    private MediaCrewDTO crew;
+    private List<DirectorDTO> directors = new ArrayList<>();
+
+    private List<WriterDTO> writers = new ArrayList<>();
+
+    private List<ActingDTO> actings = new ArrayList<>();
 
     public MediaDTO() {
     }
 
-    public MediaDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, MediaCastDTO cast, MediaCrewDTO crew) {
+    public MediaDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
         this.description = description;
         this.releaseDate = releaseDate;
-        this.rating = rating;
-        this.cast = cast;
-        this.crew = crew;
-    }
-
-    public MediaCastDTO getCast() {
-        return cast;
-    }
-
-    public void setCast(MediaCastDTO cast) {
-        this.cast = cast;
-    }
-
-    public MediaCrewDTO getCrew() {
-        return crew;
-    }
-
-    public void setCrew(MediaCrewDTO crew) {
-        this.crew = crew;
+        this.audienceRating = audienceRating;
+        this.criticRating = criticRating;
     }
 
     public Long getId() {
@@ -105,13 +92,28 @@ public class MediaDTO implements DTO {
     public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
-
-    public Integer getRating() {
-        return rating;
+    
+    public String getReleaseDateAsString() {
+        if (releaseDate == null) {
+            return null;
+        }
+        return releaseDate.format(releaseDateFormatter);
     }
 
-    public void setRating(Integer rating) {
-        this.rating = rating;
+    public Integer getAudienceRating() {
+        return audienceRating;
+    }
+
+    public void setAudienceRating(Integer audienceRating) {
+        this.audienceRating = audienceRating;
+    }
+
+    public Integer getCriticRating() {
+        return criticRating;
+    }
+
+    public void setCriticRating(Integer criticRating) {
+        this.criticRating = criticRating;
     }
 
     public List<GenreDTO> getGenres() {
@@ -129,5 +131,35 @@ public class MediaDTO implements DTO {
     public void setCritiques(List<CritiqueDTO> critiques) {
         this.critiques = critiques;
     }
+
+    public List<DirectorDTO> getDirectors() {
+        return directors;
+    }
+
+    public void setDirectors(List<DirectorDTO> directors) {
+        this.directors = directors;
+    }
+
+    public List<WriterDTO> getWriters() {
+        return writers;
+    }
+
+    public void setWriters(List<WriterDTO> writers) {
+        this.writers = writers;
+    }
+
+    public List<ActingDTO> getActings() {
+        return actings;
+    }
+
+    public void setActings(List<ActingDTO> actings) {
+        this.actings = actings;
+    }
+
+   
+
+    
+    
+    
 
 }

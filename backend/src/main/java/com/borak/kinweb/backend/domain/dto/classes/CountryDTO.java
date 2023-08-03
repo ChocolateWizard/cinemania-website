@@ -51,13 +51,11 @@ public class CountryDTO implements DTO {
     public void setName(String name) {
         this.name = name;
     }
-
-    @JsonProperty(value = "official_state_name")
+  
     public String getOfficialStateName() {
         return officialStateName;
     }
-
-    @JsonProperty(value = "official_state_name")
+   
     public void setOfficialStateName(String officialStateName) {
         this.officialStateName = officialStateName;
     }

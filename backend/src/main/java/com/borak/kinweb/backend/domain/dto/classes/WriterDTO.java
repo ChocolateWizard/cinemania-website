@@ -4,12 +4,21 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.domain.pojo.classes.*;
+import com.borak.kinweb.backend.domain.enums.Gender;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class WriterDTO extends PersonDTO{
+public class WriterDTO extends PersonDTO {
+
+    public WriterDTO() {
+    }
+
+    public WriterDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
+        super(id, firstName, lastName, gender, profilePhotoURL);
+    }
+
+    
     
 }

@@ -23,31 +23,6 @@ public class TVShowJPA extends MediaJPA {
     @Column(name = "number_of_seasons")
     private Integer numberOfSeasons;
 
-    public TVShowJPA() {
-
-    }
-
-    public TVShowJPA(Integer numberOfSeasons, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating) {
-        super(title, coverImageUrl, description, releaseDate, rating);
-        this.numberOfSeasons = numberOfSeasons;
-    }
-
-    public TVShowJPA(Integer numberOfSeasons, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
-        super(title, coverImageUrl, description, releaseDate, rating, genres);
-        this.numberOfSeasons = numberOfSeasons;
-    }
-
-    public TVShowJPA(Integer numberOfSeasons, Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer rating, List<GenreJPA> genres) {
-        super(id, title, coverImageUrl, description, releaseDate, rating, genres);
-        this.numberOfSeasons = numberOfSeasons;
-    }
-
-    public Integer getNumberOfSeasons() {
-        return numberOfSeasons;
-    }
-
-    public void setNumberOfSeasons(Integer numberOfSeasons) {
-        this.numberOfSeasons = numberOfSeasons;
-    }
+   
 
 }
