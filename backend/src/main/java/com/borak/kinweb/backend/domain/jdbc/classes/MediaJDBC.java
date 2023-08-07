@@ -114,7 +114,11 @@ public abstract class MediaJDBC implements JDBC {
     }
 
     public void setGenres(List<GenreJDBC> genres) {
-        this.genres = genres;
+        if (genres == null) {
+            this.genres = new ArrayList<>();
+        } else {
+            this.genres = genres;
+        }
     }
 
     public List<CritiqueJDBC> getCritiques() {
@@ -122,7 +126,11 @@ public abstract class MediaJDBC implements JDBC {
     }
 
     public void setCritiques(List<CritiqueJDBC> critiques) {
-        this.critiques = critiques;
+        if (critiques == null) {
+            this.critiques = new ArrayList<>();
+        } else {
+            this.critiques = critiques;
+        }
     }
 
     public List<DirectorJDBC> getDirectors() {
@@ -130,7 +138,11 @@ public abstract class MediaJDBC implements JDBC {
     }
 
     public void setDirectors(List<DirectorJDBC> directors) {
-        this.directors = directors;
+        if (directors == null) {
+            this.directors = new ArrayList<>();
+        } else {
+            this.directors = directors;
+        }
     }
 
     public List<WriterJDBC> getWriters() {
@@ -138,7 +150,11 @@ public abstract class MediaJDBC implements JDBC {
     }
 
     public void setWriters(List<WriterJDBC> writers) {
-        this.writers = writers;
+        if (writers == null) {
+            this.writers = new ArrayList<>();
+        } else {
+            this.writers = writers;
+        }
     }
 
     public List<ActingJDBC> getActings() {
@@ -146,7 +162,11 @@ public abstract class MediaJDBC implements JDBC {
     }
 
     public void setActings(List<ActingJDBC> actings) {
-        this.actings = actings;
+        if (actings == null) {
+            this.actings = new ArrayList<>();
+        } else {
+            this.actings = actings;
+        }
     }
 
     @Override

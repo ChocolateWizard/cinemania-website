@@ -32,7 +32,12 @@ public class UserCriticJDBC extends UserJDBC{
     }
 
     public void setCritiques(List<CritiqueJDBC> critiques) {
-        this.critiques = critiques;
+        if(critiques==null){
+            this.critiques=new ArrayList<>();
+        }else{
+            this.critiques = critiques;
+        }
+        
     }
     
     

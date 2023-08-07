@@ -1,20 +1,20 @@
-
-
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
+import java.util.ArrayList;
 import java.util.List;
-
-
 
 /**
  *
  * @author Mr. Poyo
  */
-public class ActingJDBC implements JDBC{
-    
+public class ActingJDBC implements JDBC {
+
     private MediaJDBC media;
     private ActorJDBC actor;
-    private List<ActingRoleJDBC> roles;
+    private List<ActingRoleJDBC> roles = new ArrayList<>();
+
+    public ActingJDBC() {
+    }
 
     public MediaJDBC getMedia() {
         return media;
@@ -37,11 +37,11 @@ public class ActingJDBC implements JDBC{
     }
 
     public void setRoles(List<ActingRoleJDBC> roles) {
-        this.roles = roles;
+        if (roles == null) {
+            this.roles = new ArrayList<>();
+        } else {
+            this.roles = roles;
+        }
     }
-    
-    
-    
-    
-    
+
 }

@@ -144,7 +144,12 @@ public class UserJDBC implements Serializable {
     }
 
     public void setLibrary(List<MediaJDBC> library) {
-        this.library = library;
+        if(library==null){
+            this.library=new ArrayList<>();
+        }else{
+            this.library = library;
+        }
+        
     }
 
     @Override

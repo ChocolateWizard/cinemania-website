@@ -30,7 +30,7 @@ public interface IMovieService {
     //Returns: specific movie with given id
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles
-    public List<MovieDTO> getMovie(Long id);
+    public MovieDTO getMovie(Long id);
 
     //Returns: specific movie with given id
     //Included: Genres,Directors, Writers, Actors, Acting roles

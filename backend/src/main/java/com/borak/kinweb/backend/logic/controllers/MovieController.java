@@ -56,7 +56,7 @@ public class MovieController {
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles
     @GetMapping(path = "/{id}")
-    public List<MovieDTO> getMovie(@PathVariable Long id) {
+    public MovieDTO getMovie(@PathVariable Long id) {
         return movieService.getMovie(id);
     }
 

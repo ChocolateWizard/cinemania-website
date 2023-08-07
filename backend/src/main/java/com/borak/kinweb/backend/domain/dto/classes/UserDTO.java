@@ -33,7 +33,7 @@ public class UserDTO implements DTO {
 
     private CountryDTO country;
 
-    private List<MediaDTO> library=new ArrayList<>();
+    private List<MediaDTO> library = new ArrayList<>();
 
     public UserDTO() {
     }
@@ -65,8 +65,6 @@ public class UserDTO implements DTO {
         this.password = password;
         this.country = country;
     }
-
-    
 
     public Long getId() {
         return id;
@@ -145,7 +143,12 @@ public class UserDTO implements DTO {
     }
 
     public void setLibrary(List<MediaDTO> library) {
-        this.library = library;
+        if (library == null) {
+            this.library = new ArrayList<>();
+        } else {
+            this.library = library;
+        }
+
     }
 
     @Override
@@ -173,8 +176,6 @@ public class UserDTO implements DTO {
         }
         return Objects.equals(this.password, other.password);
     }
-
-    
 
     @Override
     public String toString() {

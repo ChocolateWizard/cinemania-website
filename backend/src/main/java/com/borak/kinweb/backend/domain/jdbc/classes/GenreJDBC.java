@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
+import java.sql.Types;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -18,21 +19,15 @@ public class GenreJDBC implements JDBC {
 
     private String name;
 
-    private List<MediaJDBC> medias=new ArrayList<>();
+    private List<MediaJDBC> medias = new ArrayList<>();
 
     public GenreJDBC() {
     }
-    
+
     public GenreJDBC(Long id, String name) {
         this.id = id;
         this.name = name;
     }
-
-    public GenreJDBC(Long id, String name, List<MediaJDBC> medias) {
-        this.id = id;
-        this.name = name;
-        this.medias = medias;
-    }  
 
     public Long getId() {
         return id;
@@ -55,9 +50,11 @@ public class GenreJDBC implements JDBC {
     }
 
     public void setMedias(List<MediaJDBC> medias) {
-        this.medias = medias;
+        if (medias == null) {
+            this.medias = new ArrayList<>();
+        } else {
+            this.medias = medias;
+        }
     }
-    
-    
 
 }

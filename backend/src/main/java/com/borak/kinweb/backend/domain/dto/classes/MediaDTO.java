@@ -27,7 +27,7 @@ public abstract class MediaDTO implements DTO {
     private DateTimeFormatter releaseDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
     private Integer audienceRating;
-    
+
     private Integer criticRating;
 
     private List<GenreDTO> genres = new ArrayList<>();
@@ -92,7 +92,7 @@ public abstract class MediaDTO implements DTO {
     public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
-    
+
     public String getReleaseDateAsString() {
         if (releaseDate == null) {
             return null;
@@ -121,7 +121,12 @@ public abstract class MediaDTO implements DTO {
     }
 
     public void setGenres(List<GenreDTO> genres) {
-        this.genres = genres;
+        if (genres == null) {
+            this.genres = new ArrayList<>();
+        } else {
+            this.genres = genres;
+        }
+
     }
 
     public List<CritiqueDTO> getCritiques() {
@@ -129,7 +134,11 @@ public abstract class MediaDTO implements DTO {
     }
 
     public void setCritiques(List<CritiqueDTO> critiques) {
-        this.critiques = critiques;
+        if (critiques == null) {
+            this.critiques = new ArrayList<>();
+        } else {
+            this.critiques = critiques;
+        }
     }
 
     public List<DirectorDTO> getDirectors() {
@@ -137,7 +146,11 @@ public abstract class MediaDTO implements DTO {
     }
 
     public void setDirectors(List<DirectorDTO> directors) {
-        this.directors = directors;
+        if (directors == null) {
+            this.directors = new ArrayList<>();
+        } else {
+            this.directors = directors;
+        }
     }
 
     public List<WriterDTO> getWriters() {
@@ -145,7 +158,11 @@ public abstract class MediaDTO implements DTO {
     }
 
     public void setWriters(List<WriterDTO> writers) {
-        this.writers = writers;
+        if (writers == null) {
+            this.writers = new ArrayList<>();
+        } else {
+            this.writers = writers;
+        }
     }
 
     public List<ActingDTO> getActings() {
@@ -153,13 +170,11 @@ public abstract class MediaDTO implements DTO {
     }
 
     public void setActings(List<ActingDTO> actings) {
-        this.actings = actings;
+        if (actings == null) {
+            this.actings = new ArrayList<>();
+        } else {
+            this.actings = actings;
+        }
     }
-
-   
-
-    
-    
-    
 
 }

@@ -11,9 +11,10 @@ import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
+import com.borak.kinweb.backend.repository.api.IMovieRepository;
 
-import com.borak.kinweb.backend.repository.intf.IMovieRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mr. Poyo
  */
 @Service
+@Transactional
 public class MovieService implements IMovieService {
 
     @Autowired
@@ -33,7 +35,7 @@ public class MovieService implements IMovieService {
 
 //=================================================================================================
     @Override
-    public List<MovieDTO> getAllMovies() {
+    public List<MovieDTO> getAllMovies() {      
         return transformer.jdbcToDto(movieRepo.findAll());
     }
 
@@ -43,8 +45,12 @@ public class MovieService implements IMovieService {
     }
 
     @Override
-    public List<MovieDTO> getMovie(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public MovieDTO getMovie(Long id) {
+        Optional<MovieJDBC> movie=movieRepo.findById(id);
+        if(movie.isPresent()){
+            return transformer.jdbcToDto(movie.get());
+        }
+        return null;
     }
 
     @Override

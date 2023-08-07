@@ -11,11 +11,16 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
-public class ActingDTO implements DTO{
-    
+public class ActingDTO implements DTO {
+
     private MediaDTO media;
     private ActorDTO actor;
-    private List<ActingRoleDTO> roles=new ArrayList<>();
+    private List<ActingRoleDTO> roles = new ArrayList<>();
+
+    public ActingDTO() {
+    }
+    
+    
 
     public MediaDTO getMedia() {
         return media;
@@ -38,11 +43,12 @@ public class ActingDTO implements DTO{
     }
 
     public void setRoles(List<ActingRoleDTO> roles) {
-        this.roles = roles;
+        if (roles == null) {
+            this.roles = new ArrayList<>();
+        } else {
+            this.roles = roles;
+        }
+
     }
-    
-    
-    
-    
-    
+
 }

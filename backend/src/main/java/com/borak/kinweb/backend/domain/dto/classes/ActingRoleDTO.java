@@ -53,19 +53,7 @@ public class ActingRoleDTO implements DTO{
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public String toString() {
-        return "ActingRoleDTO{" + "id=" + id + ", name=" + name + '}';
-    }
-
-    
-   
-    
-
-   
-
-   
+  
     
     
 

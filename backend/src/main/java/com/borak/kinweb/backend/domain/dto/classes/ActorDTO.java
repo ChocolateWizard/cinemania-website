@@ -12,10 +12,9 @@ import com.borak.kinweb.backend.domain.enums.Gender;
  */
 public class ActorDTO extends PersonDTO {
 
-    private boolean isStar;
+    private boolean isStar=false;
 
     public ActorDTO() {
-        this.isStar = false;
     }
 
     public ActorDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL, boolean isStar) {

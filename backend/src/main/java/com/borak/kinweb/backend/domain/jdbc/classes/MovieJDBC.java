@@ -10,7 +10,7 @@ import java.time.LocalDate;
  *
  * @author Mr Poyo
  */
-public class MovieJDBC extends MediaJDBC {
+public class MovieJDBC extends MediaJDBC{
 
     private Integer length;
 

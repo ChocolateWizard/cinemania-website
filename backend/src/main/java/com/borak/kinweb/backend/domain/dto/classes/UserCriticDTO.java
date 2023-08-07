@@ -29,7 +29,12 @@ public class UserCriticDTO extends UserDTO {
     }
 
     public void setCritiques(List<CritiqueDTO> critiques) {
-        this.critiques = critiques;
+        if (critiques == null) {
+            this.critiques = new ArrayList<>();
+        } else {
+            this.critiques = critiques;
+        }
+
     }
 
 }

@@ -25,15 +25,7 @@ public class GenreDTO implements DTO {
     public GenreDTO(Long id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public GenreDTO(Long id, String name, List<MediaDTO> medias) {
-        this.id = id;
-        this.name = name;
-        this.medias = medias;
-    }
-
-    
+    } 
 
     public Long getId() {
         return id;
@@ -56,7 +48,12 @@ public class GenreDTO implements DTO {
     }
 
     public void setMedias(List<MediaDTO> medias) {
-        this.medias = medias;
+        if(medias==null){
+            this.medias=new ArrayList<>();
+        }else{
+            this.medias = medias;
+        }
+        
     }
     
     
