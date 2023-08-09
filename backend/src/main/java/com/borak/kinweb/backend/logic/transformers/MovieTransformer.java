@@ -13,8 +13,20 @@ import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.domain.dto.classes.GenreDTO;
 import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.UserCriticDTO;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.kinweb.backend.domain.jpa.classes.ActingJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.ActingRoleJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.CritiqueJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.DirectorJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.GenreJPA;
 import com.borak.kinweb.backend.domain.jpa.classes.MovieJPA;
+import com.borak.kinweb.backend.domain.jpa.classes.WriterJPA;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @author Mr. Poyo
  */
 @Component
-public class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC, MovieJPA> {
+public final class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC, MovieJPA> {
 
     @Override
     public MovieDTO jdbcToDto(MovieJDBC jdbc) throws IllegalArgumentException {
@@ -41,44 +53,58 @@ public class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC,
         movie.setCriticRating(jdbc.getCriticRating());
         movie.setLength(jdbc.getLength());
 
-        jdbc.getGenres().forEach((genre) -> {
-            movie.getGenres().add(new GenreDTO(genre.getId(), genre.getName()));
-        });
-
-        jdbc.getCritiques().forEach((critique) -> {
-            CritiqueDTO c = new CritiqueDTO();
-            if (critique.getCritic() != null) {
-                UserCriticDTO critic = new UserCriticDTO();
-                critic.setUsername(critique.getCritic().getUsername());
-                critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
-                c.setCritic(critic);
+        for (GenreJDBC genre : jdbc.getGenres()) {
+            if (genre != null) {
+                movie.getGenres().add(new GenreDTO(genre.getId(), genre.getName()));
             }
-            c.setMedia(movie);
-            c.setDescription(critique.getDescription());
-            c.setRating(critique.getRating());
+        }
 
-            movie.getCritiques().add(c);
-        });
+        for (CritiqueJDBC critique : jdbc.getCritiques()) {
+            if (critique != null) {
+                CritiqueDTO c = new CritiqueDTO();
+                if (critique.getCritic() != null) {
+                    UserCriticDTO critic = new UserCriticDTO();
+                    critic.setUsername(critique.getCritic().getUsername());
+                    critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
+                    c.setCritic(critic);
+                }
+                c.setMedia(movie);
+                c.setDescription(critique.getDescription());
+                c.setRating(critique.getRating());
 
-        jdbc.getDirectors().forEach((director) -> {
-            movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
-        });
-
-        jdbc.getWriters().forEach((writer) -> {
-            movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
-        });
-
-        jdbc.getActings().forEach((acting) -> {
-            ActingDTO a = new ActingDTO();
-            a.setMedia(movie);
-            if (acting.getActor() != null) {
-                a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isIsStar()));
+                movie.getCritiques().add(c);
             }
-            acting.getRoles().forEach((role) -> {
-                a.getRoles().add(new ActingRoleDTO(a, role.getId(), role.getName()));
-            });
-            movie.getActings().add(a);
-        });
+        }
+
+        for (DirectorJDBC director : jdbc.getDirectors()) {
+            if (director != null) {
+                movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
+
+            }
+
+        }
+        for (WriterJDBC writer : jdbc.getWriters()) {
+            if (writer != null) {
+                movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
+
+            }
+        }
+
+        for (ActingJDBC acting : jdbc.getActings()) {
+            if (acting != null) {
+                ActingDTO a = new ActingDTO();
+                a.setMedia(movie);
+                if (acting.getActor() != null) {
+                    a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isIsStar()));
+                }
+                for (ActingRoleJDBC role : acting.getRoles()) {
+                    if (role != null) {
+                        a.getRoles().add(new ActingRoleDTO(a, role.getId(), role.getName()));
+                    }
+                }
+                movie.getActings().add(a);
+            }
+        }
         return movie;
     }
 
@@ -87,6 +113,7 @@ public class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC,
         if (jpa == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
+
         MovieDTO movie = new MovieDTO();
 
         movie.setId(jpa.getId());
@@ -98,45 +125,58 @@ public class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC,
         movie.setCriticRating(jpa.getCriticRating());
         movie.setLength(jpa.getLength());
 
-        jpa.getGenres().forEach((genre) -> {
-            movie.getGenres().add(new GenreDTO(genre.getId(), genre.getName()));
-        });
-
-        jpa.getCritiques().forEach((critique) -> {
-            CritiqueDTO c = new CritiqueDTO();
-            if (critique.getCritic() != null) {
-                UserCriticDTO critic = new UserCriticDTO();
-                critic.setUsername(critique.getCritic().getUsername());
-                critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
-                c.setCritic(critic);
+        for (GenreJPA genre : jpa.getGenres()) {
+            if (genre != null) {
+                movie.getGenres().add(new GenreDTO(genre.getId(), genre.getName()));
             }
-            c.setMedia(movie);
-            c.setDescription(critique.getDescription());
-            c.setRating(critique.getRating());
+        }
 
-            movie.getCritiques().add(c);
-        });
+        for (CritiqueJPA critique : jpa.getCritiques()) {
+            if (critique != null) {
+                CritiqueDTO c = new CritiqueDTO();
+                if (critique.getCritic() != null) {
+                    UserCriticDTO critic = new UserCriticDTO();
+                    critic.setUsername(critique.getCritic().getUsername());
+                    critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
+                    c.setCritic(critic);
+                }
+                c.setMedia(movie);
+                c.setDescription(critique.getDescription());
+                c.setRating(critique.getRating());
 
-        jpa.getDirectors().forEach((director) -> {
-            movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
-        });
-
-        jpa.getWriters().forEach((writer) -> {
-            movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
-        });
-
-        jpa.getActings().forEach((acting) -> {
-            ActingDTO a = new ActingDTO();
-            a.setMedia(movie);
-            if (acting.getActor() != null) {
-                a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isIsStar()));
+                movie.getCritiques().add(c);
             }
-            acting.getRoles().forEach((role) -> {
-                a.getRoles().add(new ActingRoleDTO(a, role.getId(), role.getName()));
-            });
-            movie.getActings().add(a);
-        });
+        }
+
+        for (DirectorJPA director : jpa.getDirectors()) {
+            if (director != null) {
+                movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
+
+            }
+
+        }
+        for (WriterJPA writer : jpa.getWriters()) {
+            if (writer != null) {
+                movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
+
+            }
+        }
+
+        for (ActingJPA acting : jpa.getActings()) {
+            if (acting != null) {
+                ActingDTO a = new ActingDTO();
+                a.setMedia(movie);
+                if (acting.getActor() != null) {
+                    a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isIsStar()));
+                }
+                for (ActingRoleJPA role : acting.getRoles()) {
+                    if (role != null) {
+                        a.getRoles().add(new ActingRoleDTO(a, role.getId(), role.getName()));
+                    }
+                }
+                movie.getActings().add(a);
+            }
+        }
         return movie;
-
     }
 }

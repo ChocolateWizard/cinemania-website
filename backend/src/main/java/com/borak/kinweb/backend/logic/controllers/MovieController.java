@@ -31,21 +31,19 @@ public class MovieController {
 
     public MovieController(IMovieService movieService) {
         this.movieService = movieService;
-    }
-    
-    
+    }   
 
     //=========================GET MAPPINGS==================================
     //Returns: all movies
     //Included: Genres
-    //Excluded: Directors, Writers, Actors, Acting roles
+    //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping
     public List<MovieDTO> getAllMovies() {
-        return movieService.getAllMovies();
+        return movieService.getAllMoviesWithGenres();
     }
 
     //Returns: all movies
-    //Included: Genres,Directors, Writers, Actors, Acting roles
+    //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/details")
     public List<MovieDTO> getAllMoviesWithDetails() {
@@ -54,17 +52,17 @@ public class MovieController {
 
     //Returns: specific movie with given id
     //Included: Genres
-    //Excluded: Directors, Writers, Actors, Acting roles
+    //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping(path = "/{id}")
     public MovieDTO getMovie(@PathVariable Long id) {
-        return movieService.getMovie(id);
+        return movieService.getMovieWithGenres(id);
     }
 
     //Returns: specific movie with given id
-    //Included: Genres,Directors, Writers, Actors, Acting roles
+    //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/{id}/details")
-    public List<MovieDTO> getMovieWithDetails(@PathVariable Long id) {
+    public MovieDTO getMovieWithDetails(@PathVariable Long id) {
         return movieService.getMovieWithDetails(id);
     }
 

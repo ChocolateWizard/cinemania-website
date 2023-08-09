@@ -16,6 +16,18 @@ public class ActingJDBC implements JDBC {
     public ActingJDBC() {
     }
 
+    public ActingJDBC(ActorJDBC actor) {
+        this.actor = actor;
+    }
+
+    public ActingJDBC(MediaJDBC media, ActorJDBC actor) {
+        this.media = media;
+        this.actor = actor;
+    }
+    
+    
+    
+
     public MediaJDBC getMedia() {
         return media;
     }

@@ -4,6 +4,11 @@
  */
 package com.borak.kinweb.backend.repository.api;
 
+import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.DataAccessException;
@@ -12,8 +17,10 @@ import org.springframework.dao.DataAccessException;
  * Movie repository meant to store Movie objects into database
  *
  * @author Mr. Poyo
+ * @param <M> must represent movie in database
+ * @param <ID> must represent movie ID in database
  */
-public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
+public interface IMovieRepository<M, ID> extends IRepository<M, ID> {
 
     /**
      * Insert or update a given movie entity with its relationships. Critiques
@@ -37,7 +44,7 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * {@literal null} or not valid.
      * @throws DataAccessException if there is any problem
      */
-    T save(T movie) throws DataAccessException, IllegalArgumentException;
+    M save(M movie) throws DataAccessException, IllegalArgumentException;
 
     /**
      * Insert or update all given movie entities with their relationships.
@@ -63,7 +70,7 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * or one of its entities is {@literal null} or not valid.
      * @throws DataAccessException if there is any problem.
      */
-    List<T> saveAll(List<T> movies) throws DataAccessException, IllegalArgumentException;
+    List<M> saveAll(List<M> movies) throws DataAccessException, IllegalArgumentException;
 
     /**
      * Retrieves a movie entity by its id, with all of its relationships. Critic
@@ -75,7 +82,7 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * @throws IllegalArgumentException if {@literal id} is {@literal null}.
      * @throws DataAccessException if there is any problem.
      */
-    Optional<T> findById(ID id) throws DataAccessException, IllegalArgumentException;
+    Optional<M> findById(ID id) throws DataAccessException, IllegalArgumentException;
 
     /**
      * Returns whether a movie entity with the given id exists.
@@ -84,15 +91,18 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * @return {@literal true} if an entity with the given id exists,
      * {@literal false} otherwise.
      * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
      */
-    boolean existsById(ID id);
+    boolean existsById(ID id) throws DataAccessException, IllegalArgumentException;
 
     /**
      * Returns all instances of the movie type with all of its relationships.
+     * Critic entities in Critiques will only have username set.
      *
      * @return all entities
+     * @throws DataAccessException if there is any problem.
      */
-    List<T> findAll();
+    List<M> findAll() throws DataAccessException;
 
     /**
      * Returns all instances of the type {@code T} with the given IDs.
@@ -108,7 +118,7 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * @throws IllegalArgumentException in case the given {@link Iterable ids}
      * or one of its items is {@literal null}.
      */
-    List<T> findAllById(List<ID> ids);
+    List<M> findAllById(List<ID> ids);
 
     /**
      * Returns the number of entities available.
@@ -140,7 +150,7 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * found in the persistence store. Also thrown if the entity is assumed to
      * be present but does not exist in the database.
      */
-    void delete(T movie);
+    void delete(M movie);
 
     /**
      * Deletes all instances of the type {@code T} with the given IDs.
@@ -167,11 +177,95 @@ public interface IMovieRepository<T, ID> extends IRepository<T, ID> {
      * from that found in the persistence store. Also thrown if at least one
      * entity is assumed to be present but does not exist in the database.
      */
-    void deleteAll(List<T> movies);
+    void deleteAll(List<M> movies);
 
     /**
      * Deletes all entities managed by the repository.
      */
     void deleteAll();
+
+    /**
+     * Returns all instances of the movie type with none of its relationships.
+     *
+     * @return list of movies with no relationships
+     * @throws DataAccessException if there is any problem.
+     */
+    public List<M> findAllNoRelationships() throws DataAccessException;
+
+    /**
+     * Returns all instances of the movie type with only Genres as its
+     * relationships.
+     *
+     * @return list of movies with genres as only relationship
+     * @throws DataAccessException if there is any problem.
+     */
+    public List<M> findAllRelationshipGenres() throws DataAccessException;
+
+    /**
+     * Returns movie entity with given ID with none of its relationships.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with no relationships
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public Optional<M> findByIdNoRelationships(Long id) throws DataAccessException, IllegalArgumentException;
+
+    /**
+     * Returns movie genres of a movie with given ID, encapsulated in movie
+     * entity. Only genre relationship is set, none of other movie attributes.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with genre attribute as only set
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public M findByIdGenres(Long id) throws DataAccessException, IllegalArgumentException;
+
+    /**
+     * Returns movie directors of a movie with given ID, encapsulated in movie
+     * entity. Only director relationship is set, none of other movie
+     * attributes.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with directors attribute as only set
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public M findByIdDirectors(Long id) throws DataAccessException, IllegalArgumentException;
+
+    /**
+     * Returns movie writers of a movie with given ID, encapsulated in movie
+     * entity. Only writer relationship is set, none of other movie attributes.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with writers attribute as only set
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public M findByIdWriters(Long id) throws DataAccessException, IllegalArgumentException;
+
+    /**
+     * Returns movie actors of a movie with given ID, encapsulated in movie
+     * entity. Only actor in acting relationship is set, none of other movie
+     * attributes.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with actor in acting attribute as only set
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public M findByIdActors(Long id) throws DataAccessException, IllegalArgumentException;
+
+    /**
+     * Returns movie acting of a movie with given ID, encapsulated in movie
+     * entity. Only acting relationship is set, none of other movie attributes.
+     *
+     * @param id must not be {@literal null}.
+     * @return movie with acting attribute as only set
+     * @throws IllegalArgumentException if {@literal id} is {@literal null}.
+     * @throws DataAccessException if there is any problem.
+     */
+    public M findByIdActorsWithRoles(Long id) throws DataAccessException, IllegalArgumentException;
 
 }

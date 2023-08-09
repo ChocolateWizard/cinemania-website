@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.domain.jdbc.classes;
 
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import java.util.Objects;
 
 
 /**
@@ -74,6 +75,28 @@ public abstract class PersonJDBC implements JDBC{
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 19 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PersonJDBC other = (PersonJDBC) obj;
+        return Objects.equals(this.id, other.id);
     }
     
     

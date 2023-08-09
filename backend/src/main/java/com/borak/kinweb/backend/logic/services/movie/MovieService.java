@@ -9,9 +9,14 @@ import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.logic.transformers.ActorTransformer;
+import com.borak.kinweb.backend.logic.transformers.DirectorTransformer;
 import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
+import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,51 +36,71 @@ public class MovieService implements IMovieService {
     private IMovieRepository<MovieJDBC, Long> movieRepo;
 
     @Autowired
-    private MovieTransformer transformer;
+    private MovieTransformer mvTransformer;
+    @Autowired
+    private DirectorTransformer drTransformer;
+    @Autowired
+    private WriterTransformer wrTransformer;
+    @Autowired
+    private ActorTransformer acTranformer;
+//----------------------------------------------------------------------------------------------------
 
-//=================================================================================================
     @Override
-    public List<MovieDTO> getAllMovies() {      
-        return transformer.jdbcToDto(movieRepo.findAll());
+    public List<MovieDTO> getAllMoviesWithGenres() {
+        return mvTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
     }
 
     @Override
     public List<MovieDTO> getAllMoviesWithDetails() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return mvTransformer.jdbcToDto(movieRepo.findAll());
     }
 
     @Override
-    public MovieDTO getMovie(Long id) {
-        Optional<MovieJDBC> movie=movieRepo.findById(id);
-        if(movie.isPresent()){
-            return transformer.jdbcToDto(movie.get());
+    public MovieDTO getMovieWithGenres(Long id) {
+        Optional<MovieJDBC> movieDB = movieRepo.findByIdNoRelationships(id);
+        if (movieDB.isPresent()) {
+            MovieJDBC m = movieRepo.findByIdGenres(id);
+            movieDB.get().setGenres(m.getGenres());
+            return mvTransformer.jdbcToDto(movieDB.get());
         }
         return null;
     }
 
     @Override
-    public List<MovieDTO> getMovieWithDetails(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public MovieDTO getMovieWithDetails(Long id) {
+        Optional<MovieJDBC> movieDB = movieRepo.findById(id);
+        if (movieDB.isPresent()) {
+            return mvTransformer.jdbcToDto(movieDB.get());
+        }
+        return null;
     }
 
     @Override
     public List<DirectorDTO> getMovieDirectors(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        MovieJDBC movie = movieRepo.findByIdDirectors(id);
+        return drTransformer.jdbcToDto(movie.getDirectors());
     }
 
     @Override
     public List<WriterDTO> getMovieWriters(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        MovieJDBC movie = movieRepo.findByIdWriters(id);
+        return wrTransformer.jdbcToDto(movie.getWriters());
     }
 
     @Override
     public List<ActorDTO> getMovieActors(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        MovieJDBC movie = movieRepo.findByIdActors(id);
+        List<ActorDTO> actors = new ArrayList(movie.getActings().size());
+        for (ActingJDBC acting : movie.getActings()) {
+            actors.add(acTranformer.jdbcToDto(acting.getActor()));
+        }
+        return actors;
+
     }
 
     @Override
     public List<ActingDTO> getMovieActorsWithRoles(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported");
     }
 
 }

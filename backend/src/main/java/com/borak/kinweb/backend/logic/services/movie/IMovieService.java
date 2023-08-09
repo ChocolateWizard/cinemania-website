@@ -17,44 +17,96 @@ import java.util.List;
  */
 public interface IMovieService {
 
-    //Returns: all movies
-    //Included: Genres
-    //Excluded: Directors, Writers, Actors, Acting roles
-    public List<MovieDTO> getAllMovies();
+    /**
+     * Get main information of every movie with their respective genres.
+     *
+     * @return <div>List of movies with main attributes and list of genres. If
+     * no movie present, returns an empty list.
+     * <ul>
+     * <li>Included: Genres</li>
+     * <li>Excluded: Directors, Writers, Actors, Acting roles, Critiques</li>
+     * </ul>
+     * </div>
+     */
+    public List<MovieDTO> getAllMoviesWithGenres();
 
-    //Returns: all movies
-    //Included: Genres,Directors, Writers, Actors, Acting roles
-    //Excluded:
+    /**
+     * Get every information of every movie.
+     *
+     * @return <div>List of movies with all of their relationships. Critic in
+     * Critiques will only contain username as its attribute. If no movie
+     * present, returns an empty list.
+     * <ul>
+     * <li>Included: Genres,Directors, Writers, Actors, Acting roles,
+     * Critiques</li>
+     * <li>Excluded: Every other Critic information except username</li>
+     * </ul>
+     * </div>
+     */
     public List<MovieDTO> getAllMoviesWithDetails();
 
-    //Returns: specific movie with given id
-    //Included: Genres
-    //Excluded: Directors, Writers, Actors, Acting roles
-    public MovieDTO getMovie(Long id);
+    /**
+     * Get main information of a specific movie with its respective genres.
+     *
+     * @return <div>Specific movie with given id. If no movie present, returns
+     * {@literal null}
+     * <ul>
+     * <li>Included: Genres</li>
+     * <li>Excluded: Directors, Writers, Actors, Acting roles,Critiques</li>
+     * </ul>
+     * </div>
+     */
+    public MovieDTO getMovieWithGenres(Long id);
 
-    //Returns: specific movie with given id
-    //Included: Genres,Directors, Writers, Actors, Acting roles
-    //Excluded:
-    public List<MovieDTO> getMovieWithDetails(Long id);
+    /**
+     * Get every information of a specific movie.
+     *
+     * @return <div>Movie with all of its relationships. Critic in Critiques
+     * will only contain username as its attribute. If no movie present, returns
+     * {@literal null}
+     * <ul>
+     * <li>Included: Genres,Directors, Writers, Actors, Acting roles,
+     * Critiques</li>
+     * <li>Excluded: Every other Critic information except username</li>
+     * </ul>
+     * </div>
+     */
+    public MovieDTO getMovieWithDetails(Long id);
 
-    //Returns: directors of specific movie with given id
-    //Included:
-    //Excluded:
+    /**
+     * Directors of a specific movie.
+     *
+     * @return List of directors of a movie with given ID. If no director
+     * present, returns empty list.
+     */
     public List<DirectorDTO> getMovieDirectors(Long id);
 
-    //Returns: writers of specific movie with given id
-    //Included:
-    //Excluded:
+    /**
+     * Writers of a specific movie.
+     *
+     * @return List of writers of a movie with given ID. If no writer present,
+     * returns empty list.
+     */
     public List<WriterDTO> getMovieWriters(Long id);
 
-    //Returns: actors of specific movie with given id
-    //Included:
-    //Excluded:  Acting roles
+    /**
+     * Actors of a specific movie.
+     *
+     * @return List of actors of a movie with given ID. If no actor present,
+     * returns empty list.
+     */
     public List<ActorDTO> getMovieActors(Long id);
 
-    //Returns: actors of specific movie with given id
-    //Included: Acting roles
-    //Excluded:
+    /**
+     * Actors and their respective roles in a specific movie.
+     *
+     * @return <div>List of actors of a movie with given ID. If no acting
+     * present, returns empty list.
+     * <ul>
+     * <li>Included: Actors, Acting roles</li>
+     * </ul>
+     * </div>
+     */
     public List<ActingDTO> getMovieActorsWithRoles(Long id);
 
 }
