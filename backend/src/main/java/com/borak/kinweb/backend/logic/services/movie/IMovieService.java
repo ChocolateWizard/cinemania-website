@@ -10,6 +10,7 @@ import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 /**
  *
@@ -28,7 +29,7 @@ public interface IMovieService {
      * </ul>
      * </div>
      */
-    public List<MovieDTO> getAllMoviesWithGenres();
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres();
 
     /**
      * Get every information of every movie.
@@ -43,7 +44,7 @@ public interface IMovieService {
      * </ul>
      * </div>
      */
-    public List<MovieDTO> getAllMoviesWithDetails();
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithDetails();
 
     /**
      * Get main information of a specific movie with its respective genres.
@@ -56,7 +57,7 @@ public interface IMovieService {
      * </ul>
      * </div>
      */
-    public MovieDTO getMovieWithGenres(Long id);
+    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id);
 
     /**
      * Get every information of a specific movie.
@@ -71,7 +72,7 @@ public interface IMovieService {
      * </ul>
      * </div>
      */
-    public MovieDTO getMovieWithDetails(Long id);
+    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id);
 
     /**
      * Directors of a specific movie.
@@ -79,7 +80,7 @@ public interface IMovieService {
      * @return List of directors of a movie with given ID. If no director
      * present, returns empty list.
      */
-    public List<DirectorDTO> getMovieDirectors(Long id);
+    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id);
 
     /**
      * Writers of a specific movie.
@@ -87,7 +88,7 @@ public interface IMovieService {
      * @return List of writers of a movie with given ID. If no writer present,
      * returns empty list.
      */
-    public List<WriterDTO> getMovieWriters(Long id);
+    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id);
 
     /**
      * Actors of a specific movie.
@@ -95,7 +96,7 @@ public interface IMovieService {
      * @return List of actors of a movie with given ID. If no actor present,
      * returns empty list.
      */
-    public List<ActorDTO> getMovieActors(Long id);
+    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id);
 
     /**
      * Actors and their respective roles in a specific movie.
@@ -107,6 +108,6 @@ public interface IMovieService {
      * </ul>
      * </div>
      */
-    public List<ActingDTO> getMovieActorsWithRoles(Long id);
+    public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id);
 
 }

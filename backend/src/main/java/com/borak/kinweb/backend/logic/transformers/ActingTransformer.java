@@ -26,11 +26,13 @@ import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.ActingJPA;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Mr. Poyo
  */
+@Component
 public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJDBC, ActingJPA> {
 
     @Override

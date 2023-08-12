@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.domain.jpa.classes;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -35,6 +36,9 @@ public class ActingJPA implements JPA{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "actor_id")
     private ActorJPA actor;
+    
+    @Column(name = "is_starring")
+    private boolean starring;  
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,mappedBy = "acting")
     private List<ActingRoleJPA> roles = new ArrayList<>();
@@ -69,6 +73,14 @@ public class ActingJPA implements JPA{
 
     public void setRoles(List<ActingRoleJPA> roles) {
         this.roles = roles;
+    }
+
+    public boolean isStarring() {
+        return starring;
+    }
+
+    public void setStarring(boolean starring) {
+        this.starring = starring;
     }
     
     

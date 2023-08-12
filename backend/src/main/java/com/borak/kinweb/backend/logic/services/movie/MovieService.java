@@ -10,17 +10,25 @@ import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.kinweb.backend.exceptions.InvalidInputException;
+import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
+import com.borak.kinweb.backend.logic.transformers.ActingTransformer;
 import com.borak.kinweb.backend.logic.transformers.ActorTransformer;
 import com.borak.kinweb.backend.logic.transformers.DirectorTransformer;
 import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
 import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
-import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,74 +41,137 @@ import org.springframework.transaction.annotation.Transactional;
 public class MovieService implements IMovieService {
 
     @Autowired
-    private IMovieRepository<MovieJDBC, Long> movieRepo;
+    private IMovieRepository<MovieJDBC, GenreJDBC, DirectorJDBC, WriterJDBC, ActorJDBC, ActingJDBC, Long> movieRepo;
 
     @Autowired
-    private MovieTransformer mvTransformer;
+    private MovieTransformer movieTransformer;
     @Autowired
-    private DirectorTransformer drTransformer;
+    private DirectorTransformer directorTransformer;
     @Autowired
-    private WriterTransformer wrTransformer;
+    private WriterTransformer writerTransformer;
     @Autowired
-    private ActorTransformer acTranformer;
+    private ActorTransformer actorTransformer;
+    @Autowired
+    private ActingTransformer actingTransformer;
 //----------------------------------------------------------------------------------------------------
 
+    //movies
     @Override
-    public List<MovieDTO> getAllMoviesWithGenres() {
-        return mvTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres() {
+        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
+    //movies/details
     @Override
-    public List<MovieDTO> getAllMoviesWithDetails() {
-        return mvTransformer.jdbcToDto(movieRepo.findAll());
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithDetails() {
+        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAll());
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
+    //movies/{id}
     @Override
-    public MovieDTO getMovieWithGenres(Long id) {
-        Optional<MovieJDBC> movieDB = movieRepo.findByIdNoRelationships(id);
-        if (movieDB.isPresent()) {
-            MovieJDBC m = movieRepo.findByIdGenres(id);
-            movieDB.get().setGenres(m.getGenres());
-            return mvTransformer.jdbcToDto(movieDB.get());
+    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
         }
-        return null;
-    }
-
-    @Override
-    public MovieDTO getMovieWithDetails(Long id) {
-        Optional<MovieJDBC> movieDB = movieRepo.findById(id);
-        if (movieDB.isPresent()) {
-            return mvTransformer.jdbcToDto(movieDB.get());
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
         }
-        return null;
-    }
-
-    @Override
-    public List<DirectorDTO> getMovieDirectors(Long id) {
-        MovieJDBC movie = movieRepo.findByIdDirectors(id);
-        return drTransformer.jdbcToDto(movie.getDirectors());
-    }
-
-    @Override
-    public List<WriterDTO> getMovieWriters(Long id) {
-        MovieJDBC movie = movieRepo.findByIdWriters(id);
-        return wrTransformer.jdbcToDto(movie.getWriters());
-    }
-
-    @Override
-    public List<ActorDTO> getMovieActors(Long id) {
-        MovieJDBC movie = movieRepo.findByIdActors(id);
-        List<ActorDTO> actors = new ArrayList(movie.getActings().size());
-        for (ActingJDBC acting : movie.getActings()) {
-            actors.add(acTranformer.jdbcToDto(acting.getActor()));
+        Optional<MovieJDBC> movie = movieRepo.findByIdNoRelationships(id);
+        if (movie.isPresent()) {
+            List<GenreJDBC> genres = movieRepo.findByIdGenres(id);
+            movie.get().setGenres(genres);
+            return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
         }
-        return actors;
+        throw new ResourceNotFoundException("No movie found with id: " + id);
 
     }
 
+    //movies/{id}/details
     @Override
-    public List<ActingDTO> getMovieActorsWithRoles(Long id) {
-        throw new UnsupportedOperationException("Not supported");
+    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
+        }
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
+        }
+        Optional<MovieJDBC> movie = movieRepo.findById(id);
+        if (movie.isPresent()) {
+            return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
+    //movies/{id}/directors
+    @Override
+    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
+        }
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
+        }
+        if (movieRepo.existsById(id)) {
+            List<DirectorJDBC> directors = movieRepo.findByIdDirectors(id);
+            return new ResponseEntity<>(directorTransformer.jdbcToDto(directors), HttpStatus.OK);
+
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
+    }
+
+    //movies/{id}/writers
+    @Override
+    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
+        }
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
+        }
+        if (movieRepo.existsById(id)) {
+            List<WriterJDBC> writers = movieRepo.findByIdWriters(id);
+            return new ResponseEntity<>(writerTransformer.jdbcToDto(writers), HttpStatus.OK);
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
+    }
+
+    //movies/{id}/actors
+    @Override
+    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
+        }
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
+        }
+        if (movieRepo.existsById(id)) {
+            List<ActorJDBC> actors = movieRepo.findByIdActors(id);
+            return new ResponseEntity<>(actorTransformer.jdbcToDto(actors), HttpStatus.OK);
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
+    }
+
+    //movies/{id}/actors/roles
+    @Override
+    public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Null passed as movie id");
+        }
+        if (id < 0) {
+            throw new InvalidInputException("Neggative number passed as movie id");
+        }
+        if (movieRepo.existsById(id)) {
+            List<ActingJDBC> actings = movieRepo.findByIdActorsWithRoles(id);
+            return new ResponseEntity<>(actingTransformer.jdbcToDto(actings), HttpStatus.OK);
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
+    }
+
+    
+    
+    
+    
+    
 }

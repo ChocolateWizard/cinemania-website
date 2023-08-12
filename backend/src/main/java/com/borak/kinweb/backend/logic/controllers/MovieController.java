@@ -12,6 +12,7 @@ import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +32,14 @@ public class MovieController {
 
     public MovieController(IMovieService movieService) {
         this.movieService = movieService;
-    }   
+    }
 
     //=========================GET MAPPINGS==================================
     //Returns: all movies
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping
-    public List<MovieDTO> getAllMovies() {
+    public ResponseEntity<List<MovieDTO>> getMovies() {
         return movieService.getAllMoviesWithGenres();
     }
 
@@ -46,7 +47,7 @@ public class MovieController {
     //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/details")
-    public List<MovieDTO> getAllMoviesWithDetails() {
+    public ResponseEntity<List<MovieDTO>> getMoviesDetails() {
         return movieService.getAllMoviesWithDetails();
     }
 
@@ -54,7 +55,7 @@ public class MovieController {
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping(path = "/{id}")
-    public MovieDTO getMovie(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
         return movieService.getMovieWithGenres(id);
     }
 
@@ -62,7 +63,7 @@ public class MovieController {
     //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/{id}/details")
-    public MovieDTO getMovieWithDetails(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieByIdDetails(@PathVariable Long id) {
         return movieService.getMovieWithDetails(id);
     }
 
@@ -70,7 +71,7 @@ public class MovieController {
     //Included:
     //Excluded:
     @GetMapping(path = "/{id}/directors")
-    public List<DirectorDTO> getMovieDirectors(@PathVariable Long id) {
+    public ResponseEntity<List<DirectorDTO>> getMovieByIdDirectors(@PathVariable Long id) {
         return movieService.getMovieDirectors(id);
     }
 
@@ -78,7 +79,7 @@ public class MovieController {
     //Included:
     //Excluded:
     @GetMapping(path = "/{id}/writers")
-    public List<WriterDTO> getMovieWriters(@PathVariable Long id) {
+    public ResponseEntity<List<WriterDTO>> getMovieByIdWriters(@PathVariable Long id) {
         return movieService.getMovieWriters(id);
     }
 
@@ -86,7 +87,7 @@ public class MovieController {
     //Included:
     //Excluded:  Acting roles
     @GetMapping(path = "/{id}/actors")
-    public List<ActorDTO> getMovieActors(@PathVariable Long id) {
+    public ResponseEntity<List<ActorDTO>> getMovieByIdActors(@PathVariable Long id) {
         return movieService.getMovieActors(id);
     }
 
@@ -94,7 +95,7 @@ public class MovieController {
     //Included: Acting roles
     //Excluded:
     @GetMapping(path = "/{id}/actors/roles")
-    public List<ActingDTO> getMovieActorsWithRoles(@PathVariable Long id) {
+    public ResponseEntity<List<ActingDTO>> getMovieByIdActorsWithRoles(@PathVariable Long id) {
         return movieService.getMovieActorsWithRoles(id);
     }
 

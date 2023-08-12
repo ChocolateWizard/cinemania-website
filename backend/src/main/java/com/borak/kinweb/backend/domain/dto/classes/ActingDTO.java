@@ -15,6 +15,7 @@ public class ActingDTO implements DTO {
 
     private MediaDTO media;
     private ActorDTO actor;
+    private boolean starring=false;  
     private List<ActingRoleDTO> roles = new ArrayList<>();
 
     public ActingDTO() {
@@ -48,7 +49,16 @@ public class ActingDTO implements DTO {
         } else {
             this.roles = roles;
         }
-
     }
+
+    public boolean isStarring() {
+        return starring;
+    }
+
+    public void setStarring(boolean starring) {
+        this.starring = starring;
+    }
+    
+    
 
 }

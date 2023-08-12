@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend.repository.sql;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
@@ -49,13 +50,13 @@ public final class SQLMovie {
                                        VALUES(?,?);
                                        """;
     public static final String INSERT_MEDIA_ACTINGS_PS = """
-                                       INSERT INTO acting(media_id,actor_id) 
-                                       VALUES(?,?);
+                                       INSERT INTO acting(media_id,actor_id,is_starring) 
+                                       VALUES(?,?,?);
                                        """;
     public static final String UPDATE_MEDIA_PS = """
                                        UPDATE media
                                        SET title = ?, release_date = ?, cover_image_url = ?,description = ?,audience_rating=?
-                                       WHERE media.id=(SELECT movie.id FROM movie WHERE movie.id=?);
+                                       WHERE media.id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                        """;
     public static final String UPDATE_MEDIA_MOVIE_PS = """
                                        UPDATE movie
@@ -70,22 +71,22 @@ public final class SQLMovie {
     public static final String FIND_ALL_GENRES_PS = """
                                                      SELECT genre.id,genre.name 
                                                      FROM genre JOIN media_genres ON(genre.id=media_genres.genre_id) 
-                                                     WHERE media_genres.media_id=?;
+                                                     WHERE media_genres.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                      """;
     public static final String FIND_ALL_DIRECTORS_PS = """
                                                         SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url 
                                                         FROM media_directors JOIN director ON(media_directors.director_id=director.person_id) JOIN person ON(person.id=director.person_id) 
-                                                        WHERE media_directors.media_id=?;
+                                                        WHERE media_directors.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                         """;
     public static final String FIND_ALL_WRITERS_PS = """
                                                       SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url 
                                                       FROM media_writers JOIN writer ON(media_writers.writer_id=writer.person_id) JOIN person ON(person.id=writer.person_id) 
-                                                      WHERE media_writers.media_id=?;
+                                                      WHERE media_writers.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                       """;
-    public static final String FIND_ALL_ACTORS_PS = """
-                                                     SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url,actor.is_star 
+    public static final String FIND_ALL_ACTING_ACTORS_PS = """
+                                                     SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url,actor.is_star,acting.is_starring  
                                                      FROM acting JOIN actor ON(acting.actor_id=actor.person_id) JOIN person ON(actor.person_id=person.id) 
-                                                     WHERE acting.media_id=?;
+                                                     WHERE acting.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                      """;
     public static final String FIND_ALL_ACTING_ROLES_PS = """
                                                            SELECT acting_role.id,acting_role.name 
@@ -190,6 +191,20 @@ public final class SQLMovie {
         actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
         actor.setIsStar(rs.getBoolean("is_star"));
         return actor;
+    };
+
+    public static final RowMapper<ActingJDBC> actingActorRM = (rs, num) -> {
+        ActingJDBC acting = new ActingJDBC();
+        ActorJDBC actor = new ActorJDBC();
+        actor.setId(rs.getLong("id"));
+        actor.setFirstName(rs.getString("first_name"));
+        actor.setLastName(rs.getString("last_name"));
+        actor.setGender(Gender.parseGender(rs.getString("gender")));
+        actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
+        actor.setIsStar(rs.getBoolean("is_star"));
+        acting.setStarring(rs.getBoolean("is_starring"));
+        acting.setActor(actor);
+        return acting;
     };
 
     public static final RowMapper<ActingRoleJDBC> actingRoleRM = (rs, num) -> {

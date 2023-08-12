@@ -29,11 +29,20 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
         jg.writeStartObject();
         jg.writeNumberField("id", movie.getId());
         jg.writeStringField("title", movie.getTitle());
-        jg.writeStringField("cover_image_url", movie.getCoverImageUrl());
-        jg.writeStringField("description", movie.getDescription());
+        if (movie.getCoverImageUrl() == null) {
+            jg.writeNullField("cover_image_url");
+        } else {
+            jg.writeStringField("cover_image_url", movie.getCoverImageUrl());
+        }
         jg.writeStringField("release_date", movie.getReleaseDateAsString());
+        jg.writeStringField("description", movie.getDescription());
         jg.writeNumberField("audience_rating", movie.getAudienceRating());
-        jg.writeNumberField("critic_rating", movie.getCriticRating());
+        if (movie.getCriticRating() == null) {
+            jg.writeNullField("critic_rating");
+        } else {
+            jg.writeNumberField("critic_rating", movie.getCriticRating());
+        }
+        jg.writeNumberField("length", movie.getLength());
         writeGenres(jg, movie.getGenres());
         writeDirectors(jg, movie.getDirectors());
         writeWriters(jg, movie.getWriters());
@@ -66,6 +75,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeEndObject();
         }
         jg.writeEndArray();
+
     }
 
     private void writeWriters(JsonGenerator jg, List<WriterDTO> writers) throws IOException {
@@ -80,6 +90,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeEndObject();
         }
         jg.writeEndArray();
+
     }
 
     private void writeActings(JsonGenerator jg, List<ActingDTO> actings) throws IOException {
@@ -92,9 +103,10 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeStringField("gender", acting.getActor().getGender().toString());
             jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhotoURL());
             jg.writeBooleanField("is_star", acting.getActor().isIsStar());
+            jg.writeBooleanField("is_starring", acting.isStarring());
             jg.writeArrayFieldStart("roles");
             for (ActingRoleDTO role : acting.getRoles()) {
-                jg.writeStartObject();             
+                jg.writeStartObject();
                 jg.writeNumberField("id", role.getId());
                 jg.writeStringField("name", role.getName());
                 jg.writeEndObject();
@@ -116,6 +128,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeEndObject();
         }
         jg.writeEndArray();
+
     }
 
 }
