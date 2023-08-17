@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.domain.dto.classes;
 
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -17,12 +18,15 @@ public abstract class PersonDTO implements DTO{
 
     private Long id;
 
+    @JsonProperty(value = "first_name")
     private String firstName;
 
+    @JsonProperty(value = "last_name")
     private String lastName;
 
     private Gender gender;
 
+    @JsonProperty(value = "profile_photo_url")
     private String profilePhotoURL;
 
     public PersonDTO() {

@@ -72,7 +72,7 @@ public class ActingRoleTransformer implements GenericTransformer<ActingRoleDTO, 
                 acting.setMedia(media);
             }
             if (jdbc.getActing().getActor() != null) {
-                acting.setActor(new ActorDTO(jdbc.getActing().getActor().getId(), jdbc.getActing().getActor().getFirstName(), jdbc.getActing().getActor().getLastName(), jdbc.getActing().getActor().getGender(), jdbc.getActing().getActor().getProfilePhotoURL(), jdbc.getActing().getActor().isIsStar()));
+                acting.setActor(new ActorDTO(jdbc.getActing().getActor().getId(), jdbc.getActing().getActor().getFirstName(), jdbc.getActing().getActor().getLastName(), jdbc.getActing().getActor().getGender(), jdbc.getActing().getActor().getProfilePhotoURL(), jdbc.getActing().getActor().isStar()));
             }
             role.setActing(acting);
 //==================================================================================

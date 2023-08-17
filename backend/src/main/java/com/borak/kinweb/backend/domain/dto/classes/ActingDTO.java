@@ -19,9 +19,7 @@ public class ActingDTO implements DTO {
     private List<ActingRoleDTO> roles = new ArrayList<>();
 
     public ActingDTO() {
-    }
-    
-    
+    } 
 
     public MediaDTO getMedia() {
         return media;

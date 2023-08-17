@@ -34,7 +34,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
         } else {
             jg.writeStringField("cover_image_url", movie.getCoverImageUrl());
         }
-        jg.writeStringField("release_date", movie.getReleaseDateAsString());
+//        jg.writeStringField("release_date", movie.getReleaseDateAsString());
         jg.writeStringField("description", movie.getDescription());
         jg.writeNumberField("audience_rating", movie.getAudienceRating());
         if (movie.getCriticRating() == null) {
@@ -102,7 +102,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeStringField("last_name", acting.getActor().getLastName());
             jg.writeStringField("gender", acting.getActor().getGender().toString());
             jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhotoURL());
-            jg.writeBooleanField("is_star", acting.getActor().isIsStar());
+            jg.writeBooleanField("is_star", acting.getActor().isStar());
             jg.writeBooleanField("is_starring", acting.isStarring());
             jg.writeArrayFieldStart("roles");
             for (ActingRoleDTO role : acting.getRoles()) {

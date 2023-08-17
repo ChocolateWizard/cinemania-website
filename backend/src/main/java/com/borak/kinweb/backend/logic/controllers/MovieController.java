@@ -10,6 +10,8 @@ import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,7 @@ public class MovieController {
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping
+    @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity<List<MovieDTO>> getMovies() {
         return movieService.getAllMoviesWithGenres();
     }
@@ -47,6 +50,7 @@ public class MovieController {
     //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/details")
+    @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity<List<MovieDTO>> getMoviesDetails() {
         return movieService.getAllMoviesWithDetails();
     }
@@ -55,6 +59,7 @@ public class MovieController {
     //Included: Genres
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping(path = "/{id}")
+    @JsonView(JsonVisibilityViews.Medium.class)
     public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
         return movieService.getMovieWithGenres(id);
     }
@@ -63,6 +68,7 @@ public class MovieController {
     //Included: Genres,Directors, Writers, Actors, Acting roles, Critiques
     //Excluded:
     @GetMapping(path = "/{id}/details")
+    @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity<MovieDTO> getMovieByIdDetails(@PathVariable Long id) {
         return movieService.getMovieWithDetails(id);
     }

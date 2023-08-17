@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend.domain.dto.classes;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
@@ -12,24 +13,23 @@ import com.borak.kinweb.backend.domain.enums.Gender;
  */
 public class ActorDTO extends PersonDTO {
 
-    private boolean isStar=false;
+    @JsonProperty(value = "is_star")
+    private boolean star = false;
 
     public ActorDTO() {
     }
 
     public ActorDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL, boolean isStar) {
         super(id, firstName, lastName, gender, profilePhotoURL);
-        this.isStar = isStar;
+        this.star = isStar;
     }
 
-    public boolean isIsStar() {
-        return isStar;
+    public boolean isStar() {
+        return star;
     }
 
-    public void setIsStar(boolean isStar) {
-        this.isStar = isStar;
+    public void setStar(boolean star) {
+        this.star = star;
     }
-
-    
 
 }

@@ -4,8 +4,22 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaActingsJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaCritiquesJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaDirectorsJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaGenresJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaWritersJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,31 +27,65 @@ import java.util.List;
  *
  * @author Mr Poyo
  */
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,property = "id")
+@JsonPropertyOrder({
+    "id",
+    "title",
+    "releaseDate",
+    "coverImageUrl",
+    "description",
+    "audienceRating",
+    "criticRating",
+    "genres", "directors", "writers", "actings", "critiques"})
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.ALWAYS)
 public abstract class MediaDTO implements DTO {
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     private Long id;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     private String title;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "cover_image_url")
     private String coverImageUrl;
 
+    @JsonView(JsonVisibilityViews.Medium.class)
     private String description;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "release_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d/MM/yyyy")
     private LocalDate releaseDate;
-    private DateTimeFormatter releaseDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
 
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "audience_rating")
     private Integer audienceRating;
 
+    @JsonView(JsonVisibilityViews.Medium.class)
+    @JsonProperty(value = "critic_rating")
     private Integer criticRating;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonSerialize(using = MediaGenresJsonSerializer.class)
     private List<GenreDTO> genres = new ArrayList<>();
 
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    @JsonSerialize(using = MediaCritiquesJsonSerializer.class)
     private List<CritiqueDTO> critiques = new ArrayList<>();
 
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    @JsonSerialize(using = MediaDirectorsJsonSerializer.class)
     private List<DirectorDTO> directors = new ArrayList<>();
 
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    @JsonSerialize(using = MediaWritersJsonSerializer.class)
     private List<WriterDTO> writers = new ArrayList<>();
 
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    @JsonProperty(value = "actors")
+    @JsonSerialize(using = MediaActingsJsonSerializer.class)
     private List<ActingDTO> actings = new ArrayList<>();
 
     public MediaDTO() {
@@ -91,13 +139,6 @@ public abstract class MediaDTO implements DTO {
 
     public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
-    }
-
-    public String getReleaseDateAsString() {
-        if (releaseDate == null) {
-            return null;
-        }
-        return releaseDate.format(releaseDateFormatter);
     }
 
     public Integer getAudienceRating() {

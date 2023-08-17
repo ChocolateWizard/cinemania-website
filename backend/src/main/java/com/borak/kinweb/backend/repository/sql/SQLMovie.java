@@ -189,7 +189,7 @@ public final class SQLMovie {
         actor.setLastName(rs.getString("last_name"));
         actor.setGender(Gender.parseGender(rs.getString("gender")));
         actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
-        actor.setIsStar(rs.getBoolean("is_star"));
+        actor.setStar(rs.getBoolean("is_star"));
         return actor;
     };
 
@@ -201,7 +201,7 @@ public final class SQLMovie {
         actor.setLastName(rs.getString("last_name"));
         actor.setGender(Gender.parseGender(rs.getString("gender")));
         actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
-        actor.setIsStar(rs.getBoolean("is_star"));
+        actor.setStar(rs.getBoolean("is_star"));
         acting.setStarring(rs.getBoolean("is_starring"));
         acting.setActor(actor);
         return acting;

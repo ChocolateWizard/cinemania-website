@@ -12,22 +12,24 @@ import com.borak.kinweb.backend.domain.enums.Gender;
  */
 public class ActorJDBC extends PersonJDBC {
 
-    private boolean isStar=false;
+    private boolean star=false;
 
     public ActorJDBC() {
     }
 
     public ActorJDBC(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL, boolean isStar) {
         super(id, firstName, lastName, gender, profilePhotoURL);
-        this.isStar = isStar;
+        this.star = isStar;
     }
 
-    public boolean isIsStar() {
-        return isStar;
+    public boolean isStar() {
+        return star;
     }
 
-    public void setIsStar(boolean isStar) {
-        this.isStar = isStar;
+    public void setStar(boolean star) {
+        this.star = star;
     }
+
+    
 
 }

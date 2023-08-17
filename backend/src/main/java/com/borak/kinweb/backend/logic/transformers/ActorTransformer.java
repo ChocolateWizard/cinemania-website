@@ -27,7 +27,7 @@ public final class ActorTransformer implements GenericTransformer<ActorDTO, Acto
         actor.setLastName(jdbc.getLastName());
         actor.setGender(jdbc.getGender());
         actor.setProfilePhotoURL(jdbc.getProfilePhotoURL());
-        actor.setIsStar(jdbc.isIsStar());
+        actor.setStar(jdbc.isStar());
         return actor;
     }
 
@@ -42,7 +42,7 @@ public final class ActorTransformer implements GenericTransformer<ActorDTO, Acto
         actor.setLastName(jpa.getLastName());
         actor.setGender(jpa.getGender());
         actor.setProfilePhotoURL(jpa.getProfilePhotoURL());
-        actor.setIsStar(jpa.isIsStar());
+        actor.setStar(jpa.isStar());
         return actor;
     }
 

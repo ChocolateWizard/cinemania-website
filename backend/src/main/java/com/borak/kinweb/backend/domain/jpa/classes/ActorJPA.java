@@ -22,16 +22,18 @@ public class ActorJPA extends PersonJPA{
    
     
     @Column(name = "is_star")
-    private boolean isStar=false;
+    private boolean star=false;
+
+    public boolean isStar() {
+        return star;
+    }
+
+    public void setStar(boolean star) {
+        this.star = star;
+    }
  
 
-    public boolean isIsStar() {
-        return isStar;
-    }
-
-    public void setIsStar(boolean isStar) {
-        this.isStar = isStar;
-    }
+    
     
     
     

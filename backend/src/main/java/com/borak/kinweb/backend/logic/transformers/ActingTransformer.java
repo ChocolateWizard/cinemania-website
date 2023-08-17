@@ -113,7 +113,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
                             media.getActings().add(acting);
                             continue;
                         } else {
-                            a.setActor(new ActorDTO(mediaActing.getActor().getId(), mediaActing.getActor().getFirstName(), mediaActing.getActor().getLastName(), mediaActing.getActor().getGender(), mediaActing.getActor().getProfilePhotoURL(), mediaActing.getActor().isIsStar()));
+                            a.setActor(new ActorDTO(mediaActing.getActor().getId(), mediaActing.getActor().getFirstName(), mediaActing.getActor().getLastName(), mediaActing.getActor().getGender(), mediaActing.getActor().getProfilePhotoURL(), mediaActing.getActor().isStar()));
                         }
                     }
 
@@ -132,7 +132,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
         }
 
         if (jdbc.getActor() != null) {
-            acting.setActor(new ActorDTO(jdbc.getActor().getId(), jdbc.getActor().getFirstName(), jdbc.getActor().getLastName(), jdbc.getActor().getGender(), jdbc.getActor().getProfilePhotoURL(), jdbc.getActor().isIsStar()));
+            acting.setActor(new ActorDTO(jdbc.getActor().getId(), jdbc.getActor().getFirstName(), jdbc.getActor().getLastName(), jdbc.getActor().getGender(), jdbc.getActor().getProfilePhotoURL(), jdbc.getActor().isStar()));
         }
         for (ActingRoleJDBC roleDB : jdbc.getRoles()) {
             if (roleDB != null) {

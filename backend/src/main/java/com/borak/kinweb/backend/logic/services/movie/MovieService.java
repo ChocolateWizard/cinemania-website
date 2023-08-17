@@ -22,7 +22,9 @@ import com.borak.kinweb.backend.logic.transformers.ActorTransformer;
 import com.borak.kinweb.backend.logic.transformers.DirectorTransformer;
 import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
 import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +58,7 @@ public class MovieService implements IMovieService {
 //----------------------------------------------------------------------------------------------------
 
     //movies
-    @Override
+    @Override 
     public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres() {
         List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
         return new ResponseEntity<>(movies, HttpStatus.OK);

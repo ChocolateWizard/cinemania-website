@@ -4,17 +4,17 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
-import com.borak.kinweb.backend.logic.transformers.serializers.MovieJSONSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.time.LocalDate;
 
 /**
  *
  * @author Mr Poyo
  */
-@JsonSerialize(using = MovieJSONSerializer.class)
 public class MovieDTO extends MediaDTO {
 
+    @JsonView(JsonVisibilityViews.Medium.class)
     private Integer length;
 
     public MovieDTO() {
