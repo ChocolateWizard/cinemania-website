@@ -4,16 +4,29 @@
  */
 package com.borak.kinweb.backend.exceptions.handler;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  *
  * @author Mr. Poyo
  */
+@JsonPropertyOrder(value = {
+    "timestamp",
+    "title",
+    "status",
+    "detail",
+    "developerMessage"})
+@JsonInclude(value = JsonInclude.Include.ALWAYS)
 public class ErrorDetail {
 
+    private long timestamp;
     private String title;
     private int status;
     private String detail;
-    private long timeStamp;
+
+    @JsonProperty(value = "developer_message")
     private String developerMessage;
 
     public String getTitle() {
@@ -41,11 +54,11 @@ public class ErrorDetail {
     }
 
     public long getTimeStamp() {
-        return timeStamp;
+        return timestamp;
     }
 
     public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
+        this.timestamp = timeStamp;
     }
 
     public String getDeveloperMessage() {
@@ -56,8 +69,4 @@ public class ErrorDetail {
         this.developerMessage = developerMessage;
     }
 
-    
-    
-    
-    
 }

@@ -37,6 +37,8 @@ public interface IRepository<T, ID> {
     List<T> findAll()throws DatabaseException;
 
     List<T> findAllById(List<ID> ids)throws DatabaseException;
+    
+    List<T> findAllPaginated(int page,int size)throws DatabaseException;
 
     long count()throws DatabaseException;
 

@@ -11,7 +11,7 @@ public class ActingJDBC implements JDBC {
 
     private MediaJDBC media;
     private ActorJDBC actor;
-    private boolean starring = false;
+    private boolean starring;
     private List<ActingRoleJDBC> roles = new ArrayList<>();
 
     public ActingJDBC() {

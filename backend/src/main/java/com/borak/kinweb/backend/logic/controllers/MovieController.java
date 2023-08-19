@@ -12,13 +12,16 @@ import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.Min;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(path = "movies")
+@Validated
 public class MovieController {
 
     @Autowired
@@ -42,8 +46,26 @@ public class MovieController {
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity<List<MovieDTO>> getMovies() {
-        return movieService.getAllMoviesWithGenres();
+    public ResponseEntity<List<MovieDTO>> getMovies(
+            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+        return movieService.getAllMoviesWithGenresPaginated(page, size);
+    }
+
+    @GetMapping(path = "/popular")
+    @JsonView(JsonVisibilityViews.Lite.class)
+    public ResponseEntity<List<MovieDTO>> getMoviesPopular(
+            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+        return movieService.getAllMoviesWithGenresPopularPaginated(page, size);
+    }
+
+    @GetMapping(path = "/current")
+    @JsonView(JsonVisibilityViews.Lite.class)
+    public ResponseEntity<List<MovieDTO>> getMoviesCurrent(
+            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+        return movieService.getAllMoviesWithGenresCurrentPaginated(page, size);
     }
 
     //Returns: all movies
@@ -60,7 +82,7 @@ public class MovieController {
     //Excluded: Directors, Writers, Actors, Acting roles, Critiques
     @GetMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Medium.class)
-    public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieWithGenres(id);
     }
 
@@ -69,7 +91,7 @@ public class MovieController {
     //Excluded:
     @GetMapping(path = "/{id}/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity<MovieDTO> getMovieByIdDetails(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieByIdDetails(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieWithDetails(id);
     }
 
@@ -77,7 +99,7 @@ public class MovieController {
     //Included:
     //Excluded:
     @GetMapping(path = "/{id}/directors")
-    public ResponseEntity<List<DirectorDTO>> getMovieByIdDirectors(@PathVariable Long id) {
+    public ResponseEntity<List<DirectorDTO>> getMovieByIdDirectors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieDirectors(id);
     }
 
@@ -85,7 +107,7 @@ public class MovieController {
     //Included:
     //Excluded:
     @GetMapping(path = "/{id}/writers")
-    public ResponseEntity<List<WriterDTO>> getMovieByIdWriters(@PathVariable Long id) {
+    public ResponseEntity<List<WriterDTO>> getMovieByIdWriters(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieWriters(id);
     }
 
@@ -93,7 +115,7 @@ public class MovieController {
     //Included:
     //Excluded:  Acting roles
     @GetMapping(path = "/{id}/actors")
-    public ResponseEntity<List<ActorDTO>> getMovieByIdActors(@PathVariable Long id) {
+    public ResponseEntity<List<ActorDTO>> getMovieByIdActors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieActors(id);
     }
 
@@ -101,7 +123,7 @@ public class MovieController {
     //Included: Acting roles
     //Excluded:
     @GetMapping(path = "/{id}/actors/roles")
-    public ResponseEntity<List<ActingDTO>> getMovieByIdActorsWithRoles(@PathVariable Long id) {
+    public ResponseEntity<List<ActingDTO>> getMovieByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieActorsWithRoles(id);
     }
 

@@ -41,7 +41,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         ActingDTO acting = new ActingDTO();
-
+        acting.setStarring(jdbc.isStarring());
         if (jdbc.getMedia() != null) {
             //------------------------------------------------------------------------------------------------
             MediaDTO media = null;
@@ -134,6 +134,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
         if (jdbc.getActor() != null) {
             acting.setActor(new ActorDTO(jdbc.getActor().getId(), jdbc.getActor().getFirstName(), jdbc.getActor().getLastName(), jdbc.getActor().getGender(), jdbc.getActor().getProfilePhotoURL(), jdbc.getActor().isStar()));
         }
+
         for (ActingRoleJDBC roleDB : jdbc.getRoles()) {
             if (roleDB != null) {
                 acting.getRoles().add(new ActingRoleDTO(acting, roleDB.getId(), roleDB.getName()));
@@ -147,6 +148,5 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 //---------------------------------------------------------------------------------------------------------------
-
 
 }

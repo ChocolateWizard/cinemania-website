@@ -8,12 +8,13 @@ import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.exceptions.InvalidInputException;
 import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Date;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
  *
@@ -35,6 +36,17 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException iie, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimeStamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setTitle("Bad Request");
+        errorDetail.setDetail(iie.getMessage());
+        errorDetail.setDeveloperMessage(iie.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException iie, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimeStamp(new Date().getTime());
         errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());

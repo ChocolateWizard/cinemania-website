@@ -167,6 +167,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
             if (acting != null) {
                 ActingDTO a = new ActingDTO();
                 a.setMedia(movie);
+                a.setStarring(acting.isStarring());
                 if (acting.getActor() != null) {
                     a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isStar()));
                 }

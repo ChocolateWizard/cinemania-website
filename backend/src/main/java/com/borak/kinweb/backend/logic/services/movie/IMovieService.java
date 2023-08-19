@@ -30,6 +30,12 @@ public interface IMovieService {
      * </div>
      */
     public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres();
+    
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPaginated(int page,int size);
+    
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPopularPaginated(int page,int size);
+    
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresCurrentPaginated(int page,int size);
 
     /**
      * Get every information of every movie.

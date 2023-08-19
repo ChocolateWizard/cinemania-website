@@ -68,6 +68,22 @@ public final class SQLMovie {
                                        SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id);
                                        """;
+    
+     public static final String FIND_ALL_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+                                       FROM media JOIN movie ON(media.id=movie.media_id) LIMIT ? OFFSET ?;
+                                       """;
+     
+     public static final String FIND_ALL_BY_RATING_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+                                       FROM media JOIN movie ON(media.id=movie.media_id) WHERE media.audience_rating>=? LIMIT ? OFFSET ?;
+                                       """;
+     
+      public static final String FIND_ALL_BY_YEAR_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+                                       FROM media JOIN movie ON(media.id=movie.media_id) WHERE YEAR(media.release_date)>=? LIMIT ? OFFSET ?;
+                                       """;
+    
     public static final String FIND_ALL_GENRES_PS = """
                                                      SELECT genre.id,genre.name 
                                                      FROM genre JOIN media_genres ON(genre.id=media_genres.genre_id) 

@@ -25,6 +25,7 @@ import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
 import com.fasterxml.jackson.annotation.JsonView;
+import java.time.Year;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public class MovieService implements IMovieService {
 //----------------------------------------------------------------------------------------------------
 
     //movies
-    @Override 
+    @Override
     public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres() {
         List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
         return new ResponseEntity<>(movies, HttpStatus.OK);
@@ -73,13 +74,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
+    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {      
         Optional<MovieJDBC> movie = movieRepo.findByIdNoRelationships(id);
         if (movie.isPresent()) {
             List<GenreJDBC> genres = movieRepo.findByIdGenres(id);
@@ -92,13 +87,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/details
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
+    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {      
         Optional<MovieJDBC> movie = movieRepo.findById(id);
         if (movie.isPresent()) {
             return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
@@ -108,13 +97,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/directors
     @Override
-    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
+    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {      
         if (movieRepo.existsById(id)) {
             List<DirectorJDBC> directors = movieRepo.findByIdDirectors(id);
             return new ResponseEntity<>(directorTransformer.jdbcToDto(directors), HttpStatus.OK);
@@ -125,13 +108,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/writers
     @Override
-    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
+    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {       
         if (movieRepo.existsById(id)) {
             List<WriterJDBC> writers = movieRepo.findByIdWriters(id);
             return new ResponseEntity<>(writerTransformer.jdbcToDto(writers), HttpStatus.OK);
@@ -141,13 +118,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/actors
     @Override
-    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
+    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {     
         if (movieRepo.existsById(id)) {
             List<ActorJDBC> actors = movieRepo.findByIdActors(id);
             return new ResponseEntity<>(actorTransformer.jdbcToDto(actors), HttpStatus.OK);
@@ -158,12 +129,6 @@ public class MovieService implements IMovieService {
     //movies/{id}/actors/roles
     @Override
     public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id) {
-        if (id == null) {
-            throw new InvalidInputException("Null passed as movie id");
-        }
-        if (id < 0) {
-            throw new InvalidInputException("Neggative number passed as movie id");
-        }
         if (movieRepo.existsById(id)) {
             List<ActingJDBC> actings = movieRepo.findByIdActorsWithRoles(id);
             return new ResponseEntity<>(actingTransformer.jdbcToDto(actings), HttpStatus.OK);
@@ -171,9 +136,24 @@ public class MovieService implements IMovieService {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    
-    
-    
-    
-    
+    @Override
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPaginated(int page, int size) {
+        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenresPaginated(page - 1, size));
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPopularPaginated(int page, int size) {
+        int rating = 80;
+        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByAudienceRatingRelationshipGenresPaginated(page - 1, size, rating));
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresCurrentPaginated(int page, int size) {
+        int year = Year.now().getValue();
+        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByReleaseYearRelationshipGenresPaginated(page - 1, size, year));
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
 }

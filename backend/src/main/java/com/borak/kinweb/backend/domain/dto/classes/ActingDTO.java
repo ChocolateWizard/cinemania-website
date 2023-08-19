@@ -4,6 +4,11 @@
  */
 package com.borak.kinweb.backend.domain.dto.classes;
 
+import com.borak.kinweb.backend.logic.transformers.serializers.acting.ActingJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.media.MediaDirectorsJsonSerializer;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +16,16 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
+@JsonSerialize(using = ActingJsonSerializer.class)
 public class ActingDTO implements DTO {
 
+    
     private MediaDTO media;
+     
     private ActorDTO actor;
-    private boolean starring=false;  
+     
+    private boolean starring;
+       
     private List<ActingRoleDTO> roles = new ArrayList<>();
 
     public ActingDTO() {
