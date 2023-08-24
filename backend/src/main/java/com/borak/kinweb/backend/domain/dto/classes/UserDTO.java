@@ -23,7 +23,7 @@ public class UserDTO implements DTO {
 
     private Gender gender;
 
-    private String profileImageUrl;
+    private String profileImage;
 
     private String username;
 
@@ -48,7 +48,7 @@ public class UserDTO implements DTO {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImage = profileImageUrl;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -59,7 +59,7 @@ public class UserDTO implements DTO {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImage = profileImageUrl;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -98,13 +98,7 @@ public class UserDTO implements DTO {
         this.gender = gender;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
+    
 
     public String getUsername() {
         return username;
@@ -180,6 +174,14 @@ public class UserDTO implements DTO {
     @Override
     public String toString() {
         return firstName + " " + lastName;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
 }

@@ -20,7 +20,7 @@ public abstract class MediaJDBC implements JDBC {
 
     private String title;
 
-    private String coverImageUrl;
+    private String coverImage;
 
     private String description;
 
@@ -46,7 +46,7 @@ public abstract class MediaJDBC implements JDBC {
     public MediaJDBC(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
-        this.coverImageUrl = coverImageUrl;
+        this.coverImage = coverImageUrl;
         this.description = description;
         this.releaseDate = releaseDate;
         this.audienceRating = audienceRating;
@@ -69,13 +69,7 @@ public abstract class MediaJDBC implements JDBC {
         this.title = title;
     }
 
-    public String getCoverImageUrl() {
-        return coverImageUrl;
-    }
-
-    public void setCoverImageUrl(String coverImageUrl) {
-        this.coverImageUrl = coverImageUrl;
-    }
+    
 
     public String getDescription() {
         return description;
@@ -189,6 +183,14 @@ public abstract class MediaJDBC implements JDBC {
         }
         final MediaJDBC other = (MediaJDBC) obj;
         return Objects.equals(this.id, other.id);
+    }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(String coverImage) {
+        this.coverImage = coverImage;
     }
 
 }

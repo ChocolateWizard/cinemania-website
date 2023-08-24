@@ -28,7 +28,7 @@ public class DirectorTransformer implements GenericTransformer<DirectorDTO, Dire
         director.setFirstName(jdbc.getFirstName());
         director.setLastName(jdbc.getLastName());
         director.setGender(jdbc.getGender());
-        director.setProfilePhotoURL(jdbc.getProfilePhotoURL());
+        director.setProfilePhoto(jdbc.getProfilePhoto());
         return director;
     }
 
@@ -42,7 +42,7 @@ public class DirectorTransformer implements GenericTransformer<DirectorDTO, Dire
         director.setFirstName(jpa.getFirstName());
         director.setLastName(jpa.getLastName());
         director.setGender(jpa.getGender());
-        director.setProfilePhotoURL(jpa.getProfilePhotoURL());
+        director.setProfilePhoto(jpa.getProfilePhotoURL());
         return director;
     }
 

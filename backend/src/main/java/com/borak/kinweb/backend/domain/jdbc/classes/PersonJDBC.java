@@ -24,7 +24,7 @@ public abstract class PersonJDBC implements JDBC{
 
     private Gender gender;
 
-    private String profilePhotoURL;
+    private String profilePhoto;
 
     public PersonJDBC() {
     }
@@ -34,16 +34,10 @@ public abstract class PersonJDBC implements JDBC{
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profilePhotoURL = profilePhotoURL;
+        this.profilePhoto = profilePhotoURL;
     }
 
-    public String getProfilePhotoURL() {
-        return profilePhotoURL;
-    }
-
-    public void setProfilePhotoURL(String profilePhotoURL) {
-        this.profilePhotoURL = profilePhotoURL;
-    }
+   
 
     public Long getId() {
         return id;
@@ -97,6 +91,14 @@ public abstract class PersonJDBC implements JDBC{
         }
         final PersonJDBC other = (PersonJDBC) obj;
         return Objects.equals(this.id, other.id);
+    }
+
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
     }
     
     

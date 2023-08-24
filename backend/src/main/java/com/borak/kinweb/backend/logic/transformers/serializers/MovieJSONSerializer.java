@@ -29,10 +29,10 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
         jg.writeStartObject();
         jg.writeNumberField("id", movie.getId());
         jg.writeStringField("title", movie.getTitle());
-        if (movie.getCoverImageUrl() == null) {
+        if (movie.getCoverImage() == null) {
             jg.writeNullField("cover_image_url");
         } else {
-            jg.writeStringField("cover_image_url", movie.getCoverImageUrl());
+            jg.writeStringField("cover_image_url", movie.getCoverImage());
         }
 //        jg.writeStringField("release_date", movie.getReleaseDateAsString());
         jg.writeStringField("description", movie.getDescription());
@@ -71,7 +71,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeStringField("first_name", director.getFirstName());
             jg.writeStringField("last_name", director.getLastName());
             jg.writeStringField("gender", director.getGender().toString());
-            jg.writeStringField("profile_photo_url", director.getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", director.getProfilePhoto());
             jg.writeEndObject();
         }
         jg.writeEndArray();
@@ -86,7 +86,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeStringField("first_name", writer.getFirstName());
             jg.writeStringField("last_name", writer.getLastName());
             jg.writeStringField("gender", writer.getGender().toString());
-            jg.writeStringField("profile_photo_url", writer.getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", writer.getProfilePhoto());
             jg.writeEndObject();
         }
         jg.writeEndArray();
@@ -101,7 +101,7 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
             jg.writeStringField("first_name", acting.getActor().getFirstName());
             jg.writeStringField("last_name", acting.getActor().getLastName());
             jg.writeStringField("gender", acting.getActor().getGender().toString());
-            jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhoto());
             jg.writeBooleanField("is_star", acting.getActor().isStar());
             jg.writeBooleanField("is_starring", acting.isStarring());
             jg.writeArrayFieldStart("roles");

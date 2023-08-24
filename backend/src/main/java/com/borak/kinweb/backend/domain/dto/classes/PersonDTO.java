@@ -27,7 +27,7 @@ public abstract class PersonDTO implements DTO{
     private Gender gender;
 
     @JsonProperty(value = "profile_photo_url")
-    private String profilePhotoURL;
+    private String profilePhoto;
 
     public PersonDTO() {
     }
@@ -37,16 +37,10 @@ public abstract class PersonDTO implements DTO{
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profilePhotoURL = profilePhotoURL;
+        this.profilePhoto = profilePhotoURL;
     }
 
-    public String getProfilePhotoURL() {
-        return profilePhotoURL;
-    }
-
-    public void setProfilePhotoURL(String profilePhotoURL) {
-        this.profilePhotoURL = profilePhotoURL;
-    }
+    
 
     public Long getId() {
         return id;
@@ -78,6 +72,14 @@ public abstract class PersonDTO implements DTO{
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
     }
     
     

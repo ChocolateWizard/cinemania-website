@@ -28,7 +28,7 @@ public class WriterTransformer implements GenericTransformer<WriterDTO, WriterJD
         writer.setFirstName(jdbc.getFirstName());
         writer.setLastName(jdbc.getLastName());
         writer.setGender(jdbc.getGender());
-        writer.setProfilePhotoURL(jdbc.getProfilePhotoURL());
+        writer.setProfilePhoto(jdbc.getProfilePhoto());
         return writer;
     }
 
@@ -42,7 +42,7 @@ public class WriterTransformer implements GenericTransformer<WriterDTO, WriterJD
         writer.setFirstName(jpa.getFirstName());
         writer.setLastName(jpa.getLastName());
         writer.setGender(jpa.getGender());
-        writer.setProfilePhotoURL(jpa.getProfilePhotoURL());
+        writer.setProfilePhoto(jpa.getProfilePhotoURL());
         return writer;
     }
 

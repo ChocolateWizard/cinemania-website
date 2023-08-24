@@ -25,7 +25,7 @@ public class MediaCritiquesJsonSerializer extends JsonSerializer<List<CritiqueDT
             jg.writeStartObject();
             jg.writeObjectFieldStart("critic");
             jg.writeStringField("username", critique.getCritic().getUsername());
-            jg.writeStringField("profile_photo_url", critique.getCritic().getProfileImageUrl());
+            jg.writeStringField("profile_photo_url", critique.getCritic().getProfileImage());
             jg.writeEndObject();
             jg.writeNumberField("rating", critique.getRating());
             jg.writeStringField("description", critique.getDescription());

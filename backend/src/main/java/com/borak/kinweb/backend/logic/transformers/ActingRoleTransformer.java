@@ -64,7 +64,7 @@ public class ActingRoleTransformer implements GenericTransformer<ActingRoleDTO, 
                 }
                 media.setId(jdbc.getActing().getMedia().getId());
                 media.setTitle(jdbc.getActing().getMedia().getTitle());
-                media.setCoverImageUrl(jdbc.getActing().getMedia().getCoverImageUrl());
+                media.setCoverImage(jdbc.getActing().getMedia().getCoverImage());
                 media.setDescription(jdbc.getActing().getMedia().getDescription());
                 media.setReleaseDate(jdbc.getActing().getMedia().getReleaseDate());
                 media.setAudienceRating(jdbc.getActing().getMedia().getAudienceRating());
@@ -72,7 +72,7 @@ public class ActingRoleTransformer implements GenericTransformer<ActingRoleDTO, 
                 acting.setMedia(media);
             }
             if (jdbc.getActing().getActor() != null) {
-                acting.setActor(new ActorDTO(jdbc.getActing().getActor().getId(), jdbc.getActing().getActor().getFirstName(), jdbc.getActing().getActor().getLastName(), jdbc.getActing().getActor().getGender(), jdbc.getActing().getActor().getProfilePhotoURL(), jdbc.getActing().getActor().isStar()));
+                acting.setActor(new ActorDTO(jdbc.getActing().getActor().getId(), jdbc.getActing().getActor().getFirstName(), jdbc.getActing().getActor().getLastName(), jdbc.getActing().getActor().getGender(), jdbc.getActing().getActor().getProfilePhoto(), jdbc.getActing().getActor().isStar()));
             }
             acting.setStarring(jdbc.getActing().isStarring());
             role.setActing(acting);

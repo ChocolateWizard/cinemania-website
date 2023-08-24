@@ -367,10 +367,21 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
             throw new DatabaseException("Error while deleting all movies", e);
         }
     }
+
+    @Override
+    public Optional<String> findByIdCoverImageUrl(Long id) throws DatabaseException {
+        try {
+            String url = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, String.class);
+            return Optional.ofNullable(url);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving movie cover image url", e);
+        }
+
+    }
+
 //=====================================================================================================================
 //==============================PRIVATE METHODS========================================================================
 //=====================================================================================================================
-
     private boolean performDoesMovieIdExist(Long id) {
         try {
             jdbcTemplate.queryForObject(SQLMovie.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
@@ -385,7 +396,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(SQLMovie.INSERT_MEDIA_PS);
             ps.setString(1, movie.getTitle());
-            ps.setString(2, movie.getCoverImageUrl());
+            ps.setString(2, movie.getCoverImage());
             ps.setString(3, movie.getDescription());
             ps.setDate(4, Date.valueOf(movie.getReleaseDate()));
             ps.setInt(5, movie.getAudienceRating());
@@ -400,7 +411,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     }
 
     private void performUpdate(MovieJDBC movie) {
-        jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_PS, new Object[]{movie.getTitle(), Date.valueOf(movie.getReleaseDate()), movie.getCoverImageUrl(), movie.getDescription(), movie.getAudienceRating(), movie.getId()}, new int[]{Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT});
+        jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_PS, new Object[]{movie.getTitle(), Date.valueOf(movie.getReleaseDate()), movie.getCoverImage(), movie.getDescription(), movie.getAudienceRating(), movie.getId()}, new int[]{Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT});
         jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_MOVIE_PS, new Object[]{movie.getLength(), movie.getId()}, new int[]{Types.INTEGER, Types.BIGINT});
         performUpdateGenre(movie.getGenres(), movie.getId());
         performUpdateDirector(movie.getDirectors(), movie.getId());

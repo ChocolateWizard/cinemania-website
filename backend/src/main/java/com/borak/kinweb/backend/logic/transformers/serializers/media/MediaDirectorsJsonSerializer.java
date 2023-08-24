@@ -25,7 +25,7 @@ public class MediaDirectorsJsonSerializer extends JsonSerializer<List<DirectorDT
             jg.writeNumberField("id", directorDTO.getId());
             jg.writeStringField("first_name", directorDTO.getFirstName());
             jg.writeStringField("last_name", directorDTO.getLastName());
-            jg.writeStringField("profile_photo_url", directorDTO.getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", directorDTO.getProfilePhoto());
             jg.writeStringField("gender", directorDTO.getGender().toString());
             jg.writeEndObject();
         }

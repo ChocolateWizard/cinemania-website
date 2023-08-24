@@ -5,15 +5,28 @@
 package com.borak.kinweb.backend.domain.dto.classes;
 
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 /**
  *
  * @author Mr Poyo
  */
+@JsonPropertyOrder({
+    "id",
+    "title",
+    "releaseDate",
+    "coverImageUrl",
+    "description",
+    "audienceRating",
+    "criticRating",
+    "length",
+    "genres", "directors", "writers", "actings", "critiques"})
 public class MovieDTO extends MediaDTO {
 
+    @NotNull(message = "Length must not be null")
     @JsonView(JsonVisibilityViews.Medium.class)
     private Integer length;
 

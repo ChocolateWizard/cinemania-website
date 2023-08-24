@@ -30,7 +30,7 @@ public final class SQLMovie {
 //========================================QUERIES=================================================
 //================================================================================================
     public static final String INSERT_MEDIA_PS = """
-                                       INSERT INTO media(title,cover_image_url,description,release_date,audience_rating) 
+                                       INSERT INTO media(title,cover_image,description,release_date,audience_rating) 
                                        VALUES(?,?,?,?,?);
                                        """;
     public static final String INSERT_MEDIA_MOVIE_PS = """
@@ -55,7 +55,7 @@ public final class SQLMovie {
                                        """;
     public static final String UPDATE_MEDIA_PS = """
                                        UPDATE media
-                                       SET title = ?, release_date = ?, cover_image_url = ?,description = ?,audience_rating=?
+                                       SET title = ?, release_date = ?, cover_image = ?,description = ?,audience_rating=?
                                        WHERE media.id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                        """;
     public static final String UPDATE_MEDIA_MOVIE_PS = """
@@ -65,42 +65,42 @@ public final class SQLMovie {
                                        """;
 
     public static final String FIND_ALL_S = """
-                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+                                       SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id);
                                        """;
-    
-     public static final String FIND_ALL_PAGINATED_PS = """
-                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+
+    public static final String FIND_ALL_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id) LIMIT ? OFFSET ?;
                                        """;
-     
-     public static final String FIND_ALL_BY_RATING_PAGINATED_PS = """
-                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+
+    public static final String FIND_ALL_BY_RATING_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id) WHERE media.audience_rating>=? LIMIT ? OFFSET ?;
                                        """;
-     
-      public static final String FIND_ALL_BY_YEAR_PAGINATED_PS = """
-                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+
+    public static final String FIND_ALL_BY_YEAR_PAGINATED_PS = """
+                                       SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id) WHERE YEAR(media.release_date)>=? LIMIT ? OFFSET ?;
                                        """;
-    
+
     public static final String FIND_ALL_GENRES_PS = """
                                                      SELECT genre.id,genre.name 
                                                      FROM genre JOIN media_genres ON(genre.id=media_genres.genre_id) 
                                                      WHERE media_genres.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                      """;
     public static final String FIND_ALL_DIRECTORS_PS = """
-                                                        SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url 
+                                                        SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo 
                                                         FROM media_directors JOIN director ON(media_directors.director_id=director.person_id) JOIN person ON(person.id=director.person_id) 
                                                         WHERE media_directors.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                         """;
     public static final String FIND_ALL_WRITERS_PS = """
-                                                      SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url 
+                                                      SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo 
                                                       FROM media_writers JOIN writer ON(media_writers.writer_id=writer.person_id) JOIN person ON(person.id=writer.person_id) 
                                                       WHERE media_writers.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                       """;
     public static final String FIND_ALL_ACTING_ACTORS_PS = """
-                                                     SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo_url,actor.is_star,acting.is_starring  
+                                                     SELECT person.id,person.first_name,person.last_name,person.gender,person.profile_photo,actor.is_star,acting.is_starring  
                                                      FROM acting JOIN actor ON(acting.actor_id=actor.person_id) JOIN person ON(actor.person_id=person.id) 
                                                      WHERE acting.media_id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                                      """;
@@ -117,10 +117,17 @@ public final class SQLMovie {
                                                            """;
 
     public static final String FIND_BY_ID_PS = """
-                                       SELECT media.id,media.title,media.cover_image_url,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
+                                       SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,movie.length 
                                        FROM media JOIN movie ON(media.id=movie.media_id)
                                        WHERE movie.media_id=?;
                                        """;
+
+    public static final String FIND_BY_ID_COVER_IMAGE_URL_PS = """
+                                       SELECT media.cover_image 
+                                       FROM media JOIN movie ON(media.id=movie.media_id)
+                                       WHERE movie.media_id=?;
+                                       """;
+
     public static final String FIND_ID_PS = """
                                        SELECT media_id 
                                        FROM movie 
@@ -163,7 +170,7 @@ public final class SQLMovie {
         MovieJDBC movie = new MovieJDBC();
         movie.setId(rs.getLong("id"));
         movie.setTitle(rs.getString("title"));
-        movie.setCoverImageUrl(rs.getString("cover_image_url"));
+        movie.setCoverImage(rs.getString("cover_image"));
         movie.setDescription(rs.getString("description"));
         movie.setReleaseDate(rs.getDate("release_date").toLocalDate());
         movie.setAudienceRating(rs.getInt("audience_rating"));
@@ -184,7 +191,7 @@ public final class SQLMovie {
         director.setFirstName(rs.getString("first_name"));
         director.setLastName(rs.getString("last_name"));
         director.setGender(Gender.parseGender(rs.getString("gender")));
-        director.setProfilePhotoURL(rs.getString("profile_photo_url"));
+        director.setProfilePhoto(rs.getString("profile_photo"));
         return director;
     };
 
@@ -194,7 +201,7 @@ public final class SQLMovie {
         writer.setFirstName(rs.getString("first_name"));
         writer.setLastName(rs.getString("last_name"));
         writer.setGender(Gender.parseGender(rs.getString("gender")));
-        writer.setProfilePhotoURL(rs.getString("profile_photo_url"));
+        writer.setProfilePhoto(rs.getString("profile_photo"));
         return writer;
     };
 
@@ -204,7 +211,7 @@ public final class SQLMovie {
         actor.setFirstName(rs.getString("first_name"));
         actor.setLastName(rs.getString("last_name"));
         actor.setGender(Gender.parseGender(rs.getString("gender")));
-        actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
+        actor.setProfilePhoto(rs.getString("profile_photo"));
         actor.setStar(rs.getBoolean("is_star"));
         return actor;
     };
@@ -216,7 +223,7 @@ public final class SQLMovie {
         actor.setFirstName(rs.getString("first_name"));
         actor.setLastName(rs.getString("last_name"));
         actor.setGender(Gender.parseGender(rs.getString("gender")));
-        actor.setProfilePhotoURL(rs.getString("profile_photo_url"));
+        actor.setProfilePhoto(rs.getString("profile_photo"));
         actor.setStar(rs.getBoolean("is_star"));
         acting.setStarring(rs.getBoolean("is_starring"));
         acting.setActor(actor);
@@ -234,7 +241,7 @@ public final class SQLMovie {
         CritiqueJDBC critique = new CritiqueJDBC();
         UserCriticJDBC critic = new UserCriticJDBC();
         critic.setUsername(rs.getString("username"));
-        critic.setProfileImageUrl(rs.getString("profile_image_url"));
+        critic.setProfileImage(rs.getString("profile_image"));
         critique.setCritic(critic);
         critique.setDescription(rs.getString("description"));
         critique.setRating(rs.getInt("rating"));

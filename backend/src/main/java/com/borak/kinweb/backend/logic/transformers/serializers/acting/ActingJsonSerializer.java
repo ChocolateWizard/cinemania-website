@@ -24,7 +24,7 @@ public class ActingJsonSerializer extends JsonSerializer<ActingDTO> {
             jg.writeNumberField("id", t.getActor().getId());
             jg.writeStringField("first_name", t.getActor().getFirstName());
             jg.writeStringField("last_name", t.getActor().getLastName());
-            jg.writeStringField("profile_photo_url", t.getActor().getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", t.getActor().getProfilePhoto());
             jg.writeStringField("gender", t.getActor().getGender().toString());
             jg.writeBooleanField("is_star", t.getActor().isStar());
             jg.writeBooleanField("is_starring", t.isStarring());

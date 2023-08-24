@@ -25,7 +25,7 @@ public class MediaWritersJsonSerializer extends JsonSerializer<List<WriterDTO>> 
             jg.writeNumberField("id", writerDTO.getId());
             jg.writeStringField("first_name", writerDTO.getFirstName());
             jg.writeStringField("last_name", writerDTO.getLastName());
-            jg.writeStringField("profile_photo_url", writerDTO.getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", writerDTO.getProfilePhoto());
             jg.writeStringField("gender", writerDTO.getGender().toString());
             jg.writeEndObject();
         }

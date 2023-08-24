@@ -25,14 +25,14 @@ public interface IMovieRepository<M, G, D, W, A, AC, ID> extends IRepository<M, 
     public List<M> findAllNoRelationships() throws DatabaseException;
 
     public List<M> findAllRelationshipGenres() throws DatabaseException;
-    
-    public List<M> findAllNoRelationshipsPaginated(int page,int size) throws DatabaseException;
 
-    public List<M> findAllRelationshipGenresPaginated(int page,int size) throws DatabaseException;
-    
-    public List<M> findAllByAudienceRatingRelationshipGenresPaginated(int page,int size,int ratingThresh) throws DatabaseException;
-    
-    public List<M> findAllByReleaseYearRelationshipGenresPaginated(int page,int size,int year) throws DatabaseException;
+    public List<M> findAllNoRelationshipsPaginated(int page, int size) throws DatabaseException;
+
+    public List<M> findAllRelationshipGenresPaginated(int page, int size) throws DatabaseException;
+
+    public List<M> findAllByAudienceRatingRelationshipGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException;
+
+    public List<M> findAllByReleaseYearRelationshipGenresPaginated(int page, int size, int year) throws DatabaseException;
 
     public Optional<M> findByIdNoRelationships(ID id) throws DatabaseException;
 
@@ -45,5 +45,7 @@ public interface IMovieRepository<M, G, D, W, A, AC, ID> extends IRepository<M, 
     public List<A> findByIdActors(ID id) throws DatabaseException;
 
     public List<AC> findByIdActorsWithRoles(ID id) throws DatabaseException;
+
+    public Optional<String> findByIdCoverImageUrl(ID id) throws DatabaseException;
 
 }

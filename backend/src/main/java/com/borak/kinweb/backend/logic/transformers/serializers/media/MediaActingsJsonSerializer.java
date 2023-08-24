@@ -27,7 +27,7 @@ public class MediaActingsJsonSerializer extends JsonSerializer<List<ActingDTO>> 
             jg.writeNumberField("id", acting.getActor().getId());
             jg.writeStringField("first_name", acting.getActor().getFirstName());
             jg.writeStringField("last_name", acting.getActor().getLastName());
-            jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhotoURL());
+            jg.writeStringField("profile_photo_url", acting.getActor().getProfilePhoto());
             jg.writeStringField("gender", acting.getActor().getGender().toString());
             jg.writeBooleanField("is_star", acting.getActor().isStar());
             jg.writeBooleanField("is_starring", acting.isStarring());

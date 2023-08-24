@@ -60,7 +60,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
             }
             media.setId(jdbc.getMedia().getId());
             media.setTitle(jdbc.getMedia().getTitle());
-            media.setCoverImageUrl(jdbc.getMedia().getCoverImageUrl());
+            media.setCoverImage(jdbc.getMedia().getCoverImage());
             media.setDescription(jdbc.getMedia().getDescription());
             media.setReleaseDate(jdbc.getMedia().getReleaseDate());
             media.setAudienceRating(jdbc.getMedia().getAudienceRating());
@@ -78,7 +78,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
                     if (critique.getCritic() != null) {
                         UserCriticDTO critic = new UserCriticDTO();
                         critic.setUsername(critique.getCritic().getUsername());
-                        critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
+                        critic.setProfileImage(critique.getCritic().getProfileImage());
                         c.setCritic(critic);
                     }
                     c.setMedia(media);
@@ -91,13 +91,13 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
 
             for (DirectorJDBC director : jdbc.getMedia().getDirectors()) {
                 if (director != null) {
-                    media.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
+                    media.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhoto()));
                 }
             }
 
             for (WriterJDBC writer : jdbc.getMedia().getWriters()) {
                 if (writer != null) {
-                    media.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
+                    media.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhoto()));
                 }
             }
 
@@ -113,7 +113,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
                             media.getActings().add(acting);
                             continue;
                         } else {
-                            a.setActor(new ActorDTO(mediaActing.getActor().getId(), mediaActing.getActor().getFirstName(), mediaActing.getActor().getLastName(), mediaActing.getActor().getGender(), mediaActing.getActor().getProfilePhotoURL(), mediaActing.getActor().isStar()));
+                            a.setActor(new ActorDTO(mediaActing.getActor().getId(), mediaActing.getActor().getFirstName(), mediaActing.getActor().getLastName(), mediaActing.getActor().getGender(), mediaActing.getActor().getProfilePhoto(), mediaActing.getActor().isStar()));
                         }
                     }
 
@@ -132,7 +132,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
         }
 
         if (jdbc.getActor() != null) {
-            acting.setActor(new ActorDTO(jdbc.getActor().getId(), jdbc.getActor().getFirstName(), jdbc.getActor().getLastName(), jdbc.getActor().getGender(), jdbc.getActor().getProfilePhotoURL(), jdbc.getActor().isStar()));
+            acting.setActor(new ActorDTO(jdbc.getActor().getId(), jdbc.getActor().getFirstName(), jdbc.getActor().getLastName(), jdbc.getActor().getGender(), jdbc.getActor().getProfilePhoto(), jdbc.getActor().isStar()));
         }
 
         for (ActingRoleJDBC roleDB : jdbc.getRoles()) {

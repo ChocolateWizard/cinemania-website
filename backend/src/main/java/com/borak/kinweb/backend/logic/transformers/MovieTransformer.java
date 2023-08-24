@@ -46,7 +46,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
 
         movie.setId(jdbc.getId());
         movie.setTitle(jdbc.getTitle());
-        movie.setCoverImageUrl(jdbc.getCoverImageUrl());
+        movie.setCoverImage(jdbc.getCoverImage());
         movie.setDescription(jdbc.getDescription());
         movie.setReleaseDate(jdbc.getReleaseDate());
         movie.setAudienceRating(jdbc.getAudienceRating());
@@ -65,7 +65,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
                 if (critique.getCritic() != null) {
                     UserCriticDTO critic = new UserCriticDTO();
                     critic.setUsername(critique.getCritic().getUsername());
-                    critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
+                    critic.setProfileImage(critique.getCritic().getProfileImage());
                     c.setCritic(critic);
                 }
                 c.setMedia(movie);
@@ -78,14 +78,14 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
 
         for (DirectorJDBC director : jdbc.getDirectors()) {
             if (director != null) {
-                movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
+                movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhoto()));
 
             }
 
         }
         for (WriterJDBC writer : jdbc.getWriters()) {
             if (writer != null) {
-                movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
+                movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhoto()));
 
             }
         }
@@ -96,7 +96,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
                 a.setMedia(movie);
                 a.setStarring(acting.isStarring());
                 if (acting.getActor() != null) {
-                    a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isStar()));
+                    a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhoto(), acting.getActor().isStar()));
                 }
                 for (ActingRoleJDBC role : acting.getRoles()) {
                     if (role != null) {
@@ -111,74 +111,6 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
 
     @Override
     public MovieDTO jpaToDto(MovieJPA jpa) throws IllegalArgumentException {
-        if (jpa == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-
-        MovieDTO movie = new MovieDTO();
-
-        movie.setId(jpa.getId());
-        movie.setTitle(jpa.getTitle());
-        movie.setCoverImageUrl(jpa.getCoverImageUrl());
-        movie.setDescription(jpa.getDescription());
-        movie.setReleaseDate(jpa.getReleaseDate());
-        movie.setAudienceRating(jpa.getAudienceRating());
-        movie.setCriticRating(jpa.getCriticRating());
-        movie.setLength(jpa.getLength());
-
-        for (GenreJPA genre : jpa.getGenres()) {
-            if (genre != null) {
-                movie.getGenres().add(new GenreDTO(genre.getId(), genre.getName()));
-            }
-        }
-
-        for (CritiqueJPA critique : jpa.getCritiques()) {
-            if (critique != null) {
-                CritiqueDTO c = new CritiqueDTO();
-                if (critique.getCritic() != null) {
-                    UserCriticDTO critic = new UserCriticDTO();
-                    critic.setUsername(critique.getCritic().getUsername());
-                    critic.setProfileImageUrl(critique.getCritic().getProfileImageUrl());
-                    c.setCritic(critic);
-                }
-                c.setMedia(movie);
-                c.setDescription(critique.getDescription());
-                c.setRating(critique.getRating());
-
-                movie.getCritiques().add(c);
-            }
-        }
-
-        for (DirectorJPA director : jpa.getDirectors()) {
-            if (director != null) {
-                movie.getDirectors().add(new DirectorDTO(director.getId(), director.getFirstName(), director.getLastName(), director.getGender(), director.getProfilePhotoURL()));
-
-            }
-
-        }
-        for (WriterJPA writer : jpa.getWriters()) {
-            if (writer != null) {
-                movie.getWriters().add(new WriterDTO(writer.getId(), writer.getFirstName(), writer.getLastName(), writer.getGender(), writer.getProfilePhotoURL()));
-
-            }
-        }
-
-        for (ActingJPA acting : jpa.getActings()) {
-            if (acting != null) {
-                ActingDTO a = new ActingDTO();
-                a.setMedia(movie);
-                a.setStarring(acting.isStarring());
-                if (acting.getActor() != null) {
-                    a.setActor(new ActorDTO(acting.getActor().getId(), acting.getActor().getFirstName(), acting.getActor().getLastName(), acting.getActor().getGender(), acting.getActor().getProfilePhotoURL(), acting.getActor().isStar()));
-                }
-                for (ActingRoleJPA role : acting.getRoles()) {
-                    if (role != null) {
-                        a.getRoles().add(new ActingRoleDTO(a, role.getId(), role.getName()));
-                    }
-                }
-                movie.getActings().add(a);
-            }
-        }
-        return movie;
+        throw new UnsupportedOperationException("Not supported!");
     }
 }

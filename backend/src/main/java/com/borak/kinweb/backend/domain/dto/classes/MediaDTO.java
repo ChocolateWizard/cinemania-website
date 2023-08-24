@@ -19,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,21 +47,27 @@ public abstract class MediaDTO implements DTO {
     @JsonView(JsonVisibilityViews.Lite.class)
     private Long id;
 
+    @NotNull(message = "Title must not be null")
     @JsonView(JsonVisibilityViews.Lite.class)
     private String title;
 
     @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "cover_image_url")
-    private String coverImageUrl;
+    private String coverImage;
 
+    @NotNull(message = "Description must not be null")
     @JsonView(JsonVisibilityViews.Medium.class)
     private String description;
 
+    @NotNull(message = "Release date must not be null")
     @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "release_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d/MM/yyyy")
     private LocalDate releaseDate;
 
+    @NotNull(message = "Audience rating must not be null")
+    @Min(value = 0, message = "Audience rating must be greater than or equal to 0")
+    @Max(value = 100, message = "Audience rating must be less than or equal to 100")
     @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "audience_rating")
     private Integer audienceRating;
@@ -94,7 +103,7 @@ public abstract class MediaDTO implements DTO {
     public MediaDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
-        this.coverImageUrl = coverImageUrl;
+        this.coverImage = coverImageUrl;
         this.description = description;
         this.releaseDate = releaseDate;
         this.audienceRating = audienceRating;
@@ -117,13 +126,7 @@ public abstract class MediaDTO implements DTO {
         this.title = title;
     }
 
-    public String getCoverImageUrl() {
-        return coverImageUrl;
-    }
-
-    public void setCoverImageUrl(String coverImageUrl) {
-        this.coverImageUrl = coverImageUrl;
-    }
+    
 
     public String getDescription() {
         return description;
@@ -160,6 +163,15 @@ public abstract class MediaDTO implements DTO {
     public List<GenreDTO> getGenres() {
         return genres;
     }
+
+    public String getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(String coverImage) {
+        this.coverImage = coverImage;
+    }
+    
 
     public void setGenres(List<GenreDTO> genres) {
         if (genres == null) {

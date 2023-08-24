@@ -24,7 +24,7 @@ public class UserJDBC implements Serializable {
 
     private Gender gender;
 
-    private String profileImageUrl;
+    private String profileImage;
 
     private String username;
 
@@ -49,7 +49,7 @@ public class UserJDBC implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImage = profileImageUrl;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -60,7 +60,7 @@ public class UserJDBC implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImage = profileImageUrl;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -99,13 +99,15 @@ public class UserJDBC implements Serializable {
         this.gender = gender;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getProfileImage() {
+        return profileImage;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
+
+    
 
     public String getUsername() {
         return username;

@@ -478,7 +478,7 @@ CREATE TABLE `media` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `release_date` date NOT NULL,
-  `cover_image_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cover_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `audience_rating` int NOT NULL,
   `critic_rating` int DEFAULT NULL,
@@ -488,11 +488,11 @@ CREATE TABLE `media` (
 
 /*Data for the table `media` */
 
-insert  into `media`(`id`,`title`,`release_date`,`cover_image_url`,`description`,`audience_rating`,`critic_rating`) values 
-(1,'Mulholland Drive','2001-05-16','src\\main\\r\resources\\static\\images\\media\\1_Mulholland_Drive.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
-(2,'Inland Empire','2006-09-06','src\\main\\resources\\static\\images\\media\\2_Inland_Empire.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
-(3,'Arcane','2021-11-06','src\\main\\resources\\static\\images\\media\\3_Arcane.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
-(4,'The Lighthouse','2019-05-19','src\\main\\resources\\static\\images\\media\\4_The_Lighthouse.jpg','Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL);
+insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`audience_rating`,`critic_rating`) values 
+(1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
+(2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
+(3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
+(4,'The Lighthouse','2019-05-19','4.jpg','Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL);
 
 /*Table structure for table `media_directors` */
 
@@ -597,44 +597,44 @@ CREATE TABLE `person` (
   `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `gender` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `profile_photo_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `profile_photo` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `CONST_PERSON_GENDER` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F',_utf8mb4'O')))
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `person` */
 
-insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo_url`) values 
-(1,'David','Lynch','M','src\\main\\resources\\static\\images\\1_David_Lynch.jpg'),
-(2,'Naomi','Watts','F','src\\main\\resources\\static\\images\\2_Naomi_Watts.jpg'),
-(3,'Laura','Harring','F','src\\main\\resources\\static\\images\\3_Laura_Harring.jpg'),
-(4,'Justin','Theroux','M','src\\main\\resources\\static\\images\\4_Justin_Theroux.jpg'),
-(5,'Patrick','Fischler','M','src\\main\\resources\\static\\images\\5_Patrick_Fischler.jpg'),
-(6,'Jeanne','Bates','F','src\\main\\resources\\static\\images\\6_Jeanne_Bates.jpg'),
-(7,'Karolina','Gruszka','F','src\\main\\resources\\static\\images\\7_Karolina_Gruszka.jpg'),
-(8,'Krzysztof','Majchrzak','M','src\\main\\resources\\static\\images\\8_Krzysztof_Majchrzak.jpg'),
-(9,'Grace','Zabriskie','F','src\\main\\resources\\static\\images\\9_Grace_Zabriskie.jpg'),
-(10,'Laura','Dern','F','src\\main\\resources\\static\\images\\10_Laura_Dern.jpg'),
-(11,'Harry Dean','Stanton','M','src\\main\\resources\\static\\images\\11_Harry_Dean_Stanton.jpg'),
-(12,'Peter J.','Lucas','M','src\\main\\resources\\static\\images\\12_Peter_J._Lucas.jpg'),
-(13,'Hailee','Steinfeld','F','src\\main\\resources\\static\\images\\13_Hailee_Steinfeld.jpg'),
-(14,'Pascal','Charrue','M','src\\main\\resources\\static\\images\\14_Pascal_Charrue.jpg'),
-(15,'Arnaud','Delord','M','src\\main\\resources\\static\\images\\15_Arnaud_Delord.jpg'),
+insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`) values 
+(1,'David','Lynch','M','1.jpg'),
+(2,'Naomi','Watts','F','2.jpg'),
+(3,'Laura','Harring','F','3.jpg'),
+(4,'Justin','Theroux','M','4.jpg'),
+(5,'Patrick','Fischler','M','5.jpg'),
+(6,'Jeanne','Bates','F','6.jpg'),
+(7,'Karolina','Gruszka','F','7.jpg'),
+(8,'Krzysztof','Majchrzak','M','8.jpg'),
+(9,'Grace','Zabriskie','F','9.jpg'),
+(10,'Laura','Dern','F','10.jpg'),
+(11,'Harry Dean','Stanton','M','11.jpg'),
+(12,'Peter J.','Lucas','M','12.jpg'),
+(13,'Hailee','Steinfeld','F','13.jpg'),
+(14,'Pascal','Charrue','M','14.jpg'),
+(15,'Arnaud','Delord','M','15.jpg'),
 (16,'Mollie Bickley','St. John','F',NULL),
-(17,'Ash','Brannon','M','src\\main\\resources\\static\\images\\17_Ash_Brannon.jpg'),
+(17,'Ash','Brannon','M','17.jpg'),
 (18,'David','Dunne','M',NULL),
-(19,'Christian','Linke','M','src\\main\\resources\\static\\images\\19_Christian_Linke.jpg'),
-(20,'Kevin','Alejandro','M','src\\main\\resources\\static\\images\\20_Kevin_Alejandro.jpg'),
-(21,'Jason','Spisak','M','src\\main\\resources\\static\\images\\21_Jason_Spisak.jpg'),
-(22,'Ella','Purnell','F','src\\main\\resources\\static\\images\\22_Ella_Purnell.jpg'),
-(23,'Katie','Leung','F','src\\main\\resources\\static\\images\\23_Katie_Leung.jpg'),
-(24,'Harry','Lloyd','M','src\\main\\resources\\static\\images\\24_Harry_Lloyd.jpg'),
-(25,'Mick','Wingert','M','src\\main\\resources\\static\\images\\25_Mick_Wingert.jpg'),
-(26,'Robert','Eggers','M','src\\main\\resources\\static\\images\\26_Robert_Eggers.jpg'),
-(27,'Max','Eggers','M','src\\main\\resources\\static\\images\\27_Max_Eggers.jpg'),
-(28,'Robert','Pattinson','M','src\\main\\resources\\static\\images\\28_Robert_Pattinson.jpg'),
-(29,'Willem','Dafoe','M','src\\main\\resources\\static\\images\\29_Willem_Dafoe.jpg'),
-(30,'Valeriia','Karaman','F','src\\main\\resources\\static\\images\\30_Valeriia_Karaman.jpg');
+(19,'Christian','Linke','M','19.jpg'),
+(20,'Kevin','Alejandro','M','20.jpg'),
+(21,'Jason','Spisak','M','21.jpg'),
+(22,'Ella','Purnell','F','22.jpg'),
+(23,'Katie','Leung','F','23.jpg'),
+(24,'Harry','Lloyd','M','24.jpg'),
+(25,'Mick','Wingert','M','25.jpg'),
+(26,'Robert','Eggers','M','26.jpg'),
+(27,'Max','Eggers','M','27.jpg'),
+(28,'Robert','Pattinson','M','28.jpg'),
+(29,'Willem','Dafoe','M','29.jpg'),
+(30,'Valeriia','Karaman','F','30.jpg');
 
 /*Table structure for table `tv_show` */
 
@@ -661,7 +661,7 @@ CREATE TABLE `user` (
   `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `gender` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `profile_image_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'src\\main\\resources\\database\\images\\user\\Default_profile_photo.png',
+  `profile_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'src\\main\\resources\\database\\images\\user\\Default_profile_photo.png',
   `username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,

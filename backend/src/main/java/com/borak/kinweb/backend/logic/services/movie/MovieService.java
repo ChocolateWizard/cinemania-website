@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.services.movie;
 
+import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
@@ -24,7 +25,9 @@ import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
 import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
+import com.borak.kinweb.backend.repository.util.FileRepository;
 import com.fasterxml.jackson.annotation.JsonView;
+import java.awt.Image;
 import java.time.Year;
 
 import java.util.List;
@@ -45,6 +48,9 @@ public class MovieService implements IMovieService {
 
     @Autowired
     private IMovieRepository<MovieJDBC, GenreJDBC, DirectorJDBC, WriterJDBC, ActorJDBC, ActingJDBC, Long> movieRepo;
+
+    @Autowired
+    private FileRepository fileRepo;
 
     @Autowired
     private MovieTransformer movieTransformer;
@@ -74,7 +80,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {      
+    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdNoRelationships(id);
         if (movie.isPresent()) {
             List<GenreJDBC> genres = movieRepo.findByIdGenres(id);
@@ -87,7 +93,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/details
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {      
+    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findById(id);
         if (movie.isPresent()) {
             return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
@@ -97,7 +103,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/directors
     @Override
-    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {      
+    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {
         if (movieRepo.existsById(id)) {
             List<DirectorJDBC> directors = movieRepo.findByIdDirectors(id);
             return new ResponseEntity<>(directorTransformer.jdbcToDto(directors), HttpStatus.OK);
@@ -108,7 +114,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/writers
     @Override
-    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {       
+    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {
         if (movieRepo.existsById(id)) {
             List<WriterJDBC> writers = movieRepo.findByIdWriters(id);
             return new ResponseEntity<>(writerTransformer.jdbcToDto(writers), HttpStatus.OK);
@@ -118,7 +124,7 @@ public class MovieService implements IMovieService {
 
     //movies/{id}/actors
     @Override
-    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {     
+    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActorJDBC> actors = movieRepo.findByIdActors(id);
             return new ResponseEntity<>(actorTransformer.jdbcToDto(actors), HttpStatus.OK);
@@ -154,6 +160,19 @@ public class MovieService implements IMovieService {
         int year = Year.now().getValue();
         List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByReleaseYearRelationshipGenresPaginated(page - 1, size, year));
         return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity deleteMovieById(long id) {
+        if (movieRepo.existsById(id)) {
+            Optional<String> cover = movieRepo.findByIdCoverImageUrl(id);
+            movieRepo.deleteById(id);
+            if (cover.isPresent() && fileRepo.doesFileExist(Constants.MEDIA_IMAGES_FOLDER_PATH + cover.get())) {
+                fileRepo.deleteIfExists(Constants.MEDIA_IMAGES_FOLDER_PATH + cover.get());
+            }
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
 }
