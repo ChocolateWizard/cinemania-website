@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mr. Poyo
  */
 @RestController
-@RequestMapping(path = "movies")
+@RequestMapping(path = "api/movies")
 @Validated
 public class MovieController {
 

@@ -274,7 +274,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     @Override
     public List<MovieJDBC> findAllById(List<Long> ids) throws DatabaseException {
         try {
-            List<MovieJDBC> movies = new ArrayList<>();
+            List<MovieJDBC> movies = new ArrayList<>(ids.size());
             for (Long id : ids) {
                 MovieJDBC movie;
                 try {
@@ -336,7 +336,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     @Override
     public void deleteAllById(List<Long> ids) throws DatabaseException {
         try {
-            List<Object[]> list = new ArrayList(ids.size());
+            List<Object[]> list = new ArrayList<>(ids.size());
             for (Long id : ids) {
                 list.add(new Object[]{id});
             }
@@ -349,7 +349,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     @Override
     public void deleteAll(List<MovieJDBC> entities) throws DatabaseException {
         try {
-            List<Object[]> list = new ArrayList(entities.size());
+            List<Object[]> list = new ArrayList<>(entities.size());
             for (MovieJDBC movie : entities) {
                 list.add(new Object[]{movie.getId()});
             }
@@ -371,7 +371,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     @Override
     public Optional<String> findByIdCoverImageUrl(Long id) throws DatabaseException {
         try {
-            String url = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, String.class);
+            String url = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
             return Optional.ofNullable(url);
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while retreiving movie cover image url", e);

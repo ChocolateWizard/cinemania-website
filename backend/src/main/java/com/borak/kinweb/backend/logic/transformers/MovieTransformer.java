@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActingRoleDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
@@ -27,6 +28,8 @@ import com.borak.kinweb.backend.domain.jpa.classes.DirectorJPA;
 import com.borak.kinweb.backend.domain.jpa.classes.GenreJPA;
 import com.borak.kinweb.backend.domain.jpa.classes.MovieJPA;
 import com.borak.kinweb.backend.domain.jpa.classes.WriterJPA;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,6 +39,10 @@ import org.springframework.stereotype.Component;
 @Component
 public final class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC, MovieJPA> {
 
+    @Autowired
+    private Environment env;
+    
+    
     @Override
     public MovieDTO jdbcToDto(MovieJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
@@ -46,7 +53,9 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
 
         movie.setId(jdbc.getId());
         movie.setTitle(jdbc.getTitle());
-        movie.setCoverImage(jdbc.getCoverImage());
+        if(jdbc.getCoverImage()!=null && !jdbc.getCoverImage().isEmpty()){
+            movie.setCoverImage(Constants.MEDIA_IMAGES_BASE_URL+jdbc.getCoverImage());
+        }       
         movie.setDescription(jdbc.getDescription());
         movie.setReleaseDate(jdbc.getReleaseDate());
         movie.setAudienceRating(jdbc.getAudienceRating());

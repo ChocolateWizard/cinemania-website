@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.ActorJPA;
@@ -26,7 +27,9 @@ public final class ActorTransformer implements GenericTransformer<ActorDTO, Acto
         actor.setFirstName(jdbc.getFirstName());
         actor.setLastName(jdbc.getLastName());
         actor.setGender(jdbc.getGender());
-        actor.setProfilePhoto(jdbc.getProfilePhoto());
+         if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
+            actor.setProfilePhoto(Constants.PERSON_IMAGES_BASE_URL + jdbc.getProfilePhoto());
+        }   
         actor.setStar(jdbc.isStar());
         return actor;
     }

@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
@@ -28,7 +29,9 @@ public class DirectorTransformer implements GenericTransformer<DirectorDTO, Dire
         director.setFirstName(jdbc.getFirstName());
         director.setLastName(jdbc.getLastName());
         director.setGender(jdbc.getGender());
-        director.setProfilePhoto(jdbc.getProfilePhoto());
+        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
+            director.setProfilePhoto(Constants.PERSON_IMAGES_BASE_URL + jdbc.getProfilePhoto());
+        }
         return director;
     }
 

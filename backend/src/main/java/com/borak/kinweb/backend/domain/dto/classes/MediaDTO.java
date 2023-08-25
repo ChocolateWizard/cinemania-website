@@ -35,7 +35,7 @@ import java.util.List;
     "id",
     "title",
     "releaseDate",
-    "coverImageUrl",
+    "coverImage",
     "description",
     "audienceRating",
     "criticRating",

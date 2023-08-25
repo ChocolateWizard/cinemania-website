@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
@@ -28,7 +29,9 @@ public class WriterTransformer implements GenericTransformer<WriterDTO, WriterJD
         writer.setFirstName(jdbc.getFirstName());
         writer.setLastName(jdbc.getLastName());
         writer.setGender(jdbc.getGender());
-        writer.setProfilePhoto(jdbc.getProfilePhoto());
+        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
+            writer.setProfilePhoto(Constants.PERSON_IMAGES_BASE_URL + jdbc.getProfilePhoto());
+        }   
         return writer;
     }
 
