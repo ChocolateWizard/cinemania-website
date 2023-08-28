@@ -64,7 +64,7 @@ public class ActingRoleTransformer implements GenericTransformer<ActingRoleDTO, 
                 }
                 media.setId(jdbc.getActing().getMedia().getId());
                 media.setTitle(jdbc.getActing().getMedia().getTitle());
-                media.setCoverImage(jdbc.getActing().getMedia().getCoverImage());
+                media.setCoverImageUrl(jdbc.getActing().getMedia().getCoverImage());
                 media.setDescription(jdbc.getActing().getMedia().getDescription());
                 media.setReleaseDate(jdbc.getActing().getMedia().getReleaseDate());
                 media.setAudienceRating(jdbc.getActing().getMedia().getAudienceRating());

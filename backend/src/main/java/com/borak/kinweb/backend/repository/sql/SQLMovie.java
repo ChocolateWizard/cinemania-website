@@ -111,7 +111,7 @@ public final class SQLMovie {
                                                            """;
 
     public static final String FIND_ALL_CRITIQUES_PS = """
-                                                           SELECT user.username,user.profile_image_url,critique.description,critique.rating 
+                                                           SELECT user.username,user.profile_image,critique.description,critique.rating 
                                                            FROM critique JOIN user_critic ON(critique.user_critic_id=user_critic.user_id) JOIN USER ON(user_critic.user_id=user.id) 
                                                            WHERE media_id=?;
                                                            """;

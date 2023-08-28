@@ -54,7 +54,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
         movie.setId(jdbc.getId());
         movie.setTitle(jdbc.getTitle());
         if(jdbc.getCoverImage()!=null && !jdbc.getCoverImage().isEmpty()){
-            movie.setCoverImage(Constants.MEDIA_IMAGES_BASE_URL+jdbc.getCoverImage());
+            movie.setCoverImageUrl(Constants.MEDIA_IMAGES_BASE_URL+jdbc.getCoverImage());
         }       
         movie.setDescription(jdbc.getDescription());
         movie.setReleaseDate(jdbc.getReleaseDate());

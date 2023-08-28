@@ -18,7 +18,7 @@ import java.time.LocalDate;
     "id",
     "title",
     "releaseDate",
-    "coverImage",
+    "coverImageUrl",
     "description",
     "audienceRating",
     "criticRating",

@@ -35,7 +35,7 @@ import java.util.List;
     "id",
     "title",
     "releaseDate",
-    "coverImage",
+    "coverImageUrl",
     "description",
     "audienceRating",
     "criticRating",
@@ -53,7 +53,7 @@ public abstract class MediaDTO implements DTO {
 
     @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "cover_image_url")
-    private String coverImage;
+    private String coverImageUrl;
 
     @NotNull(message = "Description must not be null")
     @JsonView(JsonVisibilityViews.Medium.class)
@@ -97,13 +97,20 @@ public abstract class MediaDTO implements DTO {
     @JsonSerialize(using = MediaActingsJsonSerializer.class)
     private List<ActingDTO> actings = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "MediaDTO{" + "id=" + id + ", title=" + title + ", coverImage=" + coverImageUrl + ", description=" + description + ", releaseDate=" + releaseDate + ", audienceRating=" + audienceRating + ", criticRating=" + criticRating + ", genres=" + genres + ", critiques=" + critiques + ", directors=" + directors + ", writers=" + writers + ", actings=" + actings + '}';
+    }
+    
+    
+
     public MediaDTO() {
     }
 
     public MediaDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
-        this.coverImage = coverImageUrl;
+        this.coverImageUrl = coverImageUrl;
         this.description = description;
         this.releaseDate = releaseDate;
         this.audienceRating = audienceRating;
@@ -164,13 +171,15 @@ public abstract class MediaDTO implements DTO {
         return genres;
     }
 
-    public String getCoverImage() {
-        return coverImage;
+    public String getCoverImageUrl() {
+        return coverImageUrl;
     }
 
-    public void setCoverImage(String coverImage) {
-        this.coverImage = coverImage;
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
+
+    
     
 
     public void setGenres(List<GenreDTO> genres) {

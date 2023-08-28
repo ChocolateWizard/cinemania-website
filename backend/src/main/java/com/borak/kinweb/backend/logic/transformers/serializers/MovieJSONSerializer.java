@@ -29,10 +29,10 @@ public class MovieJSONSerializer extends JsonSerializer<MovieDTO> {
         jg.writeStartObject();
         jg.writeNumberField("id", movie.getId());
         jg.writeStringField("title", movie.getTitle());
-        if (movie.getCoverImage() == null) {
+        if (movie.getCoverImageUrl() == null) {
             jg.writeNullField("cover_image_url");
         } else {
-            jg.writeStringField("cover_image_url", movie.getCoverImage());
+            jg.writeStringField("cover_image_url", movie.getCoverImageUrl());
         }
 //        jg.writeStringField("release_date", movie.getReleaseDateAsString());
         jg.writeStringField("description", movie.getDescription());

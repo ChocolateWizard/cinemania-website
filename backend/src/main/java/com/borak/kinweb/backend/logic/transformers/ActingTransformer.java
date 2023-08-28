@@ -60,7 +60,7 @@ public class ActingTransformer implements GenericTransformer<ActingDTO, ActingJD
             }
             media.setId(jdbc.getMedia().getId());
             media.setTitle(jdbc.getMedia().getTitle());
-            media.setCoverImage(jdbc.getMedia().getCoverImage());
+            media.setCoverImageUrl(jdbc.getMedia().getCoverImage());
             media.setDescription(jdbc.getMedia().getDescription());
             media.setReleaseDate(jdbc.getMedia().getReleaseDate());
             media.setAudienceRating(jdbc.getMedia().getAudienceRating());
