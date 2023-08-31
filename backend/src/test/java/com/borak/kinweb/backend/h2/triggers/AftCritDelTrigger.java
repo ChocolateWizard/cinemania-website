@@ -7,15 +7,15 @@ package com.borak.kinweb.backend.h2.triggers;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import org.h2.api.Trigger;
+//import org.h2.api.Trigger;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class AftCritDelTrigger implements Trigger {
+public class AftCritDelTrigger {
 
-    @Override
+//    @Override
     public void fire(Connection conn, Object[] oldRow, Object[] newRow) throws SQLException {
         String sql = """
                    UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique
