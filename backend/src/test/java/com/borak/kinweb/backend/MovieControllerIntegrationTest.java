@@ -4,7 +4,10 @@
  */
 package com.borak.kinweb.backend;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.repository.jdbc.movie.MovieRepositoryJDBC;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,10 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("test")
 public class MovieControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private MovieRepositoryJDBC movieRepo;
+   
+    
 
 }

@@ -4,12 +4,14 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.JPA;
 import com.borak.kinweb.backend.domain.jpa.classes.WriterJPA;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +21,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class WriterTransformer implements GenericTransformer<WriterDTO, WriterJDBC, WriterJPA> {
 
+    @Autowired
+    private ConfigProperties config;
+    
     @Override
     public WriterDTO jdbcToDto(WriterJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
@@ -30,7 +35,7 @@ public class WriterTransformer implements GenericTransformer<WriterDTO, WriterJD
         writer.setLastName(jdbc.getLastName());
         writer.setGender(jdbc.getGender());
         if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            writer.setProfilePhoto(Constants.PERSON_IMAGES_BASE_URL + jdbc.getProfilePhoto());
+            writer.setProfilePhoto(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
         }   
         return writer;
     }

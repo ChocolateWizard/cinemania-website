@@ -4,12 +4,14 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.DirectorJPA;
 import com.borak.kinweb.backend.domain.jpa.classes.JPA;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +21,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DirectorTransformer implements GenericTransformer<DirectorDTO, DirectorJDBC, DirectorJPA> {
 
+    @Autowired
+    private ConfigProperties config;
+    
     @Override
     public DirectorDTO jdbcToDto(DirectorJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
@@ -30,7 +35,7 @@ public class DirectorTransformer implements GenericTransformer<DirectorDTO, Dire
         director.setLastName(jdbc.getLastName());
         director.setGender(jdbc.getGender());
         if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            director.setProfilePhoto(Constants.PERSON_IMAGES_BASE_URL + jdbc.getProfilePhoto());
+            director.setProfilePhoto(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
         }
         return director;
     }

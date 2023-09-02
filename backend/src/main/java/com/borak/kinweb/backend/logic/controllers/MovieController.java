@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.controllers;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
 import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
@@ -41,6 +42,9 @@ public class MovieController {
 
     @Autowired
     private final IMovieService movieService;
+    
+    @Autowired
+    ConfigProperties properties;
 
     public MovieController(IMovieService movieService) {
         this.movieService = movieService;

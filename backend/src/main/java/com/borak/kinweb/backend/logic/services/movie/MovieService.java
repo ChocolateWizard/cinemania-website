@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.services.movie;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
@@ -45,6 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class MovieService implements IMovieService {
+
+    @Autowired
+    ConfigProperties config;
 
     @Autowired
     private IMovieRepository<MovieJDBC, GenreJDBC, DirectorJDBC, WriterJDBC, ActorJDBC, ActingJDBC, Long> movieRepo;
@@ -167,8 +171,8 @@ public class MovieService implements IMovieService {
         if (movieRepo.existsById(id)) {
             Optional<String> cover = movieRepo.findByIdCoverImageUrl(id);
             movieRepo.deleteById(id);
-            if (cover.isPresent() && fileRepo.doesFileExist(Constants.MEDIA_IMAGES_FOLDER_PATH + cover.get())) {
-                fileRepo.deleteIfExists(Constants.MEDIA_IMAGES_FOLDER_PATH + cover.get());
+            if (cover.isPresent() && fileRepo.doesFileExist(config.getMediaImagesFolderPath() + cover.get())) {
+                fileRepo.deleteIfExists(config.getMediaImagesFolderPath() + cover.get());
             }
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

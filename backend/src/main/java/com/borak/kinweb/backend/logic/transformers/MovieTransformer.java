@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.transformers;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
 import com.borak.kinweb.backend.domain.dto.classes.ActingRoleDTO;
@@ -40,7 +41,7 @@ import org.springframework.stereotype.Component;
 public final class MovieTransformer implements GenericTransformer<MovieDTO, MovieJDBC, MovieJPA> {
 
     @Autowired
-    private Environment env;
+    private ConfigProperties config;
     
     
     @Override
@@ -54,7 +55,7 @@ public final class MovieTransformer implements GenericTransformer<MovieDTO, Movi
         movie.setId(jdbc.getId());
         movie.setTitle(jdbc.getTitle());
         if(jdbc.getCoverImage()!=null && !jdbc.getCoverImage().isEmpty()){
-            movie.setCoverImageUrl(Constants.MEDIA_IMAGES_BASE_URL+jdbc.getCoverImage());
+            movie.setCoverImageUrl(config.getMediaImagesBaseUrl()+jdbc.getCoverImage());
         }       
         movie.setDescription(jdbc.getDescription());
         movie.setReleaseDate(jdbc.getReleaseDate());
