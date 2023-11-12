@@ -11,7 +11,7 @@ public class ActingJDBC implements JDBC {
 
     private MediaJDBC media;
     private ActorJDBC actor;
-    private boolean starring;
+    private Boolean starring;
     private List<ActingRoleJDBC> roles = new ArrayList<>();
 
     public ActingJDBC() {
@@ -26,7 +26,7 @@ public class ActingJDBC implements JDBC {
         this.actor = actor;
     }
 
-    public ActingJDBC(MediaJDBC media, ActorJDBC actor, boolean starring) {
+    public ActingJDBC(MediaJDBC media, ActorJDBC actor, Boolean starring) {
         this.media = media;
         this.actor = actor;
         this.starring = starring;
@@ -60,11 +60,11 @@ public class ActingJDBC implements JDBC {
         }
     }
 
-    public boolean isStarring() {
+    public Boolean isStarring() {
         return starring;
     }
 
-    public void setStarring(boolean starring) {
+    public void setStarring(Boolean starring) {
         this.starring = starring;
     }
 

@@ -41,6 +41,8 @@ public interface IMovieService {
     public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id);
     
     public ResponseEntity deleteMovieById(long id);
+
+    public ResponseEntity<MovieDTO> postMovie(MovieDTO movie);
     
 
 }

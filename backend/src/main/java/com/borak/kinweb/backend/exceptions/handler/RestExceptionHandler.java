@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.exceptions.handler;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.exceptions.InvalidInputException;
 import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
+import com.borak.kinweb.backend.exceptions.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -60,6 +61,17 @@ public class RestExceptionHandler {
             list.add(error.getMessage());
         });
         errorDetail.setDetails(list.toArray(String[]::new));
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(value = ValidationException.class)
+    public ResponseEntity<?> handleValidationException(ValidationException ex, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setTitle("Bad Request");
+        errorDetail.setDetails(ex.getMessages());
         errorDetail.setDeveloperMessage(ex.getClass().getName());
         return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
     }

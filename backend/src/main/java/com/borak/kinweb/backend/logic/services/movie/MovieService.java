@@ -179,4 +179,9 @@ public class MovieService implements IMovieService {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
+    @Override
+    public ResponseEntity<MovieDTO> postMovie(MovieDTO movie) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 }

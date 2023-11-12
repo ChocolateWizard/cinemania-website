@@ -5,7 +5,7 @@
 package com.borak.kinweb.backend;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.repository.jdbc.movie.MovieRepositoryJDBC;
+import com.borak.kinweb.backend.repository.jdbc.MovieRepositoryJDBC;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +17,14 @@ import org.springframework.test.web.servlet.MockMvc;
  *
  * @author Mr. Poyo
  */
+
 @SpringBootTest
 @ActiveProfiles("test")
-public class MovieControllerIntegrationTest {
+public class MovieControllerTest {
 
+    
+//   MockMvc mcv;
+   
    
     
 

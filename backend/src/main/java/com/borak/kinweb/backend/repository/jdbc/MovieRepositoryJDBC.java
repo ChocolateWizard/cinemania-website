@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.kinweb.backend.repository.jdbc.movie;
+package com.borak.kinweb.backend.repository.jdbc;
 
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
@@ -257,6 +257,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
                 for (ActingJDBC acting : actings) {
                     acting.setMedia(movie);
                     List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ROLES_PS, new Object[]{movie.getId(), acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLMovie.actingRoleRM);
+                    for (ActingRoleJDBC role : roles) {
+                        role.setActing(acting);
+                    }
                     acting.setRoles(roles);
                 }
                 movie.setGenres(genres);
@@ -377,6 +380,84 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
             throw new DatabaseException("Error while retreiving movie cover image url", e);
         }
 
+    }
+
+    @Override
+    public List<MovieJDBC> findAllNoRelationshipsPaginated(int page, int size) throws DatabaseException {
+        try {
+            return jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving movies", e);
+        }
+    }
+
+    @Override
+    public List<MovieJDBC> findAllRelationshipGenresPaginated(int page, int size) throws DatabaseException {
+        try {
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            for (MovieJDBC movie : movies) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
+                movie.setGenres(genres);
+            }
+            return movies;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving movies", e);
+        }
+    }
+
+    @Override
+    public List<MovieJDBC> findAllByAudienceRatingRelationshipGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException {
+        try {
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_RATING_PAGINATED_PS, new Object[]{ratingThresh, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            for (MovieJDBC movie : movies) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
+                movie.setGenres(genres);
+            }
+            return movies;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving movies", e);
+        }
+    }
+
+    @Override
+    public List<MovieJDBC> findAllByReleaseYearRelationshipGenresPaginated(int page, int size, int year) throws DatabaseException {
+        try {
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_YEAR_PAGINATED_PS, new Object[]{year, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            for (MovieJDBC movie : movies) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
+                movie.setGenres(genres);
+            }
+            return movies;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving movies", e);
+        }
+    }
+
+    @Override
+    public List<MovieJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+        try {
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{page, size}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            for (MovieJDBC movie : movies) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
+                List<CritiqueJDBC> critiques = jdbcTemplate.query(SQLMovie.FIND_ALL_CRITIQUES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.critiqueRM);
+                List<DirectorJDBC> directors = jdbcTemplate.query(SQLMovie.FIND_ALL_DIRECTORS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.directorRM);
+                List<WriterJDBC> writers = jdbcTemplate.query(SQLMovie.FIND_ALL_WRITERS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.writerRM);
+                List<ActingJDBC> actings = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ACTORS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.actingActorRM);
+                for (ActingJDBC acting : actings) {
+                    acting.setMedia(movie);
+                    List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ROLES_PS, new Object[]{movie.getId(), acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLMovie.actingRoleRM);
+                    acting.setRoles(roles);
+                }
+                movie.setGenres(genres);
+                movie.setDirectors(directors);
+                movie.setWriters(writers);
+                movie.setActings(actings);
+                movie.setCritiques(critiques);
+            }
+            return movies;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving all movies", e);
+        }
     }
 
 //=====================================================================================================================
@@ -502,84 +583,6 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
             }
         }
         );
-    }
-
-    @Override
-    public List<MovieJDBC> findAllNoRelationshipsPaginated(int page, int size) throws DatabaseException {
-        try {
-            return jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving movies", e);
-        }
-    }
-
-    @Override
-    public List<MovieJDBC> findAllRelationshipGenresPaginated(int page, int size) throws DatabaseException {
-        try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
-            for (MovieJDBC movie : movies) {
-                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
-                movie.setGenres(genres);
-            }
-            return movies;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving movies", e);
-        }
-    }
-
-    @Override
-    public List<MovieJDBC> findAllByAudienceRatingRelationshipGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException {
-        try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_RATING_PAGINATED_PS, new Object[]{ratingThresh, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
-            for (MovieJDBC movie : movies) {
-                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
-                movie.setGenres(genres);
-            }
-            return movies;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving movies", e);
-        }
-    }
-
-    @Override
-    public List<MovieJDBC> findAllByReleaseYearRelationshipGenresPaginated(int page, int size, int year) throws DatabaseException {
-        try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_YEAR_PAGINATED_PS, new Object[]{year, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
-            for (MovieJDBC movie : movies) {
-                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
-                movie.setGenres(genres);
-            }
-            return movies;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving movies", e);
-        }
-    }
-
-    @Override
-    public List<MovieJDBC> findAllPaginated(int page, int size) throws DatabaseException {
-        try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{page, size}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
-            for (MovieJDBC movie : movies) {
-                List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
-                List<CritiqueJDBC> critiques = jdbcTemplate.query(SQLMovie.FIND_ALL_CRITIQUES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.critiqueRM);
-                List<DirectorJDBC> directors = jdbcTemplate.query(SQLMovie.FIND_ALL_DIRECTORS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.directorRM);
-                List<WriterJDBC> writers = jdbcTemplate.query(SQLMovie.FIND_ALL_WRITERS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.writerRM);
-                List<ActingJDBC> actings = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ACTORS_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.actingActorRM);
-                for (ActingJDBC acting : actings) {
-                    acting.setMedia(movie);
-                    List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ROLES_PS, new Object[]{movie.getId(), acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLMovie.actingRoleRM);
-                    acting.setRoles(roles);
-                }
-                movie.setGenres(genres);
-                movie.setDirectors(directors);
-                movie.setWriters(writers);
-                movie.setActings(actings);
-                movie.setCritiques(critiques);
-            }
-            return movies;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving all movies", e);
-        }
     }
 
 }

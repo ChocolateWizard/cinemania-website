@@ -274,7 +274,7 @@ insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`au
 (2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
 (3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
 (4,'The Lighthouse','2019-05-19','4.jpg','Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
-(5,'2001: A Space Odyssey','1968-04-02',NULL,'After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000',83,NULL);
+(5,'2001: A Space Odyssey','1968-04-02',NULL,'After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000.',83,NULL);
 
 /*Data for the table `tv_show` */
 
@@ -419,7 +419,7 @@ insert  into `acting_role`(`acting_media_id`,`acting_actor_id`,`id`,`name`) valu
 (1,3,2,'Camilla Rhodes'),
 (1,4,1,'Adam'),
 (1,6,1,'Irene'),
-(1,20,1,'Dan'),
+(1,5,1,'Dan'),
 (2,4,1,'Devon Berk'),
 (2,4,2,'Billy Side'),
 (2,7,1,'Lost Girl'),

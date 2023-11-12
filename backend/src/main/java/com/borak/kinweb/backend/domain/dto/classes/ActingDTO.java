@@ -19,17 +19,13 @@ import java.util.List;
 @JsonSerialize(using = ActingJsonSerializer.class)
 public class ActingDTO implements DTO {
 
-    
     private MediaDTO media;
-     
     private ActorDTO actor;
-     
-    private boolean starring;
-       
+    private Boolean starring;
     private List<ActingRoleDTO> roles = new ArrayList<>();
 
     public ActingDTO() {
-    } 
+    }
 
     public MediaDTO getMedia() {
         return media;
@@ -59,14 +55,12 @@ public class ActingDTO implements DTO {
         }
     }
 
-    public boolean isStarring() {
+    public Boolean isStarring() {
         return starring;
     }
 
-    public void setStarring(boolean starring) {
+    public void setStarring(Boolean starring) {
         this.starring = starring;
     }
-    
-    
 
 }

@@ -47,4 +47,13 @@ public class MovieDTO extends MediaDTO {
         this.length = length;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "length=" + length;
+    }
+
+    
+
+    
+    
 }

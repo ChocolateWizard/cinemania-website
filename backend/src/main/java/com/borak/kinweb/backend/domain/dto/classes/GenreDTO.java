@@ -40,6 +40,11 @@ public class GenreDTO implements DTO {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "GenreDTO{" + "id=" + id + ", name=" + name + '}';
+    }
     
     
 
