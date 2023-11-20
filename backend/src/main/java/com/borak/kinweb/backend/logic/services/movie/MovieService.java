@@ -5,31 +5,29 @@
 package com.borak.kinweb.backend.logic.services.movie;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.constants.Constants;
-import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
-import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
-import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
-import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
-import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
-import com.borak.kinweb.backend.exceptions.InvalidInputException;
 import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
+import com.borak.kinweb.backend.exceptions.ValidationException;
 import com.borak.kinweb.backend.logic.transformers.ActingTransformer;
 import com.borak.kinweb.backend.logic.transformers.ActorTransformer;
 import com.borak.kinweb.backend.logic.transformers.DirectorTransformer;
 import com.borak.kinweb.backend.logic.transformers.MovieTransformer;
 import com.borak.kinweb.backend.logic.transformers.WriterTransformer;
-import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.borak.kinweb.backend.repository.api.IMovieRepository;
+import com.borak.kinweb.backend.repository.jpa.ActorRepositoryJPA;
+import com.borak.kinweb.backend.repository.jpa.DirectorRepositoryJPA;
+import com.borak.kinweb.backend.repository.jpa.GenreRepositoryJPA;
+import com.borak.kinweb.backend.repository.jpa.WriterRepositoryJPA;
 import com.borak.kinweb.backend.repository.util.FileRepository;
-import com.fasterxml.jackson.annotation.JsonView;
-import java.awt.Image;
 import java.time.Year;
+import java.util.LinkedList;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,13 +43,23 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class MovieService implements IMovieService {
+public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
+
+    private static final int POPULARITY_TRESHOLD = 80;
 
     @Autowired
     ConfigProperties config;
 
     @Autowired
     private IMovieRepository<MovieJDBC, GenreJDBC, DirectorJDBC, WriterJDBC, ActorJDBC, ActingJDBC, Long> movieRepo;
+    @Autowired
+    private GenreRepositoryJPA genreRepo;
+    @Autowired
+    private DirectorRepositoryJPA directorRepo;
+    @Autowired
+    private WriterRepositoryJPA writerRepo;
+    @Autowired
+    private ActorRepositoryJPA actorRepo;
 
     @Autowired
     private FileRepository fileRepo;
@@ -68,23 +76,33 @@ public class MovieService implements IMovieService {
     private ActingTransformer actingTransformer;
 //----------------------------------------------------------------------------------------------------
 
-    //movies
     @Override
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres() {
-        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
+    public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size) {
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenresPaginated(page - 1, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    //movies/details
     @Override
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithDetails() {
-        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAll());
+    public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size) {
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByAudienceRatingRelationshipGenresPaginated(page - 1, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    //movies/{id}
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id) {
+    public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
+        int year = Year.now().getValue();
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByReleaseYearRelationshipGenresPaginated(page - 1, size, year));
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size) {
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllPaginated(page - 1, size));
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity getMovieWithGenres(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdNoRelationships(id);
         if (movie.isPresent()) {
             List<GenreJDBC> genres = movieRepo.findByIdGenres(id);
@@ -92,12 +110,10 @@ public class MovieService implements IMovieService {
             return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
-
     }
 
-    //movies/{id}/details
     @Override
-    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id) {
+    public ResponseEntity getMovieWithDetails(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findById(id);
         if (movie.isPresent()) {
             return new ResponseEntity<>(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
@@ -105,20 +121,29 @@ public class MovieService implements IMovieService {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    //movies/{id}/directors
     @Override
-    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id) {
+    public ResponseEntity getAllMoviesWithGenres() {
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenres());
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity getAllMoviesWithDetails() {
+        List<MovieResponseDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAll());
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity getMovieDirectors(Long id) {
         if (movieRepo.existsById(id)) {
             List<DirectorJDBC> directors = movieRepo.findByIdDirectors(id);
             return new ResponseEntity<>(directorTransformer.jdbcToDto(directors), HttpStatus.OK);
-
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    //movies/{id}/writers
     @Override
-    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id) {
+    public ResponseEntity getMovieWriters(Long id) {
         if (movieRepo.existsById(id)) {
             List<WriterJDBC> writers = movieRepo.findByIdWriters(id);
             return new ResponseEntity<>(writerTransformer.jdbcToDto(writers), HttpStatus.OK);
@@ -126,9 +151,8 @@ public class MovieService implements IMovieService {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    //movies/{id}/actors
     @Override
-    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id) {
+    public ResponseEntity getMovieActors(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActorJDBC> actors = movieRepo.findByIdActors(id);
             return new ResponseEntity<>(actorTransformer.jdbcToDto(actors), HttpStatus.OK);
@@ -136,34 +160,13 @@ public class MovieService implements IMovieService {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    //movies/{id}/actors/roles
     @Override
-    public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id) {
+    public ResponseEntity getMovieActorsWithRoles(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActingJDBC> actings = movieRepo.findByIdActorsWithRoles(id);
             return new ResponseEntity<>(actingTransformer.jdbcToDto(actings), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPaginated(int page, int size) {
-        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllRelationshipGenresPaginated(page - 1, size));
-        return new ResponseEntity<>(movies, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPopularPaginated(int page, int size) {
-        int rating = 80;
-        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByAudienceRatingRelationshipGenresPaginated(page - 1, size, rating));
-        return new ResponseEntity<>(movies, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresCurrentPaginated(int page, int size) {
-        int year = Year.now().getValue();
-        List<MovieDTO> movies = movieTransformer.jdbcToDto(movieRepo.findAllByReleaseYearRelationshipGenresPaginated(page - 1, size, year));
-        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
@@ -180,8 +183,51 @@ public class MovieService implements IMovieService {
     }
 
     @Override
-    public ResponseEntity<MovieDTO> postMovie(MovieDTO movie) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public ResponseEntity postMovie(MoviePOSTRequestDTO movieClient) {
+        List<String> errorMessages = new LinkedList<>();
+        for (Long genre : movieClient.getGenres()) {
+            if (!genreRepo.existsById(genre)) {
+                errorMessages.add("Genre with id: " + genre + " does not exist in database!");
+            }
+        }
+        for (Long director : movieClient.getDirectors()) {
+            if (!directorRepo.existsById(director)) {
+                errorMessages.add("Director with id: " + director + " does not exist in database!");
+            }
+        }
+        for (Long writer : movieClient.getWriters()) {
+            if (!writerRepo.existsById(writer)) {
+                errorMessages.add("Writer with id: " + writer + " does not exist in database!");
+            }
+        }
+        for (MoviePOSTRequestDTO.Actor actor : movieClient.getActors()) {
+            if (!actorRepo.existsById(actor.getId())) {
+                errorMessages.add("Actor with id: " + actor + " does not exist in database!");
+            }
+        }
+        if (!errorMessages.isEmpty()) {
+            throw new ValidationException(errorMessages.toArray(String[]::new));
+        }
+
+        for (MoviePOSTRequestDTO.Actor actor : movieClient.getActors()) {
+            long i = 1;
+            for (MoviePOSTRequestDTO.Actor.Role role : actor.getRoles()) {
+                role.setId(i);
+                i++;
+            }
+        }
+        MovieJDBC movieJDBC = movieTransformer.dtoToJdbc(movieClient);
+        MovieJDBC movieDB = movieRepo.insert(movieJDBC);
+//        if (movieClient.getCoverImage() != null) {
+//            String imageExtension=FilenameUtils.getExtension(movieClient.getCoverImage().getOriginalFilename());
+//            String imageFullName=movieDB.getId() + "." + imageExtension;
+//            movieDB.setCoverImage(imageFullName);
+//            movieRepo.updateCoverImage(movieDB.getId(), movieDB.getCoverImage());
+////            Image image=new Image(""+movieDB.getId(), imageExtension, movieDB.getId()+"."+imageExtension, movieClient.getCoverImage());
+//            fileRepo.saveMediaCoverImage(image);
+//        }
+
+        return new ResponseEntity<>(movieTransformer.jdbcToDto(movieDB), HttpStatus.OK);
     }
 
 }

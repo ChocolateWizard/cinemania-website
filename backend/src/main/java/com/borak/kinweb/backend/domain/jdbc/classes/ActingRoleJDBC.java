@@ -54,6 +54,11 @@ public class ActingRoleJDBC implements JDBC{
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return "ActingRoleJDBC{" + "id=" + id + ", name=" + name + '}';
+    }
+
    
 
    

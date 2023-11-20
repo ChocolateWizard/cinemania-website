@@ -2,19 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.kinweb.backend.domain.dto.classes;
+package com.borak.kinweb.backend.domain.dto.actor;
 
-
-
+import com.borak.kinweb.backend.domain.dto.DTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  *
- * @author Mr Poyo
+ * @author Mr. Poyo
  */
-public abstract class PersonDTO implements DTO{
+public class ActorResponseDTO implements DTO {
 
     private Long id;
 
@@ -24,23 +22,25 @@ public abstract class PersonDTO implements DTO{
     @JsonProperty(value = "last_name")
     private String lastName;
 
+    @JsonProperty(value = "profile_photo_url")
+    private String profilePhotoUrl;
+
     private Gender gender;
 
-    @JsonProperty(value = "profile_photo_url")
-    private String profilePhoto;
+    @JsonProperty(value = "is_star")
+    private Boolean star;
 
-    public PersonDTO() {
+    public ActorResponseDTO() {
     }
 
-    public PersonDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
+    public ActorResponseDTO(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender, Boolean star) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.profilePhotoUrl = profilePhotoUrl;
         this.gender = gender;
-        this.profilePhoto = profilePhotoURL;
+        this.star = star;
     }
-
-    
 
     public Long getId() {
         return id;
@@ -66,6 +66,14 @@ public abstract class PersonDTO implements DTO{
         this.lastName = lastName;
     }
 
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
+
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
+    }
+
     public Gender getGender() {
         return gender;
     }
@@ -74,15 +82,15 @@ public abstract class PersonDTO implements DTO{
         this.gender = gender;
     }
 
-    public String getProfilePhoto() {
-        return profilePhoto;
+    public Boolean getStar() {
+        return star;
     }
 
-    public void setProfilePhoto(String profilePhoto) {
-        this.profilePhoto = profilePhoto;
+    public void setStar(Boolean star) {
+        this.star = star;
     }
+
     
     
-
-
+    
 }

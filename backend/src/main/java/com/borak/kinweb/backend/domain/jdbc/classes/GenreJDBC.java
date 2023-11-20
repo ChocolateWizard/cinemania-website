@@ -19,10 +19,14 @@ public class GenreJDBC implements JDBC {
 
     private String name;
 
-    private List<MediaJDBC> medias = new ArrayList<>();
-
     public GenreJDBC() {
     }
+
+    public GenreJDBC(Long id) {
+        this.id = id;
+    }
+    
+    
 
     public GenreJDBC(Long id, String name) {
         this.id = id;
@@ -43,18 +47,6 @@ public class GenreJDBC implements JDBC {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<MediaJDBC> getMedias() {
-        return medias;
-    }
-
-    public void setMedias(List<MediaJDBC> medias) {
-        if (medias == null) {
-            this.medias = new ArrayList<>();
-        } else {
-            this.medias = medias;
-        }
     }
 
 }

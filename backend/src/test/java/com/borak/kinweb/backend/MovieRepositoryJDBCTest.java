@@ -187,9 +187,6 @@ public class MovieRepositoryJDBCTest {
 
         for (MovieJDBC movie : movies) {
             assertThat(movie.getCriticRating()).isNull();
-            for (GenreJDBC genre : movie.getGenres()) {
-                assertThat(genre.getMedias()).isNotNull().isEmpty();
-            }
             assertThat(movie.getCritiques()).isNotNull().isEmpty();
             assertThat(movie.getDirectors()).isNotNull().isEmpty();
             assertThat(movie.getWriters()).isNotNull().isEmpty();
@@ -663,9 +660,6 @@ public class MovieRepositoryJDBCTest {
         for (MovieJDBC movie : movies) {
             assertThat(movie.getCritiques()).isNotNull().isEmpty();
             assertThat(movie.getCriticRating()).isNull();
-            for (GenreJDBC genre : movie.getGenres()) {
-                assertThat(genre.getMedias()).isNotNull().isEmpty();
-            }
             for (ActingJDBC acting : movie.getActings()) {
                 assertThat(acting.getMedia() == movie).isTrue();
                 for (ActingRoleJDBC role : acting.getRoles()) {

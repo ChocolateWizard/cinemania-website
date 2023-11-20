@@ -53,6 +53,10 @@ public final class SQLMovie {
                                        INSERT INTO acting(media_id,actor_id,is_starring) 
                                        VALUES(?,?,?);
                                        """;
+    public static final String INSERT_MEDIA_ACTING_ROLES_PS = """
+                                       INSERT INTO acting_role(acting_media_id,acting_actor_id,id,NAME) 
+                                       VALUES(?,?,?,?);
+                                       """;
     public static final String UPDATE_MEDIA_PS = """
                                        UPDATE media
                                        SET title = ?, release_date = ?, cover_image = ?,description = ?,audience_rating=?
@@ -62,6 +66,11 @@ public final class SQLMovie {
                                        UPDATE movie
                                        SET length = ?
                                        WHERE movie.media_id=?;
+                                       """;
+    public static final String UPDATE_MEDIA_COVER_IMAGE_PS = """
+                                       UPDATE media
+                                       SET cover_image = ? 
+                                       WHERE media.id=(SELECT movie.media_id FROM movie WHERE movie.media_id=?);
                                        """;
 
     public static final String FIND_ALL_S = """

@@ -47,5 +47,7 @@ public interface IMovieRepository<M, G, D, W, A, AC, ID> extends IRepository<M, 
     public List<AC> findByIdActorsWithRoles(ID id) throws DatabaseException;
 
     public Optional<String> findByIdCoverImageUrl(ID id) throws DatabaseException;
+    
+    public String updateCoverImage(ID id,String coverImage)throws DatabaseException;
 
 }

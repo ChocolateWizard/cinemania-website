@@ -43,8 +43,8 @@ public abstract class PersonJPA implements JPA {
     @Convert(converter = GenderConverter.class)
     private Gender gender;
 
-    @Column(name = "profile_photo_url")
-    private String profilePhotoURL; 
+    @Column(name = "profile_photo")
+    private String profilePhoto; 
 
     public PersonJPA() {
     }
@@ -53,7 +53,7 @@ public abstract class PersonJPA implements JPA {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profilePhotoURL = profilePhotoURL;
+        this.profilePhoto = profilePhotoURL;
     }
 
     public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
@@ -61,7 +61,7 @@ public abstract class PersonJPA implements JPA {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profilePhotoURL = profilePhotoURL;
+        this.profilePhoto = profilePhotoURL;
     }
 
     public Long getId() {
@@ -96,13 +96,15 @@ public abstract class PersonJPA implements JPA {
         this.gender = gender;
     }
 
-    public String getProfilePhotoURL() {
-        return profilePhotoURL;
+    public String getProfilePhoto() {
+        return profilePhoto;
     }
 
-    public void setProfilePhotoURL(String profilePhotoURL) {
-        this.profilePhotoURL = profilePhotoURL;
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
     }
+
+    
 
 //    @Override
 //    public int hashCode() {

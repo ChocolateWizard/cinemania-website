@@ -34,12 +34,6 @@ public class GenreJPA implements JPA {
 
     private String name;
 
-    @ManyToMany
-    @JoinTable(name = "media_genres",
-            joinColumns = @JoinColumn(name = "genre_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id"))
-    private List<MediaJPA> medias = new ArrayList<>();
-
     public GenreJPA() {
     }
 
@@ -48,11 +42,6 @@ public class GenreJPA implements JPA {
         this.name = name;
     }
 
-    public GenreJPA(Long id, String name, List<MediaJPA> medias) {
-        this.id = id;
-        this.name = name;
-        this.medias = medias;
-    }
 
     public Long getId() {
         return id;
@@ -68,15 +57,7 @@ public class GenreJPA implements JPA {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<MediaJPA> getMedias() {
-        return medias;
-    }
-
-    public void setMedias(List<MediaJPA> medias) {
-        this.medias = medias;
-    }
+    } 
 
     @Override
     public int hashCode() {

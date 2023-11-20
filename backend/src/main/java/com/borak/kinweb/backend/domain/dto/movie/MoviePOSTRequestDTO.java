@@ -2,8 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.kinweb.backend.domain.dto.classes;
+package com.borak.kinweb.backend.domain.dto.movie;
 
+import com.borak.kinweb.backend.domain.dto.DTO;
+import com.borak.kinweb.backend.domain.dto.classes.MyImage;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,7 +33,7 @@ public class MoviePOSTRequestDTO implements DTO {
     private String title;
 
     @JsonIgnore
-    private MultipartFile coverImage;
+    private MyImage coverImage;
 
     @NotBlank(message = "Movie description must not be null or empty!")
     @Size(max = 500, message = "Movie description must have less than 500 characters!")
@@ -146,11 +148,11 @@ public class MoviePOSTRequestDTO implements DTO {
         this.title = title;
     }
 
-    public MultipartFile getCoverImage() {
+    public MyImage getCoverImage() {
         return coverImage;
     }
 
-    public void setCoverImage(MultipartFile coverImage) {
+    public void setCoverImage(MyImage coverImage) {
         this.coverImage = coverImage;
     }
 

@@ -29,6 +29,12 @@ public abstract class PersonJDBC implements JDBC{
     public PersonJDBC() {
     }
 
+    public PersonJDBC(Long id) {
+        this.id = id;
+    }
+    
+    
+
     public PersonJDBC(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
         this.id = id;
         this.firstName = firstName;

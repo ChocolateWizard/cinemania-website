@@ -4,45 +4,41 @@
  */
 package com.borak.kinweb.backend.logic.services.movie;
 
-import com.borak.kinweb.backend.domain.dto.classes.ActingDTO;
-import com.borak.kinweb.backend.domain.dto.classes.ActorDTO;
-import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
-import com.borak.kinweb.backend.domain.dto.classes.MovieDTO;
-import com.borak.kinweb.backend.domain.dto.classes.WriterDTO;
-import java.util.List;
+import com.borak.kinweb.backend.domain.dto.DTO;
 import org.springframework.http.ResponseEntity;
 
 /**
  *
  * @author Mr. Poyo
  */
-public interface IMovieService {
+public interface IMovieService<D extends DTO> {
 
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenres();
+    public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size);
 
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPaginated(int page, int size);
+    public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size);
 
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresPopularPaginated(int page, int size);
+    public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size);
 
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithGenresCurrentPaginated(int page, int size);
-
-    public ResponseEntity<List<MovieDTO>> getAllMoviesWithDetails();
-
-    public ResponseEntity<MovieDTO> getMovieWithGenres(Long id);
-
-    public ResponseEntity<MovieDTO> getMovieWithDetails(Long id);
-
-    public ResponseEntity<List<DirectorDTO>> getMovieDirectors(Long id);
-
-    public ResponseEntity<List<WriterDTO>> getMovieWriters(Long id);
-
-    public ResponseEntity<List<ActorDTO>> getMovieActors(Long id);
-
-    public ResponseEntity<List<ActingDTO>> getMovieActorsWithRoles(Long id);
+    public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size);
     
+    public ResponseEntity getMovieWithGenres(Long id);
+
+    public ResponseEntity getAllMoviesWithGenres();
+
+    public ResponseEntity getAllMoviesWithDetails(); 
+
+    public ResponseEntity getMovieWithDetails(Long id);
+
+    public ResponseEntity getMovieDirectors(Long id);
+
+    public ResponseEntity getMovieWriters(Long id);
+
+    public ResponseEntity getMovieActors(Long id);
+
+    public ResponseEntity getMovieActorsWithRoles(Long id);
+
     public ResponseEntity deleteMovieById(long id);
 
-    public ResponseEntity<MovieDTO> postMovie(MovieDTO movie);
-    
+    public ResponseEntity postMovie(D movie);
 
 }

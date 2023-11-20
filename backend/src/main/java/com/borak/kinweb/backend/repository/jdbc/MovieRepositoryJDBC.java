@@ -18,6 +18,7 @@ import com.borak.kinweb.backend.repository.sql.SQLMovie;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -436,7 +437,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     @Override
     public List<MovieJDBC> findAllPaginated(int page, int size) throws DatabaseException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{page, size}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             for (MovieJDBC movie : movies) {
                 List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
                 List<CritiqueJDBC> critiques = jdbcTemplate.query(SQLMovie.FIND_ALL_CRITIQUES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.critiqueRM);
@@ -460,6 +461,19 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
         }
     }
 
+    @Override
+    public String updateCoverImage(Long id, String coverImage) throws DatabaseException {
+        try {
+            int i = jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_COVER_IMAGE_PS, new Object[]{coverImage, id}, new int[]{Types.VARCHAR, Types.BIGINT});
+            if (i <= 0) {
+                throw new DatabaseException("No rows affected by updating cover image");
+            }
+            return coverImage;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while updating cover image for movie with id: " + id, e);
+        }
+    }
+
 //=====================================================================================================================
 //==============================PRIVATE METHODS========================================================================
 //=====================================================================================================================
@@ -475,20 +489,26 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
     private void performInsert(MovieJDBC movie) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(SQLMovie.INSERT_MEDIA_PS);
+            PreparedStatement ps = connection.prepareStatement(SQLMovie.INSERT_MEDIA_PS, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, movie.getTitle());
-            ps.setString(2, movie.getCoverImage());
+            if (movie.getCoverImage() == null) {
+                ps.setNull(2, Types.VARCHAR);
+            } else {
+                ps.setString(2, movie.getCoverImage());
+            }
             ps.setString(3, movie.getDescription());
             ps.setDate(4, Date.valueOf(movie.getReleaseDate()));
             ps.setInt(5, movie.getAudienceRating());
             return ps;
         }, keyHolder);
-        movie.setId((long) keyHolder.getKey());
+
+        movie.setId(keyHolder.getKey().longValue());
         jdbcTemplate.update(SQLMovie.INSERT_MEDIA_MOVIE_PS, new Object[]{movie.getId(), movie.getLength()}, new int[]{Types.BIGINT, Types.INTEGER});
         performInsertGenrePivot(movie.getGenres(), movie.getId());
         performInsertDirectorPivot(movie.getDirectors(), movie.getId());
         performInsertWriterPivot(movie.getWriters(), movie.getId());
         performInsertActorPivot(movie.getActings(), movie.getId());
+        performInsertActingRoles(movie.getActings(), movie.getId());
     }
 
     private void performUpdate(MovieJDBC movie) {
@@ -583,6 +603,37 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, GenreJDB
             }
         }
         );
+    }
+
+    private void performInsertActingRoles(List<ActingJDBC> actings, Long id) {
+        final int n = actings.stream().mapToInt(acting -> acting.getRoles().size()).sum();
+        Object[][] data = new Object[n][4];
+        int i = 0;
+        for (ActingJDBC acting : actings) {
+            for (ActingRoleJDBC role : acting.getRoles()) {
+                data[i][0] = id;
+                data[i][1] = acting.getActor().getId();
+                data[i][2] = role.getId();
+                data[i][3] = role.getName();
+                i++;
+            }
+        }
+        jdbcTemplate.batchUpdate(SQLMovie.INSERT_MEDIA_ACTING_ROLES_PS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, id);
+                ps.setLong(2, (Long) data[i][1]);
+                ps.setLong(3, (Long) data[i][2]);
+                ps.setString(4, (String) data[i][3]);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return n;
+            }
+        }
+        );
+
     }
 
 }

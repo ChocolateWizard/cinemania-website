@@ -4,13 +4,15 @@
  */
 package com.borak.kinweb.backend.logic.services.validation;
 
-import com.borak.kinweb.backend.domain.dto.classes.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.classes.MyImage;
 import com.borak.kinweb.backend.exceptions.ValidationException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DomainValidationService {
 
-    private static final String[] validImageExtentions = {"png", "jpg", "jpeg"};
-    private static final long IMAGE_MAX_SIZE = 8388608L;
-
-    public void validatePOST(MoviePOSTRequestDTO movie) {
+    public void validatePOST(MoviePOSTRequestDTO movie, MultipartFile coverImage) throws ValidationException {
         if (movie == null) {
             throw new ValidationException("Movie must not be null!");
         }
@@ -35,13 +34,23 @@ public class DomainValidationService {
         if (movie.getReleaseDate() == null) {
             messages.add("Movie release date must not be null!");
         }
-        if (movie.getCoverImage() != null) {
-            String extension = FilenameUtils.getExtension(movie.getCoverImage().getOriginalFilename());
-            if (!Arrays.asList(validImageExtentions).contains(extension)) {
-                messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(validImageExtentions));
+        if (coverImage != null) {
+            if (coverImage.getOriginalFilename() == null || coverImage.getOriginalFilename().isBlank()) {
+                messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
+            } else {
+                int index = coverImage.getOriginalFilename().lastIndexOf(".");
+                if (index == -1 || index == (coverImage.getOriginalFilename().length() - 1)) {
+                    messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
+                } else {
+                    String extension = coverImage.getOriginalFilename().substring(index + 1).trim();
+                    if (!Arrays.asList(MyImage.VALID_EXTENSIONS).contains(extension)) {
+                        messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
+                    }
+                }
+
             }
-            if (movie.getCoverImage().getSize() > IMAGE_MAX_SIZE) {
-                messages.add("Movie cover image size too big! Max size is: " + IMAGE_MAX_SIZE + " bytes");
+            if (coverImage.getSize() > MyImage.IMAGE_MAX_SIZE) {
+                messages.add("Movie cover image size too big! Max size is: " + MyImage.IMAGE_MAX_SIZE + " bytes");
             }
         }
         if (movie.getDescription() == null || movie.getDescription().isBlank()) {

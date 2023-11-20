@@ -5,12 +5,11 @@
 package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.constants.Constants;
-import com.borak.kinweb.backend.domain.dto.classes.DirectorDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieDirectorResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.JDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.DirectorJPA;
-import com.borak.kinweb.backend.domain.jpa.classes.JPA;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,39 +18,61 @@ import org.springframework.stereotype.Component;
  * @author Mr. Poyo
  */
 @Component
-public class DirectorTransformer implements GenericTransformer<DirectorDTO, DirectorJDBC, DirectorJPA> {
+public class DirectorTransformer {
 
     @Autowired
     private ConfigProperties config;
-    
-    @Override
-    public DirectorDTO jdbcToDto(DirectorJDBC jdbc) throws IllegalArgumentException {
+
+    public MovieDirectorResponseDTO jdbcToDto(DirectorJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        DirectorDTO director = new DirectorDTO();
+        MovieDirectorResponseDTO director = new MovieDirectorResponseDTO();
         director.setId(jdbc.getId());
         director.setFirstName(jdbc.getFirstName());
         director.setLastName(jdbc.getLastName());
         director.setGender(jdbc.getGender());
         if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            director.setProfilePhoto(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
+            director.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
         }
         return director;
     }
 
-    @Override
-    public DirectorDTO jpaToDto(DirectorJPA jpa) throws IllegalArgumentException {
+    public MovieDirectorResponseDTO jpaToDto(DirectorJPA jpa) throws IllegalArgumentException {
         if (jpa == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        DirectorDTO director = new DirectorDTO();
+        MovieDirectorResponseDTO director = new MovieDirectorResponseDTO();
         director.setId(jpa.getId());
         director.setFirstName(jpa.getFirstName());
         director.setLastName(jpa.getLastName());
         director.setGender(jpa.getGender());
-        director.setProfilePhoto(jpa.getProfilePhotoURL());
+        if (jpa.getProfilePhoto() != null && !jpa.getProfilePhoto().isEmpty()) {
+            director.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jpa.getProfilePhoto());
+        }
         return director;
+    }
+
+    public List<MovieDirectorResponseDTO> jdbcToDto(List<DirectorJDBC> jdbcList) throws IllegalArgumentException {
+        if (jdbcList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<MovieDirectorResponseDTO> list = new ArrayList<>();
+        for (DirectorJDBC jd : jdbcList) {
+            list.add(jdbcToDto(jd));
+        }
+        return list;
+    }
+
+    public List<MovieDirectorResponseDTO> jpaToDto(List<DirectorJPA> jpaList) throws IllegalArgumentException {
+        if (jpaList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<MovieDirectorResponseDTO> list = new ArrayList<>();
+        for (DirectorJPA jp : jpaList) {
+            list.add(jpaToDto(jp));
+        }
+        return list;
     }
 
 }

@@ -4,12 +4,14 @@
  */
 package com.borak.kinweb.backend.domain.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  *
  * @author Mr Poyo
  */
 public enum Gender {
-    MALE('M', "Male"), FEMALE('F', "Female"), OTHER('O', "Other");
+    MALE('M', "male"), FEMALE('F', "female"), OTHER('O', "other");
 
     private final char symbol;
     private final String text;
@@ -19,24 +21,22 @@ public enum Gender {
         this.text = text;
     }
 
-    public static Gender parseGender(String gender) {
-        switch (gender) {
-            case "M":
+    public static Gender parseGender(String gender) throws UnsupportedOperationException {
+        if (gender == null) {
+            return null;
+        }
+        switch (gender.toLowerCase()) {
             case "m":
-            case "Male":
+            case "male":
                 return MALE;
-            case "F":
             case "f":
-            case "Female":
+            case "female":
                 return FEMALE;
-            case "O":
             case "o":
-            case "Other":
+            case "other":
                 return OTHER;
             default:
-                throw new UnsupportedOperationException(
-                        "The gender " + gender + " is not supported!"
-                );
+                throw new UnsupportedOperationException("The gender " + gender + " is not supported!");
         }
     }
 
@@ -44,6 +44,7 @@ public enum Gender {
         return symbol;
     }
 
+    @JsonValue
     @Override
     public String toString() {
         return text;

@@ -4,11 +4,15 @@
  */
 package com.borak.kinweb.backend.repository.util;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
+import com.borak.kinweb.backend.domain.dto.classes.MyImage;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,6 +21,19 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class FileRepository {
+
+    @Autowired
+    ConfigProperties config;
+
+    public void saveMediaCoverImage(MyImage image) {
+//        try {
+//            image.getFile().transferTo(new File(config.getMediaImagesFolderPath() + image.getFullName()));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            throw new DatabaseException("Unable to store media cover image");
+//        }
+
+    }
 
     public void deleteIfExists(String filePath) throws DatabaseException {
         try {
