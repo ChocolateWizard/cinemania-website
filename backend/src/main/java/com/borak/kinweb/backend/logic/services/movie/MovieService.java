@@ -171,15 +171,16 @@ public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
 
     @Override
     public ResponseEntity deleteMovieById(long id) {
-        if (movieRepo.existsById(id)) {
-            Optional<String> cover = movieRepo.findByIdCoverImageUrl(id);
-            movieRepo.deleteById(id);
-            if (cover.isPresent() && fileRepo.doesFileExist(config.getMediaImagesFolderPath() + cover.get())) {
-                fileRepo.deleteIfExists(config.getMediaImagesFolderPath() + cover.get());
-            }
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        Optional<MovieJDBC> movie = movieRepo.findById(id);
+        if (movie.isEmpty()) {
+            throw new ResourceNotFoundException("No movie found with id: " + id);
         }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
+        movieRepo.deleteById(id);
+        if (movie.get().getCoverImage() != null && !movie.get().getCoverImage().isEmpty()) {
+            fileRepo.deleteIfExistsMediaCoverImage(movie.get().getCoverImage());
+        }
+        return new ResponseEntity(movieTransformer.jdbcToDto(movie.get()), HttpStatus.OK);
+
     }
 
     @Override
@@ -218,14 +219,18 @@ public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
         }
         MovieJDBC movieJDBC = movieTransformer.dtoToJdbc(movieClient);
         MovieJDBC movieDB = movieRepo.insert(movieJDBC);
-//        if (movieClient.getCoverImage() != null) {
+        if (movieClient.getCoverImage() != null){
+            movieClient.getCoverImage().setName(""+movieDB.getId());
+            fileRepo.saveMediaCoverImage(movieClient.getCoverImage());
+//            movieClient.getCoverImage().setName(""+movieDB.getId());
+//            fileRepo.storeMediaCoverImage(movieClient.getCoverImage());
 //            String imageExtension=FilenameUtils.getExtension(movieClient.getCoverImage().getOriginalFilename());
 //            String imageFullName=movieDB.getId() + "." + imageExtension;
 //            movieDB.setCoverImage(imageFullName);
 //            movieRepo.updateCoverImage(movieDB.getId(), movieDB.getCoverImage());
-////            Image image=new Image(""+movieDB.getId(), imageExtension, movieDB.getId()+"."+imageExtension, movieClient.getCoverImage());
+//            Image image=new Image(""+movieDB.getId(), imageExtension, movieDB.getId()+"."+imageExtension, movieClient.getCoverImage());
 //            fileRepo.saveMediaCoverImage(image);
-//        }
+        }
 
         return new ResponseEntity<>(movieTransformer.jdbcToDto(movieDB), HttpStatus.OK);
     }
