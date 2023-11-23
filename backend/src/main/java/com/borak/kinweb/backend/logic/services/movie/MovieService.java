@@ -218,18 +218,12 @@ public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
             }
         }
         MovieJDBC movieJDBC = movieTransformer.dtoToJdbc(movieClient);
+        movieJDBC.setCoverImage(null);
         MovieJDBC movieDB = movieRepo.insert(movieJDBC);
-        if (movieClient.getCoverImage() != null){
-            movieClient.getCoverImage().setName(""+movieDB.getId());
+        if (movieClient.getCoverImage() != null) {
+            movieClient.getCoverImage().setName("" + movieDB.getId());
+            movieRepo.updateCoverImage(movieDB.getId(), movieClient.getCoverImage().getFullName());
             fileRepo.saveMediaCoverImage(movieClient.getCoverImage());
-//            movieClient.getCoverImage().setName(""+movieDB.getId());
-//            fileRepo.storeMediaCoverImage(movieClient.getCoverImage());
-//            String imageExtension=FilenameUtils.getExtension(movieClient.getCoverImage().getOriginalFilename());
-//            String imageFullName=movieDB.getId() + "." + imageExtension;
-//            movieDB.setCoverImage(imageFullName);
-//            movieRepo.updateCoverImage(movieDB.getId(), movieDB.getCoverImage());
-//            Image image=new Image(""+movieDB.getId(), imageExtension, movieDB.getId()+"."+imageExtension, movieClient.getCoverImage());
-//            fileRepo.saveMediaCoverImage(image);
         }
 
         return new ResponseEntity<>(movieTransformer.jdbcToDto(movieDB), HttpStatus.OK);
