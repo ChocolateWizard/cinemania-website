@@ -4,10 +4,10 @@
  */
 package com.borak.kinweb.backend.repository.jdbc;
 
-import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
-import com.borak.kinweb.backend.repository.api.IDirectorRepository;
-import com.borak.kinweb.backend.repository.sql.SQLDirector;
+import com.borak.kinweb.backend.repository.api.IActorRepository;
+import com.borak.kinweb.backend.repository.sql.SQLActor;
 import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
@@ -22,55 +22,55 @@ import org.springframework.stereotype.Repository;
  * @author Mr. Poyo
  */
 @Repository
-public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC, Long> {
+public class ActorRepositoryJDBC implements IActorRepository<ActorJDBC, Long> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<DirectorJDBC> findAllByMediaId(Long id) throws DatabaseException {
-        try {         
-            List<DirectorJDBC> directors = jdbcTemplate.query(SQLDirector.FIND_ALL_BY_MEDIA_PS,new Object[]{id}, new int[]{Types.INTEGER}, SQLDirector.directorRM);
-            return directors;
+    public List<ActorJDBC> findAllByMediaId(Long id) throws DatabaseException {
+        try {
+            List<ActorJDBC> actors = jdbcTemplate.query(SQLActor.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLActor.actorRM);
+            return actors;
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving directors of media with id: " + id, e);
+            throw new DatabaseException("Error while retreiving actors of media with id: " + id, e);
         }
     }
 
     @Override
-    public DirectorJDBC insert(DirectorJDBC entity) throws DatabaseException {
+    public ActorJDBC insert(ActorJDBC entity) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public void update(DirectorJDBC entity) throws DatabaseException {
+    public void update(ActorJDBC entity) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public Optional<DirectorJDBC> findById(Long id) throws DatabaseException {
+    public Optional<ActorJDBC> findById(Long id) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public boolean existsById(Long id) throws DatabaseException {
         try {
-            jdbcTemplate.queryForObject(SQLDirector.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
+            jdbcTemplate.queryForObject(SQLActor.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
         } catch (IncorrectResultSizeDataAccessException e) {
             return false;
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while checking if director with id: " + id + " exists", e);
+            throw new DatabaseException("Error while checking if actor with id: " + id + " exists", e);
         }
     }
 
     @Override
-    public List<DirectorJDBC> findAll() throws DatabaseException {
+    public List<ActorJDBC> findAll() throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<DirectorJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<ActorJDBC> findAllPaginated(int page, int size) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

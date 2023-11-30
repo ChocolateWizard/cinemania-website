@@ -8,6 +8,6 @@ package com.borak.kinweb.backend.repository.api;
  *
  * @author Mr. Poyo
  */
-public interface IWriterRepository<W,ID> extends IRepository<W, ID>{
-    
+public interface IWriterRepository<W, ID> extends IPersonRepository<W, ID> {
+
 }

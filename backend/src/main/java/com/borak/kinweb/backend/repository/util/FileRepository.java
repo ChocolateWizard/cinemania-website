@@ -5,7 +5,7 @@
 package com.borak.kinweb.backend.repository.util;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.dto.classes.MyImage;
+import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import java.io.IOException;
 import java.nio.file.Files;

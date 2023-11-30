@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mr. Poyo
  */
-@Component
+//@Component
 public final class SQLMovie {
 
 //================================================================================================
@@ -54,8 +54,8 @@ public final class SQLMovie {
                                        VALUES(?,?,?);
                                        """;
     public static final String INSERT_MEDIA_ACTING_ROLES_PS = """
-                                       INSERT INTO acting_role(acting_media_id,acting_actor_id,id,NAME) 
-                                       VALUES(?,?,?,?);
+                                       INSERT INTO acting_role(acting_id,id,NAME) 
+                                       VALUES((SELECT acting.id FROM acting WHERE acting.media_id=? AND acting.actor_id=?),?,?);
                                        """;
     public static final String UPDATE_MEDIA_PS = """
                                        UPDATE media
@@ -116,7 +116,7 @@ public final class SQLMovie {
     public static final String FIND_ALL_ACTING_ROLES_PS = """
                                                            SELECT acting_role.id,acting_role.name 
                                                            FROM acting_role 
-                                                           WHERE acting_role.acting_media_id=? AND acting_role.acting_actor_id=?;
+                                                           WHERE acting_role.acting_id=(SELECT acting.id FROM acting WHERE acting.media_id=? AND acting.actor_id=?);
                                                            """;
 
     public static final String FIND_ALL_CRITIQUES_PS = """

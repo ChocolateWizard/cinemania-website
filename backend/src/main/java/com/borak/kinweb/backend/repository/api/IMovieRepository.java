@@ -9,45 +9,29 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Movie repository meant to store Movie objects into database
  *
  * @author Mr. Poyo
- * @param <M> must represent movie in database
- * @param <G> must represent genre in database
- * @param <D> must represent director in database
- * @param <W> must represent writer in database
- * @param <A> must represent actor in database
- * @param <AC> must represent acting in database
- * @param <ID> must represent movie ID in database
  */
-public interface IMovieRepository<M, G, D, W, A, AC, ID> extends IRepository<M, ID> {
+public interface IMovieRepository<M, ID> extends IRepository<M, ID> {
 
-    public List<M> findAllNoRelationships() throws DatabaseException;
+    public List<M> findAllWithGenres() throws DatabaseException;
 
-    public List<M> findAllRelationshipGenres() throws DatabaseException;
-
-    public List<M> findAllNoRelationshipsPaginated(int page, int size) throws DatabaseException;
-
-    public List<M> findAllRelationshipGenresPaginated(int page, int size) throws DatabaseException;
-
-    public List<M> findAllByAudienceRatingRelationshipGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException;
-
-    public List<M> findAllByReleaseYearRelationshipGenresPaginated(int page, int size, int year) throws DatabaseException;
-
-    public Optional<M> findByIdNoRelationships(ID id) throws DatabaseException;
-
-    public List<G> findByIdGenres(ID id) throws DatabaseException;
-
-    public List<D> findByIdDirectors(ID id) throws DatabaseException;
-
-    public List<W> findByIdWriters(ID id) throws DatabaseException;
-
-    public List<A> findByIdActors(ID id) throws DatabaseException;
-
-    public List<AC> findByIdActorsWithRoles(ID id) throws DatabaseException;
-
-    public Optional<String> findByIdCoverImageUrl(ID id) throws DatabaseException;
+    public List<M> findAllWithGenresPaginated(int page, int size) throws DatabaseException;
     
-    public String updateCoverImage(ID id,String coverImage)throws DatabaseException;
+    public List<M> findAllWithRelations() throws DatabaseException;
+
+    public List<M> findAllWithRelationsPaginated(int page, int size) throws DatabaseException;
+
+    public List<M> findAllByAudienceRatingWithGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException;
+
+    public List<M> findAllByReleaseYearWithGenresPaginated(int page, int size, int year) throws DatabaseException;
+
+    public Optional<String> findByIdCoverImage(ID id) throws DatabaseException;
+
+    public Optional<M> findByIdWithRelations(ID id) throws DatabaseException;
+    
+    public Optional<M> findByIdWithGenres(ID id) throws DatabaseException;
+    
+    public void updateCoverImage(ID id, String coverImage) throws DatabaseException;
 
 }

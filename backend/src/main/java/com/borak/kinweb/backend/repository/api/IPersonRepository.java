@@ -11,8 +11,8 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
-public interface IDirectorRepository<D, ID> extends IPersonRepository<D, ID> {
+public interface IPersonRepository<P, ID> extends IRepository<P, ID> {
 
+    public List<P> findAllByMediaId(ID id) throws DatabaseException;
     
-
 }

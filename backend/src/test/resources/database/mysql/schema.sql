@@ -187,30 +187,28 @@ CREATE TABLE `actor` (
 
 
 CREATE TABLE `acting` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `media_id` bigint unsigned NOT NULL,
   `actor_id` bigint unsigned NOT NULL,
   `is_starring` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`media_id`,`actor_id`),
-  KEY `person_id` (`actor_id`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `actings_media_actor_unique` (`media_id`,`actor_id`),
+  KEY `actor_id` (`actor_id`),
   CONSTRAINT `acting_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `acting_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `actor` (`person_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `acting_role` */
 
 
 
 CREATE TABLE `acting_role` (
-  `acting_media_id` bigint unsigned NOT NULL,
-  `acting_actor_id` bigint unsigned NOT NULL,
+  `acting_id` bigint unsigned NOT NULL,
   `id` bigint unsigned NOT NULL,
-  `name` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`acting_media_id`,`acting_actor_id`,`id`),
-  KEY `order_num` (`id`),
-  KEY `media_actors_media_id` (`acting_actor_id`),
-  CONSTRAINT `acting_role_ibfk_1` FOREIGN KEY (`acting_media_id`) REFERENCES `acting` (`media_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `acting_role_ibfk_2` FOREIGN KEY (`acting_actor_id`) REFERENCES `acting` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `name` varchar(300) NOT NULL,
+  PRIMARY KEY (`acting_id`,`id`),
+  CONSTRAINT `acting_role_ibfk_1` FOREIGN KEY (`acting_id`) REFERENCES `acting` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 

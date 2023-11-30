@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @author Mr Poyo
  */
-public abstract class PersonJDBC implements JDBC{
+public class PersonJDBC implements JDBC{
 
     private Long id;
 

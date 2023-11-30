@@ -39,9 +39,9 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(1)
-    @DisplayName("Tests normal functionality of findAllNoRelationship method of MovieRepositoryJDBC class")
-    void findAllNoRelationShip_Test() {
-        List<MovieJDBC> movies = repo.findAllNoRelationships();
+    @DisplayName("Tests normal functionality of findAll method of MovieRepositoryJDBC class")
+    void findAll_Test() {
+        List<MovieJDBC> movies = repo.findAll();
 
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(4);
@@ -95,9 +95,9 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(2)
-    @DisplayName("Tests normal functionality of findAllRelationshipGenres method of MovieRepositoryJDBC class")
-    void findAllRelationshipGenres_Test() {
-        List<MovieJDBC> movies = repo.findAllRelationshipGenres();
+    @DisplayName("Tests normal functionality of findAllWithGenres method of MovieRepositoryJDBC class")
+    void findAllWithGenres_Test() {
+        List<MovieJDBC> movies = repo.findAllWithGenres();
 
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(4);
@@ -205,9 +205,9 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(4)
-    @DisplayName("Tests normal functionality of findAll method of MovieRepositoryJDBC class")
-    void findAll_Test() {
-        List<MovieJDBC> movies = repo.findAll();
+    @DisplayName("Tests normal functionality of findAllWithRelations method of MovieRepositoryJDBC class")
+    void findAllWithRelations_Test() {
+        List<MovieJDBC> movies = repo.findAllWithRelations();
 
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(4);
@@ -672,15 +672,15 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(5)
-    @DisplayName("Tests normal functionality of findAllNoRelationshipsPaginated method of MovieRepositoryJDBC class")
-    void findAllNoRelationshipsPaginated_Test() {
+    @DisplayName("Tests normal functionality of findAllPaginated method of MovieRepositoryJDBC class")
+    void findAllPaginated_Test() {
         List<MovieJDBC> movies = new ArrayList<>();
         int page;
         int size;
 
         page = 0;
         size = 1;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(1);
         assertThat(movies.get(0)).isNotNull();
@@ -694,19 +694,19 @@ public class MovieRepositoryJDBCTest {
 
         page = 0;
         size = 10;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(4);
 
         page = 0;
         size = 3;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(3);
 
         page = 1;
         size = 1;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(1);
         assertThat(movies.get(0)).isNotNull();
@@ -720,7 +720,7 @@ public class MovieRepositoryJDBCTest {
 
         page = 2;
         size = 1;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(1);
         assertThat(movies.get(0)).isNotNull();
@@ -734,7 +734,7 @@ public class MovieRepositoryJDBCTest {
 
         page = 10;
         size = 2;
-        movies = repo.findAllNoRelationshipsPaginated(page, size);
+        movies = repo.findAllPaginated(page, size);
         assertThat(movies).isNotNull();
         assertThat(movies.size()).isEqualTo(0);
 

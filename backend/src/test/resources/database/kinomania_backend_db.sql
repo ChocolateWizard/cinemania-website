@@ -21,88 +21,86 @@ USE `kinomania_backend`;
 DROP TABLE IF EXISTS `acting`;
 
 CREATE TABLE `acting` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `media_id` bigint unsigned NOT NULL,
   `actor_id` bigint unsigned NOT NULL,
   `is_starring` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`media_id`,`actor_id`),
-  KEY `person_id` (`actor_id`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `actings_media_actor_unique` (`media_id`,`actor_id`),
+  KEY `actor_id` (`actor_id`),
   CONSTRAINT `acting_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `acting_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `actor` (`person_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Data for the table `acting` */
 
-insert  into `acting`(`media_id`,`actor_id`,`is_starring`) values 
-(1,2,1),
-(1,3,1),
-(1,4,1),
-(1,5,0),
-(1,6,0),
-(2,4,1),
-(2,7,1),
-(2,8,1),
-(2,9,1),
-(2,10,0),
-(2,11,0),
-(2,12,0),
-(3,13,1),
-(3,20,1),
-(3,21,1),
-(3,22,0),
-(3,23,0),
-(3,24,0),
-(3,25,0),
-(4,28,1),
-(4,29,1),
-(4,30,1);
+insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values 
+(1,1,2,1),
+(2,1,3,1),
+(3,1,4,1),
+(4,1,5,0),
+(5,1,6,0),
+(6,2,4,1),
+(7,2,7,1),
+(8,2,8,1),
+(9,2,9,1),
+(10,2,10,0),
+(11,2,11,0),
+(12,2,12,0),
+(13,3,13,1),
+(14,3,20,1),
+(15,3,21,1),
+(16,3,22,0),
+(17,3,23,0),
+(18,3,24,0),
+(19,3,25,0),
+(20,4,28,1),
+(21,4,29,1),
+(22,4,30,1);
 
 /*Table structure for table `acting_role` */
 
 DROP TABLE IF EXISTS `acting_role`;
 
 CREATE TABLE `acting_role` (
-  `acting_media_id` bigint unsigned NOT NULL,
-  `acting_actor_id` bigint unsigned NOT NULL,
+  `acting_id` bigint unsigned NOT NULL,
   `id` bigint unsigned NOT NULL,
-  `name` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`acting_media_id`,`acting_actor_id`,`id`),
-  KEY `order_num` (`id`),
-  KEY `media_actors_media_id` (`acting_actor_id`),
-  CONSTRAINT `acting_role_ibfk_1` FOREIGN KEY (`acting_media_id`) REFERENCES `acting` (`media_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `acting_role_ibfk_2` FOREIGN KEY (`acting_actor_id`) REFERENCES `acting` (`actor_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `name` varchar(300) NOT NULL,
+  PRIMARY KEY (`acting_id`,`id`),
+  CONSTRAINT `acting_role_ibfk_1` FOREIGN KEY (`acting_id`) REFERENCES `acting` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Data for the table `acting_role` */
 
-insert  into `acting_role`(`acting_media_id`,`acting_actor_id`,`id`,`name`) values 
-(1,2,1,'Betty Elms'),
-(1,2,2,'Diane Selwyn'),
-(1,3,1,'Rita'),
-(1,3,2,'Camilla Rhodes'),
-(1,4,1,'Adam'),
-(1,5,1,'Dan'),
-(1,6,1,'Irene'),
-(2,4,1,'Devon Berk'),
-(2,4,2,'Billy Side'),
-(2,7,1,'Lost Girl'),
-(2,8,1,'Phantom'),
-(2,9,1,'Visitor #1'),
-(2,10,1,'Nikki Grace'),
-(2,10,2,'Susan Blue'),
-(2,11,1,'Freddie Howard'),
-(2,12,1,'Piotrek Krol'),
-(3,13,1,'Vi'),
-(3,20,1,'Jayce'),
-(3,21,1,'Silico'),
-(3,21,2,'Pim'),
-(3,22,1,'Jinx'),
-(3,23,1,'Caitlyn'),
-(3,24,1,'Viktor'),
-(3,25,1,'Heimerdinger'),
-(3,25,2,'Duty Captain'),
-(4,28,1,'Thomas Howard'),
-(4,29,1,'Thomas Wake'),
-(4,30,1,'Mermaid');
+insert  into `acting_role`(`acting_id`,`id`,`name`) values 
+(1,1,'Betty Elms'),
+(1,2,'Diane Selwyn'),
+(2,1,'Rita'),
+(2,2,'Camilla Rhodes'),
+(3,1,'Adam'),
+(4,1,'Dan'),
+(5,1,'Irene'),
+(6,1,'Devon Berk'),
+(6,2,'Billy Side'),
+(7,1,'Lost Girl'),
+(8,1,'Phantom'),
+(9,1,'Visitor #1'),
+(10,1,'Nikki Grace'),
+(10,2,'Susan Blue'),
+(11,1,'Freddie Howard'),
+(12,1,'Piotrek Krol'),
+(13,1,'Vi'),
+(14,1,'Jayce'),
+(15,1,'Silico'),
+(15,2,'Pim'),
+(16,1,'Jinx'),
+(17,1,'Caitlyn'),
+(18,1,'Viktor'),
+(19,1,'Heimerdinger'),
+(19,2,'Duty Captain'),
+(20,1,'Thomas Howard'),
+(21,1,'Thomas Wake'),
+(22,1,'Mermaid');
 
 /*Table structure for table `actor` */
 

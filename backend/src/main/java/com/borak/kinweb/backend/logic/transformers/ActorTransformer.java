@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.logic.transformers;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.constants.Constants;
 import com.borak.kinweb.backend.domain.dto.actor.ActorResponseDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieActorResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jpa.classes.ActorJPA;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public final class ActorTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public ActorResponseDTO jdbcToDto(ActorJDBC jdbc) throws IllegalArgumentException {
+    public ActorResponseDTO toActorResponseDTO(ActorJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
@@ -40,40 +41,40 @@ public final class ActorTransformer {
         return actor;
     }
 
-    public ActorResponseDTO jpaToDto(ActorJPA jpa) throws IllegalArgumentException {
-        if (jpa == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        ActorResponseDTO actor = new ActorResponseDTO();
-        actor.setId(jpa.getId());
-        actor.setFirstName(jpa.getFirstName());
-        actor.setLastName(jpa.getLastName());
-        actor.setGender(jpa.getGender());
-        if (jpa.getProfilePhoto() != null && !jpa.getProfilePhoto().isEmpty()) {
-            actor.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jpa.getProfilePhoto());
-        }
-        actor.setStar(jpa.isStar());
-        return actor;
-    }
-
-    public List<ActorResponseDTO> jdbcToDto(List<ActorJDBC> jdbcList) throws IllegalArgumentException {
+    public List<ActorResponseDTO> toActorResponseDTO(List<ActorJDBC> jdbcList) throws IllegalArgumentException {
         if (jdbcList == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         List<ActorResponseDTO> list = new ArrayList<>();
         for (ActorJDBC jd : jdbcList) {
-            list.add(jdbcToDto(jd));
+            list.add(toActorResponseDTO(jd));
         }
         return list;
     }
 
-    public List<ActorResponseDTO> jpaToDto(List<ActorJPA> jpaList) throws IllegalArgumentException {
-        if (jpaList == null) {
+    public MovieActorResponseDTO toMovieActorResponseDTO(ActorJDBC jdbc) throws IllegalArgumentException {
+        if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        List<ActorResponseDTO> list = new ArrayList<>();
-        for (ActorJPA jp : jpaList) {
-            list.add(jpaToDto(jp));
+        MovieActorResponseDTO actor = new MovieActorResponseDTO();
+        actor.setId(jdbc.getId());
+        actor.setFirstName(jdbc.getFirstName());
+        actor.setLastName(jdbc.getLastName());
+        actor.setGender(jdbc.getGender());
+        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
+            actor.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
+        }
+        actor.setStar(jdbc.isStar());
+        return actor;
+    }
+
+    public List<MovieActorResponseDTO> toMovieActorResponseDTO(List<ActorJDBC> jdbcList) throws IllegalArgumentException {
+        if (jdbcList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<MovieActorResponseDTO> list = new ArrayList<>();
+        for (ActorJDBC jd : jdbcList) {
+            list.add(toMovieActorResponseDTO(jd));
         }
         return list;
     }

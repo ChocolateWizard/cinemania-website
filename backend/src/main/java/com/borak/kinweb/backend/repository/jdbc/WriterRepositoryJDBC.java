@@ -7,23 +7,34 @@ package com.borak.kinweb.backend.repository.jdbc;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.repository.api.IWriterRepository;
+import com.borak.kinweb.backend.repository.sql.SQLWriter;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>{
+@Repository
+public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long> {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
-    public WriterJDBC save(WriterJDBC entity) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public List<WriterJDBC> saveAll(List<WriterJDBC> entities) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public List<WriterJDBC> findAllByMediaId(Long id) throws DatabaseException {
+        try {
+            List<WriterJDBC> writers = jdbcTemplate.query(SQLWriter.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLWriter.writerRM);
+            return writers;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving writers of media with id: " + id, e);
+        }
     }
 
     @Override
@@ -32,17 +43,7 @@ public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>
     }
 
     @Override
-    public List<WriterJDBC> insertAll(List<WriterJDBC> entities) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public WriterJDBC update(WriterJDBC entity) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public List<WriterJDBC> updateAll(List<WriterJDBC> entities) throws DatabaseException {
+    public void update(WriterJDBC entity) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -53,16 +54,18 @@ public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>
 
     @Override
     public boolean existsById(Long id) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            jdbcTemplate.queryForObject(SQLWriter.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return false;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while checking if writer with id: " + id + " exists", e);
+        }
     }
 
     @Override
     public List<WriterJDBC> findAll() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public List<WriterJDBC> findAllById(List<Long> ids) throws DatabaseException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -81,24 +84,4 @@ public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public void delete(WriterJDBC entity) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void deleteAllById(List<Long> ids) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void deleteAll(List<WriterJDBC> entities) throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void deleteAll() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
 }

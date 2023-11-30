@@ -6,8 +6,10 @@ package com.borak.kinweb.backend.domain.dto.movie;
 
 import com.borak.kinweb.backend.domain.dto.DTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,25 +20,33 @@ import java.util.List;
 @JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender", "star", "starring", "roles"})
 public class MovieActorResponseDTO implements DTO {
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     private Long id;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "first_name")
     private String firstName;
 
-    @JsonProperty(value = "last_name")
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "last_name")   
     private String lastName;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "profile_photo_url")
     private String profilePhotoUrl;
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     private Gender gender;
 
-    @JsonProperty(value = "is_star")
+    @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "is_star")   
     private Boolean star;
 
-    @JsonProperty(value = "is_starring")
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    @JsonProperty(value = "is_starring")   
     private Boolean starring;
 
+    @JsonView(JsonVisibilityViews.Heavy.class)
     private List<Role> roles = new ArrayList<>();
 
     public MovieActorResponseDTO() {
@@ -53,6 +63,7 @@ public class MovieActorResponseDTO implements DTO {
     }
 
     @JsonPropertyOrder({"id", "name"})
+    @JsonView(JsonVisibilityViews.Heavy.class)
     public static class Role {
 
         private Long id;

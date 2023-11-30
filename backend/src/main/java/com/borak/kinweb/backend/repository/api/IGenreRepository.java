@@ -4,10 +4,15 @@
  */
 package com.borak.kinweb.backend.repository.api;
 
+import com.borak.kinweb.backend.exceptions.DatabaseException;
+import java.util.List;
+
 /**
  *
  * @author Mr. Poyo
  */
-public interface IGenreRepository<G,ID> extends IRepository<G, ID>{
+public interface IGenreRepository<G, ID> extends IRepository<G, ID> {
+
     
+
 }

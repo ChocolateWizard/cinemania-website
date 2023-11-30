@@ -24,7 +24,7 @@ public class ActingTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public MovieActorResponseDTO jdbcToDto(ActingJDBC jdbc) throws IllegalArgumentException {
+    public MovieActorResponseDTO toMovieActorResponseDTO(ActingJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
@@ -47,28 +47,13 @@ public class ActingTransformer {
         return actor;
     }
 
-    public MovieActorResponseDTO jpaToDto(ActingJPA jpa) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public List<MovieActorResponseDTO> jdbcToDto(List<ActingJDBC> jdbcList) throws IllegalArgumentException {
+    public List<MovieActorResponseDTO> toMovieActorResponseDTO(List<ActingJDBC> jdbcList) throws IllegalArgumentException {
         if (jdbcList == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         List<MovieActorResponseDTO> list = new ArrayList<>();
         for (ActingJDBC jd : jdbcList) {
-            list.add(jdbcToDto(jd));
-        }
-        return list;
-    }
-
-    public List<MovieActorResponseDTO> jpaToDto(List<ActingJPA> jpaList) throws IllegalArgumentException {
-        if (jpaList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<MovieActorResponseDTO> list = new ArrayList<>();
-        for (ActingJPA jp : jpaList) {
-            list.add(jpaToDto(jp));
+            list.add(ActingTransformer.this.toMovieActorResponseDTO(jd));
         }
         return list;
     }

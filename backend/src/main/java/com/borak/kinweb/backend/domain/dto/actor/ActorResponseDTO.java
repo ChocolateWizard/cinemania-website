@@ -7,11 +7,13 @@ package com.borak.kinweb.backend.domain.dto.actor;
 import com.borak.kinweb.backend.domain.dto.DTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  *
  * @author Mr. Poyo
  */
+@JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender", "star"})
 public class ActorResponseDTO implements DTO {
 
     private Long id;

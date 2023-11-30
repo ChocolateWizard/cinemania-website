@@ -4,15 +4,16 @@
  */
 package com.borak.kinweb.backend.logic.controllers;
 
-
 import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
-import com.borak.kinweb.backend.domain.dto.classes.MyImage;
+import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -104,11 +105,13 @@ public class MovieController {
     }
 
     @GetMapping(path = "/{id}/actors")
+    @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getMovieByIdActors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieActors(id);
     }
 
     @GetMapping(path = "/{id}/actors/roles")
+    @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity getMovieByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.getMovieActorsWithRoles(id);
     }
@@ -121,12 +124,12 @@ public class MovieController {
             movie.setCoverImage(new MyImage(coverImage));
         }
         return movieService.postMovie(movie);
-
     }
 
     //=========================PUT MAPPINGS===================================
     //=========================DELETE MAPPINGS================================
     @DeleteMapping(path = "/{id}")
+    @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity deleteMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.deleteMovieById(id);
     }

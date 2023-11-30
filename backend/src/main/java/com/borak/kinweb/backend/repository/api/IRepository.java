@@ -13,42 +13,34 @@ import java.util.Optional;
  * model
  *
  * @author Mr. Poyo
- * @param <T> entity
- * @param <ID> ID of entity
+ * @param <T> object representing database entity
+ * @param <ID> ID of an object that represents database entity
  */
 public interface IRepository<T, ID> {
 
-    T save(T entity) throws DatabaseException;
+    T insert(T entity) throws DatabaseException;
 
-    List<T> saveAll(List<T> entities)throws DatabaseException;
+    void update(T entity) throws DatabaseException;
 
-    T insert(T entity)throws DatabaseException;
+    Optional<T> findById(ID id) throws DatabaseException;
 
-    List<T> insertAll(List<T> entities)throws DatabaseException;
+    boolean existsById(ID id) throws DatabaseException;
 
-    T update(T entity)throws DatabaseException;
+    List<T> findAll() throws DatabaseException;
 
-    List<T> updateAll(List<T> entities)throws DatabaseException;
+    List<T> findAllPaginated(int page, int size) throws DatabaseException;
 
-    Optional<T> findById(ID id)throws DatabaseException;
+    long count() throws DatabaseException;
 
-    boolean existsById(ID id)throws DatabaseException;
+    void deleteById(ID id) throws DatabaseException;
 
-    List<T> findAll()throws DatabaseException;
-
-    List<T> findAllById(List<ID> ids)throws DatabaseException;
-    
-    List<T> findAllPaginated(int page,int size)throws DatabaseException;
-
-    long count()throws DatabaseException;
-
-    void deleteById(ID id)throws DatabaseException;
-
-    void delete(T entity)throws DatabaseException;
-
-    void deleteAllById(List<ID> ids)throws DatabaseException;
-
-    void deleteAll(List<T> entities)throws DatabaseException;
-
-    void deleteAll()throws DatabaseException;
+//    T save(T entity) throws DatabaseException;
+//    List<T> saveAll(List<T> entities) throws DatabaseException;
+//    List<T> insertAll(List<T> entities) throws DatabaseException;
+//    List<T> updateAll(List<T> entities) throws DatabaseException;
+//    List<T> findAllById(List<ID> ids) throws DatabaseException;
+//    void delete(T entity) throws DatabaseException;
+//    void deleteAllById(List<ID> ids) throws DatabaseException;
+//    void deleteAll(List<T> entities) throws DatabaseException;
+//    void deleteAll() throws DatabaseException;
 }
