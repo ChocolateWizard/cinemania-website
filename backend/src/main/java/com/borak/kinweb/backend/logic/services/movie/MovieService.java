@@ -4,7 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.services.movie;
 
-import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
+public class MovieService implements IMovieService<MovieRequestDTO> {
 
     private static final int POPULARITY_TRESHOLD = 80;
 
@@ -180,41 +180,87 @@ public class MovieService implements IMovieService<MoviePOSTRequestDTO> {
     }
 
     @Override
-    public ResponseEntity postMovie(MoviePOSTRequestDTO movieClient) {
+    public ResponseEntity postMovie(MovieRequestDTO movieClient) {
+        for (Long genre : movieClient.getGenres()) {
+            if (!genreRepo.existsById(genre)) {
+                throw new ResourceNotFoundException("Genre with id: " + genre + " does not exist in database!");
+            }
+        }
+        for (Long director : movieClient.getDirectors()) {
+            if (!directorRepo.existsById(director)) {
+                throw new ResourceNotFoundException("Director with id: " + director + " does not exist in database!");
+            }
+        }
+        for (Long writer : movieClient.getWriters()) {
+            if (!writerRepo.existsById(writer)) {
+                throw new ResourceNotFoundException("Writer with id: " + writer + " does not exist in database!");
+            }
+        }
+        for (MovieRequestDTO.Actor actor : movieClient.getActors()) {
+            if (!actorRepo.existsById(actor.getId())) {
+                throw new ResourceNotFoundException("Actor with id: " + actor.getId() + " does not exist in database!");
+            }
+        }
         MovieJDBC movieJDBC = movieTransformer.toMovieJDBC(movieClient);
-        List<String> errorMessages = new LinkedList<>();
-        for (GenreJDBC genre : movieJDBC.getGenres()) {
-            if (!genreRepo.existsById(genre.getId())) {
-                errorMessages.add("Genre with id: " + genre.getId() + " does not exist in database!");
-            }
-        }
-        for (DirectorJDBC director : movieJDBC.getDirectors()) {
-            if (!directorRepo.existsById(director.getId())) {
-                errorMessages.add("Director with id: " + director.getId() + " does not exist in database!");
-            }
-        }
-        for (WriterJDBC writer : movieJDBC.getWriters()) {
-            if (!writerRepo.existsById(writer.getId())) {
-                errorMessages.add("Writer with id: " + writer.getId() + " does not exist in database!");
-            }
-        }
-        for (ActingJDBC acting : movieJDBC.getActings()) {
-            if (!actorRepo.existsById(acting.getActor().getId())) {
-                errorMessages.add("Actor with id: " + acting.getActor().getId() + " does not exist in database!");
-            }
-        }
-        if (!errorMessages.isEmpty()) {
-            throw new ValidationException(errorMessages.toArray(String[]::new));
-        }
         movieJDBC.setCoverImage(null);
         MovieJDBC movieDB = movieRepo.insert(movieJDBC);
+        Optional<MovieJDBC> movie;
         if (movieClient.getCoverImage() != null) {
             movieClient.getCoverImage().setName("" + movieDB.getId());
             movieRepo.updateCoverImage(movieDB.getId(), movieClient.getCoverImage().getFullName());
+            movie = movieRepo.findById(movieDB.getId());
             fileRepo.saveMediaCoverImage(movieClient.getCoverImage());
+        } else {
+            movie = movieRepo.findById(movieDB.getId());
         }
+        return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movieDB), HttpStatus.OK);
+    @Override
+    public ResponseEntity putMovie(MovieRequestDTO movieClient) {
+        if (!movieRepo.existsById(movieClient.getId())) {
+            throw new ResourceNotFoundException("Movie with id: " + movieClient.getId() + " does not exist in database!");
+        }
+        for (Long genre : movieClient.getGenres()) {
+            if (!genreRepo.existsById(genre)) {
+                throw new ResourceNotFoundException("Genre with id: " + genre + " does not exist in database!");
+            }
+        }
+        for (Long director : movieClient.getDirectors()) {
+            if (!directorRepo.existsById(director)) {
+                throw new ResourceNotFoundException("Director with id: " + director + " does not exist in database!");
+            }
+        }
+        for (Long writer : movieClient.getWriters()) {
+            if (!writerRepo.existsById(writer)) {
+                throw new ResourceNotFoundException("Writer with id: " + writer + " does not exist in database!");
+            }
+        }
+        for (MovieRequestDTO.Actor actor : movieClient.getActors()) {
+            if (!actorRepo.existsById(actor.getId())) {
+                throw new ResourceNotFoundException("Actor with id: " + actor.getId() + " does not exist in database!");
+            }
+        }
+        Optional<MovieJDBC> movie;
+        if (movieClient.getCoverImage() != null) {
+            //replace cover image
+            movieClient.getCoverImage().setName("" + movieClient.getId());
+            MovieJDBC movieJDBC = movieTransformer.toMovieJDBC(movieClient);
+            movieRepo.update(movieJDBC);
+            movie = movieRepo.findById(movieClient.getId());
+            fileRepo.saveMediaCoverImage(movieClient.getCoverImage());
+        } else {
+            //delete cover image
+            Optional<String> coverImage = movieRepo.findByIdCoverImage(movieClient.getId());
+            MovieJDBC movieJDBC = movieTransformer.toMovieJDBC(movieClient);
+            movieRepo.update(movieJDBC);
+            movie = movieRepo.findById(movieClient.getId());
+            if (coverImage.isPresent()) {
+                fileRepo.deleteIfExistsMediaCoverImage(coverImage.get());
+            }
+        }
+        return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+
     }
 
 }

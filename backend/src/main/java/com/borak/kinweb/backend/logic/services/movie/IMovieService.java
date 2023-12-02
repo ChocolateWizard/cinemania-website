@@ -40,5 +40,7 @@ public interface IMovieService<D extends DTO> {
     public ResponseEntity deleteMovieById(long id);
 
     public ResponseEntity postMovie(D movie);
+    
+    public ResponseEntity putMovie(D movie);
 
 }

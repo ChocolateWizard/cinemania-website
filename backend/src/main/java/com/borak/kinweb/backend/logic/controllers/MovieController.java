@@ -4,16 +4,14 @@
  */
 package com.borak.kinweb.backend.logic.controllers;
 
-import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -118,7 +117,8 @@ public class MovieController {
 
     //=========================POST MAPPINGS==================================
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity postMovie(@RequestPart("movie") MoviePOSTRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    public ResponseEntity postMovie(@RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
         domainValidator.validatePOST(movie, coverImage);
         if (coverImage != null) {
             movie.setCoverImage(new MyImage(coverImage));
@@ -127,11 +127,23 @@ public class MovieController {
     }
 
     //=========================PUT MAPPINGS===================================
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @JsonView(JsonVisibilityViews.Heavy.class)
+    public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id, @RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
+        movie.setId(id);
+        domainValidator.validatePUT(movie, coverImage);
+        if (coverImage != null) {
+            movie.setCoverImage(new MyImage(coverImage));
+        }
+        return movieService.putMovie(movie);
+    }
+
     //=========================DELETE MAPPINGS================================
     @DeleteMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity deleteMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
         return movieService.deleteMovieById(id);
     }
+//=========================TESTING=============================================
 
 }

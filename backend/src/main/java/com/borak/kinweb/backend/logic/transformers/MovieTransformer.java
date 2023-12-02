@@ -5,7 +5,7 @@
 package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.dto.movie.MoviePOSTRequestDTO;
+import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
@@ -33,18 +33,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public final class MovieTransformer {
-
+    
     @Autowired
     private ConfigProperties config;
-
+    
     @Autowired
     private Util util;
-
+    
     public MovieResponseDTO toMovieResponseDTO(MovieJDBC movieJdbc) throws IllegalArgumentException {
         if (movieJdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-
+        
         MovieResponseDTO movieResponse = new MovieResponseDTO();
         movieResponse.setId(movieJdbc.getId());
         movieResponse.setTitle(movieJdbc.getTitle());
@@ -56,11 +56,11 @@ public final class MovieTransformer {
         movieResponse.setLength(movieJdbc.getLength());
         movieResponse.setAudienceRating(movieJdbc.getAudienceRating());
         movieResponse.setCriticsRating(movieJdbc.getCriticRating());
-
+        
         for (GenreJDBC genre : movieJdbc.getGenres()) {
             movieResponse.getGenres().add(new MovieResponseDTO.Genre(genre.getId(), genre.getName()));
         }
-
+        
         for (CritiqueJDBC critique : movieJdbc.getCritiques()) {
             MovieResponseDTO.Critique.Critic criticResponse = new MovieResponseDTO.Critique.Critic();
             criticResponse.setUsername(critique.getCritic().getUsername());
@@ -69,7 +69,7 @@ public final class MovieTransformer {
             }
             movieResponse.getCritiques().add(new MovieResponseDTO.Critique(criticResponse, critique.getRating(), critique.getDescription()));
         }
-
+        
         for (DirectorJDBC director : movieJdbc.getDirectors()) {
             MovieResponseDTO.Director directorResponse = new MovieResponseDTO.Director();
             directorResponse.setId(director.getId());
@@ -108,22 +108,23 @@ public final class MovieTransformer {
             }
             movieResponse.getActors().add(actorResponse);
         }
-
+        
         return movieResponse;
     }
-
-    public MovieJDBC toMovieJDBC(MoviePOSTRequestDTO movie) throws IllegalArgumentException {
+    
+    public MovieJDBC toMovieJDBC(MovieRequestDTO movie) throws IllegalArgumentException {
         if (movie == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         movie.setGenres(util.sortAsc(movie.getGenres()));
         movie.setDirectors(util.sortAsc(movie.getDirectors()));
         movie.setWriters(util.sortAsc(movie.getWriters()));
-        List<MoviePOSTRequestDTO.Actor> pom = new ArrayList<>(movie.getActors());
-        pom.sort(Comparator.comparingLong(MoviePOSTRequestDTO.Actor::getId));
+        List<MovieRequestDTO.Actor> pom = new ArrayList<>(movie.getActors());
+        pom.sort(Comparator.comparingLong(MovieRequestDTO.Actor::getId));
         movie.setActors(pom);
-
+        
         MovieJDBC jdbc = new MovieJDBC();
+        jdbc.setId(movie.getId());
         jdbc.setTitle(movie.getTitle());
         if (movie.getCoverImage() != null) {
             jdbc.setCoverImage(movie.getCoverImage().getFullName());
@@ -141,7 +142,7 @@ public final class MovieTransformer {
         for (Long writer : movie.getWriters()) {
             jdbc.getWriters().add(new WriterJDBC(writer));
         }
-        for (MoviePOSTRequestDTO.Actor actor : movie.getActors()) {
+        for (MovieRequestDTO.Actor actor : movie.getActors()) {
             ActingJDBC acting = new ActingJDBC(jdbc, new ActorJDBC(actor.getId()), actor.getStarring());
             long i = 1;
             for (String role : actor.getRoles()) {
@@ -164,5 +165,5 @@ public final class MovieTransformer {
         }
         return list;
     }
-
+    
 }

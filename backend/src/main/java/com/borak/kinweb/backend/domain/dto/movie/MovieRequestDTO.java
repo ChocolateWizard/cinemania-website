@@ -26,7 +26,10 @@ import org.springframework.validation.annotation.Validated;
  * @author Mr. Poyo
  */
 @Validated
-public class MoviePOSTRequestDTO implements DTO {
+public class MovieRequestDTO implements DTO {
+
+    @JsonIgnore
+    private Long id;
 
     @NotBlank(message = "Movie title must not be null or empty!")
     @Size(max = 300, message = "Movie title must have less than 300 characters!")
@@ -76,7 +79,7 @@ public class MoviePOSTRequestDTO implements DTO {
     private List<
             @NotNull(message = "Movie actor must not be null!") Actor> actors = new ArrayList<>();
 
-    public MoviePOSTRequestDTO() {
+    public MovieRequestDTO() {
     }
 
     public static class Actor {
@@ -120,6 +123,14 @@ public class MoviePOSTRequestDTO implements DTO {
             this.roles = roles;
         }
 
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {
