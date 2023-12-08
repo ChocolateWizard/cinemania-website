@@ -76,26 +76,26 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
 
     @Override
     public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithGenresPaginated(page - 1, size));
+        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByAudienceRatingWithGenresPaginated(page - 1, size, POPULARITY_TRESHOLD));
+        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue();
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByReleaseYearWithGenresPaginated(page - 1, size, year));
+        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithRelationsPaginated(page - 1, size));
+        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 

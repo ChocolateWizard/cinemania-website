@@ -38,12 +38,12 @@ public class ActingRepositoryJDBC implements IActingRepository<ActingJDBC, Long>
     }
 
     @Override
-    public Optional<ActingJDBC> findById(Long id) throws DatabaseException {
+    public Optional<ActingJDBC> findById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean existsById(Long id) throws DatabaseException {
+    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -53,7 +53,7 @@ public class ActingRepositoryJDBC implements IActingRepository<ActingJDBC, Long>
     }
 
     @Override
-    public List<ActingJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<ActingJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -63,14 +63,14 @@ public class ActingRepositoryJDBC implements IActingRepository<ActingJDBC, Long>
     }
 
     @Override
-    public void deleteById(Long id) throws DatabaseException {
+    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public List<ActingJDBC> findAllByMediaId(Long id) throws DatabaseException {
+    public List<ActingJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
         try {
-            List<ActingJDBC> actings = jdbcTemplate.query(SQLActing.FIND_ALL_ACTING_ACTORS_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLActing.actingActorRM);           
+            List<ActingJDBC> actings = jdbcTemplate.query(SQLActing.FIND_ALL_ACTING_ACTORS_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLActing.actingActorRM);
             for (ActingJDBC acting : actings) {
                 List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLActing.FIND_ALL_ACTING_ROLES_PS, new Object[]{id, acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLActing.actingRoleRM);
                 acting.setRoles(roles);

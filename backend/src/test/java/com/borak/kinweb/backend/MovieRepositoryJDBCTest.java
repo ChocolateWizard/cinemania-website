@@ -4,26 +4,24 @@
  */
 package com.borak.kinweb.backend;
 
-import com.borak.kinweb.backend.domain.enums.Gender;
-import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.kinweb.backend.exceptions.DatabaseException;
+import com.borak.kinweb.backend.initializer.DataInitializer;
 import com.borak.kinweb.backend.repository.jdbc.MovieRepositoryJDBC;
 import java.time.LocalDate;
-import java.time.Month;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import static org.assertj.core.api.Assertions.*;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  *
@@ -37,707 +35,942 @@ public class MovieRepositoryJDBCTest {
     @Autowired
     private MovieRepositoryJDBC repo;
 
+    private final DataInitializer init = new DataInitializer();
+
     @Test
-    @Order(1)
     @DisplayName("Tests normal functionality of findAll method of MovieRepositoryJDBC class")
     void findAll_Test() {
-        List<MovieJDBC> movies = repo.findAll();
+        List<MovieJDBC> actual = repo.findAll();
+        List<MovieJDBC> expected = init.getMovies();
 
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(4);
-
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(1);
-        assertThat(movies.get(0).getTitle()).isEqualTo("Mulholland Drive");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("1.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2001, Month.MAY, 16));
-        assertThat(movies.get(0).getDescription()).isEqualTo("After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(79);
-        assertThat(movies.get(0).getLength()).isEqualTo(147);
-
-        assertThat(movies.get(1)).isNotNull();
-        assertThat(movies.get(1).getId()).isNotNull().isEqualTo(2);
-        assertThat(movies.get(1).getTitle()).isEqualTo("Inland Empire");
-        assertThat(movies.get(1).getCoverImage()).isEqualTo("2.jpg");
-        assertThat(movies.get(1).getReleaseDate()).isEqualTo(LocalDate.of(2006, Month.SEPTEMBER, 6));
-        assertThat(movies.get(1).getDescription()).isEqualTo("As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.");
-        assertThat(movies.get(1).getAudienceRating()).isEqualTo(68);
-        assertThat(movies.get(1).getLength()).isEqualTo(180);
-
-        assertThat(movies.get(2)).isNotNull();
-        assertThat(movies.get(2).getId()).isNotNull().isEqualTo(4);
-        assertThat(movies.get(2).getTitle()).isEqualTo("The Lighthouse");
-        assertThat(movies.get(2).getCoverImage()).isEqualTo("4.jpg");
-        assertThat(movies.get(2).getReleaseDate()).isEqualTo(LocalDate.of(2019, Month.MAY, 19));
-        assertThat(movies.get(2).getDescription()).isEqualTo("Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.");
-        assertThat(movies.get(2).getAudienceRating()).isEqualTo(74);
-        assertThat(movies.get(2).getLength()).isEqualTo(109);
-
-        assertThat(movies.get(3)).isNotNull();
-        assertThat(movies.get(3).getId()).isNotNull().isEqualTo(5);
-        assertThat(movies.get(3).getTitle()).isEqualTo("2001: A Space Odyssey");
-        assertThat(movies.get(3).getCoverImage()).isNull();
-        assertThat(movies.get(3).getReleaseDate()).isEqualTo(LocalDate.of(1968, Month.APRIL, 2));
-        assertThat(movies.get(3).getDescription()).isEqualTo("After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000.");
-        assertThat(movies.get(3).getAudienceRating()).isEqualTo(83);
-        assertThat(movies.get(3).getLength()).isEqualTo(149);
-
-        for (MovieJDBC movie : movies) {
-            assertThat(movie.getCriticRating()).isNull();
-            assertThat(movie.getGenres()).isNotNull().isEmpty();
-            assertThat(movie.getDirectors()).isNotNull().isEmpty();
-            assertThat(movie.getWriters()).isNotNull().isEmpty();
-            assertThat(movie.getCritiques()).isNotNull().isEmpty();
-            assertThat(movie.getActings()).isNotNull().isEmpty();
-        }
-
+        checkValues(actual, expected);
     }
 
     @Test
-    @Order(2)
     @DisplayName("Tests normal functionality of findAllWithGenres method of MovieRepositoryJDBC class")
     void findAllWithGenres_Test() {
-        List<MovieJDBC> movies = repo.findAllWithGenres();
+        List<MovieJDBC> actual = repo.findAllWithGenres();
+        List<MovieJDBC> expected = init.getMovies();
 
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(4);
-
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(1);
-        assertThat(movies.get(0).getTitle()).isEqualTo("Mulholland Drive");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("1.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2001, Month.MAY, 16));
-        assertThat(movies.get(0).getDescription()).isEqualTo("After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(79);
-        assertThat(movies.get(0).getLength()).isEqualTo(147);
-
-        assertThat(movies.get(0).getGenres()).isNotNull();
-        assertThat(movies.get(0).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(0).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(0).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(0).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(1).getId()).isEqualTo(11);
-        assertThat(movies.get(0).getGenres().get(1).getName()).isEqualTo("Thriller");
-
-        assertThat(movies.get(0).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(2).getId()).isEqualTo(12);
-        assertThat(movies.get(0).getGenres().get(2).getName()).isEqualTo("Mystery");
-
-        assertThat(movies.get(1)).isNotNull();
-        assertThat(movies.get(1).getId()).isNotNull().isEqualTo(2);
-        assertThat(movies.get(1).getTitle()).isEqualTo("Inland Empire");
-        assertThat(movies.get(1).getCoverImage()).isEqualTo("2.jpg");
-        assertThat(movies.get(1).getReleaseDate()).isEqualTo(LocalDate.of(2006, Month.SEPTEMBER, 6));
-        assertThat(movies.get(1).getDescription()).isEqualTo("As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.");
-        assertThat(movies.get(1).getAudienceRating()).isEqualTo(68);
-        assertThat(movies.get(1).getLength()).isEqualTo(180);
-
-        assertThat(movies.get(1).getGenres()).isNotNull();
-        assertThat(movies.get(1).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(1).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(1).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(1).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(1).getId()).isEqualTo(12);
-        assertThat(movies.get(1).getGenres().get(1).getName()).isEqualTo("Mystery");
-
-        assertThat(movies.get(1).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(2).getId()).isEqualTo(13);
-        assertThat(movies.get(1).getGenres().get(2).getName()).isEqualTo("Fantasy");
-
-        assertThat(movies.get(2)).isNotNull();
-        assertThat(movies.get(2).getId()).isNotNull().isEqualTo(4);
-        assertThat(movies.get(2).getTitle()).isEqualTo("The Lighthouse");
-        assertThat(movies.get(2).getCoverImage()).isEqualTo("4.jpg");
-        assertThat(movies.get(2).getReleaseDate()).isEqualTo(LocalDate.of(2019, Month.MAY, 19));
-        assertThat(movies.get(2).getDescription()).isEqualTo("Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.");
-        assertThat(movies.get(2).getAudienceRating()).isEqualTo(74);
-        assertThat(movies.get(2).getLength()).isEqualTo(109);
-
-        assertThat(movies.get(2).getGenres()).isNotNull();
-        assertThat(movies.get(2).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(2).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(2).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(2).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(1).getId()).isEqualTo(8);
-        assertThat(movies.get(2).getGenres().get(1).getName()).isEqualTo("Horror");
-
-        assertThat(movies.get(2).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(2).getId()).isEqualTo(13);
-        assertThat(movies.get(2).getGenres().get(2).getName()).isEqualTo("Fantasy");
-
-        assertThat(movies.get(3)).isNotNull();
-        assertThat(movies.get(3).getId()).isNotNull().isEqualTo(5);
-        assertThat(movies.get(3).getTitle()).isEqualTo("2001: A Space Odyssey");
-        assertThat(movies.get(3).getCoverImage()).isNull();
-        assertThat(movies.get(3).getReleaseDate()).isEqualTo(LocalDate.of(1968, Month.APRIL, 2));
-        assertThat(movies.get(3).getDescription()).isEqualTo("After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000.");
-        assertThat(movies.get(3).getAudienceRating()).isEqualTo(83);
-        assertThat(movies.get(3).getLength()).isEqualTo(149);
-
-        assertThat(movies.get(3).getGenres()).isNotNull().isEmpty();
-
-        for (MovieJDBC movie : movies) {
-            assertThat(movie.getCriticRating()).isNull();
-            assertThat(movie.getCritiques()).isNotNull().isEmpty();
-            assertThat(movie.getDirectors()).isNotNull().isEmpty();
-            assertThat(movie.getWriters()).isNotNull().isEmpty();
-            assertThat(movie.getActings()).isNotNull().isEmpty();
-        }
-
+        checkValuesWithGenres(actual, expected);
     }
 
     @Test
-    @Order(3)
-    @DisplayName("Tests normal functionality of count method of MovieRepositoryJDBC class")
-    void count_Test() {
-        long count = repo.count();
-        assertThat(count).isEqualTo(4);
-    }
-
-    @Test
-    @Order(4)
     @DisplayName("Tests normal functionality of findAllWithRelations method of MovieRepositoryJDBC class")
     void findAllWithRelations_Test() {
-        List<MovieJDBC> movies = repo.findAllWithRelations();
+        List<MovieJDBC> actual = repo.findAllWithRelations();
+        List<MovieJDBC> expected = init.getMovies();
 
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(4);
-        //==========================================================================
-        //Test movie num 1
-        //==========================================================================
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(1);
-        assertThat(movies.get(0).getTitle()).isEqualTo("Mulholland Drive");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("1.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2001, Month.MAY, 16));
-        assertThat(movies.get(0).getDescription()).isEqualTo("After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(79);
-        assertThat(movies.get(0).getLength()).isEqualTo(147);
-
-        assertThat(movies.get(0).getGenres()).isNotNull();
-        assertThat(movies.get(0).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(0).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(0).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(0).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(1).getId()).isEqualTo(11);
-        assertThat(movies.get(0).getGenres().get(1).getName()).isEqualTo("Thriller");
-
-        assertThat(movies.get(0).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(0).getGenres().get(2).getId()).isEqualTo(12);
-        assertThat(movies.get(0).getGenres().get(2).getName()).isEqualTo("Mystery");
-
-        assertThat(movies.get(0).getDirectors()).isNotNull();
-        assertThat(movies.get(0).getDirectors().size()).isEqualTo(1);
-
-        assertThat(movies.get(0).getDirectors().get(0)).isNotNull();
-        assertThat(movies.get(0).getDirectors().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getDirectors().get(0).getFirstName()).isEqualTo("David");
-        assertThat(movies.get(0).getDirectors().get(0).getLastName()).isEqualTo("Lynch");
-        assertThat(movies.get(0).getDirectors().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(0).getDirectors().get(0).getProfilePhoto()).isEqualTo("1.jpg");
-
-        assertThat(movies.get(0).getWriters()).isNotNull();
-        assertThat(movies.get(0).getWriters().size()).isEqualTo(1);
-
-        assertThat(movies.get(0).getWriters().get(0)).isNotNull();
-        assertThat(movies.get(0).getWriters().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getWriters().get(0).getFirstName()).isEqualTo("David");
-        assertThat(movies.get(0).getWriters().get(0).getLastName()).isEqualTo("Lynch");
-        assertThat(movies.get(0).getWriters().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(0).getWriters().get(0).getProfilePhoto()).isEqualTo("1.jpg");
-
-        assertThat(movies.get(0).getActings()).isNotNull();
-        assertThat(movies.get(0).getActings().size()).isEqualTo(5);
-
-        assertThat(movies.get(0).getActings().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(0).isStarring()).isTrue();
-        assertThat(movies.get(0).getActings().get(0).getActor()).isNotNull();
-        assertThat(movies.get(0).getActings().get(0).getActor().getId()).isEqualTo(2);
-        assertThat(movies.get(0).getActings().get(0).getActor().getFirstName()).isEqualTo("Naomi");
-        assertThat(movies.get(0).getActings().get(0).getActor().getLastName()).isEqualTo("Watts");
-        assertThat(movies.get(0).getActings().get(0).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(0).getActings().get(0).getActor().getProfilePhoto()).isEqualTo("2.jpg");
-        assertThat(movies.get(0).getActings().get(0).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(0).getActings().get(0).getRoles()).isNotNull();
-        assertThat(movies.get(0).getActings().get(0).getRoles().size()).isEqualTo(2);
-
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(0).getName()).isEqualTo("Betty Elms");
-
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(1)).isNotNull();
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(1).getId()).isEqualTo(2);
-        assertThat(movies.get(0).getActings().get(0).getRoles().get(1).getName()).isEqualTo("Diane Selwyn");
-
-        assertThat(movies.get(0).getActings().get(1)).isNotNull();
-        assertThat(movies.get(0).getActings().get(1).isStarring()).isTrue();
-        assertThat(movies.get(0).getActings().get(1).getActor()).isNotNull();
-        assertThat(movies.get(0).getActings().get(1).getActor().getId()).isEqualTo(3);
-        assertThat(movies.get(0).getActings().get(1).getActor().getFirstName()).isEqualTo("Laura");
-        assertThat(movies.get(0).getActings().get(1).getActor().getLastName()).isEqualTo("Harring");
-        assertThat(movies.get(0).getActings().get(1).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(0).getActings().get(1).getActor().getProfilePhoto()).isEqualTo("3.jpg");
-        assertThat(movies.get(0).getActings().get(1).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(0).getActings().get(1).getRoles()).isNotNull();
-        assertThat(movies.get(0).getActings().get(1).getRoles().size()).isEqualTo(2);
-
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(0).getName()).isEqualTo("Rita");
-
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(1)).isNotNull();
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(1).getId()).isEqualTo(2);
-        assertThat(movies.get(0).getActings().get(1).getRoles().get(1).getName()).isEqualTo("Camilla Rhodes");
-
-        assertThat(movies.get(0).getActings().get(2)).isNotNull();
-        assertThat(movies.get(0).getActings().get(2).isStarring()).isTrue();
-        assertThat(movies.get(0).getActings().get(2).getActor()).isNotNull();
-        assertThat(movies.get(0).getActings().get(2).getActor().getId()).isEqualTo(4);
-        assertThat(movies.get(0).getActings().get(2).getActor().getFirstName()).isEqualTo("Justin");
-        assertThat(movies.get(0).getActings().get(2).getActor().getLastName()).isEqualTo("Theroux");
-        assertThat(movies.get(0).getActings().get(2).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(0).getActings().get(2).getActor().getProfilePhoto()).isEqualTo("4.jpg");
-        assertThat(movies.get(0).getActings().get(2).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(0).getActings().get(2).getRoles()).isNotNull();
-        assertThat(movies.get(0).getActings().get(2).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(0).getActings().get(2).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(2).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getActings().get(2).getRoles().get(0).getName()).isEqualTo("Adam");
-
-        assertThat(movies.get(0).getActings().get(3)).isNotNull();
-        assertThat(movies.get(0).getActings().get(3).isStarring()).isFalse();
-        assertThat(movies.get(0).getActings().get(3).getActor()).isNotNull();
-        assertThat(movies.get(0).getActings().get(3).getActor().getId()).isEqualTo(5);
-        assertThat(movies.get(0).getActings().get(3).getActor().getFirstName()).isEqualTo("Patrick");
-        assertThat(movies.get(0).getActings().get(3).getActor().getLastName()).isEqualTo("Fischler");
-        assertThat(movies.get(0).getActings().get(3).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(0).getActings().get(3).getActor().getProfilePhoto()).isEqualTo("5.jpg");
-        assertThat(movies.get(0).getActings().get(3).getActor().isStar()).isFalse();
-
-        assertThat(movies.get(0).getActings().get(3).getRoles()).isNotNull();
-        assertThat(movies.get(0).getActings().get(3).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(0).getActings().get(3).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(3).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getActings().get(3).getRoles().get(0).getName()).isEqualTo("Dan");
-
-        assertThat(movies.get(0).getActings().get(4)).isNotNull();
-        assertThat(movies.get(0).getActings().get(4).isStarring()).isFalse();
-        assertThat(movies.get(0).getActings().get(4).getActor()).isNotNull();
-        assertThat(movies.get(0).getActings().get(4).getActor().getId()).isEqualTo(6);
-        assertThat(movies.get(0).getActings().get(4).getActor().getFirstName()).isEqualTo("Jeanne");
-        assertThat(movies.get(0).getActings().get(4).getActor().getLastName()).isEqualTo("Bates");
-        assertThat(movies.get(0).getActings().get(4).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(0).getActings().get(4).getActor().getProfilePhoto()).isEqualTo("6.jpg");
-        assertThat(movies.get(0).getActings().get(4).getActor().isStar()).isFalse();
-
-        assertThat(movies.get(0).getActings().get(4).getRoles()).isNotNull();
-        assertThat(movies.get(0).getActings().get(4).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(0).getActings().get(4).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(0).getActings().get(4).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(0).getActings().get(4).getRoles().get(0).getName()).isEqualTo("Irene");
-
-        //==========================================================================
-        //Test movie num 2
-        //==========================================================================
-        assertThat(movies.get(1)).isNotNull();
-        assertThat(movies.get(1).getId()).isNotNull().isEqualTo(2);
-        assertThat(movies.get(1).getTitle()).isEqualTo("Inland Empire");
-        assertThat(movies.get(1).getCoverImage()).isEqualTo("2.jpg");
-        assertThat(movies.get(1).getReleaseDate()).isEqualTo(LocalDate.of(2006, Month.SEPTEMBER, 6));
-        assertThat(movies.get(1).getDescription()).isEqualTo("As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.");
-        assertThat(movies.get(1).getAudienceRating()).isEqualTo(68);
-        assertThat(movies.get(1).getLength()).isEqualTo(180);
-
-        assertThat(movies.get(1).getGenres()).isNotNull();
-        assertThat(movies.get(1).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(1).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(1).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(1).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(1).getId()).isEqualTo(12);
-        assertThat(movies.get(1).getGenres().get(1).getName()).isEqualTo("Mystery");
-
-        assertThat(movies.get(1).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(1).getGenres().get(2).getId()).isEqualTo(13);
-        assertThat(movies.get(1).getGenres().get(2).getName()).isEqualTo("Fantasy");
-
-        assertThat(movies.get(1).getDirectors()).isNotNull();
-        assertThat(movies.get(1).getDirectors().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getDirectors().get(0)).isNotNull();
-        assertThat(movies.get(1).getDirectors().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getDirectors().get(0).getFirstName()).isEqualTo("David");
-        assertThat(movies.get(1).getDirectors().get(0).getLastName()).isEqualTo("Lynch");
-        assertThat(movies.get(1).getDirectors().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getDirectors().get(0).getProfilePhoto()).isEqualTo("1.jpg");
-
-        assertThat(movies.get(1).getWriters()).isNotNull();
-        assertThat(movies.get(1).getWriters().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getWriters().get(0)).isNotNull();
-        assertThat(movies.get(1).getWriters().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getWriters().get(0).getFirstName()).isEqualTo("David");
-        assertThat(movies.get(1).getWriters().get(0).getLastName()).isEqualTo("Lynch");
-        assertThat(movies.get(1).getWriters().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getWriters().get(0).getProfilePhoto()).isEqualTo("1.jpg");
-
-        assertThat(movies.get(1).getActings()).isNotNull();
-        assertThat(movies.get(1).getActings().size()).isEqualTo(7);
-
-        assertThat(movies.get(1).getActings().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(0).isStarring()).isTrue();
-        assertThat(movies.get(1).getActings().get(0).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(0).getActor().getId()).isEqualTo(4);
-        assertThat(movies.get(1).getActings().get(0).getActor().getFirstName()).isEqualTo("Justin");
-        assertThat(movies.get(1).getActings().get(0).getActor().getLastName()).isEqualTo("Theroux");
-        assertThat(movies.get(1).getActings().get(0).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getActings().get(0).getActor().getProfilePhoto()).isEqualTo("4.jpg");
-        assertThat(movies.get(1).getActings().get(0).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(1).getActings().get(0).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(0).getRoles().size()).isEqualTo(2);
-
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(0).getName()).isEqualTo("Devon Berk");
-
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(1)).isNotNull();
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(1).getId()).isEqualTo(2);
-        assertThat(movies.get(1).getActings().get(0).getRoles().get(1).getName()).isEqualTo("Billy Side");
-
-        assertThat(movies.get(1).getActings().get(1)).isNotNull();
-        assertThat(movies.get(1).getActings().get(1).isStarring()).isTrue();
-        assertThat(movies.get(1).getActings().get(1).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(1).getActor().getId()).isEqualTo(7);
-        assertThat(movies.get(1).getActings().get(1).getActor().getFirstName()).isEqualTo("Karolina");
-        assertThat(movies.get(1).getActings().get(1).getActor().getLastName()).isEqualTo("Gruszka");
-        assertThat(movies.get(1).getActings().get(1).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(1).getActings().get(1).getActor().getProfilePhoto()).isEqualTo("7.jpg");
-        assertThat(movies.get(1).getActings().get(1).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(1).getActings().get(1).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(1).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getActings().get(1).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(1).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(1).getRoles().get(0).getName()).isEqualTo("Lost Girl");
-
-        assertThat(movies.get(1).getActings().get(2)).isNotNull();
-        assertThat(movies.get(1).getActings().get(2).isStarring()).isTrue();
-        assertThat(movies.get(1).getActings().get(2).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(2).getActor().getId()).isEqualTo(8);
-        assertThat(movies.get(1).getActings().get(2).getActor().getFirstName()).isEqualTo("Krzysztof");
-        assertThat(movies.get(1).getActings().get(2).getActor().getLastName()).isEqualTo("Majchrzak");
-        assertThat(movies.get(1).getActings().get(2).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getActings().get(2).getActor().getProfilePhoto()).isEqualTo("8.jpg");
-        assertThat(movies.get(1).getActings().get(2).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(1).getActings().get(2).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(2).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getActings().get(2).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(2).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(2).getRoles().get(0).getName()).isEqualTo("Phantom");
-
-        assertThat(movies.get(1).getActings().get(3)).isNotNull();
-        assertThat(movies.get(1).getActings().get(3).isStarring()).isTrue();
-        assertThat(movies.get(1).getActings().get(3).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(3).getActor().getId()).isEqualTo(9);
-        assertThat(movies.get(1).getActings().get(3).getActor().getFirstName()).isEqualTo("Grace");
-        assertThat(movies.get(1).getActings().get(3).getActor().getLastName()).isEqualTo("Zabriskie");
-        assertThat(movies.get(1).getActings().get(3).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(1).getActings().get(3).getActor().getProfilePhoto()).isEqualTo("9.jpg");
-        assertThat(movies.get(1).getActings().get(3).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(1).getActings().get(3).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(3).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getActings().get(3).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(3).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(3).getRoles().get(0).getName()).isEqualTo("Visitor #1");
-
-        assertThat(movies.get(1).getActings().get(4)).isNotNull();
-        assertThat(movies.get(1).getActings().get(4).isStarring()).isFalse();
-        assertThat(movies.get(1).getActings().get(4).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(4).getActor().getId()).isEqualTo(10);
-        assertThat(movies.get(1).getActings().get(4).getActor().getFirstName()).isEqualTo("Laura");
-        assertThat(movies.get(1).getActings().get(4).getActor().getLastName()).isEqualTo("Dern");
-        assertThat(movies.get(1).getActings().get(4).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(1).getActings().get(4).getActor().getProfilePhoto()).isEqualTo("10.jpg");
-        assertThat(movies.get(1).getActings().get(4).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(1).getActings().get(4).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(4).getRoles().size()).isEqualTo(2);
-
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(0).getName()).isEqualTo("Nikki Grace");
-
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(1)).isNotNull();
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(1).getId()).isEqualTo(2);
-        assertThat(movies.get(1).getActings().get(4).getRoles().get(1).getName()).isEqualTo("Susan Blue");
-
-        assertThat(movies.get(1).getActings().get(5)).isNotNull();
-        assertThat(movies.get(1).getActings().get(5).isStarring()).isFalse();
-        assertThat(movies.get(1).getActings().get(5).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(5).getActor().getId()).isEqualTo(11);
-        assertThat(movies.get(1).getActings().get(5).getActor().getFirstName()).isEqualTo("Harry Dean");
-        assertThat(movies.get(1).getActings().get(5).getActor().getLastName()).isEqualTo("Stanton");
-        assertThat(movies.get(1).getActings().get(5).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getActings().get(5).getActor().getProfilePhoto()).isEqualTo("11.jpg");
-        assertThat(movies.get(1).getActings().get(5).getActor().isStar()).isFalse();
-
-        assertThat(movies.get(1).getActings().get(5).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(5).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getActings().get(5).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(5).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(5).getRoles().get(0).getName()).isEqualTo("Freddie Howard");
-
-        assertThat(movies.get(1).getActings().get(6)).isNotNull();
-        assertThat(movies.get(1).getActings().get(6).isStarring()).isFalse();
-        assertThat(movies.get(1).getActings().get(6).getActor()).isNotNull();
-        assertThat(movies.get(1).getActings().get(6).getActor().getId()).isEqualTo(12);
-        assertThat(movies.get(1).getActings().get(6).getActor().getFirstName()).isEqualTo("Peter J.");
-        assertThat(movies.get(1).getActings().get(6).getActor().getLastName()).isEqualTo("Lucas");
-        assertThat(movies.get(1).getActings().get(6).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(1).getActings().get(6).getActor().getProfilePhoto()).isEqualTo("12.jpg");
-        assertThat(movies.get(1).getActings().get(6).getActor().isStar()).isFalse();
-
-        assertThat(movies.get(1).getActings().get(6).getRoles()).isNotNull();
-        assertThat(movies.get(1).getActings().get(6).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(1).getActings().get(6).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(1).getActings().get(6).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(1).getActings().get(6).getRoles().get(0).getName()).isEqualTo("Piotrek Krol");
-
-        //==========================================================================
-        //Test movie num 3
-        //==========================================================================
-        assertThat(movies.get(2)).isNotNull();
-        assertThat(movies.get(2).getId()).isNotNull().isEqualTo(4);
-        assertThat(movies.get(2).getTitle()).isEqualTo("The Lighthouse");
-        assertThat(movies.get(2).getCoverImage()).isEqualTo("4.jpg");
-        assertThat(movies.get(2).getReleaseDate()).isEqualTo(LocalDate.of(2019, Month.MAY, 19));
-        assertThat(movies.get(2).getDescription()).isEqualTo("Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.");
-        assertThat(movies.get(2).getAudienceRating()).isEqualTo(74);
-        assertThat(movies.get(2).getLength()).isEqualTo(109);
-
-        assertThat(movies.get(2).getGenres()).isNotNull();
-        assertThat(movies.get(2).getGenres().size()).isEqualTo(3);
-
-        assertThat(movies.get(2).getGenres().get(0)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(0).getId()).isEqualTo(6);
-        assertThat(movies.get(2).getGenres().get(0).getName()).isEqualTo("Drama");
-
-        assertThat(movies.get(2).getGenres().get(1)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(1).getId()).isEqualTo(8);
-        assertThat(movies.get(2).getGenres().get(1).getName()).isEqualTo("Horror");
-
-        assertThat(movies.get(2).getGenres().get(2)).isNotNull();
-        assertThat(movies.get(2).getGenres().get(2).getId()).isEqualTo(13);
-        assertThat(movies.get(2).getGenres().get(2).getName()).isEqualTo("Fantasy");
-
-        assertThat(movies.get(2).getDirectors()).isNotNull();
-        assertThat(movies.get(2).getDirectors().size()).isEqualTo(1);
-
-        assertThat(movies.get(2).getDirectors().get(0)).isNotNull();
-        assertThat(movies.get(2).getDirectors().get(0).getId()).isEqualTo(26);
-        assertThat(movies.get(2).getDirectors().get(0).getFirstName()).isEqualTo("Robert");
-        assertThat(movies.get(2).getDirectors().get(0).getLastName()).isEqualTo("Eggers");
-        assertThat(movies.get(2).getDirectors().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(2).getDirectors().get(0).getProfilePhoto()).isEqualTo("26.jpg");
-
-        assertThat(movies.get(2).getWriters()).isNotNull();
-        assertThat(movies.get(2).getWriters().size()).isEqualTo(2);
-
-        assertThat(movies.get(2).getWriters().get(0)).isNotNull();
-        assertThat(movies.get(2).getWriters().get(0).getId()).isEqualTo(26);
-        assertThat(movies.get(2).getWriters().get(0).getFirstName()).isEqualTo("Robert");
-        assertThat(movies.get(2).getWriters().get(0).getLastName()).isEqualTo("Eggers");
-        assertThat(movies.get(2).getWriters().get(0).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(2).getWriters().get(0).getProfilePhoto()).isEqualTo("26.jpg");
-
-        assertThat(movies.get(2).getWriters().get(1)).isNotNull();
-        assertThat(movies.get(2).getWriters().get(1).getId()).isEqualTo(27);
-        assertThat(movies.get(2).getWriters().get(1).getFirstName()).isEqualTo("Max");
-        assertThat(movies.get(2).getWriters().get(1).getLastName()).isEqualTo("Eggers");
-        assertThat(movies.get(2).getWriters().get(1).getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(2).getWriters().get(1).getProfilePhoto()).isEqualTo("27.jpg");
-
-        assertThat(movies.get(2).getActings()).isNotNull();
-        assertThat(movies.get(2).getActings().size()).isEqualTo(3);
-
-        assertThat(movies.get(2).getActings().get(0)).isNotNull();
-        assertThat(movies.get(2).getActings().get(0).isStarring()).isTrue();
-        assertThat(movies.get(2).getActings().get(0).getActor()).isNotNull();
-        assertThat(movies.get(2).getActings().get(0).getActor().getId()).isEqualTo(28);
-        assertThat(movies.get(2).getActings().get(0).getActor().getFirstName()).isEqualTo("Robert");
-        assertThat(movies.get(2).getActings().get(0).getActor().getLastName()).isEqualTo("Pattinson");
-        assertThat(movies.get(2).getActings().get(0).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(2).getActings().get(0).getActor().getProfilePhoto()).isEqualTo("28.jpg");
-        assertThat(movies.get(2).getActings().get(0).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(2).getActings().get(0).getRoles()).isNotNull();
-        assertThat(movies.get(2).getActings().get(0).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(2).getActings().get(0).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(2).getActings().get(0).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(2).getActings().get(0).getRoles().get(0).getName()).isEqualTo("Thomas Howard");
-
-        assertThat(movies.get(2).getActings().get(1)).isNotNull();
-        assertThat(movies.get(2).getActings().get(1).isStarring()).isTrue();
-        assertThat(movies.get(2).getActings().get(1).getActor()).isNotNull();
-        assertThat(movies.get(2).getActings().get(1).getActor().getId()).isEqualTo(29);
-        assertThat(movies.get(2).getActings().get(1).getActor().getFirstName()).isEqualTo("Willem");
-        assertThat(movies.get(2).getActings().get(1).getActor().getLastName()).isEqualTo("Dafoe");
-        assertThat(movies.get(2).getActings().get(1).getActor().getGender()).isEqualTo(Gender.MALE);
-        assertThat(movies.get(2).getActings().get(1).getActor().getProfilePhoto()).isEqualTo("29.jpg");
-        assertThat(movies.get(2).getActings().get(1).getActor().isStar()).isTrue();
-
-        assertThat(movies.get(2).getActings().get(1).getRoles()).isNotNull();
-        assertThat(movies.get(2).getActings().get(1).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(2).getActings().get(1).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(2).getActings().get(1).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(2).getActings().get(1).getRoles().get(0).getName()).isEqualTo("Thomas Wake");
-
-        assertThat(movies.get(2).getActings().get(2)).isNotNull();
-        assertThat(movies.get(2).getActings().get(2).isStarring()).isTrue();
-        assertThat(movies.get(2).getActings().get(2).getActor()).isNotNull();
-        assertThat(movies.get(2).getActings().get(2).getActor().getId()).isEqualTo(30);
-        assertThat(movies.get(2).getActings().get(2).getActor().getFirstName()).isEqualTo("Valeriia");
-        assertThat(movies.get(2).getActings().get(2).getActor().getLastName()).isEqualTo("Karaman");
-        assertThat(movies.get(2).getActings().get(2).getActor().getGender()).isEqualTo(Gender.FEMALE);
-        assertThat(movies.get(2).getActings().get(2).getActor().getProfilePhoto()).isEqualTo("30.jpg");
-        assertThat(movies.get(2).getActings().get(2).getActor().isStar()).isFalse();
-
-        assertThat(movies.get(2).getActings().get(2).getRoles()).isNotNull();
-        assertThat(movies.get(2).getActings().get(2).getRoles().size()).isEqualTo(1);
-
-        assertThat(movies.get(2).getActings().get(2).getRoles().get(0)).isNotNull();
-        assertThat(movies.get(2).getActings().get(2).getRoles().get(0).getId()).isEqualTo(1);
-        assertThat(movies.get(2).getActings().get(2).getRoles().get(0).getName()).isEqualTo("Mermaid");
-
-        //==========================================================================
-        //Test movie num 4
-        //==========================================================================
-        assertThat(movies.get(3)).isNotNull();
-        assertThat(movies.get(3).getId()).isNotNull().isEqualTo(5);
-        assertThat(movies.get(3).getTitle()).isEqualTo("2001: A Space Odyssey");
-        assertThat(movies.get(3).getCoverImage()).isNull();
-        assertThat(movies.get(3).getReleaseDate()).isEqualTo(LocalDate.of(1968, Month.APRIL, 2));
-        assertThat(movies.get(3).getDescription()).isEqualTo("After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000.");
-        assertThat(movies.get(3).getAudienceRating()).isEqualTo(83);
-        assertThat(movies.get(3).getLength()).isEqualTo(149);
-
-        assertThat(movies.get(3).getGenres()).isNotNull().isEmpty();
-        assertThat(movies.get(3).getDirectors()).isNotNull().isEmpty();
-        assertThat(movies.get(3).getWriters()).isNotNull().isEmpty();
-        assertThat(movies.get(3).getActings()).isNotNull().isEmpty();
-
-        //==========================================================================
-        for (MovieJDBC movie : movies) {
-            assertThat(movie.getCritiques()).isNotNull().isEmpty();
-            assertThat(movie.getCriticRating()).isNull();
-            for (ActingJDBC acting : movie.getActings()) {
-                assertThat(acting.getMedia() == movie).isTrue();
-                for (ActingRoleJDBC role : acting.getRoles()) {
-                    assertThat(role.getActing() == acting).isTrue();
-                }
-            }
-        }
-
+        checkValuesWithRelations(actual, expected);
     }
 
     @Test
-    @Order(5)
+    @DisplayName("Tests normal functionality of count method of MovieRepositoryJDBC class")
+    void count_Test() {
+        long actual = repo.count();
+        long expected = init.getMovies().size();
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     @DisplayName("Tests normal functionality of findAllPaginated method of MovieRepositoryJDBC class")
     void findAllPaginated_Test() {
-        List<MovieJDBC> movies = new ArrayList<>();
+        //(page,size)
+        final int[][] invalidInput = {
+            {0, 0},
+            {-1, -1},
+            {0, -1},
+            {-1, 0},
+            {-2, -2},
+            {-2, -1},
+            {-1, -2},
+            {Integer.MIN_VALUE, -2},
+            {-2, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MIN_VALUE},
+            {0, 1},
+            {0, 2},
+            {0, Integer.MAX_VALUE},
+            {1, -1},
+            {-1, 1},
+            {2, -2},
+            {-2, 2},
+            {Integer.MAX_VALUE, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input values (%s,%s)", invalidInput[i][0], invalidInput[i][1]).isThrownBy(() -> {
+                repo.findAllPaginated(invalidInput[i][0], invalidInput[i][1]);
+            }).withMessage("Invalid parameters: page must be greater than 0 and size must be non-negative");
+        }
+
+        //(page,size)
+        final int[][] emptyListInput = {
+            {1, 0},
+            {2, 0},
+            {Integer.MAX_VALUE, 0},
+            {4, 1},
+            {Integer.MAX_VALUE, 1},
+            {3, 2},
+            {Integer.MAX_VALUE, 2},
+            {2, 3},
+            {3, 3},
+            {Integer.MAX_VALUE, 3},
+            {2, 4},
+            {3, 4},
+            {4, 4},
+            {Integer.MAX_VALUE, 4},
+            {2, Integer.MAX_VALUE},
+            {3, Integer.MAX_VALUE},
+            {Integer.MAX_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < emptyListInput.length; iter++) {
+            final int i = iter;
+            List<MovieJDBC> actualList = repo.findAllPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
+        }
+
         int page;
         int size;
-
-        page = 0;
-        size = 1;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(1);
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(1);
-        assertThat(movies.get(0).getTitle()).isEqualTo("Mulholland Drive");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("1.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2001, Month.MAY, 16));
-        assertThat(movies.get(0).getDescription()).isEqualTo("After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(79);
-        assertThat(movies.get(0).getLength()).isEqualTo(147);
-
-        page = 0;
-        size = 10;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(4);
-
-        page = 0;
-        size = 3;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(3);
+        MovieJDBC expectedObject;
+        List<MovieJDBC> actualList;
+        List<MovieJDBC> expectedList;
 
         page = 1;
         size = 1;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(1);
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(2);
-        assertThat(movies.get(0).getTitle()).isEqualTo("Inland Empire");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("2.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2006, Month.SEPTEMBER, 6));
-        assertThat(movies.get(0).getDescription()).isEqualTo("As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(68);
-        assertThat(movies.get(0).getLength()).isEqualTo(180);
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(1);
-        assertThat(movies.get(0)).isNotNull();
-        assertThat(movies.get(0).getId()).isNotNull().isEqualTo(4);
-        assertThat(movies.get(0).getTitle()).isEqualTo("The Lighthouse");
-        assertThat(movies.get(0).getCoverImage()).isEqualTo("4.jpg");
-        assertThat(movies.get(0).getReleaseDate()).isEqualTo(LocalDate.of(2019, Month.MAY, 19));
-        assertThat(movies.get(0).getDescription()).isEqualTo("Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.");
-        assertThat(movies.get(0).getAudienceRating()).isEqualTo(74);
-        assertThat(movies.get(0).getLength()).isEqualTo(109);
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, Arrays.asList(expectedObject));
 
-        page = 10;
+        page = 3;
+        size = 1;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
         size = 2;
-        movies = repo.findAllPaginated(page, size);
-        assertThat(movies).isNotNull();
-        assertThat(movies.size()).isEqualTo(0);
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, expectedList);
 
+        page = 2;
+        size = 2;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        expectedList = init.getMovies();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, expectedList);
+
+        page = 1;
+        size = 4;
+        expectedList = init.getMovies();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, expectedList);
+
+        page = 1;
+        size = Integer.MAX_VALUE;
+        expectedList = init.getMovies();
+        actualList = repo.findAllPaginated(page, size);
+        checkValues(actualList, expectedList);
+
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findAllWithGenresPaginated method of MovieRepositoryJDBC class")
+    void findAllWithGenresPaginated_Test() {
+        //(page,size)
+        final int[][] invalidInput = {
+            {0, 0},
+            {-1, -1},
+            {0, -1},
+            {-1, 0},
+            {-2, -2},
+            {-2, -1},
+            {-1, -2},
+            {Integer.MIN_VALUE, -2},
+            {-2, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MIN_VALUE},
+            {0, 1},
+            {0, 2},
+            {0, Integer.MAX_VALUE},
+            {1, -1},
+            {-1, 1},
+            {2, -2},
+            {-2, 2},
+            {Integer.MAX_VALUE, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input values (%s,%s)", invalidInput[i][0], invalidInput[i][1]).isThrownBy(() -> {
+                repo.findAllWithGenresPaginated(invalidInput[i][0], invalidInput[i][1]);
+            }).withMessage("Invalid parameters: page must be greater than 0 and size must be non-negative");
+        }
+
+        //(page,size)
+        final int[][] emptyListInput = {
+            {1, 0},
+            {2, 0},
+            {Integer.MAX_VALUE, 0},
+            {4, 1},
+            {Integer.MAX_VALUE, 1},
+            {3, 2},
+            {Integer.MAX_VALUE, 2},
+            {2, 3},
+            {3, 3},
+            {Integer.MAX_VALUE, 3},
+            {2, 4},
+            {3, 4},
+            {4, 4},
+            {Integer.MAX_VALUE, 4},
+            {2, Integer.MAX_VALUE},
+            {3, Integer.MAX_VALUE},
+            {Integer.MAX_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < emptyListInput.length; iter++) {
+            final int i = iter;
+            List<MovieJDBC> actualList = repo.findAllWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
+        }
+
+        int page;
+        int size;
+        MovieJDBC expectedObject;
+        List<MovieJDBC> actualList;
+        List<MovieJDBC> expectedList;
+
+        page = 1;
+        size = 1;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 2;
+        size = 1;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 3;
+        size = 1;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 2;
+        size = 2;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 4;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = Integer.MAX_VALUE;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithGenresPaginated(page, size);
+        checkValuesWithGenres(actualList, expectedList);
+
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findAllWithRelationsPaginated method of MovieRepositoryJDBC class")
+    void findAllWithRelationsPaginated_Test() {
+        //(page,size)
+        final int[][] invalidInput = {
+            {0, 0},
+            {-1, -1},
+            {0, -1},
+            {-1, 0},
+            {-2, -2},
+            {-2, -1},
+            {-1, -2},
+            {Integer.MIN_VALUE, -2},
+            {-2, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MIN_VALUE},
+            {0, 1},
+            {0, 2},
+            {0, Integer.MAX_VALUE},
+            {1, -1},
+            {-1, 1},
+            {2, -2},
+            {-2, 2},
+            {Integer.MAX_VALUE, Integer.MIN_VALUE},
+            {Integer.MIN_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input values (%s,%s)", invalidInput[i][0], invalidInput[i][1]).isThrownBy(() -> {
+                repo.findAllWithRelationsPaginated(invalidInput[i][0], invalidInput[i][1]);
+            }).withMessage("Invalid parameters: page must be greater than 0 and size must be non-negative");
+        }
+
+        //(page,size)
+        final int[][] emptyListInput = {
+            {1, 0},
+            {2, 0},
+            {Integer.MAX_VALUE, 0},
+            {4, 1},
+            {Integer.MAX_VALUE, 1},
+            {3, 2},
+            {Integer.MAX_VALUE, 2},
+            {2, 3},
+            {3, 3},
+            {Integer.MAX_VALUE, 3},
+            {2, 4},
+            {3, 4},
+            {4, 4},
+            {Integer.MAX_VALUE, 4},
+            {2, Integer.MAX_VALUE},
+            {3, Integer.MAX_VALUE},
+            {Integer.MAX_VALUE, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < emptyListInput.length; iter++) {
+            final int i = iter;
+            List<MovieJDBC> actualList = repo.findAllWithRelationsPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
+        }
+
+        int page;
+        int size;
+        MovieJDBC expectedObject;
+        List<MovieJDBC> actualList;
+        List<MovieJDBC> expectedList;
+
+        page = 1;
+        size = 1;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
+
+        page = 2;
+        size = 1;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
+
+        page = 3;
+        size = 1;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, expectedList);
+
+        page = 2;
+        size = 2;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, expectedList);
+
+        page = 1;
+        size = 4;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, expectedList);
+
+        page = 1;
+        size = Integer.MAX_VALUE;
+        expectedList = init.getMovies();
+        actualList = repo.findAllWithRelationsPaginated(page, size);
+        checkValuesWithRelations(actualList, expectedList);
+
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findAllByAudienceRatingWithGenresPaginated method of MovieRepositoryJDBC class")
+    void findAllByAudienceRatingWithGenresPaginated_Test() {
+        //(page,size,treshold)
+        final int[][] invalidInput = {
+            {0, 0, 0},
+            {-1, -1, 0},
+            {0, -1, 0},
+            {-1, 0, 0},
+            {-2, -2, 0},
+            {-2, -1, 0},
+            {-1, -2, 0},
+            {Integer.MIN_VALUE, -2, 0},
+            {-2, Integer.MIN_VALUE, 0},
+            {Integer.MIN_VALUE, Integer.MIN_VALUE, 0},
+            {0, 1, 0},
+            {0, 2, 0},
+            {0, Integer.MAX_VALUE, 0},
+            {1, -1, 0},
+            {-1, 1, 0},
+            {2, -2, 0},
+            {-2, 2, 0},
+            {Integer.MAX_VALUE, Integer.MIN_VALUE, 0},
+            {Integer.MIN_VALUE, Integer.MAX_VALUE, 0},
+            {0, 0, 100},
+            {0, 1, 100},
+            {0, 2, 100},
+            {1, 3, -1},
+            {1, 3, -2},
+            {1, 3, Integer.MIN_VALUE},
+            {1, 3, 101},
+            {1, 3, 102},
+            {1, 3, Integer.MAX_VALUE}
+        };
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input values (%s,%s,%s)", invalidInput[i][0], invalidInput[i][1], invalidInput[i][2]).isThrownBy(() -> {
+                repo.findAllByAudienceRatingWithGenresPaginated(invalidInput[i][0], invalidInput[i][1], invalidInput[i][2]);
+            }).withMessage("Invalid parameters: page must be greater than 0, size must be non-negative, and ratingTresh must be between 0 and 100 (inclusive)");
+        }
+
+        //(page,size,treshold)
+        final int[][] emptyListInput = {
+            {1, 0, 0},
+            {2, 0, 0},
+            {Integer.MAX_VALUE, 0, 0},
+            {4, 1, 0},
+            {Integer.MAX_VALUE, 1, 0},
+            {3, 2, 0},
+            {Integer.MAX_VALUE, 2, 0},
+            {2, 3, 0},
+            {3, 3, 0},
+            {Integer.MAX_VALUE, 3, 0},
+            {2, 4, 0},
+            {3, 4, 0},
+            {4, 4, 0},
+            {Integer.MAX_VALUE, 4, 0},
+            {2, Integer.MAX_VALUE, 0},
+            {3, Integer.MAX_VALUE, 0},
+            {Integer.MAX_VALUE, Integer.MAX_VALUE, 0},
+            {1, 1, 100},
+            {1, 3, 100},
+            {1, 1, 90},
+            {1, 3, 90},
+            {1, 10, 90},
+            {1, 1, 80},
+            {1, 3, 80},
+            {1, 10, 80}
+        };
+        for (int iter = 0; iter < emptyListInput.length; iter++) {
+            final int i = iter;
+            List<MovieJDBC> actualList = repo.findAllByAudienceRatingWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
+            assertThat(actualList).as("Code input values (%s,%s,%s)", emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]).isNotNull().isEmpty();
+        }
+
+        int page;
+        int size;
+        int treshold;
+        MovieJDBC expectedObject;
+        List<MovieJDBC> actualList;
+        List<MovieJDBC> expectedList;
+
+        page = 1;
+        size = 1;
+        treshold = 0;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 2;
+        size = 1;
+        treshold = 0;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 3;
+        size = 1;
+        treshold = 0;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        treshold = 0;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 2;
+        size = 2;
+        treshold = 0;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        treshold = 0;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 4;
+        treshold = 0;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = Integer.MAX_VALUE;
+        treshold = 0;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 1;
+        treshold = 68;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 1;
+        treshold = 79;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        treshold = 68;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 2;
+        size = 1;
+        treshold = 68;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        treshold = 68;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 2;
+        treshold = 74;
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+
+        page = 1;
+        size = 3;
+        treshold = 74;
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+
+        page = 2;
+        size = 1;
+        treshold = 74;
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(init.getTheLighthouse()));
+
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findAllByReleaseYearWithGenresPaginated method of MovieRepositoryJDBC class")
+    void findAllByReleaseYearWithGenresPaginated_Test() {
+        //(page,size,year)
+        final int currentYear = Year.now().getValue();
+        final int[][] invalidInput = {
+            {0, 0, 0},
+            {-1, -1, 0},
+            {0, -1, 0},
+            {-1, 0, 0},
+            {-2, -2, 0},
+            {-2, -1, 0},
+            {-1, -2, 0},
+            {Integer.MIN_VALUE, -2, 0},
+            {-2, Integer.MIN_VALUE, 0},
+            {Integer.MIN_VALUE, Integer.MIN_VALUE, 0},
+            {0, 1, 0},
+            {0, 2, 0},
+            {0, Integer.MAX_VALUE, 0},
+            {1, -1, 0},
+            {-1, 1, 0},
+            {2, -2, 0},
+            {-2, 2, 0},
+            {Integer.MAX_VALUE, Integer.MIN_VALUE, 0},
+            {Integer.MIN_VALUE, Integer.MAX_VALUE, 0},
+            {0, 0, currentYear},
+            {0, 1, currentYear},
+            {0, 2, currentYear},
+            {1, 3, -1},
+            {1, 3, -2},
+            {1, 3, Integer.MIN_VALUE}
+        };
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input values (%s,%s,%s)", invalidInput[i][0], invalidInput[i][1], invalidInput[i][2]).isThrownBy(() -> {
+                repo.findAllByReleaseYearWithGenresPaginated(invalidInput[i][0], invalidInput[i][1], invalidInput[i][2]);
+            }).withMessage("Invalid parameters: page must be greater than 0 and the size and year must be non-negative");
+        }
+
+        //(page,size,year)
+        final int[][] emptyListInput = {
+            {1, 0, 0},
+            {2, 0, 0},
+            {Integer.MAX_VALUE, 0, 0},
+            {4, 1, 0},
+            {Integer.MAX_VALUE, 1, 0},
+            {3, 2, 0},
+            {Integer.MAX_VALUE, 2, 0},
+            {2, 3, 0},
+            {3, 3, 0},
+            {Integer.MAX_VALUE, 3, 0},
+            {2, 4, 0},
+            {3, 4, 0},
+            {4, 4, 0},
+            {Integer.MAX_VALUE, 4, 0},
+            {2, Integer.MAX_VALUE, 0},
+            {3, Integer.MAX_VALUE, 0},
+            {Integer.MAX_VALUE, Integer.MAX_VALUE, 0},
+            {1, 1, currentYear},
+            {1, 3, currentYear},
+            {1, 1, 2021},
+            {1, 3, 2021},
+            {1, 10, 2021},
+            {1, 1, 2020},
+            {1, 3, 2020},
+            {1, 10, 2020},
+            {1, 1, Integer.MAX_VALUE},
+            {1, 3, Integer.MAX_VALUE},
+            {1, 10, Integer.MAX_VALUE},};
+        for (int iter = 0; iter < emptyListInput.length; iter++) {
+            final int i = iter;
+            List<MovieJDBC> actualList = repo.findAllByReleaseYearWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
+            assertThat(actualList).as("Code input values (%s,%s,%s)", emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]).isNotNull().isEmpty();
+        }
+
+        int page;
+        int size;
+        int year;
+        MovieJDBC expectedObject;
+        List<MovieJDBC> actualList;
+        List<MovieJDBC> expectedList;
+
+        page = 1;
+        size = 1;
+        year = 2000;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 2;
+        size = 1;
+        year = 2000;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 3;
+        size = 1;
+        year = 2000;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        year = 2000;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 2;
+        size = 2;
+        year = 2000;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        year = 2000;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 4;
+        year = 2000;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = Integer.MAX_VALUE;
+        year = 2000;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 1;
+        year = 2001;
+        expectedObject = init.getMullholadDrive();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 1;
+        year = 2002;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 1;
+        year = 2006;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        year = 2001;
+        expectedList = init.getMovies().subList(0, 2);
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 2;
+        size = 1;
+        year = 2001;
+        expectedObject = init.getInlandEmpire();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 3;
+        year = 2001;
+        expectedList = init.getMovies();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 1;
+        year = 2019;
+        expectedObject = init.getTheLighthouse();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 2;
+        year = 2006;
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(init.getInlandEmpire(), init.getTheLighthouse()));
+
+        page = 1;
+        size = 3;
+        year = 2006;
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(init.getInlandEmpire(), init.getTheLighthouse()));
+
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findByIdCoverImage method of MovieRepositoryJDBC class")
+    void findByIdCoverImage_Test() {
+        //(id)
+        final Long[] invalidInput = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput[i]).isThrownBy(() -> {
+                repo.findByIdCoverImage(invalidInput[i]);
+            }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+
+        Long id;
+        String expected;
+        Optional<String> actual;
+
+        id = 1l;
+        expected = init.getMullholadDrive().getCoverImage();
+        actual = repo.findByIdCoverImage(id);
+        assertThat(actual.get()).isNotNull().isNotEmpty().isEqualTo(expected);
+
+        id = 2l;
+        expected = init.getInlandEmpire().getCoverImage();
+        actual = repo.findByIdCoverImage(id);
+        assertThat(actual.get()).isNotNull().isNotEmpty().isEqualTo(expected);
+
+    }
+
+//==============================================================================================================
+//===========================================PRIVATE METHODS====================================================
+//==============================================================================================================
+    //expect Lists to be non null and non empty
+    private void checkValues(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+        assertThat(actual).isNotNull().isNotEmpty();
+        assertThat(actual.size() == expected.size()).isTrue();
+        for (int i = 0; i < actual.size(); i++) {
+            assertThat(actual.get(i)).isNotNull();
+            assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
+            assertThat(actual.get(i).getTitle()).isEqualTo(expected.get(i).getTitle());
+            assertThat(actual.get(i).getCoverImage()).isEqualTo(expected.get(i).getCoverImage());
+            assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
+            assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
+            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getCriticRating()).isNull();
+
+            assertThat(actual.get(i).getGenres()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getDirectors()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getWriters()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getCritiques()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getActings()).isNotNull().isEmpty();
+        }
+    }
+
+    //expect Lists to be non null and non empty
+    private void checkValuesWithGenres(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+        assertThat(actual).isNotNull().isNotEmpty();
+        assertThat(actual.size() == expected.size()).isTrue();
+        for (int i = 0; i < actual.size(); i++) {
+            assertThat(actual.get(i)).isNotNull();
+            assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
+            assertThat(actual.get(i).getTitle()).isEqualTo(expected.get(i).getTitle());
+            assertThat(actual.get(i).getCoverImage()).isEqualTo(expected.get(i).getCoverImage());
+            assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
+            assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
+            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getCriticRating()).isNull();
+
+            assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
+            assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
+
+            for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
+                assertThat(actual.get(i).getGenres().get(j)).isNotNull();
+                assertThat(actual.get(i).getGenres().get(j).getId()).isEqualTo(expected.get(i).getGenres().get(j).getId());
+                assertThat(actual.get(i).getGenres().get(j).getName()).isEqualTo(expected.get(i).getGenres().get(j).getName());
+            }
+            assertThat(actual.get(i).getDirectors()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getWriters()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getCritiques()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getActings()).isNotNull().isEmpty();
+        }
+    }
+
+    //expect Lists to be non null and non empty
+    private void checkValuesWithRelations(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+        assertThat(actual).isNotNull().isNotEmpty();
+        assertThat(actual.size() == expected.size()).isTrue();
+
+        for (int i = 0; i < actual.size(); i++) {
+            assertThat(actual.get(i)).isNotNull();
+            assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
+            assertThat(actual.get(i).getTitle()).isEqualTo(expected.get(i).getTitle());
+            assertThat(actual.get(i).getCoverImage()).isEqualTo(expected.get(i).getCoverImage());
+            assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
+            assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
+            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getCriticRating()).isNull();
+
+            assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
+            assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
+
+            for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
+                assertThat(actual.get(i).getGenres().get(j)).isNotNull();
+                assertThat(actual.get(i).getGenres().get(j).getId()).isEqualTo(expected.get(i).getGenres().get(j).getId());
+                assertThat(actual.get(i).getGenres().get(j).getName()).isEqualTo(expected.get(i).getGenres().get(j).getName());
+            }
+
+            assertThat(actual.get(i).getDirectors()).isNotNull().isNotEmpty();
+            assertThat(actual.get(i).getDirectors().size() == expected.get(i).getDirectors().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getDirectors().size(); j++) {
+                assertThat(actual.get(i).getDirectors().get(j)).isNotNull();
+                assertThat(actual.get(i).getDirectors().get(j).getId()).isEqualTo(expected.get(i).getDirectors().get(j).getId());
+                assertThat(actual.get(i).getDirectors().get(j).getFirstName()).isEqualTo(expected.get(i).getDirectors().get(j).getFirstName());
+                assertThat(actual.get(i).getDirectors().get(j).getLastName()).isEqualTo(expected.get(i).getDirectors().get(j).getLastName());
+                assertThat(actual.get(i).getDirectors().get(j).getGender()).isEqualTo(expected.get(i).getDirectors().get(j).getGender());
+                assertThat(actual.get(i).getDirectors().get(j).getProfilePhoto()).isEqualTo(expected.get(i).getDirectors().get(j).getProfilePhoto());
+            }
+
+            assertThat(actual.get(i).getWriters()).isNotNull().isNotEmpty();
+            assertThat(actual.get(i).getWriters().size() == expected.get(i).getWriters().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getWriters().size(); j++) {
+                assertThat(actual.get(i).getWriters().get(j)).isNotNull();
+                assertThat(actual.get(i).getWriters().get(j).getId()).isEqualTo(expected.get(i).getWriters().get(j).getId());
+                assertThat(actual.get(i).getWriters().get(j).getFirstName()).isEqualTo(expected.get(i).getWriters().get(j).getFirstName());
+                assertThat(actual.get(i).getWriters().get(j).getLastName()).isEqualTo(expected.get(i).getWriters().get(j).getLastName());
+                assertThat(actual.get(i).getWriters().get(j).getGender()).isEqualTo(expected.get(i).getWriters().get(j).getGender());
+                assertThat(actual.get(i).getWriters().get(j).getProfilePhoto()).isEqualTo(expected.get(i).getWriters().get(j).getProfilePhoto());
+            }
+
+            assertThat(actual.get(i).getActings()).isNotNull().isNotEmpty();
+            assertThat(actual.get(i).getActings().size() == expected.get(i).getActings().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getActings().size(); j++) {
+                assertThat(actual.get(i).getActings().get(j)).isNotNull();
+                assertThat(actual.get(i).getActings().get(j).isStarring()).isEqualTo(expected.get(i).getActings().get(j).isStarring());
+
+                assertThat(actual.get(i).getActings().get(j).getActor()).isNotNull();
+                assertThat(actual.get(i).getActings().get(j).getActor().getId()).isEqualTo(expected.get(i).getActings().get(j).getActor().getId());
+                assertThat(actual.get(i).getActings().get(j).getActor().getFirstName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getFirstName());
+                assertThat(actual.get(i).getActings().get(j).getActor().getLastName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getLastName());
+                assertThat(actual.get(i).getActings().get(j).getActor().getGender()).isEqualTo(expected.get(i).getActings().get(j).getActor().getGender());
+                assertThat(actual.get(i).getActings().get(j).getActor().getProfilePhoto()).isEqualTo(expected.get(i).getActings().get(j).getActor().getProfilePhoto());
+                assertThat(actual.get(i).getActings().get(j).getActor().isStar()).isEqualTo(expected.get(i).getActings().get(j).getActor().isStar());
+
+                assertThat(actual.get(i).getActings().get(j).getMedia()).isNotNull();
+                assertThat(actual.get(i).getActings().get(j).getMedia() == actual.get(i)).isTrue();
+
+                assertThat(actual.get(i).getActings().get(j).getRoles()).isNotNull().isNotEmpty();
+                assertThat(actual.get(i).getActings().get(j).getRoles().size() == expected.get(i).getActings().get(j).getRoles().size()).isTrue();
+                for (int k = 0; k < actual.get(i).getActings().get(j).getRoles().size(); k++) {
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k)).isNotNull();
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getActing()).isNotNull();
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getActing() == actual.get(i).getActings().get(j)).isTrue();
+
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId());
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getName()).isEqualTo(actual.get(i).getActings().get(j).getRoles().get(k).getName());
+                }
+            }
+
+            assertThat(actual.get(i).getCritiques()).isNotNull().isEmpty();
+
+        }
     }
 
 }

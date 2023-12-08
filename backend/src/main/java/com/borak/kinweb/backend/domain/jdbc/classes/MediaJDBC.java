@@ -44,10 +44,10 @@ public abstract class MediaJDBC implements JDBC {
     public MediaJDBC() {
     }
 
-    public MediaJDBC(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
+    public MediaJDBC(Long id, String title, String coverImage, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
-        this.coverImage = coverImageUrl;
+        this.coverImage = coverImage;
         this.description = description;
         this.releaseDate = releaseDate;
         this.audienceRating = audienceRating;

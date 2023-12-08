@@ -14,14 +14,14 @@ public class KinomaniaWebsiteBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(KinomaniaWebsiteBackendApplication.class, args);
 
-//        String pom = "...txt.png.txt";
-//        String pom2 = "    ..        ..          ..          txt.";
-//        String pom3 = "";
-//        String pom4 = ".";
-//        System.out.println("Index: " + pom.lastIndexOf(".") + ", SIze: " + pom.length());
-//        System.out.println("Index: " + pom2.lastIndexOf(".") + ", SIze: " + pom2.length());
-//        System.out.println("Index: " + pom3.lastIndexOf(".") + ", SIze: " + pom3.length());
-//        System.out.println("Index: " + pom4.lastIndexOf(".") + ", SIze: " + pom4.length());
+//        int a = Integer.MAX_VALUE;
+//        int b = Integer.MAX_VALUE;
+//        System.out.println("A: " + a + "\nB: " + b);
+//        for (int i = 0; i < 10; i++) {
+//            int c = (a-1) * b;
+//            System.out.println("  C: " + c);
+//        }
+
     }
 
 }

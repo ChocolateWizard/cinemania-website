@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class RestExceptionHandler {
-    
 
     @ExceptionHandler(value = ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
@@ -56,15 +55,15 @@ public class RestExceptionHandler {
         errorDetail.setTimestamp(new Date().getTime());
         errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
         errorDetail.setTitle("Bad Request");
-        List<String> list=new ArrayList(ex.getConstraintViolations().size());
-        ex.getConstraintViolations().forEach((error)->{
+        List<String> list = new ArrayList(ex.getConstraintViolations().size());
+        ex.getConstraintViolations().forEach((error) -> {
             list.add(error.getMessage());
         });
         errorDetail.setDetails(list.toArray(String[]::new));
         errorDetail.setDeveloperMessage(ex.getClass().getName());
         return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(value = ValidationException.class)
     public ResponseEntity<?> handleValidationException(ValidationException ex, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();
@@ -74,6 +73,17 @@ public class RestExceptionHandler {
         errorDetail.setDetails(ex.getMessages());
         errorDetail.setDeveloperMessage(ex.getClass().getName());
         return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorDetail.setTitle("Internal server error");
+        errorDetail.setDetails(new String[]{"Unexpected error"});
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(value = {

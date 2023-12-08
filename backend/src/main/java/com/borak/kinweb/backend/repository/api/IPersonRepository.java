@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface IPersonRepository<P, ID> extends IRepository<P, ID> {
 
-    public List<P> findAllByMediaId(ID id) throws DatabaseException;
+    public List<P> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
     
 }

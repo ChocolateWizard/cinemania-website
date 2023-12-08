@@ -273,21 +273,24 @@ insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`au
 (1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
 (2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
 (3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
-(4,'The Lighthouse','2019-05-19','4.jpg','Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
-(5,'2001: A Space Odyssey','1968-04-02',NULL,'After uncovering a mysterious artifact buried beneath the Lunar surface, a spacecraft is sent to Jupiter to find its origins: a spacecraft manned by two men and the supercomputer HAL 9000.',83,NULL);
+(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
+(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,NULL),
+(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,NULL);
+
 
 /*Data for the table `tv_show` */
 
 insert  into `tv_show`(`media_id`,`number_of_seasons`) values 
-(3,1);
+(3,1),
+(5,6),
+(6,26);
 
 /*Data for the table `movie` */
 
 insert  into `movie`(`media_id`,`length`) values 
 (1,147),
 (2,180),
-(4,109),
-(5,149);
+(4,109);
 
 /*Data for the table `genre` */
 
@@ -338,7 +341,27 @@ insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`) va
 (27,'Max','Eggers','M','27.jpg'),
 (28,'Robert','Pattinson','M','28.jpg'),
 (29,'Willem','Dafoe','M','29.jpg'),
-(30,'Valeriia','Karaman','F','30.jpg');
+(30,'Valeriia','Karaman','F','30.jpg'),
+(31,'Jeffrey J.','Abrams','M','31.jpg'),
+(32,'Jeffrey','Lieber','M',NULL),
+(33,'Damon','Lindelof','M','33.jpg'),
+(34,'Carlton','Cuse','M',NULL),
+(35,'Jorge','Garcia','M','35.jpg'),
+(36,'Josh','Holloway','M','36.jpg'),
+(37,'Yunjin','Kim','F','37.jpg'),
+(38,'Evangeline','Lilly','F','38.jpg'),
+(39,'Terry','O\'Quinn','M','39.jpg'),
+(40,'Matthew','Fox','M','40.jpg'),
+(41,'Daniel','Dae Kim','M','41.jpg'),
+(42,'Naveen','Andrews','M','42.jpg'),
+(43,'Emilie','de Ravin','F','43.jpg'),
+(44,'Dominic','Monaghan','M',NULL),
+(45,'Michael','Emerson','M','45.jpg'),
+(46,'Trey','Parker','M','46.jpg'),
+(47,'Matt','Stone','M','47.jpg'),
+(48,'Brian','Graden','M','48.jpg'),
+(49,'Isaac','Hayes','M','49.jpg'),
+(50,'Mona','Marshall','F',NULL);
 
 
 
@@ -348,7 +371,13 @@ insert  into `director`(`person_id`) values
 (1),
 (14),
 (15),
-(26);
+(26),
+(31),
+(32),
+(33),
+(46),
+(47),
+(48);
 
 /*Data for the table `writer` */
 
@@ -359,7 +388,12 @@ insert  into `writer`(`person_id`) values
 (18),
 (19),
 (26),
-(27);
+(27),
+(31),
+(33),
+(34),
+(46),
+(47);
 
 /*Data for the table `actor` */
 
@@ -384,7 +418,22 @@ insert  into `actor`(`person_id`,`is_star`) values
 (25,0),
 (28,1),
 (29,1),
-(30,0);
+(30,0),
+(35,1),
+(36,1),
+(37,1),
+(38,1),
+(39,0),
+(40,0),
+(41,1),
+(42,0),
+(43,0),
+(44,0),
+(45,0),
+(46,1),
+(47,1),
+(49,0),
+(50,0);
 
 insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values 
 (1,1,2,1),
@@ -408,7 +457,22 @@ insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values
 (19,3,25,0),
 (20,4,28,1),
 (21,4,29,1),
-(22,4,30,1);
+(22,4,30,1),
+(23,5,35,1),
+(24,5,36,1),
+(25,5,37,1),
+(26,5,38,0),
+(27,5,39,0),
+(28,5,40,0),
+(29,5,41,0),
+(30,5,42,0),
+(31,5,43,0),
+(32,5,44,0),
+(33,5,45,0),
+(34,6,46,1),
+(35,6,47,1),
+(36,6,49,1),
+(37,6,50,0);
 
 /*Data for the table `acting_role` */
 
@@ -440,7 +504,68 @@ insert  into `acting_role`(`acting_id`,`id`,`name`) values
 (19,2,'Duty Captain'),
 (20,1,'Thomas Howard'),
 (21,1,'Thomas Wake'),
-(22,1,'Mermaid');
+(22,1,'Mermaid'),
+(23,1,'Hugo \'Hurley\' Reyes'),
+(24,1,'James \'Sawyer\' Ford'),
+(25,1,'Sun-Hwa Kwon'),
+(26,1,'Kate Austen'),
+(27,1,'John Locke'),
+(27,2,'Man in Black'),
+(28,1,'Dr. Jack Shephard'),
+(29,1,'Jin-Soo Kwon'),
+(30,1,'Sayid Jarrah'),
+(31,1,'Claire Littleton'),
+(32,1,'Charlie Pace'),
+(33,1,'Ben Linus'),
+(33,2,'Henry Gale'),
+(34,1,'Stan Marsh'),
+(34,2,'Eric Cartman'),
+(34,3,'Randy Marsh'),
+(34,4,'Mr. Garrison'),
+(34,5,'Mr. Mackey'),
+(34,6,'Clyde'),
+(34,7,'Jimmy Valmer'),
+(34,8,'Stephen Stotch'),
+(34,9,'Officer Barbrady'),
+(34,10,'News Reporter'),
+(34,11,'TV Announcer'),
+(34,12,'Chris Stotch'),
+(34,13,'Tom the News Reader'),
+(34,14,'Timmy'),
+(34,15,'Dr. Doctor'),
+(34,16,'Narrator'),
+(34,17,'Additional voices'),
+(34,18,'PC Principal'),
+(34,19,'Phillip'),
+(34,20,'Doctor'),
+(34,21,'Sgt. Yates'),
+(34,22,'Clyde Donovan'),
+(34,23,'Mrs. Garrison'),
+(34,24,'Grandpa Marsh'),
+(34,25,'Mr. Hankey'),
+(34,26,'Satan'),
+(34,27,'Santa'),
+(35,1,'Kyle Broflovski'),
+(35,2,'Kenny McCormick'),
+(35,3,'Gerald Broflovski'),
+(35,4,'Butters Stotch'),
+(35,5,'Butters'),
+(35,6,'Jimbo Kern'),
+(35,7,'Craig'),
+(35,8,'Craig Tucker'),
+(35,9,'Stuart McCormick'),
+(35,10,'Additional voices'),
+(35,11,'Priest Maxi'),
+(35,12,'Terrance'),
+(35,13,'Jesus'),
+(35,14,'Pip Pirrup'),
+(35,15,'Ted'),
+(35,16,'Tweek Tweak'),
+(35,17,'Tweek'),
+(35,18,'Scott Malkinson'),
+(36,1,'Chef'),
+(37,1,'Sheila Broflovski'),
+(37,2,'Linda Stotch');
 
 
 
@@ -461,23 +586,34 @@ insert  into `media_directors`(`media_id`,`director_id`) values
 (2,1),
 (3,14),
 (3,15),
-(4,26);
+(4,26),
+(5,31),
+(5,32),
+(5,33),
+(6,46),
+(6,47),
+(6,48);
 
 /*Data for the table `media_genres` */
 
 insert  into `media_genres`(`media_id`,`genre_id`) values 
 (3,1),
 (3,2),
+(5,2),
 (3,3),
+(6,3),
+(6,4),
 (1,6),
 (2,6),
 (4,6),
+(5,6),
 (4,8),
 (1,11),
 (1,12),
 (2,12),
 (2,13),
-(4,13);
+(4,13),
+(5,13);
 
 /*Data for the table `media_writers` */
 
@@ -489,10 +625,12 @@ insert  into `media_writers`(`media_id`,`writer_id`) values
 (3,18),
 (3,19),
 (4,26),
-(4,27);
-
-
-
+(4,27),
+(5,31),
+(5,33),
+(5,34),
+(6,46),
+(6,47);
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

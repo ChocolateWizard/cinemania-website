@@ -28,7 +28,7 @@ public class ActorRepositoryJDBC implements IActorRepository<ActorJDBC, Long> {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<ActorJDBC> findAllByMediaId(Long id) throws DatabaseException {
+    public List<ActorJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
         try {
             List<ActorJDBC> actors = jdbcTemplate.query(SQLActor.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLActor.actorRM);
             return actors;
@@ -48,12 +48,12 @@ public class ActorRepositoryJDBC implements IActorRepository<ActorJDBC, Long> {
     }
 
     @Override
-    public Optional<ActorJDBC> findById(Long id) throws DatabaseException {
+    public Optional<ActorJDBC> findById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean existsById(Long id) throws DatabaseException {
+    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
             jdbcTemplate.queryForObject(SQLActor.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
@@ -70,7 +70,7 @@ public class ActorRepositoryJDBC implements IActorRepository<ActorJDBC, Long> {
     }
 
     @Override
-    public List<ActorJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<ActorJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -80,7 +80,7 @@ public class ActorRepositoryJDBC implements IActorRepository<ActorJDBC, Long> {
     }
 
     @Override
-    public void deleteById(Long id) throws DatabaseException {
+    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

@@ -30,7 +30,7 @@ CREATE TABLE `acting` (
   KEY `actor_id` (`actor_id`),
   CONSTRAINT `acting_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `acting_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `actor` (`person_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Data for the table `acting` */
 
@@ -56,7 +56,22 @@ insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values
 (19,3,25,0),
 (20,4,28,1),
 (21,4,29,1),
-(22,4,30,1);
+(22,4,30,1),
+(23,5,35,1),
+(24,5,36,1),
+(25,5,37,1),
+(26,5,38,0),
+(27,5,39,0),
+(28,5,40,0),
+(29,5,41,0),
+(30,5,42,0),
+(31,5,43,0),
+(32,5,44,0),
+(33,5,45,0),
+(34,6,46,1),
+(35,6,47,1),
+(36,6,49,1),
+(37,6,50,0);
 
 /*Table structure for table `acting_role` */
 
@@ -100,7 +115,68 @@ insert  into `acting_role`(`acting_id`,`id`,`name`) values
 (19,2,'Duty Captain'),
 (20,1,'Thomas Howard'),
 (21,1,'Thomas Wake'),
-(22,1,'Mermaid');
+(22,1,'Mermaid'),
+(23,1,'Hugo \'Hurley\' Reyes'),
+(24,1,'James \'Sawyer\' Ford'),
+(25,1,'Sun-Hwa Kwon'),
+(26,1,'Kate Austen'),
+(27,1,'John Locke'),
+(27,2,'Man in Black'),
+(28,1,'Dr. Jack Shephard'),
+(29,1,'Jin-Soo Kwon'),
+(30,1,'Sayid Jarrah'),
+(31,1,'Claire Littleton'),
+(32,1,'Charlie Pace'),
+(33,1,'Ben Linus'),
+(33,2,'Henry Gale'),
+(34,1,'Stan Marsh'),
+(34,2,'Eric Cartman'),
+(34,3,'Randy Marsh'),
+(34,4,'Mr. Garrison'),
+(34,5,'Mr. Mackey'),
+(34,6,'Clyde'),
+(34,7,'Jimmy Valmer'),
+(34,8,'Stephen Stotch'),
+(34,9,'Officer Barbrady'),
+(34,10,'News Reporter'),
+(34,11,'TV Announcer'),
+(34,12,'Chris Stotch'),
+(34,13,'Tom the News Reader'),
+(34,14,'Timmy'),
+(34,15,'Dr. Doctor'),
+(34,16,'Narrator'),
+(34,17,'Additional voices'),
+(34,18,'PC Principal'),
+(34,19,'Phillip'),
+(34,20,'Doctor'),
+(34,21,'Sgt. Yates'),
+(34,22,'Clyde Donovan'),
+(34,23,'Mrs. Garrison'),
+(34,24,'Grandpa Marsh'),
+(34,25,'Mr. Hankey'),
+(34,26,'Satan'),
+(34,27,'Santa'),
+(35,1,'Kyle Broflovski'),
+(35,2,'Kenny McCormick'),
+(35,3,'Gerald Broflovski'),
+(35,4,'Butters Stotch'),
+(35,5,'Butters'),
+(35,6,'Jimbo Kern'),
+(35,7,'Craig'),
+(35,8,'Craig Tucker'),
+(35,9,'Stuart McCormick'),
+(35,10,'Additional voices'),
+(35,11,'Priest Maxi'),
+(35,12,'Terrance'),
+(35,13,'Jesus'),
+(35,14,'Pip Pirrup'),
+(35,15,'Ted'),
+(35,16,'Tweek Tweak'),
+(35,17,'Tweek'),
+(35,18,'Scott Malkinson'),
+(36,1,'Chef'),
+(37,1,'Sheila Broflovski'),
+(37,2,'Linda Stotch');
 
 /*Table structure for table `actor` */
 
@@ -136,7 +212,22 @@ insert  into `actor`(`person_id`,`is_star`) values
 (25,0),
 (28,1),
 (29,1),
-(30,0);
+(30,0),
+(35,1),
+(36,1),
+(37,1),
+(38,1),
+(39,0),
+(40,0),
+(41,1),
+(42,0),
+(43,0),
+(44,0),
+(45,0),
+(46,1),
+(47,1),
+(49,0),
+(50,0);
 
 /*Table structure for table `country` */
 
@@ -155,7 +246,7 @@ CREATE TABLE `country` (
 
 insert  into `country`(`id`,`name`,`official_state_name`,`code`) values 
 (1,'Afghanistan','The Islamic Republic of Afghanistan','AF'),
-(2,'Åland Islands','Åland','AX'),
+(2,'Ã…land Islands','Ã…land','AX'),
 (3,'Albania','The Republic of Albania','AL'),
 (4,'Algeria','The People\'s Democratic Republic of Algeria','DZ'),
 (5,'American Samoa','The Territory of American Samoa','AS'),
@@ -208,10 +299,10 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (52,'DR Congo','The Democratic Republic of the Congo','CD'),
 (53,'Cook Islands','The Cook Islands','CK'),
 (54,'Costa Rica','The Republic of Costa Rica','CR'),
-(55,'Côte d\'Ivoire','The Republic of Côte d\'Ivoire','CI'),
+(55,'CÃ´te d\'Ivoire','The Republic of CÃ´te d\'Ivoire','CI'),
 (56,'Croatia','The Republic of Croatia','HR'),
 (57,'Cuba','The Republic of Cuba','CU'),
-(58,'Curaçao','The Country of Curaçao','CW'),
+(58,'CuraÃ§ao','The Country of CuraÃ§ao','CW'),
 (59,'Cyprus','The Republic of Cyprus','CY'),
 (60,'Czech Republic','The Czech Republic','CZ'),
 (61,'Denmark','The Kingdom of Denmark','DK'),
@@ -325,21 +416,21 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (169,'Pakistan','The Islamic Republic of Pakistan','PK'),
 (170,'Palau','The Republic of Palau','PW'),
 (171,'Palestine','The State of Palestine','PS'),
-(172,'Panama','The Republic of Panamá','PA'),
+(172,'Panama','The Republic of PanamÃ¡','PA'),
 (173,'Papua New Guinea','The Independent State of Papua New Guinea','PG'),
 (174,'Paraguay','The Republic of Paraguay','PY'),
-(175,'Peru','The Republic of Perú','PE'),
+(175,'Peru','The Republic of PerÃº','PE'),
 (176,'Philippines','The Republic of the Philippines','PH'),
 (177,'Pitcairn','The Pitcairn, Henderson, Ducie and Oeno Islands','PN'),
 (178,'Poland','The Republic of Poland','PL'),
 (179,'Portugal','The Portuguese Republic','PT'),
 (180,'Puerto Rico','The Commonwealth of Puerto Rico','PR'),
 (181,'Qatar','The State of Qatar','QA'),
-(182,'Réunion','Réunion','RE'),
+(182,'RÃ©union','RÃ©union','RE'),
 (183,'Romania','Romania','RO'),
 (184,'Russia','The Russian Federation','RU'),
 (185,'Rwanda','The Republic of Rwanda','RW'),
-(186,'Saint Barthélemy','The Collectivity of Saint-Barthélemy','BL'),
+(186,'Saint BarthÃ©lemy','The Collectivity of Saint-BarthÃ©lemy','BL'),
 (187,'Saint Helena, Ascension and Tristan da Cunha','Saint Helena, Ascension and Tristan da Cunha','SH'),
 (188,'Saint Kitts and Nevis','Saint Kitts and Nevis','KN'),
 (189,'Saint Lucia','Saint Lucia','LC'),
@@ -348,7 +439,7 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (192,'Saint Vincent and the Grenadines','Saint Vincent and the Grenadines','VC'),
 (193,'Samoa','The Independent State of Samoa','WS'),
 (194,'San Marino','The Republic of San Marino','SM'),
-(195,'Sao Tome and Principe','The Democratic Republic of São Tomé and Príncipe','ST'),
+(195,'Sao Tome and Principe','The Democratic Republic of SÃ£o TomÃ© and PrÃ­ncipe','ST'),
 (196,'Saudi Arabia','The Kingdom of Saudi Arabia','SA'),
 (197,'Senegal','The Republic of Senegal','SN'),
 (198,'Serbia','The Republic of Serbia','RS'),
@@ -381,7 +472,7 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (225,'Tonga','The Kingdom of Tonga','TO'),
 (226,'Trinidad and Tobago','The Republic of Trinidad and Tobago','TT'),
 (227,'Tunisia','The Republic of Tunisia','TN'),
-(228,'Turkiye','The Republic of Türkiye','TR'),
+(228,'Turkiye','The Republic of TÃ¼rkiye','TR'),
 (229,'Turkmenistan','Turkmenistan','TM'),
 (230,'Turks and Caicos Islands','The Turks and Caicos Islands','TC'),
 (231,'Tuvalu','Tuvalu','TV'),
@@ -438,7 +529,13 @@ insert  into `director`(`person_id`) values
 (1),
 (14),
 (15),
-(26);
+(26),
+(31),
+(32),
+(33),
+(46),
+(47),
+(48);
 
 /*Table structure for table `genre` */
 
@@ -482,7 +579,7 @@ CREATE TABLE `media` (
   `critic_rating` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `RATING_DOMAIN` CHECK (((`audience_rating` >= 0) and (`audience_rating` <= 100)))
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `media` */
 
@@ -490,7 +587,9 @@ insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`au
 (1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
 (2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
 (3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
-(4,'The Lighthouse','2019-05-19','4.jpg','Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL);
+(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
+(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,NULL),
+(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,NULL);
 
 /*Table structure for table `media_directors` */
 
@@ -512,7 +611,13 @@ insert  into `media_directors`(`media_id`,`director_id`) values
 (2,1),
 (3,14),
 (3,15),
-(4,26);
+(4,26),
+(5,31),
+(5,32),
+(5,33),
+(6,46),
+(6,47),
+(6,48);
 
 /*Table structure for table `media_genres` */
 
@@ -532,16 +637,21 @@ CREATE TABLE `media_genres` (
 insert  into `media_genres`(`media_id`,`genre_id`) values 
 (3,1),
 (3,2),
+(5,2),
 (3,3),
+(6,3),
+(6,4),
 (1,6),
 (2,6),
 (4,6),
+(5,6),
 (4,8),
 (1,11),
 (1,12),
 (2,12),
 (2,13),
-(4,13);
+(4,13),
+(5,13);
 
 /*Table structure for table `media_writers` */
 
@@ -566,7 +676,12 @@ insert  into `media_writers`(`media_id`,`writer_id`) values
 (3,18),
 (3,19),
 (4,26),
-(4,27);
+(4,27),
+(5,31),
+(5,33),
+(5,34),
+(6,46),
+(6,47);
 
 /*Table structure for table `movie` */
 
@@ -598,7 +713,7 @@ CREATE TABLE `person` (
   `profile_photo` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `CONST_PERSON_GENDER` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F',_utf8mb4'O')))
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `person` */
 
@@ -632,7 +747,27 @@ insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`) va
 (27,'Max','Eggers','M','27.jpg'),
 (28,'Robert','Pattinson','M','28.jpg'),
 (29,'Willem','Dafoe','M','29.jpg'),
-(30,'Valeriia','Karaman','F','30.jpg');
+(30,'Valeriia','Karaman','F','30.jpg'),
+(31,'Jeffrey J.','Abrams','M','31.jpg'),
+(32,'Jeffrey','Lieber','M',NULL),
+(33,'Damon','Lindelof','M','33.jpg'),
+(34,'Carlton','Cuse','M',NULL),
+(35,'Jorge','Garcia','M','35.jpg'),
+(36,'Josh','Holloway','M','36.jpg'),
+(37,'Yunjin','Kim','F','37.jpg'),
+(38,'Evangeline','Lilly','F','38.jpg'),
+(39,'Terry','O\'Quinn','M','39.jpg'),
+(40,'Matthew','Fox','M','40.jpg'),
+(41,'Daniel','Dae Kim','M','41.jpg'),
+(42,'Naveen','Andrews','M','42.jpg'),
+(43,'Emilie','de Ravin','F','43.jpg'),
+(44,'Dominic','Monaghan','M',NULL),
+(45,'Michael','Emerson','M','45.jpg'),
+(46,'Trey','Parker','M','46.jpg'),
+(47,'Matt','Stone','M','47.jpg'),
+(48,'Brian','Graden','M','48.jpg'),
+(49,'Isaac','Hayes','M','49.jpg'),
+(50,'Mona','Marshall','F',NULL);
 
 /*Table structure for table `tv_show` */
 
@@ -648,7 +783,9 @@ CREATE TABLE `tv_show` (
 /*Data for the table `tv_show` */
 
 insert  into `tv_show`(`media_id`,`number_of_seasons`) values 
-(3,1);
+(3,1),
+(5,6),
+(6,26);
 
 /*Table structure for table `user` */
 
@@ -732,7 +869,12 @@ insert  into `writer`(`person_id`) values
 (18),
 (19),
 (26),
-(27);
+(27),
+(31),
+(33),
+(34),
+(46),
+(47);
 
 /* Trigger structure for table `critique` */
 
@@ -740,9 +882,7 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `aftcritins` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritins` AFTER INSERT ON `critique` FOR EACH ROW UPDATE media set critic_rating=(SELECT ROUND(AVG(rating)) FROM critique
-                         WHERE media.id = critique.media_id)
-where id=NEW.media_id */$$
+/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritins` AFTER INSERT ON `critique` FOR EACH ROW UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id) WHERE id=NEW.media_id */$$
 
 
 DELIMITER ;
@@ -753,9 +893,7 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `aftcritupd` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritupd` AFTER UPDATE ON `critique` FOR EACH ROW UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique
-                         WHERE media.id = critique.media_id)
-WHERE id=NEW.media_id */$$
+/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritupd` AFTER UPDATE ON `critique` FOR EACH ROW UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id) WHERE id=NEW.media_id */$$
 
 
 DELIMITER ;
@@ -766,14 +904,11 @@ DELIMITER $$
 
 /*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `aftcritdel` */$$
 
-/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritdel` AFTER DELETE ON `critique` FOR EACH ROW UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique
-                         WHERE media.id = critique.media_id)
-WHERE id=OLD.media_id */$$
+/*!50003 CREATE */ /*!50017 DEFINER = 'Despot'@'localhost' */ /*!50003 TRIGGER `aftcritdel` AFTER DELETE ON `critique` FOR EACH ROW UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id) WHERE id=OLD.media_id */$$
 
 
 DELIMITER ;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

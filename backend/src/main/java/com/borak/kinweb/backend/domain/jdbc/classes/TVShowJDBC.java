@@ -22,8 +22,8 @@ public class TVShowJDBC extends MediaJDBC {
         
     }
 
-    public TVShowJDBC(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating,Integer numberOfSeasons) {
-        super(id, title, coverImageUrl, description, releaseDate, audienceRating, criticRating);
+    public TVShowJDBC(Long id, String title, String coverImage, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating,Integer numberOfSeasons) {
+        super(id, title, coverImage, description, releaseDate, audienceRating, criticRating);
         this.numberOfSeasons = numberOfSeasons;
     }
 

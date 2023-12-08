@@ -28,8 +28,7 @@ class KinomaniaWebsiteBackendApplicationTests {
     @Value("${kinweb.property.userImagesBackupFolderPath}")
     private String userImagesBackupFolderPath;
 
-    @Test
-//    @RepeatedTest(value = 5)
+    @Test     
     @DisplayName(value = "Tests functionality of ConfigProperties.class and if valid properties are set in application.properties and application-test.properties")
     void configPropertiesAndProperties_InitializedProperly() {
         assertThat(mediaImagesBackupFolderPath).isEqualTo("src/test/resources/database/images/media/");

@@ -55,9 +55,18 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public List<MovieJDBC> findAllWithGenresPaginated(int page, int size) throws DatabaseException {
+    public List<MovieJDBC> findAllWithGenresPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            if (page < 1 || size < 0) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, offset}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             for (MovieJDBC movie : movies) {
                 List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
                 movie.setGenres(genres);
@@ -99,9 +108,18 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public List<MovieJDBC> findAllWithRelationsPaginated(int page, int size) throws DatabaseException {
+    public List<MovieJDBC> findAllWithRelationsPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            if (page < 1 || size < 0) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, offset}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             for (MovieJDBC movie : movies) {
                 List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
                 List<CritiqueJDBC> critiques = jdbcTemplate.query(SQLMovie.FIND_ALL_CRITIQUES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.critiqueRM);
@@ -111,6 +129,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
                 for (ActingJDBC acting : actings) {
                     acting.setMedia(movie);
                     List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ROLES_PS, new Object[]{movie.getId(), acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLMovie.actingRoleRM);
+                    for (ActingRoleJDBC role : roles) {
+                        role.setActing(acting);
+                    }
                     acting.setRoles(roles);
                 }
                 movie.setGenres(genres);
@@ -126,9 +147,18 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public List<MovieJDBC> findAllByAudienceRatingWithGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException {
+    public List<MovieJDBC> findAllByAudienceRatingWithGenresPaginated(int page, int size, int ratingThresh) throws DatabaseException, IllegalArgumentException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_RATING_PAGINATED_PS, new Object[]{ratingThresh, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            if (page < 1 || size < 0 || ratingThresh < 0 || ratingThresh > 100) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0, size must be non-negative, and ratingTresh must be between 0 and 100 (inclusive)");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_RATING_PAGINATED_PS, new Object[]{ratingThresh, size, offset}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             for (MovieJDBC movie : movies) {
                 List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
                 movie.setGenres(genres);
@@ -140,9 +170,18 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public List<MovieJDBC> findAllByReleaseYearWithGenresPaginated(int page, int size, int year) throws DatabaseException {
+    public List<MovieJDBC> findAllByReleaseYearWithGenresPaginated(int page, int size, int year) throws DatabaseException, IllegalArgumentException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_YEAR_PAGINATED_PS, new Object[]{year, size, page}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            if (page < 1 || size < 0 || year < 0) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and the size and year must be non-negative");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_BY_YEAR_PAGINATED_PS, new Object[]{year, size, offset}, new int[]{Types.INTEGER, Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             for (MovieJDBC movie : movies) {
                 List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{movie.getId()}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
                 movie.setGenres(genres);
@@ -154,8 +193,11 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public Optional<String> findByIdCoverImage(Long id) throws DatabaseException {
+    public Optional<String> findByIdCoverImage(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             String coverImage = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
             return Optional.ofNullable(coverImage);
         } catch (DataAccessException e) {
@@ -164,11 +206,14 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public void updateCoverImage(Long id, String coverImage) throws DatabaseException {
+    public void updateCoverImage(Long id, String coverImage) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             int i = jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_COVER_IMAGE_PS, new Object[]{coverImage, id}, new int[]{Types.VARCHAR, Types.BIGINT});
             if (i <= 0) {
-                throw new DatabaseException("Unable to update cover image");
+                throw new DatabaseException("Unable to update cover image for movie with id: " + id);
             }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while updating cover image for movie with id: " + id, e);
@@ -195,8 +240,11 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public Optional<MovieJDBC> findById(Long id) throws DatabaseException {
+    public Optional<MovieJDBC> findById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             MovieJDBC movie = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.movieRM);
             return Optional.of(movie);
         } catch (IncorrectResultSizeDataAccessException ex) {
@@ -207,12 +255,12 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public Optional<MovieJDBC> findByIdWithGenres(Long id) throws DatabaseException {
+    public Optional<MovieJDBC> findByIdWithGenres(Long id) throws DatabaseException, IllegalArgumentException {
         try {
-            MovieJDBC movie = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.movieRM);
-            if (movie == null) {
-                return Optional.empty();
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
             }
+            MovieJDBC movie = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.movieRM);
             List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
             movie.setGenres(genres);
             return Optional.of(movie);
@@ -224,8 +272,11 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public Optional<MovieJDBC> findByIdWithRelations(Long id) throws DatabaseException {
+    public Optional<MovieJDBC> findByIdWithRelations(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             MovieJDBC movie = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.movieRM);
             List<GenreJDBC> genres = jdbcTemplate.query(SQLMovie.FIND_ALL_GENRES_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.genreRM);
             List<CritiqueJDBC> critiques = jdbcTemplate.query(SQLMovie.FIND_ALL_CRITIQUES_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLMovie.critiqueRM);
@@ -251,8 +302,11 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public boolean existsById(Long id) throws DatabaseException {
+    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             jdbcTemplate.queryForObject(SQLMovie.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
         } catch (IncorrectResultSizeDataAccessException e) {
@@ -273,9 +327,18 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public List<MovieJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<MovieJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         try {
-            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, page}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
+            if (page < 1 || size < 0) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MovieJDBC> movies = jdbcTemplate.query(SQLMovie.FIND_ALL_PAGINATED_PS, new Object[]{size, offset}, new int[]{Types.INTEGER, Types.INTEGER}, SQLMovie.movieRM);
             return movies;
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while retreiving movies", e);
@@ -292,7 +355,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public void deleteById(Long id) throws DatabaseException {
+    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
             jdbcTemplate.update(SQLMovie.DELETE_MEDIA_PS, new Object[]{id}, new int[]{Types.BIGINT});
         } catch (DataAccessException e) {

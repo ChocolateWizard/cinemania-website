@@ -13,7 +13,7 @@ import java.util.Optional;
  * model
  *
  * @author Mr. Poyo
- * @param <T> object representing database entity
+ * @param <T> Object representing database entity
  * @param <ID> ID of an object that represents database entity
  */
 public interface IRepository<T, ID> {
@@ -22,25 +22,16 @@ public interface IRepository<T, ID> {
 
     void update(T entity) throws DatabaseException;
 
-    Optional<T> findById(ID id) throws DatabaseException;
+    Optional<T> findById(ID id) throws DatabaseException, IllegalArgumentException;
 
-    boolean existsById(ID id) throws DatabaseException;
+    boolean existsById(ID id) throws DatabaseException, IllegalArgumentException;
 
     List<T> findAll() throws DatabaseException;
 
-    List<T> findAllPaginated(int page, int size) throws DatabaseException;
+    List<T> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException;
 
     long count() throws DatabaseException;
 
-    void deleteById(ID id) throws DatabaseException;
+    void deleteById(ID id) throws DatabaseException, IllegalArgumentException;
 
-//    T save(T entity) throws DatabaseException;
-//    List<T> saveAll(List<T> entities) throws DatabaseException;
-//    List<T> insertAll(List<T> entities) throws DatabaseException;
-//    List<T> updateAll(List<T> entities) throws DatabaseException;
-//    List<T> findAllById(List<ID> ids) throws DatabaseException;
-//    void delete(T entity) throws DatabaseException;
-//    void deleteAllById(List<ID> ids) throws DatabaseException;
-//    void deleteAll(List<T> entities) throws DatabaseException;
-//    void deleteAll() throws DatabaseException;
 }

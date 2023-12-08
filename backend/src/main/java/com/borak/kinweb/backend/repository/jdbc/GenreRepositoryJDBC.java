@@ -38,12 +38,12 @@ public class GenreRepositoryJDBC implements IGenreRepository<GenreJDBC, Long> {
     }
 
     @Override
-    public Optional<GenreJDBC> findById(Long id) throws DatabaseException {
+    public Optional<GenreJDBC> findById(Long id) throws DatabaseException,IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean existsById(Long id) throws DatabaseException {
+    public boolean existsById(Long id) throws DatabaseException,IllegalArgumentException {
         try {
             jdbcTemplate.queryForObject(SQLGenre.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
@@ -60,7 +60,7 @@ public class GenreRepositoryJDBC implements IGenreRepository<GenreJDBC, Long> {
     }
 
     @Override
-    public List<GenreJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<GenreJDBC> findAllPaginated(int page, int size) throws DatabaseException,IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -70,7 +70,7 @@ public class GenreRepositoryJDBC implements IGenreRepository<GenreJDBC, Long> {
     }
 
     @Override
-    public void deleteById(Long id) throws DatabaseException {
+    public void deleteById(Long id) throws DatabaseException,IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 //=====================================================================================================================

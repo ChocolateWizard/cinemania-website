@@ -18,8 +18,8 @@ public class MovieJDBC extends MediaJDBC{
 
     }
 
-    public MovieJDBC(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating, Integer length) {
-        super(id, title, coverImageUrl, description, releaseDate, audienceRating, criticRating);
+    public MovieJDBC(Long id, String title, String coverImage, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating, Integer length) {
+        super(id, title, coverImage, description, releaseDate, audienceRating, criticRating);
         this.length = length;
     }
 

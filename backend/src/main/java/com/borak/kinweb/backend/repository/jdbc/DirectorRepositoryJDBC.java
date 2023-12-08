@@ -28,9 +28,9 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<DirectorJDBC> findAllByMediaId(Long id) throws DatabaseException {
-        try {         
-            List<DirectorJDBC> directors = jdbcTemplate.query(SQLDirector.FIND_ALL_BY_MEDIA_PS,new Object[]{id}, new int[]{Types.INTEGER}, SQLDirector.directorRM);
+    public List<DirectorJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
+        try {
+            List<DirectorJDBC> directors = jdbcTemplate.query(SQLDirector.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLDirector.directorRM);
             return directors;
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while retreiving directors of media with id: " + id, e);
@@ -48,12 +48,12 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     }
 
     @Override
-    public Optional<DirectorJDBC> findById(Long id) throws DatabaseException {
+    public Optional<DirectorJDBC> findById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public boolean existsById(Long id) throws DatabaseException {
+    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
             jdbcTemplate.queryForObject(SQLDirector.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
@@ -70,7 +70,7 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     }
 
     @Override
-    public List<DirectorJDBC> findAllPaginated(int page, int size) throws DatabaseException {
+    public List<DirectorJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
@@ -80,7 +80,7 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     }
 
     @Override
-    public void deleteById(Long id) throws DatabaseException {
+    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

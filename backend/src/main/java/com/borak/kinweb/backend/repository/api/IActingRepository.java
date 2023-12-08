@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IActingRepository<AT, ID> extends IRepository<AT, ID> {
 
-    public List<AT> findAllByMediaId(ID id) throws DatabaseException;
+    public List<AT> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
 
     public List<AT> insertAll(List<AT> entities) throws DatabaseException;
 
