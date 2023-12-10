@@ -200,8 +200,10 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             }
             String coverImage = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
             return Optional.ofNullable(coverImage);
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving movie cover image", e);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new DatabaseException("No movie found with given id: " + id, e);
+        } catch (DataAccessException ex) {
+            throw new DatabaseException("Error while retreiving movie cover image", ex);
         }
     }
 
@@ -286,6 +288,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             for (ActingJDBC acting : actings) {
                 acting.setMedia(movie);
                 List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLMovie.FIND_ALL_ACTING_ROLES_PS, new Object[]{id, acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLMovie.actingRoleRM);
+                for (ActingRoleJDBC role : roles) {
+                    role.setActing(acting);
+                }
                 acting.setRoles(roles);
             }
             movie.setGenres(genres);

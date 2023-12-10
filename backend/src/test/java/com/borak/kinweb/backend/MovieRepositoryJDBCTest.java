@@ -22,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -812,12 +814,19 @@ public class MovieRepositoryJDBCTest {
     @DisplayName("Tests normal functionality of findByIdCoverImage method of MovieRepositoryJDBC class")
     void findByIdCoverImage_Test() {
         //(id)
-        final Long[] invalidInput = {null, 0l, -1l, -2l, Long.MIN_VALUE};
-        for (int iter = 0; iter < invalidInput.length; iter++) {
+        final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput1.length; iter++) {
             final int i = iter;
-            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput[i]).isThrownBy(() -> {
-                repo.findByIdCoverImage(invalidInput[i]);
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput1[i]).isThrownBy(() -> {
+                repo.findByIdCoverImage(invalidInput1[i]);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+        final Long[] invalidInput2 = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        for (int iter = 0; iter < invalidInput2.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(DatabaseException.class).as("Code input value (%s)", invalidInput2[i]).isThrownBy(() -> {
+                repo.findByIdCoverImage(invalidInput2[i]);
+            }).withMessage("No movie found with given id: " + invalidInput2[i]);
         }
 
         Long id;
@@ -827,13 +836,243 @@ public class MovieRepositoryJDBCTest {
         id = 1l;
         expected = init.getMullholadDrive().getCoverImage();
         actual = repo.findByIdCoverImage(id);
+        assertThat(actual).isNotNull();
         assertThat(actual.get()).isNotNull().isNotEmpty().isEqualTo(expected);
 
         id = 2l;
         expected = init.getInlandEmpire().getCoverImage();
         actual = repo.findByIdCoverImage(id);
+        assertThat(actual).isNotNull();
         assertThat(actual.get()).isNotNull().isNotEmpty().isEqualTo(expected);
 
+        id = 4l;
+        actual = repo.findByIdCoverImage(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isTrue();
+        assertThat(actual.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of existsById method of MovieRepositoryJDBC class")
+    void existsById_Test() {
+        //(id)
+        final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput1.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput1[i]).isThrownBy(() -> {
+                repo.existsById(invalidInput1[i]);
+            }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+        Long id = 1l;
+        boolean actual = repo.existsById(id);
+        assertThat(actual).isTrue();
+
+        id = 2l;
+        actual = repo.existsById(id);
+        assertThat(actual).isTrue();
+
+        id = 3l;
+        actual = repo.existsById(id);
+        assertThat(actual).isFalse();
+
+        id = 4l;
+        actual = repo.existsById(id);
+        assertThat(actual).isTrue();
+
+        id = 5l;
+        actual = repo.existsById(id);
+        assertThat(actual).isFalse();
+
+        id = 6l;
+        actual = repo.existsById(id);
+        assertThat(actual).isFalse();
+
+        id = Long.MAX_VALUE;
+        actual = repo.existsById(id);
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findById method of MovieRepositoryJDBC class")
+    void findById_Test() {
+        //(id)
+        final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput1.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput1[i]).isThrownBy(() -> {
+                repo.findById(invalidInput1[i]);
+            }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+        Long id = 1l;
+        MovieJDBC expected = init.getMullholadDrive();
+        Optional<MovieJDBC> actual = repo.findById(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 2l;
+        expected = init.getInlandEmpire();
+        actual = repo.findById(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 4l;
+        expected = init.getTheLighthouse();
+        actual = repo.findById(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        for (int i = 0; i < emptyInput.length; i++) {
+            actual = repo.findById(emptyInput[i]);
+            assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
+            assertThat(actual.isEmpty()).as("Code input value (%s)", emptyInput[i]).isTrue();
+            assertThat(actual.isPresent()).as("Code input value (%s)", emptyInput[i]).isFalse();
+        }
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findByIdWithGenres method of MovieRepositoryJDBC class")
+    void findByIdWithGenres_Test() {
+        //(id)
+        final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput1.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput1[i]).isThrownBy(() -> {
+                repo.findByIdWithGenres(invalidInput1[i]);
+            }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+        Long id = 1l;
+        MovieJDBC expected = init.getMullholadDrive();
+        Optional<MovieJDBC> actual = repo.findByIdWithGenres(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 2l;
+        expected = init.getInlandEmpire();
+        actual = repo.findByIdWithGenres(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 4l;
+        expected = init.getTheLighthouse();
+        actual = repo.findByIdWithGenres(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        for (int i = 0; i < emptyInput.length; i++) {
+            actual = repo.findByIdWithGenres(emptyInput[i]);
+            assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
+            assertThat(actual.isEmpty()).as("Code input value (%s)", emptyInput[i]).isTrue();
+            assertThat(actual.isPresent()).as("Code input value (%s)", emptyInput[i]).isFalse();
+        }
+    }
+
+    @Test
+    @DisplayName("Tests normal functionality of findByIdWithRelations method of MovieRepositoryJDBC class")
+    void findByIdWithRelations_Test() {
+        //(id)
+        final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput1.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput1[i]).isThrownBy(() -> {
+                repo.findByIdWithRelations(invalidInput1[i]);
+            }).withMessage("Invalid parameter: id must be non-null and greater than 0");
+        }
+        Long id = 1l;
+        MovieJDBC expected = init.getMullholadDrive();
+        Optional<MovieJDBC> actual = repo.findByIdWithRelations(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 2l;
+        expected = init.getInlandEmpire();
+        actual = repo.findByIdWithRelations(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        id = 4l;
+        expected = init.getTheLighthouse();
+        actual = repo.findByIdWithRelations(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isPresent()).isTrue();
+        checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
+
+        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        for (int i = 0; i < emptyInput.length; i++) {
+            actual = repo.findByIdWithRelations(emptyInput[i]);
+            assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
+            assertThat(actual.isEmpty()).as("Code input value (%s)", emptyInput[i]).isTrue();
+            assertThat(actual.isPresent()).as("Code input value (%s)", emptyInput[i]).isFalse();
+        }
+
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Tests normal functionality of insert method of MovieRepositoryJDBC class")
+    void insert_Test() {
+        List<MovieJDBC> invalidInput = new ArrayList<MovieJDBC>() {
+            {
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 0, null, null));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 0, null, -1));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 0, null, -2));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 0, null, Integer.MIN_VALUE));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), null, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), -1, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), -2, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), Integer.MIN_VALUE, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 101, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 102, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), Integer.MAX_VALUE, null, 0));
+                add(new MovieJDBC(null, "Dummy title", null, "Dummy description", LocalDate.now(), 0, null, 0));
+            }
+        };
+        for (int iter = 0; iter < invalidInput.size(); iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code number (i) value (%s)", i).isThrownBy(() -> {
+                repo.insert(invalidInput.get(i));
+            }).withMessage("Error while inserting movie");
+        }
+
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Tests normal functionality of update method of MovieRepositoryJDBC class")
+    void update_Test() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Tests normal functionality of updateCoverImage method of MovieRepositoryJDBC class")
+    void updateCoverImage_Test() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Tests normal functionality of deleteById method of MovieRepositoryJDBC class")
+    void deleteById_Test() {
+        throw new UnsupportedOperationException("Not supported");
     }
 
 //==============================================================================================================

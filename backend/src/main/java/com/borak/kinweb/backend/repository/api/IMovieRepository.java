@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface IMovieRepository<M, ID> extends IRepository<M, ID> {
 
     public List<M> findAllWithGenres() throws DatabaseException;
-    
+
     public List<M> findAllWithRelations() throws DatabaseException;
 
     public List<M> findAllWithGenresPaginated(int page, int size) throws DatabaseException, IllegalArgumentException;
@@ -28,9 +28,9 @@ public interface IMovieRepository<M, ID> extends IRepository<M, ID> {
 
     public Optional<String> findByIdCoverImage(ID id) throws DatabaseException, IllegalArgumentException;
 
-    public Optional<M> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
-
     public Optional<M> findByIdWithGenres(ID id) throws DatabaseException, IllegalArgumentException;
+
+    public Optional<M> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
 
     public void updateCoverImage(ID id, String coverImage) throws DatabaseException, IllegalArgumentException;
 

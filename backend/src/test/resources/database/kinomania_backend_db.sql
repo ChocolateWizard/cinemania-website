@@ -689,7 +689,7 @@ DROP TABLE IF EXISTS `movie`;
 
 CREATE TABLE `movie` (
   `media_id` bigint unsigned NOT NULL,
-  `length` int NOT NULL,
+  `length` int unsigned NOT NULL,
   PRIMARY KEY (`media_id`),
   CONSTRAINT `movie_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -775,7 +775,7 @@ DROP TABLE IF EXISTS `tv_show`;
 
 CREATE TABLE `tv_show` (
   `media_id` bigint unsigned NOT NULL,
-  `number_of_seasons` int NOT NULL,
+  `number_of_seasons` int unsigned NOT NULL,
   PRIMARY KEY (`media_id`),
   CONSTRAINT `tv_show_ibfk_1` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
