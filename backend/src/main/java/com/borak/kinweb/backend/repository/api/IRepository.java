@@ -18,9 +18,9 @@ import java.util.Optional;
  */
 public interface IRepository<T, ID> {
 
-    T insert(T entity) throws DatabaseException;
+    T insert(T entity) throws DatabaseException, IllegalArgumentException;
 
-    void update(T entity) throws DatabaseException;
+    void update(T entity) throws DatabaseException, IllegalArgumentException;
 
     Optional<T> findById(ID id) throws DatabaseException, IllegalArgumentException;
 

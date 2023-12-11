@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.kinweb.backend.initializer;
+package com.borak.kinweb.backend.helpers;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;

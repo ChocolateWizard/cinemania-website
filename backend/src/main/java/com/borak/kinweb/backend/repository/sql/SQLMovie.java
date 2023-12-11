@@ -34,8 +34,7 @@ public final class SQLMovie {
                                        VALUES(?,?,?,?,?);
                                        """;
     public static final String INSERT_MEDIA_MOVIE_PS = """
-                                       INSERT INTO movie(media_id,length) 
-                                       VALUES(?,?);
+                                       INSERT INTO movie(media_id,length) VALUES(?,?);
                                        """;
     public static final String INSERT_MEDIA_GENRE_PS = """
                                        INSERT INTO media_genres(media_id,genre_id) 

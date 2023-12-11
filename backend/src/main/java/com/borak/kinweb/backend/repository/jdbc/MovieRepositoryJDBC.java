@@ -215,7 +215,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             }
             int i = jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_COVER_IMAGE_PS, new Object[]{coverImage, id}, new int[]{Types.VARCHAR, Types.BIGINT});
             if (i <= 0) {
-                throw new DatabaseException("Unable to update cover image for movie with id: " + id);
+                throw new DatabaseException("Error while updating cover image for movie with id: " + id + ". No movie found with given id");
             }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while updating cover image for movie with id: " + id, e);
@@ -223,20 +223,28 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     }
 
     @Override
-    public MovieJDBC insert(MovieJDBC entity) throws DatabaseException {
+    public MovieJDBC insert(MovieJDBC entity) throws DatabaseException, IllegalArgumentException {
         try {
+            if (entity == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
             performInsert(entity);
             return entity;
-        } catch (DataAccessException e) {
+        } catch (NullPointerException | DataAccessException e) {
             throw new DatabaseException("Error while inserting movie", e);
         }
     }
 
     @Override
-    public void update(MovieJDBC entity) throws DatabaseException {
+    public void update(MovieJDBC entity) throws DatabaseException, IllegalArgumentException {
         try {
+            if (entity == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
             performUpdate(entity);
-        } catch (DataAccessException e) {
+        } catch (DatabaseException e) {
+            throw new DatabaseException("Error while updating movie with id: " + entity.getId() + ". " + e.getMessage(), e);
+        } catch (NullPointerException | DataAccessException e) {
             throw new DatabaseException("Error while updating movie with id: " + entity.getId(), e);
         }
     }
@@ -362,7 +370,13 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
     @Override
     public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
-            jdbcTemplate.update(SQLMovie.DELETE_MEDIA_PS, new Object[]{id}, new int[]{Types.BIGINT});
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
+            int i = jdbcTemplate.update(SQLMovie.DELETE_MEDIA_PS, new Object[]{id}, new int[]{Types.BIGINT});
+            if (i <= 0) {
+                throw new DatabaseException("Error while deleting movie with id: " + id+". No movie found with given id");
+            }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while deleting movie with id: " + id, e);
         }
@@ -371,16 +385,17 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
 //=====================================================================================================================
 //=========================================PRIVATE METHODS=============================================================
 //=====================================================================================================================
-    private void performUpdate(MovieJDBC movie) {
+    private void performUpdate(MovieJDBC movie) throws DatabaseException {
         int i = jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_PS, new Object[]{movie.getTitle(), Date.valueOf(movie.getReleaseDate()), movie.getCoverImage(), movie.getDescription(), movie.getAudienceRating(), movie.getId()}, new int[]{Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.BIGINT});
         if (i <= 0) {
-            throw new DatabaseException("Unable to update movie with id: " + movie.getId());
+            throw new DatabaseException("No movie found with given id");
         }
         jdbcTemplate.update(SQLMovie.UPDATE_MEDIA_MOVIE_PS, new Object[]{movie.getLength(), movie.getId()}, new int[]{Types.INTEGER, Types.BIGINT});
         performUpdateGenre(movie.getGenres(), movie.getId());
         performUpdateDirector(movie.getDirectors(), movie.getId());
         performUpdateWriter(movie.getWriters(), movie.getId());
         performUpdateActors(movie.getActings(), movie.getId());
+        performInsertActingRoles(movie.getActings(), movie.getId());
     }
 
     private void performUpdateGenre(List<GenreJDBC> genres, Long id) {
@@ -418,7 +433,6 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             ps.setInt(5, movie.getAudienceRating());
             return ps;
         }, keyHolder);
-
         movie.setId(keyHolder.getKey().longValue());
         jdbcTemplate.update(SQLMovie.INSERT_MEDIA_MOVIE_PS, new Object[]{movie.getId(), movie.getLength()}, new int[]{Types.BIGINT, Types.INTEGER});
         performInsertGenrePivot(movie.getGenres(), movie.getId());
