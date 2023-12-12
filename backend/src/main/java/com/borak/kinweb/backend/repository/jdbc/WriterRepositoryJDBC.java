@@ -30,6 +30,9 @@ public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>
     @Override
     public List<WriterJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             List<WriterJDBC> writers = jdbcTemplate.query(SQLWriter.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLWriter.writerRM);
             return writers;
         } catch (DataAccessException e) {
@@ -55,6 +58,9 @@ public class WriterRepositoryJDBC implements IWriterRepository<WriterJDBC, Long>
     @Override
     public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             jdbcTemplate.queryForObject(SQLWriter.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
         } catch (IncorrectResultSizeDataAccessException e) {

@@ -30,6 +30,9 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     @Override
     public List<DirectorJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             List<DirectorJDBC> directors = jdbcTemplate.query(SQLDirector.FIND_ALL_BY_MEDIA_PS, new Object[]{id}, new int[]{Types.INTEGER}, SQLDirector.directorRM);
             return directors;
         } catch (DataAccessException e) {
@@ -55,6 +58,9 @@ public class DirectorRepositoryJDBC implements IDirectorRepository<DirectorJDBC,
     @Override
     public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             jdbcTemplate.queryForObject(SQLDirector.FIND_ID_PS, new Object[]{id}, new int[]{Types.BIGINT}, Long.class);
             return true;
         } catch (IncorrectResultSizeDataAccessException e) {

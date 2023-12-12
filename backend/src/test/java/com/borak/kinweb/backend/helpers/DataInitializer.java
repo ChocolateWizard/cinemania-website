@@ -10,13 +10,17 @@ import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -43,7 +47,14 @@ public class DataInitializer {
     }
 
     public void initMediaImages() {
+        throw new UnsupportedOperationException("Not supported!");
+    }
 
+    public List<MediaJDBC> getMedias() {
+        List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
+                .sorted(Comparator.comparingLong(p -> p.getId()))
+                .collect(Collectors.toList());
+        return medias;
     }
 
     public List<MovieJDBC> getMovies() {

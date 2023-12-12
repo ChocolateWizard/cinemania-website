@@ -70,9 +70,15 @@ public class ActingRepositoryJDBC implements IActingRepository<ActingJDBC, Long>
     @Override
     public List<ActingJDBC> findAllByMediaId(Long id) throws DatabaseException, IllegalArgumentException {
         try {
+            if (id == null || id < 1) {
+                throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
+            }
             List<ActingJDBC> actings = jdbcTemplate.query(SQLActing.FIND_ALL_ACTING_ACTORS_PS, new Object[]{id}, new int[]{Types.BIGINT}, SQLActing.actingActorRM);
             for (ActingJDBC acting : actings) {
                 List<ActingRoleJDBC> roles = jdbcTemplate.query(SQLActing.FIND_ALL_ACTING_ROLES_PS, new Object[]{id, acting.getActor().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLActing.actingRoleRM);
+                for (ActingRoleJDBC role : roles) {
+                    role.setActing(acting);
+                }
                 acting.setRoles(roles);
             }
             return actings;

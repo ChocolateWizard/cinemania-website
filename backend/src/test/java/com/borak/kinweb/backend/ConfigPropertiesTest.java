@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.config.ConfigProperties;
 import java.util.HashMap;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ public class ConfigPropertiesTest {
         }
         return true;
     }
-
+    
 //=======================================================================================================    
     @Value("${kinweb.property.mediaImagesBackupFolderPath}")
     private String mediaImagesBackupFolderPath;
