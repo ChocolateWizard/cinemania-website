@@ -4,6 +4,9 @@
  */
 package com.borak.kinweb.backend.helpers;
 
+import com.borak.kinweb.backend.ConfigPropertiesTest;
+import com.borak.kinweb.backend.config.ConfigProperties;
+import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
@@ -12,21 +15,53 @@ import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Mr. Poyo
  */
 public class DataInitializer {
+
+    public static final String mediaImagesBackupFolderPath = "src/test/resources/database/images/media/";
+    public static final String personImagesBackupFolderPath = "src/test/resources/database/images/person/";
+    public static final String userImagesBackupFolderPath = "src/test/resources/database/images/user/";
+
+    public static final String mediaImagesFolderPath = "src/test/resources/static/images/media/";
+    public static final String personImagesFolderPath = "src/test/resources/static/images/person/";
+    public static final String userImagesFolderPath = "src/test/resources/static/images/user/";
+
+    public static final String address = "http://localhost";
+    public static final int port = 8080;
+
+    public static final String mediaImagesBaseUrl = address + ":" + port + "/test/images/media/";
+    public static final String personImagesBaseUrl = address + ":" + port + "/test/images/person/";
+    public static final String userImagesBaseUrl = address + ":" + port + "/test/images/user/";
 
     private List<MovieJDBC> movies;
     private List<TVShowJDBC> shows;
@@ -46,10 +81,6 @@ public class DataInitializer {
         initTVShows();
     }
 
-    public void initMediaImages() {
-        throw new UnsupportedOperationException("Not supported!");
-    }
-
     public List<MediaJDBC> getMedias() {
         List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
                 .sorted(Comparator.comparingLong(p -> p.getId()))
@@ -61,48 +92,24 @@ public class DataInitializer {
         return movies;
     }
 
-    public void setMovies(List<MovieJDBC> movies) {
-        this.movies = movies;
-    }
-
     public List<TVShowJDBC> getShows() {
         return shows;
-    }
-
-    public void setShows(List<TVShowJDBC> shows) {
-        this.shows = shows;
     }
 
     public List<GenreJDBC> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<GenreJDBC> genres) {
-        this.genres = genres;
-    }
-
     public List<DirectorJDBC> getDirectors() {
         return directors;
-    }
-
-    public void setDirectors(List<DirectorJDBC> directors) {
-        this.directors = directors;
     }
 
     public List<WriterJDBC> getWriters() {
         return writers;
     }
 
-    public void setWriters(List<WriterJDBC> writers) {
-        this.writers = writers;
-    }
-
     public List<ActorJDBC> getActors() {
         return actors;
-    }
-
-    public void setActors(List<ActorJDBC> actors) {
-        this.actors = actors;
     }
 
     public MovieJDBC getMullholadDrive() {
@@ -115,6 +122,39 @@ public class DataInitializer {
 
     public MovieJDBC getTheLighthouse() {
         return movies.get(2);
+    }
+
+    /**
+     * Deletes all files (excluding .gitignore) in:
+     * <ul>
+     * <li>{@value #mediaImagesFolderPath}</li>
+     * <li>{@value #personImagesFolderPath}</li>
+     * </ul>
+     * and populates them with dummy random one-color and size images
+     * <p>
+     * Media image names are got from iterating over a combined list of all
+     * media type lists (movie, show), and calling getCoverImage() on each
+     * element, while person image names are got from iterating over a combined
+     * list of all person type lists (director, writer, actor) and calling
+     * getProfilePhoto(). Duplicate person ids are ignored while merging lists.
+     * <p>
+     * If media or person contain null as their image name, then it wont be
+     * created.
+     *
+     * @throws IllegalStateException if this method is called prior to
+     * ConfigPropertiesTest class passing all of its tests
+     * @throws IllegalArgumentException if provided invalid image names in lists
+     * @throws RuntimeException if an exception occurred while deleting and
+     * creating images
+     *
+     */
+    public void initImages() throws IllegalStateException, IllegalArgumentException, RuntimeException {
+        if (ConfigPropertiesTest.didAllTestsPass()) {
+            initMediaImages();
+            initPersonImages();
+        } else {
+            throw new IllegalStateException("ConfigPropertiesTest class tests must all pass in order to use this method!");
+        }
     }
 
 //==========================================================================================================
@@ -506,6 +546,78 @@ public class DataInitializer {
         shows.add(s1);
         shows.add(s2);
         shows.add(s3);
+    }
+
+    private void initMediaImages() throws IllegalArgumentException, RuntimeException {
+        deleteFilesFromFolder(mediaImagesFolderPath);
+        List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
+                .sorted(Comparator.comparingLong(p -> p.getId()))
+                .collect(Collectors.toList());
+        Random rand = new Random();
+        for (MediaJDBC media : medias) {
+            if (media.getCoverImage() != null) {
+                createImage(media.getCoverImage(), mediaImagesFolderPath, rand);
+            }
+        }
+
+    }
+
+    private void initPersonImages() throws IllegalArgumentException, RuntimeException {
+        deleteFilesFromFolder(personImagesFolderPath);
+        Set<PersonJDBC> personSet = new HashSet<>();
+        personSet.addAll(directors);
+        personSet.addAll(writers);
+        personSet.addAll(actors);
+
+        List<PersonJDBC> people = new ArrayList<>(personSet);
+        people.sort(Comparator.comparingLong(person -> person.getId()));
+
+        Random rand = new Random();
+        for (PersonJDBC person : people) {
+            if (person.getProfilePhoto() != null) {
+                createImage(person.getProfilePhoto(), personImagesFolderPath, rand);
+            }
+        }
+    }
+
+    private void deleteFilesFromFolder(String folder) throws RuntimeException {
+        Path dir = Paths.get(folder);
+        try {
+            Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!file.getFileName().toString().equals(".gitignore")) {
+                        Files.delete(file);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("Error while initializing images. Unable to delete files from folder: " + folder);
+        }
+    }
+
+    private void createImage(String imageName, String folder, Random rand) throws IllegalArgumentException, RuntimeException {
+        String extension = imageName.substring(imageName.lastIndexOf(".") + 1);
+        if (!Arrays.asList(MyImage.VALID_EXTENSIONS).contains(extension)) {
+            throw new IllegalArgumentException("Invalid image extension!");
+        }
+        int width = rand.nextInt(500) + 100; // Random width between 100 and 600
+        int height = rand.nextInt(500) + 100; // Random height between 100 and 600
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = img.createGraphics();
+
+        // Generate a random color
+        Color color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, width, height);
+
+        // Save
+        try {
+            ImageIO.write(img, extension, new File(folder + imageName));
+        } catch (IOException e) {
+            throw new RuntimeException("Error while initializing images. Unable to create image with name: " + imageName);
+        }
     }
 
 }

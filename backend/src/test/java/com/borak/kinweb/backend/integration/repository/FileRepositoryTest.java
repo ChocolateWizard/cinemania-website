@@ -5,10 +5,12 @@
 package com.borak.kinweb.backend.integration.repository;
 
 import com.borak.kinweb.backend.ConfigPropertiesTest;
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.helpers.DataInitializer;
-import com.borak.kinweb.backend.repository.jdbc.ActorRepositoryJDBC;
 import com.borak.kinweb.backend.repository.util.FileRepository;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
@@ -21,7 +23,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -34,7 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class FileRepositoryTest {
 
     @Autowired
-    private FileRepository repo;
+    private FileRepository repo;  
+    private DataInitializer init=new DataInitializer();
+
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 
     static {
@@ -55,6 +58,8 @@ public class FileRepositoryTest {
     @BeforeEach
     void beforeEach() {
         Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        init.initImages();
+
     }
 
     @Test

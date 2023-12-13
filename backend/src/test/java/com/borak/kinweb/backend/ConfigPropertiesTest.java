@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
+import com.borak.kinweb.backend.helpers.DataInitializer;
 import java.util.HashMap;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +44,7 @@ public class ConfigPropertiesTest {
         }
         return true;
     }
-    
+
 //=======================================================================================================    
     @Value("${kinweb.property.mediaImagesBackupFolderPath}")
     private String mediaImagesBackupFolderPath;
@@ -57,24 +58,24 @@ public class ConfigPropertiesTest {
     @Test
     @DisplayName(value = "Tests functionality of ConfigProperties.class and if valid properties are set in application.properties and application-test.properties")
     void configPropertiesAndProperties_InitializedProperly() {
-        assertThat(mediaImagesBackupFolderPath).isEqualTo("src/test/resources/database/images/media/");
-        assertThat(personImagesBackupFolderPath).isEqualTo("src/test/resources/database/images/person/");
-        assertThat(userImagesBackupFolderPath).isEqualTo("src/test/resources/database/images/user/");
+        assertThat(mediaImagesBackupFolderPath).isEqualTo(DataInitializer.mediaImagesBackupFolderPath);
+        assertThat(personImagesBackupFolderPath).isEqualTo(DataInitializer.personImagesBackupFolderPath);
+        assertThat(userImagesBackupFolderPath).isEqualTo(DataInitializer.userImagesBackupFolderPath);
 
         assertThat(properties).isNotNull();
-        assertThat(properties.getMediaImagesFolderPath()).isEqualTo("src/test/resources/static/images/media/");
-        assertThat(properties.getPersonImagesFolderPath()).isEqualTo("src/test/resources/static/images/person/");
-        assertThat(properties.getUserImagesFolderPath()).isEqualTo("src/test/resources/static/images/user/");
+        assertThat(properties.getMediaImagesFolderPath()).isEqualTo(DataInitializer.mediaImagesFolderPath);
+        assertThat(properties.getPersonImagesFolderPath()).isEqualTo(DataInitializer.personImagesFolderPath);
+        assertThat(properties.getUserImagesFolderPath()).isEqualTo(DataInitializer.userImagesFolderPath);
 
         Integer port = properties.getServerPort();
         String address = properties.getServerAddress();
 
-        assertThat(port).isNotNull().isBetween(8080, 8100);
-        assertThat(address).isNotNull().isEqualTo("http://localhost");
+        assertThat(port).isNotNull().isEqualTo(DataInitializer.port);
+        assertThat(address).isNotNull().isEqualTo(DataInitializer.address);
 
-        assertThat(properties.getMediaImagesBaseUrl()).isEqualTo(address + ":" + port + "/test/images/media/");
-        assertThat(properties.getPersonImagesBaseUrl()).isEqualTo(address + ":" + port + "/test/images/person/");
-        assertThat(properties.getUserImagesBaseUrl()).isEqualTo(address + ":" + port + "/test/images/user/");
+        assertThat(properties.getMediaImagesBaseUrl()).isEqualTo(DataInitializer.mediaImagesBaseUrl);
+        assertThat(properties.getPersonImagesBaseUrl()).isEqualTo(DataInitializer.personImagesBaseUrl);
+        assertThat(properties.getUserImagesBaseUrl()).isEqualTo(DataInitializer.userImagesBaseUrl);
 
         testsPassed.put("configPropertiesAndProperties_InitializedProperly", true);
     }
