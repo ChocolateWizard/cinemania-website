@@ -13,15 +13,6 @@ public class KinomaniaWebsiteBackendApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(KinomaniaWebsiteBackendApplication.class, args);
-
-//        int a = Integer.MAX_VALUE;
-//        int b = Integer.MAX_VALUE;
-//        System.out.println("A: " + a + "\nB: " + b);
-//        for (int i = 0; i < 10; i++) {
-//            int c = (a-1) * b;
-//            System.out.println("  C: " + c);
-//        }
-
     }
 
 }

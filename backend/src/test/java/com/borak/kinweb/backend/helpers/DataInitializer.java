@@ -63,6 +63,9 @@ public class DataInitializer {
     public static final String personImagesBaseUrl = address + ":" + port + "/test/images/person/";
     public static final String userImagesBaseUrl = address + ":" + port + "/test/images/user/";
 
+    public static final String[] MYIMAGE_VALID_EXTENSIONS = {"png", "jpg", "jpeg"};
+    public static final long MYIMAGE_IMAGE_MAX_SIZE = 8388608L;
+
     private List<MovieJDBC> movies;
     private List<TVShowJDBC> shows;
 

@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.integration.domain.MyImageTest;
 import com.borak.kinweb.backend.repository.util.FileRepository;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -30,13 +32,14 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(9)
+@Order(10)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FileRepositoryTest {
 
     @Autowired
-    private FileRepository repo;  
-    private DataInitializer init=new DataInitializer();
+    private FileRepository repo;
+
+    private DataInitializer init = new DataInitializer();
 
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 
@@ -58,14 +61,13 @@ public class FileRepositoryTest {
     @BeforeEach
     void beforeEach() {
         Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(MyImageTest.didAllTestsPass());
         init.initImages();
-
     }
 
     @Test
     @Order(1)
     void saveMediaCoverImage() {
-
         testsPassed.put("saveMediaCoverImage", true);
     }
 
