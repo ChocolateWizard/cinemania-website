@@ -12,6 +12,7 @@ import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibil
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,7 +121,7 @@ public class MovieController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity postMovie(@RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
-        domainValidator.validatePOST(movie, coverImage);
+        domainValidator.validate(movie, coverImage, RequestMethod.POST);
         if (coverImage != null) {
             movie.setCoverImage(new MyImage(coverImage));
         }
@@ -131,7 +133,7 @@ public class MovieController {
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id, @RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
         movie.setId(id);
-        domainValidator.validatePUT(movie, coverImage);
+        domainValidator.validate(movie, coverImage, RequestMethod.PUT);
         if (coverImage != null) {
             movie.setCoverImage(new MyImage(coverImage));
         }

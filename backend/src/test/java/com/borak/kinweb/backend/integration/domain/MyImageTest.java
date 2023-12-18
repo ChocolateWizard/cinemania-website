@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(4)
+@Order(3)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MyImageTest {
 

@@ -37,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(5)
+@Order(4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FileRepositoryTest {
 

@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(3)
+@Order(4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public class WriterRepositoryJDBCTest {

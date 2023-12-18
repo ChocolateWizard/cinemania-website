@@ -16,7 +16,7 @@ public class JsonVisibilityViews {
     
     public static class Heavy extends Medium{}
     
-    public static class POST{}
-    
-    public static class PUT extends POST{}
+//    public static class POST{}
+//    
+//    public static class PUT extends POST{}
 }

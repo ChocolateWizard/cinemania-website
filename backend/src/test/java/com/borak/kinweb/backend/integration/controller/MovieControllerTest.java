@@ -4,18 +4,24 @@
  */
 package com.borak.kinweb.backend.integration.controller;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Mr. Poyo
  */
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Order(5)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Transactional
 public class MovieControllerTest {
 
 
