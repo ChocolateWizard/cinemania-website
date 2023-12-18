@@ -11,16 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 @Order(1)
 class KinomaniaWebsiteBackendApplicationTests {
 
-    @AfterAll
-    static void dummy() {
-        System.out.println(""+KinomaniaWebsiteBackendApplicationTests.class.getName());
-    }
-    
     @Test
-    void contextLoads_Test() {
-
+    void contextLoads() {
     }
 
-    
-    
 }

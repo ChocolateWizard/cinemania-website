@@ -7,17 +7,14 @@ package com.borak.kinweb.backend.integration.repository;
 import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
 import com.borak.kinweb.backend.repository.jdbc.ActorRepositoryJDBC;
-import com.borak.kinweb.backend.repository.jdbc.DirectorRepositoryJDBC;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(7)
+@Order(3)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public class ActorRepositoryJDBCTest {

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(8)
+@Order(3)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 public class ActingRepositoryJDBCTest {
@@ -56,7 +55,7 @@ public class ActingRepositoryJDBCTest {
         return true;
     }
 //=================================================================================================
-    
+
     @BeforeEach
     void beforeEach() {
         Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());

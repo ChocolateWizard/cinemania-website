@@ -7,25 +7,20 @@ package com.borak.kinweb.backend.integration.domain;
 import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.helpers.DataInitializer;
-import com.borak.kinweb.backend.repository.util.FileRepository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-@Order(9)
+@Order(4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MyImageTest {
 
