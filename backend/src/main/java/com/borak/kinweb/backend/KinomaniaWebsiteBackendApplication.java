@@ -10,9 +10,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(value = {ConfigProperties.class})
 //@ConfigurationPropertiesScan(basePackages = {"com.borak.kinweb.backend.config"})
 public class KinomaniaWebsiteBackendApplication {
-
+    
     public static void main(String[] args) {
         SpringApplication.run(KinomaniaWebsiteBackendApplication.class, args);
+       
     }
-
+    
 }

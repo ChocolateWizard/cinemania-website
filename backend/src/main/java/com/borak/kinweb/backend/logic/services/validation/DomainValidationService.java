@@ -40,21 +40,10 @@ public class DomainValidationService {
             messages.add("Movie release date must not be null!");
         }
         if (coverImage != null) {
-            if (coverImage.getOriginalFilename() == null || coverImage.getOriginalFilename().isBlank()) {
-                messages.add("Movie cover image unknown type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-            } else {
-                int index = coverImage.getOriginalFilename().lastIndexOf(".");
-                if (index == -1 || index == (coverImage.getOriginalFilename().length() - 1)) {
-                    messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-                } else {
-                    String extension = coverImage.getOriginalFilename().substring(index + 1).trim();
-                    if (!Arrays.asList(MyImage.VALID_EXTENSIONS).contains(extension)) {
-                        messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-                    }
-                }
-            }
-            if (coverImage.getSize() > MyImage.IMAGE_MAX_SIZE) {
-                messages.add("Movie cover image size too big! Max size is: " + MyImage.IMAGE_MAX_SIZE + " bytes");
+            try {
+                new MyImage(coverImage);
+            } catch (IllegalArgumentException e) {
+                messages.add("Movie cover image - " + e.getMessage());
             }
         }
         if (movie.getDescription() == null || movie.getDescription().isBlank()) {
@@ -182,21 +171,10 @@ public class DomainValidationService {
             messages.add("Movie release date must not be null!");
         }
         if (coverImage != null) {
-            if (coverImage.getOriginalFilename() == null || coverImage.getOriginalFilename().isBlank()) {
-                messages.add("Movie cover image unknown type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-            } else {
-                int index = coverImage.getOriginalFilename().lastIndexOf(".");
-                if (index == -1 || index == (coverImage.getOriginalFilename().length() - 1)) {
-                    messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-                } else {
-                    String extension = coverImage.getOriginalFilename().substring(index + 1).trim();
-                    if (!Arrays.asList(MyImage.VALID_EXTENSIONS).contains(extension)) {
-                        messages.add("Movie cover image invalid type! Valid types are: " + Arrays.toString(MyImage.VALID_EXTENSIONS));
-                    }
-                }
-            }
-            if (coverImage.getSize() > MyImage.IMAGE_MAX_SIZE) {
-                messages.add("Movie cover image size too big! Max size is: " + MyImage.IMAGE_MAX_SIZE + " bytes");
+            try {
+                new MyImage(coverImage);
+            } catch (IllegalArgumentException e) {
+                messages.add("Movie cover image - " + e.getMessage());
             }
         }
         if (movie.getDescription() == null || movie.getDescription().isBlank()) {
@@ -304,10 +282,5 @@ public class DomainValidationService {
         }
     }
 
-    
-    
 //---------------------------------------------------------------------------------------------------------
-    
-    
-    
 }

@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +64,7 @@ public class DataInitializer {
     public static final String personImagesBaseUrl = address + ":" + port + "/test/images/person/";
     public static final String userImagesBaseUrl = address + ":" + port + "/test/images/user/";
 
-    public static final String[] MYIMAGE_VALID_EXTENSIONS = {"png", "jpg", "jpeg"};
+    public static final List<String> MYIMAGE_VALID_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("png", "jpg", "jpeg"));
     public static final long MYIMAGE_IMAGE_MAX_SIZE = 8388608L;
 
     private List<MovieJDBC> movies;
@@ -601,10 +602,9 @@ public class DataInitializer {
     }
 
     private void createImage(String imageName, String folder, Random rand) throws IllegalArgumentException, RuntimeException {
-        String extension = imageName.substring(imageName.lastIndexOf(".") + 1);
-        if (!Arrays.asList(MyImage.VALID_EXTENSIONS).contains(extension)) {
-            throw new IllegalArgumentException("Invalid image extension!");
-        }
+        String[] parts = imageName.split("\\.");
+        String extension = parts[1];
+
         int width = rand.nextInt(500) + 100; // Random width between 100 and 600
         int height = rand.nextInt(500) + 100; // Random height between 100 and 600
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);

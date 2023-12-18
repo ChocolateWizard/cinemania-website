@@ -10,6 +10,8 @@ import com.borak.kinweb.backend.exceptions.DatabaseException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,21 +25,22 @@ public class FileRepository {
     @Autowired
     ConfigProperties config;
 
-    
-    public void saveMediaCoverImage(MyImage image) {
+    public void saveMediaCoverImage(MyImage image) throws DatabaseException {
         try {
             Files.write(Path.of(config.getMediaImagesFolderPath() + image.getFullName()), image.getBytes());
-        } catch (IOException ex) {
+        } catch (NullPointerException | IOException ex) {
             throw new DatabaseException("Unable to save media cover image");
         }
     }
 
-    public void deleteIfExistsMediaCoverImage(String imageName) {
+    public void deleteIfExistsMediaCoverImage(String imageName) throws IllegalArgumentException, DatabaseException {
         try {
-            Files.deleteIfExists(Path.of(config.getMediaImagesFolderPath() + imageName));
+            String[] parts = MyImage.extractNameAndExtension(imageName);
+            Files.deleteIfExists(Path.of(config.getMediaImagesFolderPath() + parts[0] + "." + parts[1]));
         } catch (IOException ex) {
             throw new DatabaseException("Unable to delete media cover image");
         }
     }
+//===================================================================================================
 
 }
