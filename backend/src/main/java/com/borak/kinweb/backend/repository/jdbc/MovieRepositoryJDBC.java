@@ -260,7 +260,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
         } catch (IncorrectResultSizeDataAccessException ex) {
             return Optional.empty();
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while searing for movie with id: " + id, e);
+            throw new DatabaseException("Error while searching for movie with id: " + id, e);
         }
     }
 
@@ -277,7 +277,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
         } catch (IncorrectResultSizeDataAccessException ex) {
             return Optional.empty();
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while searing for movie with id: " + id, e);
+            throw new DatabaseException("Error while searching for movie with id: " + id, e);
         }
     }
 
@@ -310,7 +310,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
         } catch (IncorrectResultSizeDataAccessException ex) {
             return Optional.empty();
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while searing for movie with id: " + id, e);
+            throw new DatabaseException("Error while searching for movie with id: " + id, e);
         }
     }
 

@@ -4,20 +4,20 @@
  */
 package com.borak.kinweb.backend.logic.controllers;
 
-import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.classes.MyImage;
+import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
+import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.kinweb.backend.logic.services.movie.IMovieService;
+import com.borak.kinweb.backend.logic.services.tv.ITVShowService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,12 +34,12 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Mr. Poyo
  */
 @RestController
-@RequestMapping(path = "api/movies")
+@RequestMapping(path = "api/tv")
 @Validated
-public class MovieController {
+public class TVShowController {
 
     @Autowired
-    private IMovieService movieService;
+    private ITVShowService tvShowService;
 
     @Autowired
     private DomainValidationService domainValidator;
@@ -47,98 +47,98 @@ public class MovieController {
     //=========================GET MAPPINGS==================================  
     @GetMapping
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getMovies(
+    public ResponseEntity getTVShows(
             @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
-        return movieService.getAllMoviesWithGenresPaginated(page, size);
+        return tvShowService.getAllTVShowsWithGenresPaginated(page, size);
     }
 
     @GetMapping(path = "/popular")
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getMoviesPopular(
+    public ResponseEntity getTVShowsPopular(
             @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
-        return movieService.getAllMoviesWithGenresPopularPaginated(page, size);
+        return tvShowService.getAllTVShowsWithGenresPopularPaginated(page, size);
     }
 
     @GetMapping(path = "/current")
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getMoviesCurrent(
+    public ResponseEntity getTVShowsCurrent(
             @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
-        return movieService.getAllMoviesWithGenresCurrentPaginated(page, size);
+        return tvShowService.getAllTVShowsWithGenresCurrentPaginated(page, size);
     }
 
     @GetMapping(path = "/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity getMoviesDetails(
+    public ResponseEntity getTVShowsDetails(
             @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
-        return movieService.getAllMoviesWithDetailsPaginated(page, size);
+        return tvShowService.getAllTVShowsWithDetailsPaginated(page, size);
     }
 
     @GetMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Medium.class)
-    public ResponseEntity getMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieWithGenres(id);
+    public ResponseEntity getTVShowById(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowWithGenres(id);
     }
 
     @GetMapping(path = "/{id}/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity getMovieByIdDetails(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieWithDetails(id);
+    public ResponseEntity getTVShowByIdDetails(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowWithDetails(id);
     }
 
     @GetMapping(path = "/{id}/directors")
-    public ResponseEntity getMovieByIdDirectors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieDirectors(id);
+    public ResponseEntity getTVShowByIdDirectors(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowDirectors(id);
     }
 
     @GetMapping(path = "/{id}/writers")
-    public ResponseEntity getMovieByIdWriters(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieWriters(id);
+    public ResponseEntity getTVShowByIdWriters(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowWriters(id);
     }
 
     @GetMapping(path = "/{id}/actors")
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getMovieByIdActors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieActors(id);
+    public ResponseEntity getTVShowByIdActors(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowActors(id);
     }
 
     @GetMapping(path = "/{id}/actors/roles")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity getMovieByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieActorsWithRoles(id);
+    public ResponseEntity getTVShowByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.getTVShowActorsWithRoles(id);
     }
 
     //=========================POST MAPPINGS==================================
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity postMovie(@RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
-        domainValidator.validate(movie, coverImage, RequestMethod.POST);
+    public ResponseEntity postTVShow(@RequestPart("tv_show") TVShowRequestDTO tvShow, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
+        domainValidator.validate(tvShow, coverImage, RequestMethod.POST);
         if (coverImage != null) {
-            movie.setCoverImage(new MyImage(coverImage));
+            tvShow.setCoverImage(new MyImage(coverImage));
         }
-        return movieService.postMovie(movie);
+        return tvShowService.postTVShow(tvShow);
     }
 
     //=========================PUT MAPPINGS===================================
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id, @RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
-        movie.setId(id);
-        domainValidator.validate(movie, coverImage, RequestMethod.PUT);
+    public ResponseEntity putTVShow(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id, @RequestPart("tv_show") TVShowRequestDTO tvShow, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
+        tvShow.setId(id);
+        domainValidator.validate(tvShow, coverImage, RequestMethod.PUT);
         if (coverImage != null) {
-            movie.setCoverImage(new MyImage(coverImage));
+            tvShow.setCoverImage(new MyImage(coverImage));
         }
-        return movieService.putMovie(movie);
+        return tvShowService.putTVShow(tvShow);
     }
 
     //=========================DELETE MAPPINGS================================
     @DeleteMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity deleteMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.deleteMovieById(id);
+    public ResponseEntity deleteTVShowById(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
+        return tvShowService.deleteTVShowById(id);
     }
 
 }

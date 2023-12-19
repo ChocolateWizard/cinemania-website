@@ -128,6 +128,18 @@ public class DataInitializer {
         return movies.get(2);
     }
 
+    public TVShowJDBC getArcane() {
+        return shows.get(0);
+    }
+
+    public TVShowJDBC getLost() {
+        return shows.get(1);
+    }
+
+    public TVShowJDBC getSouthPark() {
+        return shows.get(2);
+    }
+
     /**
      * Deletes all files (excluding .gitignore) in:
      * <ul>

@@ -11,11 +11,11 @@ import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
-import com.borak.kinweb.backend.repository.jdbc.MovieRepositoryJDBC;
+import com.borak.kinweb.backend.repository.jdbc.TVShowRepositoryJDBC;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
@@ -24,18 +24,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
-import static org.assertj.core.api.Assertions.*;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -47,10 +47,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(4)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
-public class MovieRepositoryJDBCTest {
+public class TVShowRepositoryJDBCTest {
 
     @Autowired
-    private MovieRepositoryJDBC repo;
+    private TVShowRepositoryJDBC repo;
     private final DataInitializer init = new DataInitializer();
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 
@@ -88,16 +88,16 @@ public class MovieRepositoryJDBCTest {
     void beforeEach() {
         Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
     }
+//============================================================================================================ 
+//===========================================TESTS============================================================ 
+//============================================================================================================ 
 
-    //============================================================================================================ 
-    //===========================================TESTS============================================================ 
-    //============================================================================================================ 
     @Test
     @Order(1)
-    @DisplayName("Tests normal functionality of findAll method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAll method of TVShowRepositoryJDBC class")
     void findAll_Test() {
-        List<MovieJDBC> actual = repo.findAll();
-        List<MovieJDBC> expected = init.getMovies();
+        List<TVShowJDBC> actual = repo.findAll();
+        List<TVShowJDBC> expected = init.getShows();
 
         checkValues(actual, expected);
         testsPassed.put("findAll_Test", true);
@@ -105,10 +105,10 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(2)
-    @DisplayName("Tests normal functionality of findAllWithGenres method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllWithGenres method of TVShowRepositoryJDBC class")
     void findAllWithGenres_Test() {
-        List<MovieJDBC> actual = repo.findAllWithGenres();
-        List<MovieJDBC> expected = init.getMovies();
+        List<TVShowJDBC> actual = repo.findAllWithGenres();
+        List<TVShowJDBC> expected = init.getShows();
 
         checkValuesWithGenres(actual, expected);
         testsPassed.put("findAllWithGenres_Test", true);
@@ -116,10 +116,10 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(3)
-    @DisplayName("Tests normal functionality of findAllWithRelations method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllWithRelations method of TVShowRepositoryJDBC class")
     void findAllWithRelations_Test() {
-        List<MovieJDBC> actual = repo.findAllWithRelations();
-        List<MovieJDBC> expected = init.getMovies();
+        List<TVShowJDBC> actual = repo.findAllWithRelations();
+        List<TVShowJDBC> expected = init.getShows();
 
         checkValuesWithRelations(actual, expected);
         testsPassed.put("findAllWithRelations_Test", true);
@@ -127,17 +127,17 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(4)
-    @DisplayName("Tests normal functionality of count method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of count method of TVShowRepositoryJDBC class")
     void count_Test() {
         long actual = repo.count();
-        long expected = init.getMovies().size();
+        long expected = init.getShows().size();
         assertThat(actual).isEqualTo(expected);
         testsPassed.put("count_Test", true);
     }
 
     @Test
     @Order(5)
-    @DisplayName("Tests normal functionality of findAllPaginated method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllPaginated method of TVShowRepositoryJDBC class")
     void findAllPaginated_Test() {
         //(page,size)
         final int[][] invalidInput = {
@@ -190,61 +190,61 @@ public class MovieRepositoryJDBCTest {
         };
         for (int iter = 0; iter < emptyListInput.length; iter++) {
             final int i = iter;
-            List<MovieJDBC> actualList = repo.findAllPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            List<TVShowJDBC> actualList = repo.findAllPaginated(emptyListInput[i][0], emptyListInput[i][1]);
             assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
         }
 
         int page;
         int size;
-        MovieJDBC expectedObject;
-        List<MovieJDBC> actualList;
-        List<MovieJDBC> expectedList;
+        TVShowJDBC expectedObject;
+        List<TVShowJDBC> actualList;
+        List<TVShowJDBC> expectedList;
 
         page = 1;
         size = 1;
-        expectedObject = init.getMullholadDrive();
+        expectedObject = init.getArcane();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, expectedList);
 
         page = 2;
         size = 2;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, expectedList);
 
         page = 1;
         size = 4;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllPaginated(page, size);
         checkValues(actualList, expectedList);
         testsPassed.put("findAllPaginated_Test", true);
@@ -252,7 +252,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(6)
-    @DisplayName("Tests normal functionality of findAllWithGenresPaginated method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllWithGenresPaginated method of TVShowRepositoryJDBC class")
     void findAllWithGenresPaginated_Test() {
         //(page,size)
         final int[][] invalidInput = {
@@ -305,61 +305,61 @@ public class MovieRepositoryJDBCTest {
         };
         for (int iter = 0; iter < emptyListInput.length; iter++) {
             final int i = iter;
-            List<MovieJDBC> actualList = repo.findAllWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            List<TVShowJDBC> actualList = repo.findAllWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1]);
             assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
         }
 
         int page;
         int size;
-        MovieJDBC expectedObject;
-        List<MovieJDBC> actualList;
-        List<MovieJDBC> expectedList;
+        TVShowJDBC expectedObject;
+        List<TVShowJDBC> actualList;
+        List<TVShowJDBC> expectedList;
 
         page = 1;
         size = 1;
-        expectedObject = init.getMullholadDrive();
+        expectedObject = init.getArcane();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithGenresPaginated(page, size);
         checkValuesWithGenres(actualList, expectedList);
         testsPassed.put("findAllWithGenresPaginated_Test", true);
@@ -367,7 +367,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(7)
-    @DisplayName("Tests normal functionality of findAllWithRelationsPaginated method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllWithRelationsPaginated method of TVShowRepositoryJDBC class")
     void findAllWithRelationsPaginated_Test() {
         //(page,size)
         final int[][] invalidInput = {
@@ -420,61 +420,61 @@ public class MovieRepositoryJDBCTest {
         };
         for (int iter = 0; iter < emptyListInput.length; iter++) {
             final int i = iter;
-            List<MovieJDBC> actualList = repo.findAllWithRelationsPaginated(emptyListInput[i][0], emptyListInput[i][1]);
+            List<TVShowJDBC> actualList = repo.findAllWithRelationsPaginated(emptyListInput[i][0], emptyListInput[i][1]);
             assertThat(actualList).as("Code input values (%s,%s)", emptyListInput[i][0], emptyListInput[i][1]).isNotNull().isEmpty();
         }
 
         int page;
         int size;
-        MovieJDBC expectedObject;
-        List<MovieJDBC> actualList;
-        List<MovieJDBC> expectedList;
+        TVShowJDBC expectedObject;
+        List<TVShowJDBC> actualList;
+        List<TVShowJDBC> expectedList;
 
         page = 1;
         size = 1;
-        expectedObject = init.getMullholadDrive();
+        expectedObject = init.getArcane();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, expectedList);
 
         page = 2;
         size = 2;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, expectedList);
 
         page = 1;
         size = 4;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllWithRelationsPaginated(page, size);
         checkValuesWithRelations(actualList, expectedList);
         testsPassed.put("findAllWithRelationsPaginated_Test", true);
@@ -482,7 +482,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(8)
-    @DisplayName("Tests normal functionality of findAllByAudienceRatingWithGenresPaginated method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllByAudienceRatingWithGenresPaginated method of TVShowRepositoryJDBC class")
     void findAllByAudienceRatingWithGenresPaginated_Test() {
         //(page,size,treshold)
         final int[][] invalidInput = {
@@ -543,140 +543,154 @@ public class MovieRepositoryJDBCTest {
             {Integer.MAX_VALUE, Integer.MAX_VALUE, 0},
             {1, 1, 100},
             {1, 3, 100},
-            {1, 1, 90},
-            {1, 3, 90},
-            {1, 10, 90},
-            {1, 1, 80},
-            {1, 3, 80},
-            {1, 10, 80}
+            {1, 1, 95},
+            {1, 3, 95},
+            {1, 10, 95},
+            {1, 1, 91},
+            {1, 3, 91},
+            {1, 10, 91}
         };
         for (int iter = 0; iter < emptyListInput.length; iter++) {
             final int i = iter;
-            List<MovieJDBC> actualList = repo.findAllByAudienceRatingWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
+            List<TVShowJDBC> actualList = repo.findAllByAudienceRatingWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
             assertThat(actualList).as("Code input values (%s,%s,%s)", emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]).isNotNull().isEmpty();
         }
 
         int page;
         int size;
         int treshold;
-        MovieJDBC expectedObject;
-        List<MovieJDBC> actualList;
-        List<MovieJDBC> expectedList;
+        TVShowJDBC expectedObject;
+        List<TVShowJDBC> actualList;
+        List<TVShowJDBC> expectedList;
 
         page = 1;
         size = 1;
         treshold = 0;
-        expectedObject = init.getMullholadDrive();
+        expectedObject = init.getArcane();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
         treshold = 0;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
         treshold = 0;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         treshold = 0;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
         treshold = 0;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 1;
         treshold = 68;
-        expectedObject = init.getMullholadDrive();
+        expectedObject = init.getArcane();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 1;
-        treshold = 79;
-        expectedObject = init.getMullholadDrive();
+        treshold = 87;
+        expectedObject = init.getArcane();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 1;
+        treshold = 90;
+        expectedObject = init.getArcane();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         treshold = 68;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         treshold = 68;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 68;
-        expectedList = init.getMovies();
+        expectedList = init.getShows();
+        actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
+        checkValuesWithGenres(actualList, expectedList);
+
+        page = 1;
+        size = 3;
+        treshold = 83;
+        expectedList = init.getShows();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 2;
-        treshold = 74;
+        treshold = 87;
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getSouthPark()));
 
         page = 1;
         size = 3;
-        treshold = 74;
+        treshold = 87;
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getSouthPark()));
 
         page = 2;
         size = 1;
-        treshold = 74;
+        treshold = 87;
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, Arrays.asList(init.getSouthPark()));
         testsPassed.put("findAllByAudienceRatingWithGenresPaginated_Test", true);
     }
 
     @Test
     @Order(9)
-    @DisplayName("Tests normal functionality of findAllByReleaseYearWithGenresPaginated method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findAllByReleaseYearWithGenresPaginated method of TVShowRepositoryJDBC class")
     void findAllByReleaseYearWithGenresPaginated_Test() {
         //(page,size,year)
         final int currentYear = Year.now().getValue();
@@ -735,150 +749,151 @@ public class MovieRepositoryJDBCTest {
             {Integer.MAX_VALUE, Integer.MAX_VALUE, 0},
             {1, 1, currentYear},
             {1, 3, currentYear},
-            {1, 1, 2021},
-            {1, 3, 2021},
-            {1, 10, 2021},
-            {1, 1, 2020},
-            {1, 3, 2020},
-            {1, 10, 2020},
+            {1, 1, 2023},
+            {1, 3, 2023},
+            {1, 10, 2023},
+            {1, 1, 2022},
+            {1, 3, 2022},
+            {1, 10, 2022},
             {1, 1, Integer.MAX_VALUE},
             {1, 3, Integer.MAX_VALUE},
             {1, 10, Integer.MAX_VALUE},};
         for (int iter = 0; iter < emptyListInput.length; iter++) {
             final int i = iter;
-            List<MovieJDBC> actualList = repo.findAllByReleaseYearWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
+            List<TVShowJDBC> actualList = repo.findAllByReleaseYearWithGenresPaginated(emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]);
             assertThat(actualList).as("Code input values (%s,%s,%s)", emptyListInput[i][0], emptyListInput[i][1], emptyListInput[i][2]).isNotNull().isEmpty();
         }
 
         int page;
         int size;
         int year;
-        MovieJDBC expectedObject;
-        List<MovieJDBC> actualList;
-        List<MovieJDBC> expectedList;
+        TVShowJDBC expectedObject;
+        List<TVShowJDBC> actualList;
+        List<TVShowJDBC> expectedList;
 
         page = 1;
         size = 1;
-        year = 2000;
-        expectedObject = init.getMullholadDrive();
+        year = 1996;
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 2;
         size = 1;
-        year = 2000;
-        expectedObject = init.getInlandEmpire();
+        year = 1996;
+        expectedObject = init.getLost();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
-        year = 2000;
-        expectedObject = init.getTheLighthouse();
+        year = 1996;
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
-        year = 2000;
-        expectedList = init.getMovies().subList(0, 2);
+        year = 1996;
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
-        year = 2000;
-        expectedObject = init.getTheLighthouse();
+        year = 1996;
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
-        year = 2000;
-        expectedList = init.getMovies();
+        year = 1996;
+        expectedList = init.getShows();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
-        year = 2000;
-        expectedList = init.getMovies();
+        year = 1996;
+        expectedList = init.getShows();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
-        year = 2000;
-        expectedList = init.getMovies();
+        year = 1996;
+        expectedList = init.getShows();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 1;
-        year = 2001;
-        expectedObject = init.getMullholadDrive();
+        year = 1997;
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
-        size = 1;
-        year = 2002;
-        expectedObject = init.getInlandEmpire();
+        size = 3;
+        year = 1997;
+        expectedList = init.getShows();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
-
-        page = 1;
-        size = 1;
-        year = 2006;
-        expectedObject = init.getInlandEmpire();
-        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 2;
         year = 2001;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = init.getShows().subList(0, 2);
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         year = 2001;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getLost();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
-        size = 3;
-        year = 2001;
-        expectedList = init.getMovies();
-        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, expectedList);
-
-        page = 1;
         size = 1;
-        year = 2019;
-        expectedObject = init.getTheLighthouse();
+        year = 2004;
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
-        year = 2006;
+        year = 2004;
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getInlandEmpire(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getLost()));
 
         page = 1;
         size = 3;
-        year = 2006;
+        year = 2004;
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getInlandEmpire(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getLost()));
+
+        page = 1;
+        size = 1;
+        year = 2019;
+        expectedObject = init.getArcane();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
+        page = 1;
+        size = 1;
+        year = 2021;
+        expectedObject = init.getArcane();
+        actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
+        checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
+
         testsPassed.put("findAllByReleaseYearWithGenresPaginated_Test", true);
     }
 
     @Test
     @Order(10)
-    @DisplayName("Tests normal functionality of findByIdCoverImage method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findByIdCoverImage method of TVShowRepositoryJDBC class")
     void findByIdCoverImage_Test() {
         //(id)
         final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
@@ -888,46 +903,46 @@ public class MovieRepositoryJDBCTest {
                 repo.findByIdCoverImage(invalidInput1[i]);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
         }
-        final Long[] invalidInput2 = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        final Long[] invalidInput2 = {1l, 2l, 4l, 7l, Long.MAX_VALUE};
         for (int iter = 0; iter < invalidInput2.length; iter++) {
             final int i = iter;
             assertThatExceptionOfType(DatabaseException.class).as("Code input value (%s)", invalidInput2[i]).isThrownBy(() -> {
                 repo.findByIdCoverImage(invalidInput2[i]);
-            }).withMessage("No movie found with given id: " + invalidInput2[i]);
+            }).withMessage("No tv show found with given id: " + invalidInput2[i]);
         }
 
         Long id;
         String expected;
         Optional<String> actual;
 
-        id = 1l;
-        expected = init.getMullholadDrive().getCoverImage();
+        id = 3l;
+        expected = init.getArcane().getCoverImage();
         actual = repo.findByIdCoverImage(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.get()).isNotEmpty().isEqualTo(expected);
 
-        id = 2l;
-        expected = init.getInlandEmpire().getCoverImage();
-        actual = repo.findByIdCoverImage(id);
-        assertThat(actual).isNotNull();
-        assertThat(actual.isPresent()).isTrue();
-        assertThat(actual.isEmpty()).isFalse();
-        assertThat(actual.get()).isNotEmpty().isEqualTo(expected);
-
-        id = 4l;
+        id = 5l;
         actual = repo.findByIdCoverImage(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isPresent()).isFalse();
         assertThat(actual.isEmpty()).isTrue();
+
+        id = 6l;
+        expected = init.getSouthPark().getCoverImage();
+        actual = repo.findByIdCoverImage(id);
+        assertThat(actual).isNotNull();
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.get()).isNotEmpty().isEqualTo(expected);
 
         testsPassed.put("findByIdCoverImage_Test", true);
     }
 
     @Test
     @Order(11)
-    @DisplayName("Tests normal functionality of existsById method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of existsById method of TVShowRepositoryJDBC class")
     void existsById_Test() {
         //(id)
         final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
@@ -939,25 +954,33 @@ public class MovieRepositoryJDBCTest {
         }
         Long id = 1l;
         boolean actual = repo.existsById(id);
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
 
         id = 2l;
         actual = repo.existsById(id);
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
 
         id = 3l;
         actual = repo.existsById(id);
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
 
         id = 4l;
         actual = repo.existsById(id);
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
 
         id = 5l;
         actual = repo.existsById(id);
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
 
         id = 6l;
+        actual = repo.existsById(id);
+        assertThat(actual).isTrue();
+
+        id = 7l;
+        actual = repo.existsById(id);
+        assertThat(actual).isFalse();
+
+        id = 10l;
         actual = repo.existsById(id);
         assertThat(actual).isFalse();
 
@@ -969,7 +992,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(12)
-    @DisplayName("Tests normal functionality of findById method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findById method of TVShowRepositoryJDBC class")
     void findById_Test() {
         //(id)
         final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
@@ -979,31 +1002,31 @@ public class MovieRepositoryJDBCTest {
                 repo.findById(invalidInput1[i]);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
         }
-        Long id = 1l;
-        MovieJDBC expected = init.getMullholadDrive();
-        Optional<MovieJDBC> actual = repo.findById(id);
+        Long id = 3l;
+        TVShowJDBC expected = init.getArcane();
+        Optional<TVShowJDBC> actual = repo.findById(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 2l;
-        expected = init.getInlandEmpire();
+        id = 5l;
+        expected = init.getLost();
         actual = repo.findById(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 4l;
-        expected = init.getTheLighthouse();
+        id = 6l;
+        expected = init.getSouthPark();
         actual = repo.findById(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValues(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        Long[] emptyInput = {1l, 2l, 4l, 7l, Long.MAX_VALUE};
         for (int i = 0; i < emptyInput.length; i++) {
             actual = repo.findById(emptyInput[i]);
             assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
@@ -1016,7 +1039,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(13)
-    @DisplayName("Tests normal functionality of findByIdWithGenres method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findByIdWithGenres method of TVShowRepositoryJDBC class")
     void findByIdWithGenres_Test() {
         //(id)
         final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
@@ -1026,31 +1049,31 @@ public class MovieRepositoryJDBCTest {
                 repo.findByIdWithGenres(invalidInput1[i]);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
         }
-        Long id = 1l;
-        MovieJDBC expected = init.getMullholadDrive();
-        Optional<MovieJDBC> actual = repo.findByIdWithGenres(id);
+        Long id = 3l;
+        TVShowJDBC expected = init.getArcane();
+        Optional<TVShowJDBC> actual = repo.findByIdWithGenres(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 2l;
-        expected = init.getInlandEmpire();
+        id = 5l;
+        expected = init.getLost();
         actual = repo.findByIdWithGenres(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 4l;
-        expected = init.getTheLighthouse();
+        id = 6l;
+        expected = init.getSouthPark();
         actual = repo.findByIdWithGenres(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithGenres(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        Long[] emptyInput = {1l, 2l, 4l, 7l, Long.MAX_VALUE};
         for (int i = 0; i < emptyInput.length; i++) {
             actual = repo.findByIdWithGenres(emptyInput[i]);
             assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
@@ -1062,7 +1085,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(14)
-    @DisplayName("Tests normal functionality of findByIdWithRelations method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of findByIdWithRelations method of TVShowRepositoryJDBC class")
     void findByIdWithRelations_Test() {
         //(id)
         final Long[] invalidInput1 = {null, 0l, -1l, -2l, Long.MIN_VALUE};
@@ -1072,31 +1095,31 @@ public class MovieRepositoryJDBCTest {
                 repo.findByIdWithRelations(invalidInput1[i]);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
         }
-        Long id = 1l;
-        MovieJDBC expected = init.getMullholadDrive();
-        Optional<MovieJDBC> actual = repo.findByIdWithRelations(id);
+        Long id = 3l;
+        TVShowJDBC expected = init.getArcane();
+        Optional<TVShowJDBC> actual = repo.findByIdWithRelations(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 2l;
-        expected = init.getInlandEmpire();
+        id = 5l;
+        expected = init.getLost();
         actual = repo.findByIdWithRelations(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        id = 4l;
-        expected = init.getTheLighthouse();
+        id = 6l;
+        expected = init.getSouthPark();
         actual = repo.findByIdWithRelations(id);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isFalse();
         assertThat(actual.isPresent()).isTrue();
         checkValuesWithRelations(Arrays.asList(actual.get()), Arrays.asList(expected));
 
-        Long[] emptyInput = {3l, 5l, 6l, 7l, Long.MAX_VALUE};
+        Long[] emptyInput = {1l, 2l, 4l, 7l, Long.MAX_VALUE};
         for (int i = 0; i < emptyInput.length; i++) {
             actual = repo.findByIdWithRelations(emptyInput[i]);
             assertThat(actual).as("Code input value (%s)", emptyInput[i]).isNotNull();
@@ -1108,48 +1131,48 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(15)
-    @DisplayName("Tests normal functionality of insert method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of insert method of TVShowRepositoryJDBC class")
     void insert_Test() {
-        //Assume dependant methods executed with no errors, since i need them to test wheter or not Movie inserted properly      
+        //Assume dependant methods executed with no errors, since i need them to test wheter or not TV show inserted properly      
         Assumptions.assumeTrue(testsPassed.get("findById_Test"));
         Assumptions.assumeTrue(testsPassed.get("findByIdWithRelations_Test"));
 
         //Invalid inputs to insert method
-        List<MovieJDBC> invalidInput = new ArrayList<MovieJDBC>() {
+        List<TVShowJDBC> invalidInput = new ArrayList<TVShowJDBC>() {
             {
-                add(new MovieJDBC(null, "Dummy title 0", null, "Dummy description 0", LocalDate.now(), 0, null, null));
-                add(new MovieJDBC(null, "Dummy title 1", null, "Dummy description 1", LocalDate.now(), 0, null, -1));
-                add(new MovieJDBC(null, "Dummy title 2", null, "Dummy description 2", LocalDate.now(), 0, null, -2));
-                add(new MovieJDBC(null, "Dummy title 3", null, "Dummy description 3", LocalDate.now(), 0, null, Integer.MIN_VALUE));
-                add(new MovieJDBC(null, "Dummy title 4", null, "Dummy description 4", LocalDate.now(), null, null, 0));
-                add(new MovieJDBC(null, "Dummy title 5", null, "Dummy description 5", LocalDate.now(), -1, null, 0));
-                add(new MovieJDBC(null, "Dummy title 6", null, "Dummy description 6", LocalDate.now(), -2, null, 0));
-                add(new MovieJDBC(null, "Dummy title 7", null, "Dummy description 7", LocalDate.now(), Integer.MIN_VALUE, null, 0));
-                add(new MovieJDBC(null, "Dummy title 8", null, "Dummy description 8", LocalDate.now(), 101, null, 0));
-                add(new MovieJDBC(null, "Dummy title 9", null, "Dummy description 9", LocalDate.now(), 102, null, 0));
-                add(new MovieJDBC(null, "Dummy title 10", null, "Dummy description 10", LocalDate.now(), Integer.MAX_VALUE, null, 0));
-                add(new MovieJDBC(null, "Dummy title 11", null, "Dummy description 11", null, 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 12", null, null, LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, null, null, "Dummy description 13", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 14", "Dummy cover image 14", "Dummy description 14", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 15", "Dummy cover image 15", "Dummy description 15", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 16", "Dummy cover image 16", "Dummy description 16", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 17", "Dummy cover image 17", "Dummy description 17", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 18", "Dummy cover image 18", "Dummy description 18", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 19", "Dummy cover image 19", "Dummy description 19", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 20", "Dummy cover image 20", "Dummy description 20", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 21", "Dummy cover image 21", "Dummy description 21", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 22", "Dummy cover image 22", "Dummy description 22", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 23", "Dummy cover image 23", "Dummy description 23", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 24", "Dummy cover image 24", "Dummy description 24", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 25", "Dummy cover image 25", "Dummy description 25", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 26", "Dummy cover image 26", "Dummy description 26", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 27", "Dummy cover image 27", "Dummy description 27", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 28", "Dummy cover image 28", "Dummy description 28", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 29", "Dummy cover image 29", "Dummy description 29", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 30", "Dummy cover image 30", "Dummy description 30", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 31", "Dummy cover image 31", "Dummy description 31", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 32", "Dummy cover image 32", "Dummy description 32", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 0", null, "Dummy description 0", LocalDate.now(), 0, null, null));
+                add(new TVShowJDBC(null, "Dummy title 1", null, "Dummy description 1", LocalDate.now(), 0, null, -1));
+                add(new TVShowJDBC(null, "Dummy title 2", null, "Dummy description 2", LocalDate.now(), 0, null, -2));
+                add(new TVShowJDBC(null, "Dummy title 3", null, "Dummy description 3", LocalDate.now(), 0, null, Integer.MIN_VALUE));
+                add(new TVShowJDBC(null, "Dummy title 4", null, "Dummy description 4", LocalDate.now(), null, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 5", null, "Dummy description 5", LocalDate.now(), -1, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 6", null, "Dummy description 6", LocalDate.now(), -2, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 7", null, "Dummy description 7", LocalDate.now(), Integer.MIN_VALUE, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 8", null, "Dummy description 8", LocalDate.now(), 101, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 9", null, "Dummy description 9", LocalDate.now(), 102, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 10", null, "Dummy description 10", LocalDate.now(), Integer.MAX_VALUE, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 11", null, "Dummy description 11", null, 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 12", null, null, LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, null, null, "Dummy description 13", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 14", "Dummy cover image 14", "Dummy description 14", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 15", "Dummy cover image 15", "Dummy description 15", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 16", "Dummy cover image 16", "Dummy description 16", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 17", "Dummy cover image 17", "Dummy description 17", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 18", "Dummy cover image 18", "Dummy description 18", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 19", "Dummy cover image 19", "Dummy description 19", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 20", "Dummy cover image 20", "Dummy description 20", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 21", "Dummy cover image 21", "Dummy description 21", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 22", "Dummy cover image 22", "Dummy description 22", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 23", "Dummy cover image 23", "Dummy description 23", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 24", "Dummy cover image 24", "Dummy description 24", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 25", "Dummy cover image 25", "Dummy description 25", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 26", "Dummy cover image 26", "Dummy description 26", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 27", "Dummy cover image 27", "Dummy description 27", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 28", "Dummy cover image 28", "Dummy description 28", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 29", "Dummy cover image 29", "Dummy description 29", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 30", "Dummy cover image 30", "Dummy description 30", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 31", "Dummy cover image 31", "Dummy description 31", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 32", "Dummy cover image 32", "Dummy description 32", LocalDate.now(), 0, null, 0));
             }
         };
         invalidInput.get(14).getGenres().add(new GenreJDBC(1l, "Dummy genre 0"));
@@ -1246,22 +1269,22 @@ public class MovieRepositoryJDBCTest {
             final int i = iter;
             assertThatExceptionOfType(DatabaseException.class).as("Code number(i) value (%s)", i).isThrownBy(() -> {
                 repo.insert(invalidInput.get(i));
-            }).withMessage("Error while inserting movie");
+            }).withMessage("Error while inserting tv show");
         }
 
         //VALID inputs to insert method
-        //1. Movie ID is null, but rest values are valid and given. No relations
-        MovieJDBC validInput = new MovieJDBC(null, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 140);
-        MovieJDBC returnedInput = repo.insert(validInput);
+        //1. TV show ID is null, but rest values are valid and given. No relations
+        TVShowJDBC validInput = new TVShowJDBC(null, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 0);
+        TVShowJDBC returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
         checkValues(returnedInput, validInput);
-        Optional<MovieJDBC> actual = repo.findById(returnedInput.getId());
+        Optional<TVShowJDBC> actual = repo.findById(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
-        checkValues(actual.get(), returnedInput);
+        checkValues(actual.get(), validInput);
 
         //2. ID is given as already present one in DB; rest values are valid; No relations
-        validInput = new MovieJDBC(2l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 140);
+        validInput = new TVShowJDBC(5l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 0);
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
@@ -1271,7 +1294,7 @@ public class MovieRepositoryJDBCTest {
         checkValues(actual.get(), returnedInput);
 
         //3. ID is given as already present one in DB; rest values are valid; With relations
-        validInput = new MovieJDBC(2l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 140);
+        validInput = new TVShowJDBC(5l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
@@ -1304,8 +1327,8 @@ public class MovieRepositoryJDBCTest {
         assertThat(actual.isPresent()).isTrue();
         checkValues(actual.get(), returnedInput);
 
-        //4. Check if returned movie after insert ordered ids correctly
-        validInput = new MovieJDBC(2l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 140);
+        //4. Check if returned tv show after insert ordered ids correctly
+        validInput = new TVShowJDBC(5l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
@@ -1363,51 +1386,51 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(16)
-    @DisplayName("Tests normal functionality of update method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of update method of TVShowRepositoryJDBC class")
     void update_Test() {
-        //Assume dependant methods executed with no errors, since i need them to test wheter or not Movie updated properly    
+        //Assume dependant methods executed with no errors, since i need them to test wheter or not TV show updated properly    
         Assumptions.assumeTrue(testsPassed.get("findById_Test"));
         Assumptions.assumeTrue(testsPassed.get("findByIdWithRelations_Test"));
 
         //Invalid inputs to insert method
-        List<MovieJDBC> invalidInput = new ArrayList<MovieJDBC>() {
+        List<TVShowJDBC> invalidInput = new ArrayList<TVShowJDBC>() {
             {
-                add(new MovieJDBC(1l, "Dummy title 0", null, "Dummy description 0", LocalDate.now(), 0, null, null));
-                add(new MovieJDBC(1l, "Dummy title 1", null, "Dummy description 1", LocalDate.now(), 0, null, -1));
-                add(new MovieJDBC(1l, "Dummy title 2", null, "Dummy description 2", LocalDate.now(), 0, null, -2));
-                add(new MovieJDBC(1l, "Dummy title 3", null, "Dummy description 3", LocalDate.now(), 0, null, Integer.MIN_VALUE));
-                add(new MovieJDBC(1l, "Dummy title 4", null, "Dummy description 4", LocalDate.now(), null, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 5", null, "Dummy description 5", LocalDate.now(), -1, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 6", null, "Dummy description 6", LocalDate.now(), -2, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 7", null, "Dummy description 7", LocalDate.now(), Integer.MIN_VALUE, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 8", null, "Dummy description 8", LocalDate.now(), 101, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 9", null, "Dummy description 9", LocalDate.now(), 102, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 10", null, "Dummy description 10", LocalDate.now(), Integer.MAX_VALUE, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 11", null, "Dummy description 11", null, 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 12", null, null, LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, null, null, "Dummy description 13", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(null, "Dummy title 14", "Dummy cover image 14", "Dummy description 14", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 15", "Dummy cover image 15", "Dummy description 15", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 16", "Dummy cover image 16", "Dummy description 16", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 17", "Dummy cover image 17", "Dummy description 17", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 18", "Dummy cover image 18", "Dummy description 18", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 19", "Dummy cover image 19", "Dummy description 19", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 20", "Dummy cover image 20", "Dummy description 20", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 21", "Dummy cover image 21", "Dummy description 21", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 22", "Dummy cover image 22", "Dummy description 22", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 23", "Dummy cover image 23", "Dummy description 23", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 24", "Dummy cover image 24", "Dummy description 24", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 25", "Dummy cover image 25", "Dummy description 25", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 26", "Dummy cover image 26", "Dummy description 26", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 27", "Dummy cover image 27", "Dummy description 27", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 28", "Dummy cover image 28", "Dummy description 28", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 29", "Dummy cover image 29", "Dummy description 29", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 30", "Dummy cover image 30", "Dummy description 30", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 31", "Dummy cover image 31", "Dummy description 31", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 32", "Dummy cover image 32", "Dummy description 32", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(1l, "Dummy title 33", "Dummy cover image 33", "Dummy description 33", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(3l, "Dummy title 34", "Dummy cover image 34", "Dummy description 34", LocalDate.now(), 0, null, 0));
-                add(new MovieJDBC(30l, "Dummy title 35", "Dummy cover image 35", "Dummy description 35", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 0", null, "Dummy description 0", LocalDate.now(), 0, null, null));
+                add(new TVShowJDBC(3l, "Dummy title 1", null, "Dummy description 1", LocalDate.now(), 0, null, -1));
+                add(new TVShowJDBC(3l, "Dummy title 2", null, "Dummy description 2", LocalDate.now(), 0, null, -2));
+                add(new TVShowJDBC(3l, "Dummy title 3", null, "Dummy description 3", LocalDate.now(), 0, null, Integer.MIN_VALUE));
+                add(new TVShowJDBC(3l, "Dummy title 4", null, "Dummy description 4", LocalDate.now(), null, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 5", null, "Dummy description 5", LocalDate.now(), -1, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 6", null, "Dummy description 6", LocalDate.now(), -2, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 7", null, "Dummy description 7", LocalDate.now(), Integer.MIN_VALUE, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 8", null, "Dummy description 8", LocalDate.now(), 101, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 9", null, "Dummy description 9", LocalDate.now(), 102, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 10", null, "Dummy description 10", LocalDate.now(), Integer.MAX_VALUE, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 11", null, "Dummy description 11", null, 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 12", null, null, LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, null, null, "Dummy description 13", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(null, "Dummy title 14", "Dummy cover image 14", "Dummy description 14", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 15", "Dummy cover image 15", "Dummy description 15", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 16", "Dummy cover image 16", "Dummy description 16", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 17", "Dummy cover image 17", "Dummy description 17", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 18", "Dummy cover image 18", "Dummy description 18", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 19", "Dummy cover image 19", "Dummy description 19", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 20", "Dummy cover image 20", "Dummy description 20", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 21", "Dummy cover image 21", "Dummy description 21", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 22", "Dummy cover image 22", "Dummy description 22", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 23", "Dummy cover image 23", "Dummy description 23", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 24", "Dummy cover image 24", "Dummy description 24", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 25", "Dummy cover image 25", "Dummy description 25", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 26", "Dummy cover image 26", "Dummy description 26", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 27", "Dummy cover image 27", "Dummy description 27", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 28", "Dummy cover image 28", "Dummy description 28", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 29", "Dummy cover image 29", "Dummy description 29", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 30", "Dummy cover image 30", "Dummy description 30", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 31", "Dummy cover image 31", "Dummy description 31", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 32", "Dummy cover image 32", "Dummy description 32", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(3l, "Dummy title 33", "Dummy cover image 33", "Dummy description 33", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(4l, "Dummy title 34", "Dummy cover image 34", "Dummy description 34", LocalDate.now(), 0, null, 0));
+                add(new TVShowJDBC(30l, "Dummy title 35", "Dummy cover image 35", "Dummy description 35", LocalDate.now(), 0, null, 0));
             }
         };
 
@@ -1505,9 +1528,9 @@ public class MovieRepositoryJDBCTest {
             final int i = iter;
             String message;
             if (i == 14 || i >= 34) {
-                message = "Error while updating movie with id: " + invalidInput.get(i).getId() + ". No movie found with given id";
+                message = "Error while updating tv show with id: " + invalidInput.get(i).getId() + ". No tv show found with given id";
             } else {
-                message = "Error while updating movie with id: " + invalidInput.get(i).getId();
+                message = "Error while updating tv show with id: " + invalidInput.get(i).getId();
             }
             assertThatExceptionOfType(DatabaseException.class).as("Code number(i) value (%s)", i).isThrownBy(() -> {
                 repo.update(invalidInput.get(i));
@@ -1516,14 +1539,14 @@ public class MovieRepositoryJDBCTest {
 
         //VALID inputs to update method
         //1. ID is given as already present one in DB; rest values are valid; No relations
-        MovieJDBC validInput = new MovieJDBC(1l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 140);
+        TVShowJDBC validInput = new TVShowJDBC(3l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 0);
         repo.update(validInput);
-        Optional<MovieJDBC> actual = repo.findByIdWithRelations(1l);
+        Optional<TVShowJDBC> actual = repo.findByIdWithRelations(3l);
         assertThat(actual.isPresent()).isTrue();
         checkValues(actual.get(), validInput);
 
         //2. ID is given as already present one in DB; rest values are valid; With relations
-        validInput = new MovieJDBC(1l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 140);
+        validInput = new TVShowJDBC(3l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
@@ -1549,12 +1572,12 @@ public class MovieRepositoryJDBCTest {
         validActing.getRoles().add(new ActingRoleJDBC(validActing, 6l, "Dummy name 0"));
 
         repo.update(validInput);
-        actual = repo.findByIdWithRelations(1l);
+        actual = repo.findByIdWithRelations(3l);
         assertThat(actual.isPresent()).isTrue();
         checkValues(actual.get(), validInput);
 
         //4. Check if returned movie after update ordered ids correctly
-        validInput = new MovieJDBC(2l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 140);
+        validInput = new TVShowJDBC(5l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
@@ -1580,7 +1603,7 @@ public class MovieRepositoryJDBCTest {
         validActing.getRoles().add(new ActingRoleJDBC(validActing, 1l, "Dummy name 2"));
 
         repo.update(validInput);
-        actual = repo.findByIdWithRelations(2l);
+        actual = repo.findByIdWithRelations(5l);
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get().getGenres().get(0).getId()).isEqualTo(1l);
         assertThat(actual.get().getGenres().get(1).getId()).isEqualTo(3l);
@@ -1609,7 +1632,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(17)
-    @DisplayName("Tests normal functionality of updateCoverImage method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of updateCoverImage method of TVShowRepositoryJDBC class")
     void updateCoverImage_Test() {
         //Assumes findbyIdCoverImage_Test passed with no problems, as i need that method to check if cover image updated corectly
         Assumptions.assumeTrue(testsPassed.get("findByIdCoverImage_Test"));
@@ -1635,20 +1658,20 @@ public class MovieRepositoryJDBCTest {
             sb.append('a'); // or any other character
         }
         Object[][] invalidInput2 = {
-            {3l, "Dummy cover image 0"},
-            {6l, "Dummy cover image 1"},
+            {1l, "Dummy cover image 0"},
+            {4l, "Dummy cover image 1"},
             {150l, "Dummy cover image 2"},
             {Long.MAX_VALUE, "Dummy cover image 3"},
-            {1l, sb.toString()}
+            {3l, sb.toString()}
         };
 
         for (int iter = 0; iter < invalidInput2.length; iter++) {
             final int i = iter;
             String message;
             if (i <= 3) {
-                message = "Error while updating cover image for movie with id: " + invalidInput2[i][0] + ". No movie found with given id";
+                message = "Error while updating cover image for tv show with id: " + invalidInput2[i][0] + ". No tv show found with given id";
             } else {
-                message = "Error while updating cover image for movie with id: " + invalidInput2[i][0];
+                message = "Error while updating cover image for tv show with id: " + invalidInput2[i][0];
             }
             assertThatExceptionOfType(DatabaseException.class).as("Code number(i) value (%s)", i).isThrownBy(() -> {
                 repo.updateCoverImage((Long) invalidInput2[i][0], (String) invalidInput2[i][1]);
@@ -1656,19 +1679,19 @@ public class MovieRepositoryJDBCTest {
         }
 
         //VALID values
-        Optional<String> actual = repo.findByIdCoverImage(1l);
+        Optional<String> actual = repo.findByIdCoverImage(3l);
         assertThat(actual).isNotNull();
         assertThat(actual.isPresent()).isTrue();
-        assertThat(actual.get()).isEqualTo(init.getMullholadDrive().getCoverImage());
+        assertThat(actual.get()).isEqualTo(init.getArcane().getCoverImage());
 
-        repo.updateCoverImage(1l, "Dummy cover image");
-        actual = repo.findByIdCoverImage(1l);
+        repo.updateCoverImage(3l, "Dummy cover image");
+        actual = repo.findByIdCoverImage(3l);
         assertThat(actual).isNotNull();
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get()).isEqualTo("Dummy cover image");
 
-        repo.updateCoverImage(1l, null);
-        actual = repo.findByIdCoverImage(1l);
+        repo.updateCoverImage(3l, null);
+        actual = repo.findByIdCoverImage(3l);
         assertThat(actual).isNotNull();
         assertThat(actual.isEmpty()).isTrue();
 
@@ -1677,7 +1700,7 @@ public class MovieRepositoryJDBCTest {
 
     @Test
     @Order(18)
-    @DisplayName("Tests normal functionality of deleteById method of MovieRepositoryJDBC class")
+    @DisplayName("Tests normal functionality of deleteById method of TVShowRepositoryJDBC class")
     void deleteById_Test() {
         //Assumes existById_Test passed with no errors, as ill need existsById to rest whether or not deleteById works properly
         Assumptions.assumeTrue(testsPassed.get("existsById_Test"));
@@ -1689,21 +1712,21 @@ public class MovieRepositoryJDBCTest {
                 repo.deleteById(id);
             }).withMessage("Invalid parameter: id must be non-null and greater than 0");
         }
-        invalidInput = new Long[]{3l, 6l, 150l, Long.MAX_VALUE};
+        invalidInput = new Long[]{1l, 4l, 150l, Long.MAX_VALUE};
         for (int iter = 0; iter < invalidInput.length; iter++) {
             final int i = iter;
             final Long id = invalidInput[i];
             assertThatExceptionOfType(DatabaseException.class).as("Code number(i) value (%s)", i).isThrownBy(() -> {
                 repo.deleteById(id);
-            }).withMessage("Error while deleting movie with id: " + id + ". No movie found with given id");
+            }).withMessage("Error while deleting tv show with id: " + id + ". No tv show found with given id");
         }
 
-        Long id = 1l;
+        Long id = 3l;
         assertThat(repo.existsById(id)).isTrue();
         repo.deleteById(id);
         assertThat(repo.existsById(id)).isFalse();
 
-        id = 2l;
+        id = 5l;
         assertThat(repo.existsById(id)).isTrue();
         repo.deleteById(id);
         assertThat(repo.existsById(id)).isFalse();
@@ -1715,7 +1738,7 @@ public class MovieRepositoryJDBCTest {
 //===========================================PRIVATE METHODS====================================================
 //==============================================================================================================
     //expect Lists to be non null and non empty
-    private void checkValues(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+    private void checkValues(List<TVShowJDBC> actual, List<TVShowJDBC> expected) {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
         for (int i = 0; i < actual.size(); i++) {
@@ -1726,7 +1749,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
-            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
             assertThat(actual.get(i).getCriticRating()).isNull();
 
             assertThat(actual.get(i).getGenres()).isNotNull().isEmpty();
@@ -1738,7 +1761,7 @@ public class MovieRepositoryJDBCTest {
     }
 
     //expect Lists to be non null and non empty
-    private void checkValuesWithGenres(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+    private void checkValuesWithGenres(List<TVShowJDBC> actual, List<TVShowJDBC> expected) {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
         for (int i = 0; i < actual.size(); i++) {
@@ -1749,7 +1772,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
-            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
             assertThat(actual.get(i).getCriticRating()).isNull();
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
@@ -1768,7 +1791,7 @@ public class MovieRepositoryJDBCTest {
     }
 
     //expect Lists to be non null and non empty
-    private void checkValuesWithRelations(List<MovieJDBC> actual, List<MovieJDBC> expected) {
+    private void checkValuesWithRelations(List<TVShowJDBC> actual, List<TVShowJDBC> expected) {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
 
@@ -1780,7 +1803,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
-            assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
+            assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
             assertThat(actual.get(i).getCriticRating()).isNull();
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
@@ -1848,7 +1871,7 @@ public class MovieRepositoryJDBCTest {
         }
     }
 
-    private void checkValues(MovieJDBC actual, MovieJDBC expected) {
+    private void checkValues(TVShowJDBC actual, TVShowJDBC expected) {
         assertThat(actual).isNotNull();
         assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
         assertThat(actual.getTitle()).isEqualTo(expected.getTitle());
@@ -1856,7 +1879,7 @@ public class MovieRepositoryJDBCTest {
         assertThat(actual.getReleaseDate()).isEqualTo(expected.getReleaseDate());
         assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
-        assertThat(actual.getLength()).isEqualTo(expected.getLength());
+        assertThat(actual.getNumberOfSeasons()).isEqualTo(expected.getNumberOfSeasons());
         assertThat(actual.getCriticRating()).isNull();
 
         assertThat(actual.getGenres()).isNotNull();

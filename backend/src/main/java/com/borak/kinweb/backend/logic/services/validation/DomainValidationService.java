@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.logic.services.validation;
 
 import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.classes.MyImage;
+import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.kinweb.backend.exceptions.ValidationException;
 import com.borak.kinweb.backend.logic.util.Util;
 import java.util.LinkedList;
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -130,6 +133,144 @@ public class DomainValidationService {
             }
             int i = 1;
             for (MovieRequestDTO.Actor actor : movie.getActors()) {
+                if (actor == null) {
+                    messages.add("Invalid actor at actor number: " + i + ". Actor must not be null!");
+                } else {
+                    if (actor.getId() == null) {
+                        messages.add("Invalid actor id at actor number: " + i + ". Actor id must not be null!");
+                    } else if (actor.getId() <= 0) {
+                        messages.add("Invalid actor id at actor number: " + i + ". Actor id must be greater than 0!");
+                    }
+                    if (actor.getStarring() == null) {
+                        messages.add("Invalid actor starring value at actor number: " + i + ". Actor starring value must not be null!");
+                    }
+                    if (actor.getRoles() == null || actor.getRoles().isEmpty()) {
+                        messages.add("Invalid actor roles field at actor number: " + i + ". Actor roles field must not be null or empty!");
+                    } else {
+                        int j = 1;
+                        for (String role : actor.getRoles()) {
+                            if (role == null || role.isBlank()) {
+                                messages.add("Invalid name of role number: " + j + " at actor number: " + i + ". Actor role name must not be null or empty!");
+                            } else if (role.length() > 300) {
+                                messages.add("Invalid name of role number: " + j + " at actor number: " + i + ". Actor role name must have less than 300 characters!");
+                            }
+                            j++;
+                        }
+                    }
+                }
+                i++;
+            }
+        }
+
+        if (!messages.isEmpty()) {
+            throw new ValidationException(messages.toArray(String[]::new));
+        }
+    }
+
+    public void validate(TVShowRequestDTO tvShow, MultipartFile coverImage, RequestMethod requestType) throws ValidationException {
+        if (tvShow == null) {
+            throw new ValidationException("TV show must not be null!");
+        }
+        List<String> messages = new LinkedList<>();
+        switch (requestType) {
+            case PUT:
+                if (tvShow.getId() == null) {
+                    messages.add("TV show id must not be null!");
+                } else if (tvShow.getId() <= 0) {
+                    messages.add("TV show id must be greater than or equal to 1!");
+                }
+                break;
+            case POST:
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported requestType!");
+        }
+        if (tvShow.getTitle() == null || tvShow.getTitle().isBlank()) {
+            messages.add("TV show title must not be null or empty!");
+        } else if (tvShow.getTitle().length() > 300) {
+            messages.add("TV show title must have less than 300 characters!");
+        }
+        if (tvShow.getReleaseDate() == null) {
+            messages.add("TV show release date must not be null!");
+        }
+        if (coverImage != null) {
+            try {
+                new MyImage(coverImage);
+            } catch (IllegalArgumentException e) {
+                messages.add("TV show cover image - " + e.getMessage());
+            }
+        }
+        if (tvShow.getDescription() == null || tvShow.getDescription().isBlank()) {
+            messages.add("TV show description must not be null or empty!");
+        } else if (tvShow.getDescription().length() > 500) {
+            messages.add("TV show description must have less than 500 characters!");
+        }
+        if (tvShow.getAudienceRating() == null) {
+            messages.add("TV show audience rating must not be null!");
+        } else if (tvShow.getAudienceRating() < 0 || tvShow.getAudienceRating() > 100) {
+            messages.add("TV show audience rating must be between 0 and 100!");
+        }
+        if (tvShow.getNumberOfSeasons() == null) {
+            messages.add("TV show number of seasons must not be null!");
+        } else if (tvShow.getNumberOfSeasons() <= 0) {
+            messages.add("TV show number of seasons must be greater than 0!");
+        }
+        if (tvShow.getGenres() == null || tvShow.getGenres().isEmpty()) {
+            messages.add("Genres field must not be null or empty!");
+        } else {
+            if (util.doesDuplicatesExistIgnoreNonNatural(tvShow.getGenres())) {
+                messages.add("Genres field must not contain duplicate id values!");
+            }
+            int i = 1;
+            for (Long genre : tvShow.getGenres()) {
+                if (genre == null) {
+                    messages.add("Invalid genre id at genre number: " + i + ". Genre id must not be null!");
+                } else if (genre <= 0) {
+                    messages.add("Invalid genre id at genre number: " + i + ". Genre id must be greater than 0!");
+                }
+                i++;
+            }
+        }
+        if (tvShow.getDirectors() == null || tvShow.getDirectors().isEmpty()) {
+            messages.add("Directors field must not be null or empty!");
+        } else {
+            if (util.doesDuplicatesExistIgnoreNonNatural(tvShow.getDirectors())) {
+                messages.add("Directors field must not contain duplicate id values!");
+            }
+            int i = 1;
+            for (Long director : tvShow.getDirectors()) {
+                if (director == null) {
+                    messages.add("Invalid director id at director number: " + i + ". Director id must not be null!");
+                } else if (director <= 0) {
+                    messages.add("Invalid director id at director number: " + i + ". Director id must be greater than 0!");
+                }
+                i++;
+            }
+        }
+        if (tvShow.getWriters() == null || tvShow.getWriters().isEmpty()) {
+            messages.add("Writers field must not be null or empty!");
+        } else {
+            if (util.doesDuplicatesExistIgnoreNonNatural(tvShow.getWriters())) {
+                messages.add("Writers field must not contain duplicate id values!");
+            }
+            int i = 1;
+            for (Long writer : tvShow.getWriters()) {
+                if (writer == null) {
+                    messages.add("Invalid writer id at writer number: " + i + ". Writer id must not be null!");
+                } else if (writer <= 0) {
+                    messages.add("Invalid writer id at writer number: " + i + ". Writer id must be greater than 0!");
+                }
+                i++;
+            }
+        }
+        if (tvShow.getActors() == null || tvShow.getActors().isEmpty()) {
+            messages.add("Actors field must not be null or empty!");
+        } else {
+            if (util.doesDuplicatesExistIgnoreNonNatural(tvShow.getActors().stream().map(TVShowRequestDTO.Actor::getId).collect(Collectors.toList()))) {
+                messages.add("Actors field must not contain duplicate id values!");
+            }
+            int i = 1;
+            for (TVShowRequestDTO.Actor actor : tvShow.getActors()) {
                 if (actor == null) {
                     messages.add("Invalid actor at actor number: " + i + ". Actor must not be null!");
                 } else {

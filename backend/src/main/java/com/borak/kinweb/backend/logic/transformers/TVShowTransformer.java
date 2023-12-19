@@ -7,6 +7,8 @@ package com.borak.kinweb.backend.logic.transformers;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
+import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
+import com.borak.kinweb.backend.domain.dto.tv.TVShowResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
@@ -14,16 +16,12 @@ import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.logic.util.Util;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,46 +30,46 @@ import org.springframework.stereotype.Component;
  * @author Mr. Poyo
  */
 @Component
-public final class MovieTransformer {
-    
+public final class TVShowTransformer {
+
     @Autowired
     private ConfigProperties config;
-    
+
     @Autowired
     private Util util;
-    
-    public MovieResponseDTO toMovieResponseDTO(MovieJDBC movieJdbc) throws IllegalArgumentException {
-        if (movieJdbc == null) {
+
+    public TVShowResponseDTO toTVShowResponseDTO(TVShowJDBC tvShowJdbc) throws IllegalArgumentException {
+        if (tvShowJdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        
-        MovieResponseDTO movieResponse = new MovieResponseDTO();
-        movieResponse.setId(movieJdbc.getId());
-        movieResponse.setTitle(movieJdbc.getTitle());
-        if (movieJdbc.getCoverImage() != null && !movieJdbc.getCoverImage().isEmpty()) {
-            movieResponse.setCoverImageUrl(config.getMediaImagesBaseUrl() + movieJdbc.getCoverImage());
+
+        TVShowResponseDTO tvShowResponse = new TVShowResponseDTO();
+        tvShowResponse.setId(tvShowJdbc.getId());
+        tvShowResponse.setTitle(tvShowJdbc.getTitle());
+        if (tvShowJdbc.getCoverImage() != null && !tvShowJdbc.getCoverImage().isEmpty()) {
+            tvShowResponse.setCoverImageUrl(config.getMediaImagesBaseUrl() + tvShowJdbc.getCoverImage());
         }
-        movieResponse.setDescription(movieJdbc.getDescription());
-        movieResponse.setReleaseDate(movieJdbc.getReleaseDate());
-        movieResponse.setLength(movieJdbc.getLength());
-        movieResponse.setAudienceRating(movieJdbc.getAudienceRating());
-        movieResponse.setCriticsRating(movieJdbc.getCriticRating());
-        
-        for (GenreJDBC genre : movieJdbc.getGenres()) {
-            movieResponse.getGenres().add(new MovieResponseDTO.Genre(genre.getId(), genre.getName()));
+        tvShowResponse.setDescription(tvShowJdbc.getDescription());
+        tvShowResponse.setReleaseDate(tvShowJdbc.getReleaseDate());
+        tvShowResponse.setNumberOfSeasons(tvShowJdbc.getNumberOfSeasons());
+        tvShowResponse.setAudienceRating(tvShowJdbc.getAudienceRating());
+        tvShowResponse.setCriticsRating(tvShowJdbc.getCriticRating());
+
+        for (GenreJDBC genre : tvShowJdbc.getGenres()) {
+            tvShowResponse.getGenres().add(new TVShowResponseDTO.Genre(genre.getId(), genre.getName()));
         }
-        
-        for (CritiqueJDBC critique : movieJdbc.getCritiques()) {
-            MovieResponseDTO.Critique.Critic criticResponse = new MovieResponseDTO.Critique.Critic();
+
+        for (CritiqueJDBC critique : tvShowJdbc.getCritiques()) {
+            TVShowResponseDTO.Critique.Critic criticResponse = new TVShowResponseDTO.Critique.Critic();
             criticResponse.setUsername(critique.getCritic().getUsername());
             if (critique.getCritic().getProfileImage() != null && !critique.getCritic().getProfileImage().isEmpty()) {
                 criticResponse.setProfileImageUrl(config.getUserImagesBaseUrl() + critique.getCritic().getProfileImage());
             }
-            movieResponse.getCritiques().add(new MovieResponseDTO.Critique(criticResponse, critique.getRating(), critique.getDescription()));
+            tvShowResponse.getCritiques().add(new TVShowResponseDTO.Critique(criticResponse, critique.getRating(), critique.getDescription()));
         }
-        
-        for (DirectorJDBC director : movieJdbc.getDirectors()) {
-            MovieResponseDTO.Director directorResponse = new MovieResponseDTO.Director();
+
+        for (DirectorJDBC director : tvShowJdbc.getDirectors()) {
+            TVShowResponseDTO.Director directorResponse = new TVShowResponseDTO.Director();
             directorResponse.setId(director.getId());
             directorResponse.setFirstName(director.getFirstName());
             directorResponse.setLastName(director.getLastName());
@@ -79,10 +77,10 @@ public final class MovieTransformer {
             if (director.getProfilePhoto() != null && !director.getProfilePhoto().isEmpty()) {
                 directorResponse.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + director.getProfilePhoto());
             }
-            movieResponse.getDirectors().add(directorResponse);
+            tvShowResponse.getDirectors().add(directorResponse);
         }
-        for (WriterJDBC writer : movieJdbc.getWriters()) {
-            MovieResponseDTO.Writer writerResponse = new MovieResponseDTO.Writer();
+        for (WriterJDBC writer : tvShowJdbc.getWriters()) {
+            TVShowResponseDTO.Writer writerResponse = new TVShowResponseDTO.Writer();
             writerResponse.setId(writer.getId());
             writerResponse.setFirstName(writer.getFirstName());
             writerResponse.setLastName(writer.getLastName());
@@ -90,10 +88,10 @@ public final class MovieTransformer {
             if (writer.getProfilePhoto() != null && !writer.getProfilePhoto().isEmpty()) {
                 writerResponse.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + writer.getProfilePhoto());
             }
-            movieResponse.getWriters().add(writerResponse);
+            tvShowResponse.getWriters().add(writerResponse);
         }
-        for (ActingJDBC acting : movieJdbc.getActings()) {
-            MovieResponseDTO.Actor actorResponse = new MovieResponseDTO.Actor();
+        for (ActingJDBC acting : tvShowJdbc.getActings()) {
+            TVShowResponseDTO.Actor actorResponse = new TVShowResponseDTO.Actor();
             actorResponse.setId(acting.getActor().getId());
             actorResponse.setFirstName(acting.getActor().getFirstName());
             actorResponse.setLastName(acting.getActor().getLastName());
@@ -104,45 +102,45 @@ public final class MovieTransformer {
                 actorResponse.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + acting.getActor().getProfilePhoto());
             }
             for (ActingRoleJDBC role : acting.getRoles()) {
-                actorResponse.getRoles().add(new MovieResponseDTO.Actor.Role(role.getId(), role.getName()));
+                actorResponse.getRoles().add(new TVShowResponseDTO.Actor.Role(role.getId(), role.getName()));
             }
-            movieResponse.getActors().add(actorResponse);
+            tvShowResponse.getActors().add(actorResponse);
         }
-        
-        return movieResponse;
+
+        return tvShowResponse;
     }
-    
-    public MovieJDBC toMovieJDBC(MovieRequestDTO movie) throws IllegalArgumentException {
-        if (movie == null) {
+
+    public TVShowJDBC toTVShowJDBC(TVShowRequestDTO tvShow) throws IllegalArgumentException {
+        if (tvShow == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        movie.setGenres(util.sortAsc(movie.getGenres()));
-        movie.setDirectors(util.sortAsc(movie.getDirectors()));
-        movie.setWriters(util.sortAsc(movie.getWriters()));
-        List<MovieRequestDTO.Actor> pom = new ArrayList<>(movie.getActors());
-        pom.sort(Comparator.comparingLong(MovieRequestDTO.Actor::getId));
-        movie.setActors(pom);
-        
-        MovieJDBC jdbc = new MovieJDBC();
-        jdbc.setId(movie.getId());
-        jdbc.setTitle(movie.getTitle());
-        if (movie.getCoverImage() != null) {
-            jdbc.setCoverImage(movie.getCoverImage().getFullName());
+        tvShow.setGenres(util.sortAsc(tvShow.getGenres()));
+        tvShow.setDirectors(util.sortAsc(tvShow.getDirectors()));
+        tvShow.setWriters(util.sortAsc(tvShow.getWriters()));
+        List<TVShowRequestDTO.Actor> pom = new ArrayList<>(tvShow.getActors());
+        pom.sort(Comparator.comparingLong(TVShowRequestDTO.Actor::getId));
+        tvShow.setActors(pom);
+
+        TVShowJDBC jdbc = new TVShowJDBC();
+        jdbc.setId(tvShow.getId());
+        jdbc.setTitle(tvShow.getTitle());
+        if (tvShow.getCoverImage() != null) {
+            jdbc.setCoverImage(tvShow.getCoverImage().getFullName());
         }
-        jdbc.setDescription(movie.getDescription());
-        jdbc.setReleaseDate(movie.getReleaseDate());
-        jdbc.setAudienceRating(movie.getAudienceRating());
-        jdbc.setLength(movie.getLength());
-        for (Long genre : movie.getGenres()) {
+        jdbc.setDescription(tvShow.getDescription());
+        jdbc.setReleaseDate(tvShow.getReleaseDate());
+        jdbc.setAudienceRating(tvShow.getAudienceRating());
+        jdbc.setNumberOfSeasons(tvShow.getNumberOfSeasons());
+        for (Long genre : tvShow.getGenres()) {
             jdbc.getGenres().add(new GenreJDBC(genre));
         }
-        for (Long director : movie.getDirectors()) {
+        for (Long director : tvShow.getDirectors()) {
             jdbc.getDirectors().add(new DirectorJDBC(director));
         }
-        for (Long writer : movie.getWriters()) {
+        for (Long writer : tvShow.getWriters()) {
             jdbc.getWriters().add(new WriterJDBC(writer));
         }
-        for (MovieRequestDTO.Actor actor : movie.getActors()) {
+        for (TVShowRequestDTO.Actor actor : tvShow.getActors()) {
             ActingJDBC acting = new ActingJDBC(jdbc, new ActorJDBC(actor.getId()), actor.getStarring());
             long i = 1;
             for (String role : actor.getRoles()) {
@@ -155,15 +153,14 @@ public final class MovieTransformer {
     }
 //---------------------------------------------------------------------------------------------------------------------------------
 
-    public List<MovieResponseDTO> toMovieResponseDTO(List<MovieJDBC> jdbcList) throws IllegalArgumentException {
+    public List<TVShowResponseDTO> toTVShowResponseDTO(List<TVShowJDBC> jdbcList) throws IllegalArgumentException {
         if (jdbcList == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        List<MovieResponseDTO> list = new ArrayList<>();
-        for (MovieJDBC jd : jdbcList) {
-            list.add(toMovieResponseDTO(jd));
+        List<TVShowResponseDTO> list = new ArrayList<>();
+        for (TVShowJDBC jd : jdbcList) {
+            list.add(toTVShowResponseDTO(jd));
         }
         return list;
     }
-    
 }

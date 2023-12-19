@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.logic.transformers;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.dto.actor.ActorResponseDTO;
 import com.borak.kinweb.backend.domain.dto.movie.MovieActorResponseDTO;
+import com.borak.kinweb.backend.domain.dto.tv.TVShowActorResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,4 +78,33 @@ public final class ActorTransformer {
         return list;
     }
 
+     public TVShowActorResponseDTO toTVShowActorResponseDTO(ActorJDBC jdbc) throws IllegalArgumentException {
+        if (jdbc == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        TVShowActorResponseDTO actor = new TVShowActorResponseDTO();
+        actor.setId(jdbc.getId());
+        actor.setFirstName(jdbc.getFirstName());
+        actor.setLastName(jdbc.getLastName());
+        actor.setGender(jdbc.getGender());
+        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
+            actor.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
+        }
+        actor.setStar(jdbc.isStar());
+        return actor;
+    }
+
+    public List<TVShowActorResponseDTO> toTVShowActorResponseDTO(List<ActorJDBC> jdbcList) throws IllegalArgumentException {
+        if (jdbcList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<TVShowActorResponseDTO> list = new ArrayList<>();
+        for (ActorJDBC jd : jdbcList) {
+            list.add(toTVShowActorResponseDTO(jd));
+        }
+        return list;
+    }
+
+    
+    
 }
