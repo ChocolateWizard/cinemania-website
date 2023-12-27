@@ -6,13 +6,15 @@ package com.borak.kinweb.backend.repository.api;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
  * @author Mr. Poyo
  */
-public interface IDirectorRepository<D, ID> extends IRepository<D, ID> {
+public interface IPersonWrapperRepository<PW, ID> extends IRepository<PW, ID> {
 
-    public List<D> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
+    public List<PW> findAllWithRelationsPaginated(int page, int size) throws DatabaseException, IllegalArgumentException;
 
+    public Optional<PW> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
 }

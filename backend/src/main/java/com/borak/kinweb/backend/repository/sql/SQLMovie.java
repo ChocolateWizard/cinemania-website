@@ -130,7 +130,7 @@ public final class SQLMovie {
                                        WHERE movie.media_id=?;
                                        """;
 
-    public static final String FIND_BY_ID_COVER_IMAGE_URL_PS = """
+    public static final String FIND_BY_ID_COVER_IMAGE_PS = """
                                        SELECT media.cover_image 
                                        FROM media JOIN movie ON(media.id=movie.media_id)
                                        WHERE movie.media_id=?;

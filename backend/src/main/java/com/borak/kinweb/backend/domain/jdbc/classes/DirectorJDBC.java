@@ -5,12 +5,16 @@
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class DirectorJDBC extends PersonJDBC{
+public class DirectorJDBC extends PersonJDBC {
+
+    private List<MediaJDBC> medias = new ArrayList<>();
 
     public DirectorJDBC() {
     }
@@ -22,5 +26,17 @@ public class DirectorJDBC extends PersonJDBC{
     public DirectorJDBC(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
         super(id, firstName, lastName, gender, profilePhotoURL);
     }
-    
+
+    public List<MediaJDBC> getMedias() {
+        return medias;
+    }
+
+    public void setMedias(List<MediaJDBC> medias) {
+        if (medias == null) {
+            this.medias = new ArrayList<>();
+        } else {
+            this.medias = medias;
+        }
+    }
+
 }

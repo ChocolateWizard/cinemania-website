@@ -24,10 +24,12 @@ public class ValidationException extends RuntimeException {
 
     public ValidationException(String message) {
         super(message);
+        this.messages = new String[]{message};
     }
 
     public ValidationException(String message, Throwable cause) {
         super(message, cause);
+        this.messages = new String[]{message};
     }
 
     public String[] getMessages() {

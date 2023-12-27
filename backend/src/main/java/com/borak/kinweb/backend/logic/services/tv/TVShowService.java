@@ -204,58 +204,63 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
         if (tvShowClient.getCoverImage() != null) {
             tvShowClient.getCoverImage().setName("" + tvShowDB.getId());
             tvShowRepo.updateCoverImage(tvShowDB.getId(), tvShowClient.getCoverImage().getFullName());
-            tvShow = tvShowRepo.findById(tvShowDB.getId());
+            tvShow = tvShowRepo.findByIdWithRelations(tvShowDB.getId());
             fileRepo.saveMediaCoverImage(tvShowClient.getCoverImage());
         } else {
-            tvShow = tvShowRepo.findById(tvShowDB.getId());
+            tvShow = tvShowRepo.findByIdWithRelations(tvShowDB.getId());
         }
         return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity putTVShow(TVShowRequestDTO tvShowClient) {
-        if (!tvShowRepo.existsById(tvShowClient.getId())) {
-            throw new ResourceNotFoundException("TV show with id: " + tvShowClient.getId() + " does not exist in database!");
+    public ResponseEntity putTVShow(TVShowRequestDTO request) {
+        if (!tvShowRepo.existsById(request.getId())) {
+            throw new ResourceNotFoundException("TV show with id: " + request.getId() + " does not exist in database!");
         }
-        for (Long genre : tvShowClient.getGenres()) {
+        for (Long genre : request.getGenres()) {
             if (!genreRepo.existsById(genre)) {
                 throw new ResourceNotFoundException("Genre with id: " + genre + " does not exist in database!");
             }
         }
-        for (Long director : tvShowClient.getDirectors()) {
+        for (Long director : request.getDirectors()) {
             if (!directorRepo.existsById(director)) {
                 throw new ResourceNotFoundException("Director with id: " + director + " does not exist in database!");
             }
         }
-        for (Long writer : tvShowClient.getWriters()) {
+        for (Long writer : request.getWriters()) {
             if (!writerRepo.existsById(writer)) {
                 throw new ResourceNotFoundException("Writer with id: " + writer + " does not exist in database!");
             }
         }
-        for (TVShowRequestDTO.Actor actor : tvShowClient.getActors()) {
+        for (TVShowRequestDTO.Actor actor : request.getActors()) {
             if (!actorRepo.existsById(actor.getId())) {
                 throw new ResourceNotFoundException("Actor with id: " + actor.getId() + " does not exist in database!");
             }
         }
-        Optional<TVShowJDBC> tvShow;
-        if (tvShowClient.getCoverImage() != null) {
+        Optional<TVShowJDBC> response;
+        Optional<String> beforeUpdateCoverImage = tvShowRepo.findByIdCoverImage(request.getId());
+        if (request.getCoverImage() != null) {
+            //MyImage != null
             //replace cover image
-            tvShowClient.getCoverImage().setName("" + tvShowClient.getId());
-            TVShowJDBC tvShowJDBC = tvShowTransformer.toTVShowJDBC(tvShowClient);
-            tvShowRepo.update(tvShowJDBC);
-            tvShow = tvShowRepo.findById(tvShowClient.getId());
-            fileRepo.saveMediaCoverImage(tvShowClient.getCoverImage());
+            request.getCoverImage().setName("" + request.getId());
+            TVShowJDBC tvShowToStore = tvShowTransformer.toTVShowJDBC(request);
+            tvShowRepo.update(tvShowToStore);
+            response = tvShowRepo.findByIdWithRelations(request.getId());
+            if (beforeUpdateCoverImage.isPresent()) {
+                fileRepo.deleteIfExistsMediaCoverImage(beforeUpdateCoverImage.get());
+            }
+            fileRepo.saveMediaCoverImage(request.getCoverImage());
         } else {
-            //delete cover image
-            Optional<String> coverImage = tvShowRepo.findByIdCoverImage(tvShowClient.getId());
-            TVShowJDBC tvShowJDBC = tvShowTransformer.toTVShowJDBC(tvShowClient);
-            tvShowRepo.update(tvShowJDBC);
-            tvShow = tvShowRepo.findById(tvShowClient.getId());
-            if (coverImage.isPresent()) {
-                fileRepo.deleteIfExistsMediaCoverImage(coverImage.get());
+            //MyImage == null
+            //delete cover image         
+            TVShowJDBC tvShowToStore = tvShowTransformer.toTVShowJDBC(request);
+            tvShowRepo.update(tvShowToStore);
+            response = tvShowRepo.findByIdWithRelations(request.getId());
+            if (beforeUpdateCoverImage.isPresent()) {
+                fileRepo.deleteIfExistsMediaCoverImage(beforeUpdateCoverImage.get());
             }
         }
-        return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(response.get()), HttpStatus.OK);
     }
 
 }

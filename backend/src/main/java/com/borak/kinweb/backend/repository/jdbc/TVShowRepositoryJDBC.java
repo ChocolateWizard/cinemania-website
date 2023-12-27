@@ -198,7 +198,7 @@ public class TVShowRepositoryJDBC implements ITVShowRepository<TVShowJDBC, Long>
             if (id == null || id < 1) {
                 throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
             }
-            String coverImage = jdbcTemplate.queryForObject(SQLTVShow.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
+            String coverImage = jdbcTemplate.queryForObject(SQLTVShow.FIND_BY_ID_COVER_IMAGE_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
             return Optional.ofNullable(coverImage);
         } catch (IncorrectResultSizeDataAccessException e) {
             throw new DatabaseException("No tv show found with given id: " + id, e);

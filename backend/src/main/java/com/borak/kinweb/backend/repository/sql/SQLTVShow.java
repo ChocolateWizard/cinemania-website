@@ -126,7 +126,7 @@ public final class SQLTVShow {
                                        WHERE tv_show.media_id=?;
                                        """;
 
-    public static final String FIND_BY_ID_COVER_IMAGE_URL_PS = """
+    public static final String FIND_BY_ID_COVER_IMAGE_PS = """
                                        SELECT media.cover_image 
                                        FROM media JOIN tv_show ON(media.id=tv_show.media_id)
                                        WHERE tv_show.media_id=?;

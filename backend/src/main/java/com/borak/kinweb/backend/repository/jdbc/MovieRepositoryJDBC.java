@@ -198,7 +198,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             if (id == null || id < 1) {
                 throw new IllegalArgumentException("Invalid parameter: id must be non-null and greater than 0");
             }
-            String coverImage = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_URL_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
+            String coverImage = jdbcTemplate.queryForObject(SQLMovie.FIND_BY_ID_COVER_IMAGE_PS, new Object[]{id}, new int[]{Types.BIGINT}, String.class);
             return Optional.ofNullable(coverImage);
         } catch (IncorrectResultSizeDataAccessException e) {
             throw new DatabaseException("No movie found with given id: " + id, e);
@@ -375,7 +375,7 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
             }
             int i = jdbcTemplate.update(SQLMovie.DELETE_MEDIA_PS, new Object[]{id}, new int[]{Types.BIGINT});
             if (i <= 0) {
-                throw new DatabaseException("Error while deleting movie with id: " + id+". No movie found with given id");
+                throw new DatabaseException("Error while deleting movie with id: " + id + ". No movie found with given id");
             }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while deleting movie with id: " + id, e);

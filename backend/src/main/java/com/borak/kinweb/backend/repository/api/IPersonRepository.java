@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.repository.api;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -13,6 +14,7 @@ import java.util.List;
  */
 public interface IPersonRepository<P, ID> extends IRepository<P, ID> {
 
-    public List<P> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
-    
+    public void updateProfilePhoto(ID id, String profilePhoto) throws DatabaseException, IllegalArgumentException;
+
+    public Optional<String> findByIdProfilePhoto(ID id) throws DatabaseException, IllegalArgumentException;
 }

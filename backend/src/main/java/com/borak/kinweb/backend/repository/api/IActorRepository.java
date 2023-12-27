@@ -4,10 +4,15 @@
  */
 package com.borak.kinweb.backend.repository.api;
 
+import com.borak.kinweb.backend.exceptions.DatabaseException;
+import java.util.List;
+
 /**
  *
  * @author Mr. Poyo
  */
-public interface IActorRepository<A,ID> extends IPersonRepository<A, ID> {
+public interface IActorRepository<A,ID> extends IRepository<A, ID> {
+    
+    public List<A> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
     
 }

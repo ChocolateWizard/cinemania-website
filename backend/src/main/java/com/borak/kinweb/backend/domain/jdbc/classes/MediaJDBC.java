@@ -15,7 +15,7 @@ import java.util.Objects;
  *
  * @author Mr Poyo
  */
-public abstract class MediaJDBC implements JDBC {
+public class MediaJDBC implements JDBC {
 
     private Long id;
 
@@ -44,6 +44,10 @@ public abstract class MediaJDBC implements JDBC {
     public MediaJDBC() {
     }
 
+    public MediaJDBC(Long id) {
+        this.id = id;
+    }
+
     public MediaJDBC(Long id, String title, String coverImage, String description, LocalDate releaseDate, Integer audienceRating, Integer criticRating) {
         this.id = id;
         this.title = title;
@@ -69,8 +73,6 @@ public abstract class MediaJDBC implements JDBC {
     public void setTitle(String title) {
         this.title = title;
     }
-
-    
 
     public String getDescription() {
         return description;

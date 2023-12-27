@@ -33,6 +33,14 @@ public class FileRepository {
         }
     }
 
+    public void savePersonProfilePhoto(MyImage image) throws DatabaseException {
+        try {
+            Files.write(Path.of(config.getPersonImagesFolderPath() + image.getFullName()), image.getBytes());
+        } catch (NullPointerException | IOException ex) {
+            throw new DatabaseException("Unable to save person profile photo");
+        }
+    }
+
     public void deleteIfExistsMediaCoverImage(String imageName) throws IllegalArgumentException, DatabaseException {
         try {
             String[] parts = MyImage.extractNameAndExtension(imageName);
@@ -41,6 +49,15 @@ public class FileRepository {
             throw new DatabaseException("Unable to delete media cover image");
         }
     }
-//===================================================================================================
 
+    public void deleteIfExistsPersonPhotoImage(String imageName) throws IllegalArgumentException, DatabaseException {
+        try {
+            String[] parts = MyImage.extractNameAndExtension(imageName);
+            Files.deleteIfExists(Path.of(config.getPersonImagesFolderPath() + parts[0] + "." + parts[1]));
+        } catch (IOException ex) {
+            throw new DatabaseException("Unable to delete person photo");
+        }
+    }
+
+//===================================================================================================
 }

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Util {
 
-    public boolean doesDuplicatesExistIgnoreNonNatural(List<Long> list) {
+    public boolean duplicatesExistIgnoreNullAndNonNatural(List<Long> list) {
         Set<Long> set = new HashSet();
         for (Long aLong : list) {
             if (aLong != null && aLong > 0 && !set.add(aLong)) {

@@ -76,6 +76,8 @@ public class DataInitializer {
     private List<WriterJDBC> writers;
     private List<ActorJDBC> actors;
 
+    private List<PersonJDBC> persons;
+
     public DataInitializer() {
         initGenres();
         initDirectors();
@@ -83,6 +85,7 @@ public class DataInitializer {
         initActors();
         initMovies();
         initTVShows();
+        initPersons();
     }
 
     public List<MediaJDBC> getMedias() {
@@ -138,6 +141,10 @@ public class DataInitializer {
 
     public TVShowJDBC getSouthPark() {
         return shows.get(2);
+    }
+
+    public List<PersonJDBC> getPersons() {
+        return persons;
     }
 
     /**
@@ -285,23 +292,30 @@ public class DataInitializer {
         m1.getGenres().add(genres.get(11));
 
         m1.getDirectors().add(directors.get(0));
+        directors.get(0).getMedias().add(m1);
         m1.getWriters().add(writers.get(0));
+        writers.get(0).getMedias().add(m1);
 
         ActingJDBC a11 = new ActingJDBC(m1, actors.get(0), true);
+        actors.get(0).getActings().add(a11);
         a11.getRoles().add(new ActingRoleJDBC(a11, 1l, "Betty Elms"));
         a11.getRoles().add(new ActingRoleJDBC(a11, 2l, "Diane Selwyn"));
 
         ActingJDBC a12 = new ActingJDBC(m1, actors.get(1), true);
+        actors.get(1).getActings().add(a12);
         a12.getRoles().add(new ActingRoleJDBC(a12, 1l, "Rita"));
         a12.getRoles().add(new ActingRoleJDBC(a12, 2l, "Camilla Rhodes"));
 
         ActingJDBC a13 = new ActingJDBC(m1, actors.get(2), true);
+        actors.get(2).getActings().add(a13);
         a13.getRoles().add(new ActingRoleJDBC(a13, 1l, "Adam"));
 
         ActingJDBC a14 = new ActingJDBC(m1, actors.get(3), false);
+        actors.get(3).getActings().add(a14);
         a14.getRoles().add(new ActingRoleJDBC(a14, 1l, "Dan"));
 
         ActingJDBC a15 = new ActingJDBC(m1, actors.get(4), false);
+        actors.get(4).getActings().add(a15);
         a15.getRoles().add(new ActingRoleJDBC(a15, 1l, "Irene"));
 
         m1.getActings().add(a11);
@@ -317,29 +331,38 @@ public class DataInitializer {
         m2.getGenres().add(genres.get(12));
 
         m2.getDirectors().add(directors.get(0));
+        directors.get(0).getMedias().add(m2);
         m2.getWriters().add(writers.get(0));
+        writers.get(0).getMedias().add(m2);
 
         ActingJDBC a21 = new ActingJDBC(m2, actors.get(2), true);
+        actors.get(2).getActings().add(a21);
         a21.getRoles().add(new ActingRoleJDBC(a21, 1l, "Devon Berk"));
         a21.getRoles().add(new ActingRoleJDBC(a21, 2l, "Billy Side"));
 
         ActingJDBC a22 = new ActingJDBC(m2, actors.get(5), true);
+        actors.get(5).getActings().add(a22);
         a22.getRoles().add(new ActingRoleJDBC(a22, 1l, "Lost Girl"));
 
         ActingJDBC a23 = new ActingJDBC(m2, actors.get(6), true);
+        actors.get(6).getActings().add(a23);
         a23.getRoles().add(new ActingRoleJDBC(a23, 1l, "Phantom"));
 
         ActingJDBC a24 = new ActingJDBC(m2, actors.get(7), true);
+        actors.get(7).getActings().add(a24);
         a24.getRoles().add(new ActingRoleJDBC(a24, 1l, "Visitor #1"));
 
         ActingJDBC a25 = new ActingJDBC(m2, actors.get(8), false);
+        actors.get(8).getActings().add(a25);
         a25.getRoles().add(new ActingRoleJDBC(a25, 1l, "Nikki Grace"));
         a25.getRoles().add(new ActingRoleJDBC(a25, 2l, "Susan Blue"));
 
         ActingJDBC a26 = new ActingJDBC(m2, actors.get(9), false);
+        actors.get(9).getActings().add(a26);
         a26.getRoles().add(new ActingRoleJDBC(a26, 1l, "Freddie Howard"));
 
         ActingJDBC a27 = new ActingJDBC(m2, actors.get(10), false);
+        actors.get(10).getActings().add(a27);
         a27.getRoles().add(new ActingRoleJDBC(a27, 1l, "Piotrek Krol"));
 
         m2.getActings().add(a21);
@@ -357,16 +380,22 @@ public class DataInitializer {
         m3.getGenres().add(genres.get(12));
 
         m3.getDirectors().add(directors.get(3));
+        directors.get(3).getMedias().add(m3);
         m3.getWriters().add(writers.get(5));
+        writers.get(5).getMedias().add(m3);
         m3.getWriters().add(writers.get(6));
+        writers.get(6).getMedias().add(m3);
 
         ActingJDBC a31 = new ActingJDBC(m3, actors.get(18), true);
+        actors.get(18).getActings().add(a31);
         a31.getRoles().add(new ActingRoleJDBC(a31, 1l, "Thomas Howard"));
 
         ActingJDBC a32 = new ActingJDBC(m3, actors.get(19), true);
+        actors.get(19).getActings().add(a32);
         a32.getRoles().add(new ActingRoleJDBC(a32, 1l, "Thomas Wake"));
 
         ActingJDBC a33 = new ActingJDBC(m3, actors.get(20), true);
+        actors.get(20).getActings().add(a33);
         a33.getRoles().add(new ActingRoleJDBC(a33, 1l, "Mermaid"));
 
         m3.getActings().add(a31);
@@ -388,33 +417,46 @@ public class DataInitializer {
         s1.getGenres().add(genres.get(2));
 
         s1.getDirectors().add(directors.get(1));
+        directors.get(1).getMedias().add(s1);
         s1.getDirectors().add(directors.get(2));
+        directors.get(2).getMedias().add(s1);
 
         s1.getWriters().add(writers.get(1));
+        writers.get(1).getMedias().add(s1);
         s1.getWriters().add(writers.get(2));
+        writers.get(2).getMedias().add(s1);
         s1.getWriters().add(writers.get(3));
+        writers.get(3).getMedias().add(s1);
         s1.getWriters().add(writers.get(4));
+        writers.get(4).getMedias().add(s1);
 
         ActingJDBC a11 = new ActingJDBC(s1, actors.get(11), true);
+        actors.get(11).getActings().add(a11);
         a11.getRoles().add(new ActingRoleJDBC(a11, 1l, "Vi"));
 
         ActingJDBC a12 = new ActingJDBC(s1, actors.get(12), true);
+        actors.get(12).getActings().add(a12);
         a12.getRoles().add(new ActingRoleJDBC(a12, 1l, "Jayce"));
 
         ActingJDBC a13 = new ActingJDBC(s1, actors.get(13), true);
+        actors.get(13).getActings().add(a13);
         a13.getRoles().add(new ActingRoleJDBC(a13, 1l, "Silico"));
         a13.getRoles().add(new ActingRoleJDBC(a13, 2l, "Pim"));
 
         ActingJDBC a14 = new ActingJDBC(s1, actors.get(14), false);
+        actors.get(14).getActings().add(a14);
         a14.getRoles().add(new ActingRoleJDBC(a14, 1l, "Jinx"));
 
         ActingJDBC a15 = new ActingJDBC(s1, actors.get(15), false);
+        actors.get(15).getActings().add(a15);
         a15.getRoles().add(new ActingRoleJDBC(a15, 1l, "Caitlyn"));
 
         ActingJDBC a16 = new ActingJDBC(s1, actors.get(16), false);
+        actors.get(16).getActings().add(a16);
         a16.getRoles().add(new ActingRoleJDBC(a16, 1l, "Viktor"));
 
         ActingJDBC a17 = new ActingJDBC(s1, actors.get(17), false);
+        actors.get(17).getActings().add(a17);
         a17.getRoles().add(new ActingRoleJDBC(a17, 1l, "Heimerdinger"));
         a17.getRoles().add(new ActingRoleJDBC(a17, 2l, "Duty Captain"));
 
@@ -432,45 +474,62 @@ public class DataInitializer {
         s2.getGenres().add(genres.get(12));
 
         s2.getDirectors().add(directors.get(4));
+        directors.get(4).getMedias().add(s2);
         s2.getDirectors().add(directors.get(5));
+        directors.get(5).getMedias().add(s2);
         s2.getDirectors().add(directors.get(6));
+        directors.get(6).getMedias().add(s2);
 
         s2.getWriters().add(writers.get(7));
+        writers.get(7).getMedias().add(s2);
         s2.getWriters().add(writers.get(8));
+        writers.get(8).getMedias().add(s2);
         s2.getWriters().add(writers.get(9));
+        writers.get(9).getMedias().add(s2);
 
         ActingJDBC a21 = new ActingJDBC(s2, actors.get(21), true);
+        actors.get(21).getActings().add(a21);
         a21.getRoles().add(new ActingRoleJDBC(a21, 1l, "Hugo 'Hurley' Reyes"));
 
         ActingJDBC a22 = new ActingJDBC(s2, actors.get(22), true);
+        actors.get(22).getActings().add(a22);
         a22.getRoles().add(new ActingRoleJDBC(a22, 1l, "James 'Sawyer' Ford"));
 
         ActingJDBC a23 = new ActingJDBC(s2, actors.get(23), true);
+        actors.get(23).getActings().add(a23);
         a23.getRoles().add(new ActingRoleJDBC(a23, 1l, "Sun-Hwa Kwon"));
 
         ActingJDBC a24 = new ActingJDBC(s2, actors.get(24), false);
+        actors.get(24).getActings().add(a24);
         a24.getRoles().add(new ActingRoleJDBC(a24, 1l, "Kate Austen"));
 
         ActingJDBC a25 = new ActingJDBC(s2, actors.get(25), false);
+        actors.get(25).getActings().add(a25);
         a25.getRoles().add(new ActingRoleJDBC(a25, 1l, "John Locke"));
         a25.getRoles().add(new ActingRoleJDBC(a25, 2l, "Man in Black"));
 
         ActingJDBC a26 = new ActingJDBC(s2, actors.get(26), false);
+        actors.get(26).getActings().add(a26);
         a26.getRoles().add(new ActingRoleJDBC(a26, 1l, "Dr. Jack Shephard"));
 
         ActingJDBC a27 = new ActingJDBC(s2, actors.get(27), false);
+        actors.get(27).getActings().add(a27);
         a27.getRoles().add(new ActingRoleJDBC(a27, 1l, "Jin-Soo Kwon"));
 
         ActingJDBC a28 = new ActingJDBC(s2, actors.get(28), false);
+        actors.get(28).getActings().add(a28);
         a28.getRoles().add(new ActingRoleJDBC(a28, 1l, "Sayid Jarrah"));
 
         ActingJDBC a29 = new ActingJDBC(s2, actors.get(29), false);
+        actors.get(29).getActings().add(a29);
         a29.getRoles().add(new ActingRoleJDBC(a29, 1l, "Claire Littleton"));
 
         ActingJDBC a210 = new ActingJDBC(s2, actors.get(30), false);
+        actors.get(30).getActings().add(a210);
         a210.getRoles().add(new ActingRoleJDBC(a210, 1l, "Charlie Pace"));
 
         ActingJDBC a211 = new ActingJDBC(s2, actors.get(31), false);
+        actors.get(31).getActings().add(a211);
         a211.getRoles().add(new ActingRoleJDBC(a211, 1l, "Ben Linus"));
         a211.getRoles().add(new ActingRoleJDBC(a211, 2l, "Henry Gale"));
 
@@ -491,13 +550,19 @@ public class DataInitializer {
         s3.getGenres().add(genres.get(3));
 
         s3.getDirectors().add(directors.get(7));
+        directors.get(7).getMedias().add(s3);
         s3.getDirectors().add(directors.get(8));
+        directors.get(8).getMedias().add(s3);
         s3.getDirectors().add(directors.get(9));
+        directors.get(9).getMedias().add(s3);
 
         s3.getWriters().add(writers.get(10));
+        writers.get(10).getMedias().add(s3);
         s3.getWriters().add(writers.get(11));
+        writers.get(11).getMedias().add(s3);
 
         ActingJDBC a31 = new ActingJDBC(s3, actors.get(32), true);
+        actors.get(32).getActings().add(a31);
         a31.getRoles().add(new ActingRoleJDBC(a31, 1l, "Stan Marsh"));
         a31.getRoles().add(new ActingRoleJDBC(a31, 2l, "Eric Cartman"));
         a31.getRoles().add(new ActingRoleJDBC(a31, 3l, "Randy Marsh"));
@@ -527,6 +592,7 @@ public class DataInitializer {
         a31.getRoles().add(new ActingRoleJDBC(a31, 27l, "Santa"));
 
         ActingJDBC a32 = new ActingJDBC(s3, actors.get(33), true);
+        actors.get(33).getActings().add(a32);
         a32.getRoles().add(new ActingRoleJDBC(a32, 1l, "Kyle Broflovski"));
         a32.getRoles().add(new ActingRoleJDBC(a32, 2l, "Kenny McCormick"));
         a32.getRoles().add(new ActingRoleJDBC(a32, 3l, "Gerald Broflovski"));
@@ -547,9 +613,11 @@ public class DataInitializer {
         a32.getRoles().add(new ActingRoleJDBC(a32, 18l, "Scott Malkinson"));
 
         ActingJDBC a33 = new ActingJDBC(s3, actors.get(34), true);
+        actors.get(34).getActings().add(a33);
         a33.getRoles().add(new ActingRoleJDBC(a33, 1l, "Chef"));
 
         ActingJDBC a34 = new ActingJDBC(s3, actors.get(35), false);
+        actors.get(35).getActings().add(a34);
         a34.getRoles().add(new ActingRoleJDBC(a34, 1l, "Sheila Broflovski"));
         a34.getRoles().add(new ActingRoleJDBC(a34, 2l, "Linda Stotch"));
 
@@ -564,6 +632,26 @@ public class DataInitializer {
         shows.add(s3);
     }
 
+    private void initPersons() {
+        Set<PersonJDBC> set = new HashSet<>();
+        PersonJDBC person = null;
+        for (DirectorJDBC d : directors) {
+            person = new PersonJDBC(d.getId(), d.getFirstName(), d.getLastName(), d.getGender(), d.getProfilePhoto());
+            set.add(person);
+        }
+        for (WriterJDBC w : writers) {
+            person = new PersonJDBC(w.getId(), w.getFirstName(), w.getLastName(), w.getGender(), w.getProfilePhoto());
+            set.add(person);
+        }
+        for (ActorJDBC a : actors) {
+            person = new PersonJDBC(a.getId(), a.getFirstName(), a.getLastName(), a.getGender(), a.getProfilePhoto());
+            set.add(person);
+        }
+        this.persons = new ArrayList<>(set.stream().collect(Collectors.toList()));
+        this.persons.sort(Comparator.comparingLong(PersonJDBC::getId));
+    }
+
+//==================================================================================================================    
     private void initMediaImages() throws IllegalArgumentException, RuntimeException {
         deleteFilesFromFolder(mediaImagesFolderPath);
         List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
