@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.repository.jdbc;
 
+import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.repository.api.IMediaRepository;
@@ -75,6 +76,29 @@ public class MediaRepositoryJDBC implements IMediaRepository<MediaJDBC, Long> {
     @Override
     public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<MediaJDBC> findAllByTitleWithGenresPaginated(int page, int size, String title) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (page < 1 || size < 0 || title == null) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0, size must be non-negative and title must be non-null");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<MediaJDBC> medias = jdbcTemplate.query(SQLMedia.FIND_ALL_BY_TITLE_PAGINATED_PS, new Object[]{"%" + title + "%", size, offset}, new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER}, SQLMedia.mediaRM);
+            for (MediaJDBC media : medias) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLMedia.FIND_ALL_GENRES_PS, new Object[]{media.getId()}, new int[]{Types.BIGINT}, SQLMedia.genreRM);
+                media.setGenres(genres);
+            }
+            return medias;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving medias", e);
+        }
     }
 
 }
