@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend.exceptions.handler;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
+import com.borak.kinweb.backend.exceptions.DuplicateResourceException;
 import com.borak.kinweb.backend.exceptions.EmailTakenException;
 import com.borak.kinweb.backend.exceptions.InvalidInputException;
 import com.borak.kinweb.backend.exceptions.ProfileNameTakenException;
@@ -41,6 +42,17 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorDetail, null, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(value = DuplicateResourceException.class)
+    public ResponseEntity<?> handleDuplicateResourceException(DuplicateResourceException ex, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.CONFLICT.value());
+        errorDetail.setTitle("Duplicate resource");
+        errorDetail.setDetails(new String[]{ex.getMessage()});
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.CONFLICT);
+    }
+    
     @ExceptionHandler(value = InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();

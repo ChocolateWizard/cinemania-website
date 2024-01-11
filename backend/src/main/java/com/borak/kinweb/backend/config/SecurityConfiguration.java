@@ -87,6 +87,15 @@ public class SecurityConfiguration {
                         "/api/persons/**"
                 ).permitAll()
                         .requestMatchers(HttpMethod.POST,
+                                "api/critiques/*"
+                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.PUT,
+                                "api/critiques/*"
+                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "api/critiques/*"
+                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/movies",
                                 "/api/tv",
                                 "/api/persons"

@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.services.user;
 
+import com.borak.kinweb.backend.domain.dto.MessageResponseDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserResponseDTO;
@@ -78,7 +79,7 @@ public class UserService implements IUserService<UserRegisterDTO, UserLoginDTO> 
             registerForm.getProfileImage().setName(userJDBC.getProfileName());
             fileRepo.saveUserProfileImage(registerForm.getProfileImage());
         }
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
+        return new ResponseEntity<>(new MessageResponseDTO("User registered successfully!"), HttpStatus.OK);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class UserService implements IUserService<UserRegisterDTO, UserLoginDTO> 
     public ResponseEntity logout() {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body("You've been logged out!");
+                .body(new MessageResponseDTO("You've been logged out!"));
     }
 
 }
