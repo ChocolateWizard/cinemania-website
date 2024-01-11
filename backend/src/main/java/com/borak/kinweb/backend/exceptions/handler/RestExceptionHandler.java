@@ -5,8 +5,11 @@
 package com.borak.kinweb.backend.exceptions.handler;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
+import com.borak.kinweb.backend.exceptions.EmailTakenException;
 import com.borak.kinweb.backend.exceptions.InvalidInputException;
+import com.borak.kinweb.backend.exceptions.ProfileNameTakenException;
 import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
+import com.borak.kinweb.backend.exceptions.UsernameTakenException;
 import com.borak.kinweb.backend.exceptions.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -40,6 +43,21 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setTitle("Bad Request");
+        errorDetail.setDetails(new String[]{ex.getMessage()});
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {
+        UsernameTakenException.class,
+        EmailTakenException.class,
+        ProfileNameTakenException.class
+    })
+    public ResponseEntity<?> handleUserAuthExceptions(RuntimeException ex, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date().getTime());
         errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());

@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend.repository.sql;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
@@ -12,7 +13,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.UserCriticJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -115,8 +116,8 @@ public final class SQLTVShow {
                                                            """;
 
     public static final String FIND_ALL_CRITIQUES_PS = """
-                                                           SELECT user.username,user.profile_image,critique.description,critique.rating 
-                                                           FROM critique JOIN user_critic ON(critique.user_critic_id=user_critic.user_id) JOIN USER ON(user_critic.user_id=user.id) 
+                                                           SELECT user.profile_name,user.profile_image,critique.description,critique.rating 
+                                                           FROM critique JOIN user ON(critique.user_critic_id=user.id) 
                                                            WHERE media_id=?;
                                                            """;
 
@@ -243,8 +244,9 @@ public final class SQLTVShow {
 
     public static final RowMapper<CritiqueJDBC> critiqueRM = (rs, num) -> {
         CritiqueJDBC critique = new CritiqueJDBC();
-        UserCriticJDBC critic = new UserCriticJDBC();
-        critic.setUsername(rs.getString("username"));
+        UserJDBC critic = new UserJDBC();
+        critic.setRole(UserRole.CRITIC);
+        critic.setProfileName(rs.getString("profile_name"));
         critic.setProfileImage(rs.getString("profile_image"));
         critique.setCritic(critic);
         critique.setDescription(rs.getString("description"));

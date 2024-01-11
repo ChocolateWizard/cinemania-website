@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
+import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.kinweb.backend.exceptions.ValidationException;
 import com.borak.kinweb.backend.logic.util.Util;
 import java.util.LinkedList;
@@ -444,6 +445,23 @@ public class DomainValidationService {
         }
         if (!messages.isEmpty()) {
             throw new ValidationException(messages.toArray(String[]::new));
+        }
+
+    }
+
+    public void validate(UserRegisterDTO registerForm, MultipartFile coverImage) throws ValidationException {
+        if (registerForm == null) {
+            throw new ValidationException("Invalid user info!");
+        }
+        if (registerForm.getProfileName().contains(" ")) {
+            throw new ValidationException("Profile name must not contain blank spaces");
+        }
+        if (coverImage != null) {
+            try {
+                new MyImage(coverImage);
+            } catch (IllegalArgumentException e) {
+                throw new ValidationException("User profile image - " + e.getMessage());
+            }
         }
 
     }

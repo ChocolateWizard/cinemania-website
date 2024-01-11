@@ -5,7 +5,9 @@
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,8 @@ public class UserJDBC implements Serializable {
 
     private Gender gender;
 
+    private String profileName;
+
     private String profileImage;
 
     private String username;
@@ -32,9 +36,17 @@ public class UserJDBC implements Serializable {
 
     private String password;
 
+    private UserRole role;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
     private CountryJDBC country;
 
-    private List<MediaJDBC> library = new ArrayList<>();
+    private List<MediaJDBC> medias = new ArrayList<>();
+
+    private List<CritiqueJDBC> critiques = new ArrayList<>();
 
     public UserJDBC() {
     }
@@ -44,26 +56,19 @@ public class UserJDBC implements Serializable {
         this.password = password;
     }
 
-    public UserJDBC(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password) {
+    public UserJDBC(Long id, String firstName, String lastName, Gender gender, String profileName, String profileImage, String username, String email, String password, UserRole role, LocalDateTime createdAt, LocalDateTime updatedAt, CountryJDBC country) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
-        this.profileImage = profileImageUrl;
+        this.profileName = profileName;
+        this.profileImage = profileImage;
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public UserJDBC(Long id, String firstName, String lastName, Gender gender, String profileImageUrl, String username, String email, String password, CountryJDBC country) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.profileImage = profileImageUrl;
-        this.username = username;
-        this.email = email;
-        this.password = password;
+        this.role = role;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.country = country;
     }
 
@@ -99,6 +104,14 @@ public class UserJDBC implements Serializable {
         this.gender = gender;
     }
 
+    public String getProfileName() {
+        return profileName;
+    }
+
+    public void setProfileName(String profileName) {
+        this.profileName = profileName;
+    }
+
     public String getProfileImage() {
         return profileImage;
     }
@@ -106,8 +119,6 @@ public class UserJDBC implements Serializable {
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
-
-    
 
     public String getUsername() {
         return username;
@@ -133,6 +144,30 @@ public class UserJDBC implements Serializable {
         this.password = password;
     }
 
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public CountryJDBC getCountry() {
         return country;
     }
@@ -141,24 +176,35 @@ public class UserJDBC implements Serializable {
         this.country = country;
     }
 
-    public List<MediaJDBC> getLibrary() {
-        return library;
+    public List<MediaJDBC> getMedias() {
+        return medias;
     }
 
-    public void setLibrary(List<MediaJDBC> library) {
-        if(library==null){
-            this.library=new ArrayList<>();
-        }else{
-            this.library = library;
+    public void setMedias(List<MediaJDBC> medias) {
+        if (medias == null) {
+            this.medias = new ArrayList<>();
+        } else {
+            this.medias = medias;
         }
-        
+    }
+
+    public List<CritiqueJDBC> getCritiques() {
+        return critiques;
+    }
+
+    public void setCritiques(List<CritiqueJDBC> critiques) {
+        if (critiques == null) {
+            this.critiques = new ArrayList<>();
+        } else {
+            this.critiques = critiques;
+        }
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 53 * hash + Objects.hashCode(this.email);
-        hash = 53 * hash + Objects.hashCode(this.password);
+        int hash = 3;
+        hash = 17 * hash + Objects.hashCode(this.username);
+        hash = 17 * hash + Objects.hashCode(this.password);
         return hash;
     }
 
@@ -174,15 +220,12 @@ public class UserJDBC implements Serializable {
             return false;
         }
         final UserJDBC other = (UserJDBC) obj;
-        if (!Objects.equals(this.email, other.email)) {
+        if (!Objects.equals(this.username, other.username)) {
             return false;
         }
         return Objects.equals(this.password, other.password);
     }
 
-    @Override
-    public String toString() {
-        return firstName + " " + lastName;
-    }
-
+    
+    
 }

@@ -1,5 +1,5 @@
 /*
-SQLyog Community v13.1.9 (64 bit)
+SQLyog Community
 MySQL - 8.0.29 : Database - kinomania_backend
 *********************************************************************
 */
@@ -9,16 +9,15 @@ MySQL - 8.0.29 : Database - kinomania_backend
 /*!40101 SET SQL_MODE=''*/;
 
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*Data for the table `acting` */
+
 
 /*Data for the table `country` */
 
 insert  into `country`(`id`,`name`,`official_state_name`,`code`) values 
 (1,'Afghanistan','The Islamic Republic of Afghanistan','AF'),
-(2,'Åland Islands','Åland','AX'),
+(2,'Ã…land Islands','Ã…land','AX'),
 (3,'Albania','The Republic of Albania','AL'),
 (4,'Algeria','The People\'s Democratic Republic of Algeria','DZ'),
 (5,'American Samoa','The Territory of American Samoa','AS'),
@@ -71,10 +70,10 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (52,'DR Congo','The Democratic Republic of the Congo','CD'),
 (53,'Cook Islands','The Cook Islands','CK'),
 (54,'Costa Rica','The Republic of Costa Rica','CR'),
-(55,'Côte d\'Ivoire','The Republic of Côte d\'Ivoire','CI'),
+(55,'CÃ´te d\'Ivoire','The Republic of CÃ´te d\'Ivoire','CI'),
 (56,'Croatia','The Republic of Croatia','HR'),
 (57,'Cuba','The Republic of Cuba','CU'),
-(58,'Curaçao','The Country of Curaçao','CW'),
+(58,'CuraÃ§ao','The Country of CuraÃ§ao','CW'),
 (59,'Cyprus','The Republic of Cyprus','CY'),
 (60,'Czech Republic','The Czech Republic','CZ'),
 (61,'Denmark','The Kingdom of Denmark','DK'),
@@ -188,21 +187,21 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (169,'Pakistan','The Islamic Republic of Pakistan','PK'),
 (170,'Palau','The Republic of Palau','PW'),
 (171,'Palestine','The State of Palestine','PS'),
-(172,'Panama','The Republic of Panamá','PA'),
+(172,'Panama','The Republic of PanamÃ¡','PA'),
 (173,'Papua New Guinea','The Independent State of Papua New Guinea','PG'),
 (174,'Paraguay','The Republic of Paraguay','PY'),
-(175,'Peru','The Republic of Perú','PE'),
+(175,'Peru','The Republic of PerÃº','PE'),
 (176,'Philippines','The Republic of the Philippines','PH'),
 (177,'Pitcairn','The Pitcairn, Henderson, Ducie and Oeno Islands','PN'),
 (178,'Poland','The Republic of Poland','PL'),
 (179,'Portugal','The Portuguese Republic','PT'),
 (180,'Puerto Rico','The Commonwealth of Puerto Rico','PR'),
 (181,'Qatar','The State of Qatar','QA'),
-(182,'Réunion','Réunion','RE'),
+(182,'RÃ©union','RÃ©union','RE'),
 (183,'Romania','Romania','RO'),
 (184,'Russia','The Russian Federation','RU'),
 (185,'Rwanda','The Republic of Rwanda','RW'),
-(186,'Saint Barthélemy','The Collectivity of Saint-Barthélemy','BL'),
+(186,'Saint BarthÃ©lemy','The Collectivity of Saint-BarthÃ©lemy','BL'),
 (187,'Saint Helena, Ascension and Tristan da Cunha','Saint Helena, Ascension and Tristan da Cunha','SH'),
 (188,'Saint Kitts and Nevis','Saint Kitts and Nevis','KN'),
 (189,'Saint Lucia','Saint Lucia','LC'),
@@ -211,7 +210,7 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (192,'Saint Vincent and the Grenadines','Saint Vincent and the Grenadines','VC'),
 (193,'Samoa','The Independent State of Samoa','WS'),
 (194,'San Marino','The Republic of San Marino','SM'),
-(195,'Sao Tome and Principe','The Democratic Republic of São Tomé and Príncipe','ST'),
+(195,'Sao Tome and Principe','The Democratic Republic of SÃ£o TomÃ© and PrÃ­ncipe','ST'),
 (196,'Saudi Arabia','The Kingdom of Saudi Arabia','SA'),
 (197,'Senegal','The Republic of Senegal','SN'),
 (198,'Serbia','The Republic of Serbia','RS'),
@@ -244,7 +243,7 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (225,'Tonga','The Kingdom of Tonga','TO'),
 (226,'Trinidad and Tobago','The Republic of Trinidad and Tobago','TT'),
 (227,'Tunisia','The Republic of Tunisia','TN'),
-(228,'Turkiye','The Republic of Türkiye','TR'),
+(228,'Turkiye','The Republic of TÃ¼rkiye','TR'),
 (229,'Turkmenistan','Turkmenistan','TM'),
 (230,'Turks and Caicos Islands','The Turks and Caicos Islands','TC'),
 (231,'Tuvalu','Tuvalu','TV'),
@@ -267,31 +266,6 @@ insert  into `country`(`id`,`name`,`official_state_name`,`code`) values
 (248,'Zambia','The Republic of Zambia','ZM'),
 (249,'Zimbabwe','The Republic of Zimbabwe','ZW');
 
-/*Data for the table `media` */
-
-insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`audience_rating`,`critic_rating`) values 
-(1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
-(2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
-(3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
-(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
-(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,NULL),
-(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,NULL);
-
-
-/*Data for the table `tv_show` */
-
-insert  into `tv_show`(`media_id`,`number_of_seasons`) values 
-(3,1),
-(5,6),
-(6,26);
-
-/*Data for the table `movie` */
-
-insert  into `movie`(`media_id`,`length`) values 
-(1,147),
-(2,180),
-(4,109);
-
 /*Data for the table `genre` */
 
 insert  into `genre`(`id`,`name`) values 
@@ -308,6 +282,30 @@ insert  into `genre`(`id`,`name`) values
 (9,'Science fiction'),
 (11,'Thriller'),
 (10,'Western');
+
+/*Data for the table `media` */
+
+insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`audience_rating`,`critic_rating`) values 
+(1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
+(2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
+(3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
+(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
+(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,NULL),
+(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,NULL);
+
+/*Data for the table `movie` */
+
+insert  into `movie`(`media_id`,`length`) values 
+(1,147),
+(2,180),
+(4,109);
+
+/*Data for the table `tv_show` */
+
+insert  into `tv_show`(`media_id`,`number_of_seasons`) values 
+(3,1),
+(5,6),
+(6,26);
 
 /*Data for the table `person` */
 
@@ -362,8 +360,6 @@ insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`) va
 (48,'Brian','Graden','M','48.jpg'),
 (49,'Isaac','Hayes','M','49.jpg'),
 (50,'Mona','Marshall','F',NULL);
-
-
 
 /*Data for the table `director` */
 
@@ -434,6 +430,8 @@ insert  into `actor`(`person_id`,`is_star`) values
 (47,1),
 (49,0),
 (50,0);
+
+/*Data for the table `acting` */
 
 insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values 
 (1,1,2,1),
@@ -567,16 +565,7 @@ insert  into `acting_role`(`acting_id`,`id`,`name`) values
 (37,1,'Sheila Broflovski'),
 (37,2,'Linda Stotch');
 
-
-
-
-
 /*Data for the table `critique` */
-
-
-
-
-
 
 
 /*Data for the table `media_directors` */
@@ -633,7 +622,13 @@ insert  into `media_writers`(`media_id`,`writer_id`) values
 (6,47);
 
 
+
+/*Data for the table `user` */
+
+/*Data for the table `user_media` */
+
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

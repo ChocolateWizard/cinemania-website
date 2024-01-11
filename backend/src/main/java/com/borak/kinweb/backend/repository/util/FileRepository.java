@@ -41,6 +41,14 @@ public class FileRepository {
         }
     }
 
+    public void saveUserProfileImage(MyImage image) throws DatabaseException {
+        try {
+            Files.write(Path.of(config.getUserImagesFolderPath()+ image.getFullName()), image.getBytes());
+        } catch (NullPointerException | IOException ex) {
+            throw new DatabaseException("Unable to save user profile image");
+        }
+    }
+    
     public void deleteIfExistsMediaCoverImage(String imageName) throws IllegalArgumentException, DatabaseException {
         try {
             String[] parts = MyImage.extractNameAndExtension(imageName);

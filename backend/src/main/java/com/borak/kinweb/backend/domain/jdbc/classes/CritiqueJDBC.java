@@ -10,7 +10,7 @@ package com.borak.kinweb.backend.domain.jdbc.classes;
  */
 public class CritiqueJDBC implements JDBC {
 
-    private UserCriticJDBC critic;
+    private UserJDBC critic;
 
     private MediaJDBC media;
 
@@ -21,18 +21,18 @@ public class CritiqueJDBC implements JDBC {
     public CritiqueJDBC() {
     }
 
-    public CritiqueJDBC(UserCriticJDBC critic, MediaJDBC media, String description, Integer rating) {
+    public CritiqueJDBC(UserJDBC critic, MediaJDBC media, String description, Integer rating) {
         this.critic = critic;
         this.media = media;
         this.description = description;
         this.rating = rating;
     }
 
-    public UserCriticJDBC getCritic() {
+    public UserJDBC getCritic() {
         return critic;
     }
 
-    public void setCritic(UserCriticJDBC critic) {
+    public void setCritic(UserJDBC critic) {
         this.critic = critic;
     }
 
@@ -60,10 +60,6 @@ public class CritiqueJDBC implements JDBC {
         this.rating = rating;
     }
 
-    
-    
-    
-    
     
 
 }

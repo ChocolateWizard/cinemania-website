@@ -10,29 +10,28 @@ import java.io.Serializable;
  *
  * @author Mr Poyo
  */
-public class CountryJDBC implements JDBC{
+public class CountryJDBC implements JDBC {
 
-    
     private Long id;
 
-   
     private String name;
 
-   
     private String officialStateName;
 
-    
     private String code;
 
     public CountryJDBC() {
     }
 
+    public CountryJDBC(Long id) {
+        this.id = id;
+    }
+  
     public CountryJDBC(String name, String officialStateName, String code) {
         this.name = name;
         this.officialStateName = officialStateName;
         this.code = code;
-    }   
-    
+    }
 
     public CountryJDBC(Long id, String name, String officialStateName, String code) {
         this.id = id;
@@ -77,8 +76,5 @@ public class CountryJDBC implements JDBC{
     public String toString() {
         return name + " (" + code + ')';
     }
-
-    
-    
 
 }
