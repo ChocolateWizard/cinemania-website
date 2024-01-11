@@ -181,8 +181,50 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long> {
             throw new DatabaseException("Error while searching for user with id: " + id, e);
         }
     }
-//================================================================================================================
 
+    @Override
+    public void addMediaToLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (entity == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
+            jdbcTemplate.update(SQLUser.INSERT_MEDIA_PIVOT_PS, new Object[]{
+                entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT});
+
+        } catch (NullPointerException | IndexOutOfBoundsException | DataAccessException e) {
+            throw new DatabaseException("Error while adding media to users library", e);
+        }
+    }
+
+    @Override
+    public boolean existsMediaInLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            jdbcTemplate.queryForObject(SQLUser.EXISTS_MEDIA_IN_LIBRARY, new Object[]{entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT}, Long.class);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return false;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while checking if user has media with id: " + entity.getMedias().get(0).getId() + " in library", e);
+        }
+    }
+
+    @Override
+    public void removeMediaFromLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (entity == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
+            int i = jdbcTemplate.update(SQLUser.DELETE_MEDIA_PIVOT_PS, new Object[]{
+                entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT});
+            if (i <= 0) {
+                throw new DatabaseException("Error while removing media with id: " + entity.getMedias().get(0).getId() + " from users library");
+            }
+        } catch (NullPointerException | IndexOutOfBoundsException | DataAccessException e) {
+            throw new DatabaseException("Error while adding media to users library", e);
+        }
+    }
+
+//================================================================================================================
     private void performInsert(UserJDBC user) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {

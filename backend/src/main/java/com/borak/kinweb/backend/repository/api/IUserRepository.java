@@ -21,6 +21,12 @@ public interface IUserRepository<U, ID> extends IRepository<U, ID> {
 
     boolean existsProfileName(String profileName) throws DatabaseException, IllegalArgumentException;
 
-    public Optional<U> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
-    
+    Optional<U> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
+
+    void addMediaToLibrary(U user) throws DatabaseException, IllegalArgumentException;
+
+    void removeMediaFromLibrary(U user) throws DatabaseException, IllegalArgumentException;
+
+    boolean existsMediaInLibrary(U user) throws DatabaseException, IllegalArgumentException;
+
 }

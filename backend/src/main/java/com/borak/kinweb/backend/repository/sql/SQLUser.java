@@ -84,6 +84,20 @@ public final class SQLUser {
                                                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?);                                                 
                                                 """;
 
+    public static final String INSERT_MEDIA_PIVOT_PS = """                                                    
+                                         INSERT INTO user_media(user_id,media_id) 
+                                          VALUES(?,?);                                                 
+                                                """;
+    public static final String DELETE_MEDIA_PIVOT_PS = """                                                    
+                                         DELETE FROM user_media 
+                                         WHERE user_id=? AND media_id=?;                                                 
+                                                """;
+    public static final String EXISTS_MEDIA_IN_LIBRARY = """                                                    
+                                         SELECT user_id 
+                                          FROM user_media 
+                                          WHERE user_id=? AND media_id=?;                                            
+                                                """;
+
     public static final RowMapper<UserJDBC> userRM = (rs, num) -> {
         UserJDBC user = new UserJDBC();
         user.setId(rs.getLong("id"));

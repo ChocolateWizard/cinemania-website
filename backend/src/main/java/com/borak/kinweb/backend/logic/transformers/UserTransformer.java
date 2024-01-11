@@ -61,6 +61,28 @@ public class UserTransformer {
         return user;
     }
 
+    public UserJDBC toUserJDBC(SecurityUser securityUser, Long mediaId) throws IllegalArgumentException {
+        if (securityUser == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        UserJDBC user = new UserJDBC();
+        user.setId(securityUser.getId());
+        user.setFirstName(securityUser.getFirstName());
+        user.setLastName(securityUser.getLastName());
+        user.setGender(securityUser.getGender());
+        user.setRole(securityUser.getRole());
+        user.setProfileName(securityUser.getProfileName());
+        user.setProfileImage(securityUser.getProfileName());
+        user.setUsername(securityUser.getUsername());
+        user.setPassword(encoder.encode(securityUser.getPassword()));
+        user.setEmail(securityUser.getEmail());
+        user.setCreatedAt(securityUser.getCreatedAt());
+        user.setUpdatedAt(securityUser.getUpdatedAt());
+        user.setCountry(new CountryJDBC(securityUser.getCountry().getId()));
+        user.getMedias().add(new MediaJDBC(mediaId));
+        return user;
+    }
+
     public UserResponseDTO toUserResponseDTO(UserJDBC userJDBC) throws IllegalArgumentException {
         if (userJDBC == null) {
             throw new IllegalArgumentException("Null passed as method parameter");

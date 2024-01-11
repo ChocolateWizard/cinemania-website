@@ -8,7 +8,7 @@ import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.logic.security.AuthEntryPointJwt;
 import com.borak.kinweb.backend.logic.security.AuthTokenFilter;
 import com.borak.kinweb.backend.logic.security.MyUserDetailsService;
-import com.borak.kinweb.backend.logic.services.user.UserService;
+import com.borak.kinweb.backend.logic.services.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -112,6 +112,8 @@ public class SecurityConfiguration {
                         ).hasAuthority(UserRole.ADMINISTRATOR.toString())
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users/library/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/library/*").authenticated()
                         .anyRequest().authenticated()
                 );
 

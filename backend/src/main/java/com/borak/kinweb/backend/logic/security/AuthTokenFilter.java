@@ -5,7 +5,7 @@
 package com.borak.kinweb.backend.logic.security;
 
 import com.borak.kinweb.backend.domain.security.SecurityUser;
-import com.borak.kinweb.backend.logic.services.user.UserService;
+import com.borak.kinweb.backend.logic.services.auth.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

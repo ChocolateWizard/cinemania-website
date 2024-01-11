@@ -7,7 +7,6 @@ package com.borak.kinweb.backend.logic.controllers;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
-import com.borak.kinweb.backend.logic.services.user.IUserService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import com.borak.kinweb.backend.logic.services.auth.IAuthService;
 
 /**
  *
@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuthController {
 
     @Autowired
-    private IUserService<UserRegisterDTO, UserLoginDTO> userService;
+    private IAuthService<UserRegisterDTO, UserLoginDTO> userService;
 
     @Autowired
     private DomainValidationService domainValidator;

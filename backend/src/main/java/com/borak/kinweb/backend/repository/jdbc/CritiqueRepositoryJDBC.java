@@ -91,9 +91,8 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
         } catch (IncorrectResultSizeDataAccessException e) {
             return false;
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while checking if critique with media id: " + entity.getMedia().getId() + " and user id:" + entity.getCritic().getId() + " exists", e);
+            throw new DatabaseException("Error while checking if users critique with media id: " + entity.getMedia().getId() + " exists", e);
         }
-
     }
 
     @Override
