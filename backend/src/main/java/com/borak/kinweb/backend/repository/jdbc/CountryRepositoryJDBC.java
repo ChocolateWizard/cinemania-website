@@ -26,7 +26,7 @@ public class CountryRepositoryJDBC implements ICountryRepository<CountryJDBC, Lo
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+
     @Override
     public CountryJDBC insert(CountryJDBC entity) throws DatabaseException, IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -59,7 +59,12 @@ public class CountryRepositoryJDBC implements ICountryRepository<CountryJDBC, Lo
 
     @Override
     public List<CountryJDBC> findAll() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            List<CountryJDBC> countries = jdbcTemplate.query(SQLCountry.FIND_ALL_S, SQLCountry.countryRM);
+            return countries;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving countries", e);
+        }
     }
 
     @Override

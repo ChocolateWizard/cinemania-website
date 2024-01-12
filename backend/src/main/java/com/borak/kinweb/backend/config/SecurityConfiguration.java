@@ -84,7 +84,8 @@ public class SecurityConfiguration {
                         "/api/medias/**",
                         "/api/movies/**",
                         "/api/tv/**",
-                        "/api/persons/**"
+                        "/api/persons/**",
+                        "/api/countries/**"
                 ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "api/critiques/*"
