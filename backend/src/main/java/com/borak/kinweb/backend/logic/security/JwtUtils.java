@@ -4,6 +4,7 @@
  */
 package com.borak.kinweb.backend.logic.security;
 
+import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.security.SecurityUser;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -27,6 +28,7 @@ import io.jsonwebtoken.security.Keys;
 
 //import io.jsonwebtoken.security.SignatureAlgorithm;
 import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -37,14 +39,11 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    private final String jwtSecret = "Hesaid3BlessedarethepoorinspiritfortheirsiSthekingdomofheaven4BessedarEthosewhomournfortheywillbecomforted5Blessedarethemeekfortheywillinherittheearth6Blessedarethosewhohungerandthirstforrighteousnessfortheywillbefilled7Blessedarethemercifulfortheywillbeshownmercy8BlessedarethepureinheartfortheywillseeGod9BlessedarethepeacemakersfortheywillbecalledchildrenofGod10Blessedarethosewhoarepersecutedbecauseofrighteousnessfortheirsisthekingdomofheaven";
-
-    private final int jwtExpirationMs = 86400000;
-
-    private final String jwtCookie = "kinweb";
+    @Autowired
+    private ConfigProperties config;
 
     public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+        Cookie cookie = WebUtils.getCookie(request, config.getJwtCookieName());
         if (cookie != null) {
             return cookie.getValue();
         } else {
@@ -54,12 +53,12 @@ public class JwtUtils {
 
     public ResponseCookie generateJwtCookie(SecurityUser userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
+        ResponseCookie cookie = ResponseCookie.from(config.getJwtCookieName(), jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
         return cookie;
     }
 
     public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
+        ResponseCookie cookie = ResponseCookie.from(config.getJwtCookieName(), null).path("/api").build();
         return cookie;
     }
 
@@ -68,7 +67,7 @@ public class JwtUtils {
     }
 
     private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(config.getJwtSecret()));
     }
 
     public boolean validateJwtToken(String authToken) {
@@ -94,9 +93,9 @@ public class JwtUtils {
 
     public String generateTokenFromUsername(String username) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date((new Date()).getTime() + config.getJwtExpirationMs()))
                 .signWith(key(), Jwts.SIG.HS256)
                 .compact();
     }

@@ -59,6 +59,10 @@ public class DataInitializer {
 
     public static final String address = "http://localhost";
     public static final int port = 8080;
+    
+    public static final String jwtCookieName="kinweb";
+    public static final Integer jwtExpirationMs=86400000;
+    public static final String jwtSecret="Hesaid3BlessedarethepoorinspiritfortheirsiSthekingdomofheaven4BessedarEthosewhomournfortheywillbecomforted5Blessedarethemeekfortheywillinherittheearth6Blessedarethosewhohungerandthirstforrighteousnessfortheywillbefilled7Blessedarethemercifulfortheywillbeshownmercy8BlessedarethepureinheartfortheywillseeGod9BlessedarethepeacemakersfortheywillbecalledchildrenofGod10Blessedarethosewhoarepersecutedbecauseofrighteousnessfortheirsisthekingdomofheaven";
 
     public static final String mediaImagesBaseUrl = address + ":" + port + "/test/images/media/";
     public static final String personImagesBaseUrl = address + ":" + port + "/test/images/person/";

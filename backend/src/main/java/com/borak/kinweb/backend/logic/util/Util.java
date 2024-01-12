@@ -5,10 +5,7 @@
 package com.borak.kinweb.backend.logic.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
@@ -21,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class Util {
 
     public boolean duplicatesExistIgnoreNullAndNonNatural(List<Long> list) {
-        Set<Long> set = new HashSet();
+        Set<Long> set = new HashSet<>();
         for (Long aLong : list) {
             if (aLong != null && aLong > 0 && !set.add(aLong)) {
                 return true;

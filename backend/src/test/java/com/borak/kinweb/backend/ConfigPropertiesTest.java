@@ -73,6 +73,10 @@ public class ConfigPropertiesTest {
         assertThat(port).isNotNull().isEqualTo(DataInitializer.port);
         assertThat(address).isNotNull().isEqualTo(DataInitializer.address);
 
+        assertThat(properties.getJwtCookieName()).isEqualTo(DataInitializer.jwtCookieName);
+        assertThat(properties.getJwtExpirationMs()).isNotNull().isEqualTo(DataInitializer.jwtExpirationMs);
+        assertThat(properties.getJwtSecret()).isEqualTo(DataInitializer.jwtSecret);
+
         assertThat(properties.getMediaImagesBaseUrl()).isEqualTo(DataInitializer.mediaImagesBaseUrl);
         assertThat(properties.getPersonImagesBaseUrl()).isEqualTo(DataInitializer.personImagesBaseUrl);
         assertThat(properties.getUserImagesBaseUrl()).isEqualTo(DataInitializer.userImagesBaseUrl);
