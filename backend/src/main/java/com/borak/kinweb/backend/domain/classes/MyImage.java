@@ -60,6 +60,18 @@ public class MyImage {
         }
     }
 
+    public MyImage(String fullName, byte[] bytes) throws IllegalArgumentException {
+        try {
+            String[] parts = extractNameAndExtension(fullName);
+            this.name = parts[0];
+            this.extension = parts[1];
+            this.fullName = parts[0] + "." + parts[1];          
+            this.bytes = bytes;
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Invalid argument: unable to infer image parameters!");
+        }
+    }
+
     public String getName() {
         return name;
     }
