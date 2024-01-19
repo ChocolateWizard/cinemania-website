@@ -143,7 +143,7 @@ public class Database {
         jdbc.batchUpdate(sqlD, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setLong(1, persons.get(i).getPerson().getId());
+                ps.setLong(1, directors.get(i).getPerson().getId());
             }
 
             @Override
@@ -155,7 +155,7 @@ public class Database {
         jdbc.batchUpdate(sqlW, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setLong(1, persons.get(i).getPerson().getId());
+                ps.setLong(1, writers.get(i).getPerson().getId());
             }
 
             @Override
@@ -167,8 +167,8 @@ public class Database {
         jdbc.batchUpdate(sqlA, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setLong(1, persons.get(i).getPerson().getId());
-                ps.setBoolean(2, persons.get(i).getActor().isStar());
+                ps.setLong(1, actors.get(i).getPerson().getId());
+                ps.setBoolean(2, actors.get(i).getActor().isStar());
             }
 
             @Override

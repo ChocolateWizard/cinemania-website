@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -38,6 +40,7 @@ public class Datastore {
     private UserDB user;
 
     private final Database database;
+    private static final Logger log = LoggerFactory.getLogger(Datastore.class);
 
     @Autowired
     public Datastore(Database database) {
@@ -123,17 +126,26 @@ public class Datastore {
     }
 
     void persistData() throws Exception {
+        log.info("----------->Removing all table data...");
         database.removeAllTableData();
+        log.info("----------->Storing genres table data...");
         database.storeAllGenres(genres);
+        log.info("----------->Storing persons table data...");
         database.storeAllPersons(persons);
+        log.info("----------->Storing movies table data...");
         database.storeAllMovies(movies);
+        log.info("----------->Storing tv shows table data...");
         database.storeAllShows(shows);
+        log.info("----------->Storing user table data...");
         database.storeUser(user);
+        log.info("----------->Removing all images...");
         database.removeAllImages();
         List<MediaDB> medias = new ArrayList<>();
         medias.addAll(movies);
         medias.addAll(shows);
+        log.info("----------->Retreiving and persisting media images...");
         database.storeMediaImages(medias);
+        log.info("----------->Retreiving and persisting persons images...");
         database.storePersonImages(persons);
 
         //remove pointers to arrays of data so garbage collector can dispose of them

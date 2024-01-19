@@ -9,6 +9,7 @@ import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.exceptions.ValidationException;
 import com.borak.kinweb.backend.logic.util.Util;
 import java.util.LinkedList;
@@ -66,8 +67,8 @@ public class DomainValidationService {
         }
         if (movie.getDescription() == null || movie.getDescription().isBlank()) {
             messages.add("Movie description must not be null or empty!");
-        } else if (movie.getDescription().length() > 500) {
-            messages.add("Movie description must have less than 500 characters!");
+        } else if (movie.getDescription().length() > 1000) {
+            messages.add("Movie description must have less than 1000 characters!");
         }
         if (movie.getAudienceRating() == null) {
             messages.add("Movie audience rating must not be null!");
@@ -206,8 +207,8 @@ public class DomainValidationService {
         }
         if (tvShow.getDescription() == null || tvShow.getDescription().isBlank()) {
             messages.add("TV show description must not be null or empty!");
-        } else if (tvShow.getDescription().length() > 500) {
-            messages.add("TV show description must have less than 500 characters!");
+        } else if (tvShow.getDescription().length() > 1000) {
+            messages.add("TV show description must have less than 1000 characters!");
         }
         if (tvShow.getAudienceRating() == null) {
             messages.add("TV show audience rating must not be null!");
@@ -454,7 +455,14 @@ public class DomainValidationService {
             throw new ValidationException("Invalid user info!");
         }
         if (registerForm.getProfileName().contains(" ")) {
-            throw new ValidationException("Profile name must not contain blank spaces");
+            throw new ValidationException("Profile name must not contain blank spaces!");
+        }
+        if (registerForm.getProfileName().equals("default")) {
+            throw new ValidationException("Profile name is already reserved!");
+        }
+        //ADMINISTRATOR roles should be given manually, not by client choise
+        if (registerForm.getRole() == UserRole.ADMINISTRATOR) {
+            throw new ValidationException("Special permision is needed for an ADMINISTRATOR role!");
         }
         if (coverImage != null) {
             try {

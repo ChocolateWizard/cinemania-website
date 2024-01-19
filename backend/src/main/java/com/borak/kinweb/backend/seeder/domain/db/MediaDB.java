@@ -52,8 +52,6 @@ public class MediaDB {
         this.audienceRating = audienceRating;
     }
 
-    
-
     public Long getId() {
         return id;
     }

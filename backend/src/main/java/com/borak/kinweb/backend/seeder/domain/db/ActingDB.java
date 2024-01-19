@@ -2,13 +2,14 @@ package com.borak.kinweb.backend.seeder.domain.db;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author Mr. Poyo
  */
 public class ActingDB {
-   
+
     private MediaDB media;
     private ActorDB actor;
     private Boolean starring;
@@ -26,7 +27,7 @@ public class ActingDB {
         this.media = media;
         this.actor = actor;
         this.starring = starring;
-    }   
+    }
 
     public MediaDB getMedia() {
         return media;
@@ -62,6 +63,32 @@ public class ActingDB {
         } else {
             this.roles = roles;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.media);
+        hash = 79 * hash + Objects.hashCode(this.actor);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ActingDB other = (ActingDB) obj;
+        if (!Objects.equals(this.media, other.media)) {
+            return false;
+        }
+        return Objects.equals(this.actor, other.actor);
     }
 
 }

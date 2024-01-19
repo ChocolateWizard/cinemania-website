@@ -46,26 +46,29 @@ public class DataRetreiver {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private static final String BASE_IMAGES_URL = "https://image.tmdb.org/t/p/";
 
-    private static final Logger log = LoggerFactory.getLogger(DatabaseSeeder.class);
+    private static final Logger log = LoggerFactory.getLogger(DataRetreiver.class);
 //===============================================================================================================
 //===========================PUBLIC METGODS======================================================================
 //===============================================================================================================   
 
     //returns all movie and tv genres grouped in one list without duplicates by its id
     List<GenreDB> getGenres() throws Exception {
-        log.info("----->Retreiving genres...");
+        log.info("----------->Retreiving genres...");
         String movieGenresUrl = BASE_URL + "genre/movie/list?" + API_KEY_NAME + "=" + API_KEY_VALUE;
         String tvGenresUrl = BASE_URL + "genre/tv/list?" + API_KEY_NAME + "=" + API_KEY_VALUE;
-        List<GenreDB> movieGenres = ApiCaller.getInstance().getGenres(movieGenresUrl);
-        List<GenreDB> tvGenres = ApiCaller.getInstance().getGenres(tvGenresUrl);
-        return Stream.concat(movieGenres.stream(), tvGenres.stream()).distinct().collect(Collectors.toList());
+        List<ApiGenre> movieGenres = ApiCaller.getInstance().getGenres(movieGenresUrl);
+        List<ApiGenre> tvGenres = ApiCaller.getInstance().getGenres(tvGenresUrl);
+        return Stream.concat(movieGenres.stream(), tvGenres.stream())
+                .distinct()
+                .map((genre) -> new GenreDB(genre.getId(), genre.getName()))
+                .collect(Collectors.toList());
     }
 
     //fetch movies
     List<MovieDB> getMovies() throws Exception {
-        log.info("----->Retreiving movies...");
+        log.info("----------->Retreiving movies...");
         int minPage = 1;
-        final int maxPage = 3;
+        final int maxPage = 1;
         int minYear = 1965;
         final int maxYear = Year.now().getValue() - 1;
         Map<String, String> discoverMoviesURLParams = new LinkedHashMap<>() {
@@ -80,10 +83,12 @@ public class DataRetreiver {
             }
         };
 
+        log.info("----------->Retreiving movies ids...");
         String discoverURL = BASE_URL + "discover/movie?" + buildURLParams(discoverMoviesURLParams);
         List<Integer> allMoviesIDs = getMovieIdsByCriteria(discoverURL, minYear, maxYear, minPage, maxPage);
         String detailsURL = BASE_URL + "movie/%d?" + API_KEY_NAME + "=" + API_KEY_VALUE + "&append_to_response=credits";
         List<MovieDB> movies = new ArrayList<>();
+        log.info("----------->Retreiving movies details...");
         for (Integer id : allMoviesIDs) {
             String movieURL = String.format(detailsURL, id);
             ApiDetailsMovie details = ApiCaller.getInstance().getMovieDetails(movieURL);
@@ -95,9 +100,9 @@ public class DataRetreiver {
 
     //fetch shows
     List<TVShowDB> getTVShows() throws Exception {
-        log.info("----->Retreiving tv shows...");
+        log.info("----------->Retreiving tv shows...");
         int minPage = 1;
-        final int maxPage = 3;
+        final int maxPage = 1;
         int minYear = 2000;
         final int maxYear = Year.now().getValue() - 1;
         Map<String, String> discoverTVURLParams = new LinkedHashMap<>() {
@@ -111,10 +116,12 @@ public class DataRetreiver {
                 put("page", "%d");
             }
         };
+        log.info("----------->Retreiving tv shows ids...");
         String discoverURL = BASE_URL + "discover/tv?" + buildURLParams(discoverTVURLParams);
         List<Integer> allTVIds = getTVIdsByCriteria(discoverURL, minYear, maxYear, minPage, maxPage);
         String detailsURL = BASE_URL + "tv/%d?" + API_KEY_NAME + "=" + API_KEY_VALUE + "&append_to_response=credits";
         List<TVShowDB> shows = new ArrayList<>();
+        log.info("----------->Retreiving tv shows details...");
         for (Integer id : allTVIds) {
             String showURL = String.format(detailsURL, id);
             ApiDetailsTV details = ApiCaller.getInstance().getTVDetails(showURL);
@@ -198,6 +205,10 @@ public class DataRetreiver {
                 default:
             }
         }
+
+        movie.setDirectors(movie.getDirectors().stream().distinct().collect(Collectors.toList()));
+        movie.setWriters(movie.getWriters().stream().distinct().collect(Collectors.toList()));
+
         int numberOfStars = 3;
         for (ApiCreditsCast cast : details.getCredits().getCast()) {
             ActorDB actor = new ActorDB();
@@ -221,6 +232,7 @@ public class DataRetreiver {
             }
             movie.getActings().add(acting);
         }
+        movie.setActings(movie.getActings().stream().distinct().collect(Collectors.toList()));
         return movie;
     }
 
@@ -266,6 +278,10 @@ public class DataRetreiver {
                 default:
             }
         }
+
+        show.setDirectors(show.getDirectors().stream().distinct().collect(Collectors.toList()));
+        show.setWriters(show.getWriters().stream().distinct().collect(Collectors.toList()));
+
         int numberOfStars = 3;
         for (ApiCreditsCast cast : details.getCredits().getCast()) {
             ActorDB actor = new ActorDB();
@@ -289,6 +305,7 @@ public class DataRetreiver {
             }
             show.getActings().add(acting);
         }
+        show.setActings(show.getActings().stream().distinct().collect(Collectors.toList()));
         return show;
     }
 

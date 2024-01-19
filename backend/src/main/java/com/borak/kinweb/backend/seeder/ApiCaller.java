@@ -11,6 +11,8 @@ import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverMovie;
 import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverMovieResponse;
 import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverTV;
 import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverTVResponse;
+import com.borak.kinweb.backend.seeder.domain.api.ApiGenre;
+import com.borak.kinweb.backend.seeder.domain.api.ApiGenreResponse;
 import com.borak.kinweb.backend.seeder.domain.db.GenreDB;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -45,11 +47,11 @@ public class ApiCaller {
     }
 //=============================================================================================================
 
-    public List<GenreDB> getGenres(String url) throws Exception {
-        ResponseEntity<List<GenreDB>> response = api.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<GenreDB>>() {
+    public List<ApiGenre> getGenres(String url) throws Exception {
+        ResponseEntity<ApiGenreResponse> response = api.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<ApiGenreResponse>() {
         });
         if (response.getStatusCode().is2xxSuccessful()) {
-            return response.getBody();
+            return response.getBody().getGenres();
         } else {
             throw new Exception("Unable to retreive genre information!");
         }

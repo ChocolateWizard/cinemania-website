@@ -52,7 +52,7 @@ CREATE TABLE `media` (
   `title` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `release_date` date NOT NULL,
   `cover_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `audience_rating` int NOT NULL,
   `critic_rating` int DEFAULT NULL,
   PRIMARY KEY (`id`),

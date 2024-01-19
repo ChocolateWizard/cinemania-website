@@ -40,7 +40,7 @@ public class TVShowRequestDTO implements DTO {
     private MyImage coverImage;
 
     @NotBlank(message = "TV show description must not be null or empty!")
-    @Size(max = 500, message = "TV show description must have less than 500 characters!")
+    @Size(max = 1000, message = "TV show description must have less than 500 characters!")
     @JsonProperty(value = "description")
     private String description;
 

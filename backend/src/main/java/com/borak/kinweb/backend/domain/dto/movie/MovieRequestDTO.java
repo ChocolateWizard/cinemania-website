@@ -40,7 +40,7 @@ public class MovieRequestDTO implements DTO {
     private MyImage coverImage;
 
     @NotBlank(message = "Movie description must not be null or empty!")
-    @Size(max = 500, message = "Movie description must have less than 500 characters!")
+    @Size(max = 1000, message = "Movie description must have less than 500 characters!")
     @JsonProperty(value = "description")
     private String description;
 
