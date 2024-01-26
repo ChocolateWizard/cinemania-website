@@ -1,14 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+import { fetchCurrentMovies, fetchPopularMovies } from "../../../utils/Api";
 
 import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
-
-import { fetchMoviesPageData } from "../../../utils/Api";
-
 import CardCarousel from "../../cards/carousel/CardCarousel";
 import MediaCard from "../../cards/MediaCard";
 
 export default function MoviesPage() {
-  const response = fetchMoviesPageData();
+  const [currentMovies, setCurrentMovies] = useState([]);
+  const [popularMovies, setPopularMovies] = useState([]);
+  const [loadingCurrentMovies, setLoadingCurrentMovies] = useState(true);
+  const [loadingPopularMovies, setLoadingPopularMovies] = useState(true);
+  const [errorCurrentMovies, setErrorCurrentMovies] = useState(null);
+  const [errorPopularMovies, setErrorPopularMovies] = useState(null);
+
+  useEffect(() => {
+    setLoadingCurrentMovies(true);
+    setLoadingPopularMovies(true);
+
+    fetchCurrentMovies(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((movie) => {
+            movie.media_type = "movie";
+          });        
+          setCurrentMovies(response.data);
+        } else {
+          console.error(response.data);
+          setErrorCurrentMovies(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorCurrentMovies(err);
+      })
+      .finally(() => {
+        setLoadingCurrentMovies(false);
+      });
+    fetchPopularMovies(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((movie) => {
+            movie.media_type = "movie";
+          });
+          setPopularMovies(response.data);
+        } else {
+          console.error(response.data);
+          setErrorPopularMovies(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorPopularMovies(err);
+      })
+      .finally(() => {
+        setLoadingPopularMovies(false);
+      });
+  }, []);
 
   const ShowCardsList = ({
     dataArray,
@@ -33,12 +81,12 @@ export default function MoviesPage() {
     <div className="container mx-auto px-4 pt-16">
       <div>
         <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
-          Popular
+          Current
         </h2>
         <ShowCardsList
-          dataArray={response.data.movies}
-          errorMessage={"Could not load popular movies"}
-          loading={response.loading.loadingMovies}
+          dataArray={currentMovies}
+          errorMessage={"Could not load current movies"}
+          loading={loadingCurrentMovies}
           CardComponent={MediaCard}
         />
       </div>
@@ -47,9 +95,9 @@ export default function MoviesPage() {
           Popular
         </h2>
         <ShowCardsList
-          dataArray={response.data.movies}
+          dataArray={popularMovies}
           errorMessage={"Could not load popular movies"}
-          loading={response.loading.loadingMovies}
+          loading={loadingPopularMovies}
           CardComponent={MediaCard}
         />
       </div>

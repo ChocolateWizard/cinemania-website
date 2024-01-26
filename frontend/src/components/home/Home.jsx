@@ -1,13 +1,65 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 
-import { fetchHomepageData } from "../../utils/Api";
+import { fetchPopularMovies, fetchPopularShows } from "../../utils/Api";
 
 import CardLoader from "../helpers/loaders/cardLoader/CardLoader";
 import CardCarousel from "../cards/carousel/CardCarousel";
 import MediaCard from "../cards/MediaCard";
 
 export default function Home() {
-  const response = fetchHomepageData();
+  const [movies, setMovies] = useState([]);
+  const [shows, setShows] = useState([]);
+  const [loadingMovies, setLoadingMovies] = useState(true);
+  const [loadingShows, setLoadingShows] = useState(true);
+  const [errorMovies, setErrorMovies] = useState(null);
+  const [errorShows, setErrorShows] = useState(null);
+
+  useEffect(() => {
+    setLoadingMovies(true);
+    setLoadingShows(true);
+
+    //fetch popular movies from api. Method returns promise
+    fetchPopularMovies(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((movie) => {
+            movie.media_type = "movie";
+          });
+          setMovies(response.data);
+        } else {
+          console.error(response.data);
+          setErrorMovies(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorMovies(err);
+      })
+      .finally(() => {
+        setLoadingMovies(false);
+      });
+
+    //fetch popular shows from api. Method returns promise
+    fetchPopularShows(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((show) => {
+            show.media_type = "tv_show";
+          });
+          setShows(response.data);
+        } else {
+          console.error(response.data);
+          setErrorShows(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorShows(err);
+      })
+      .finally(() => {
+        setLoadingShows(false);
+      });
+  }, []);
 
   const RenderCardsList = ({
     dataArray,
@@ -35,9 +87,9 @@ export default function Home() {
           Popular movies
         </h2>
         <RenderCardsList
-          dataArray={response.data.movies}
+          dataArray={movies}
           errorMessage={"Could not load popular movies"}
-          loading={response.loading.loadingMovies}
+          loading={loadingMovies}
           CardComponent={MediaCard}
         />
       </div>
@@ -46,9 +98,9 @@ export default function Home() {
           Popular shows
         </h2>
         <RenderCardsList
-          dataArray={response.data.shows}
+          dataArray={shows}
           errorMessage={"Could not load popular shows"}
-          loading={response.loading.loadingShows}
+          loading={loadingShows}
           CardComponent={MediaCard}
         />
       </div>

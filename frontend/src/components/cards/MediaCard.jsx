@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
+import { concatGenreNames, getCoverImageURL } from "../../utils/Util";
 
 export default function MediaCard({ data }) {
-
   const detailsPageURL = getPageURL(data);
 
   function getPageURL(data) {
-    switch (data.mediaType) {
+    switch (data.media_type) {
       case "movie":
         return `/movie/${data.id}`;
-      case "show":
+      case "tv_show":
         return `/show/${data.id}`;
       default:
-        return '/';
+        return "/";
     }
   }
 
@@ -20,7 +20,7 @@ export default function MediaCard({ data }) {
       <Link to={detailsPageURL}>
         <img
           className="h-[350px] hover:opacity-75 transition ease-in-out duration-150"
-          src={data.coverPath}
+          src={getCoverImageURL(data.cover_image_url)}
           alt=""
         />
       </Link>
@@ -38,11 +38,13 @@ export default function MediaCard({ data }) {
           >
             <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
           </svg>
-          <span className="ml-1">{data.rating}%</span>
+          <span className="ml-1">{data.audience_rating}%</span>
           <span className="mx-2">|</span>
-          <span>{data.releaseDate}</span>
+          <span>{data.release_date}</span>
         </div>
-        <div className="text-gray-400 text-sm">{data.genresAsText}</div>
+        <div className="text-gray-400 text-sm">
+          {concatGenreNames(data.genres,", ")}
+        </div>
       </div>
     </div>
   );

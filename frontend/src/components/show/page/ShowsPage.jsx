@@ -1,15 +1,63 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
+
+import { fetchCurrentShows, fetchPopularShows } from "../../../utils/Api";
 
 import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
-
-import { fetchShowsPageData } from "../../../utils/Api";
-
 import CardCarousel from "../../cards/carousel/CardCarousel";
 import MediaCard from "../../cards/MediaCard";
 
-
 export default function ShowsPage() {
-  const response = fetchShowsPageData();
+  const [currentShows, setCurrentShows] = useState([]);
+  const [popularShows, setPopularShows] = useState([]);
+  const [loadingCurrentShows, setLoadingCurrentShows] = useState(true);
+  const [loadingPopularShows, setLoadingPopularShows] = useState(true);
+  const [errorCurrentShows, setErrorCurrentShows] = useState(null);
+  const [errorPopularShows, setErrorPopularShows] = useState(null);
+
+  useEffect(() => {
+    setLoadingCurrentShows(true);
+    setLoadingPopularShows(true);
+
+    fetchCurrentShows(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((show) => {
+            show.media_type = "tv_show";
+          });
+          setCurrentShows(response.data);
+        } else {
+          console.log(response.data);
+          setErrorCurrentShows(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorCurrentShows(err);
+      })
+      .finally(() => {
+        setLoadingCurrentShows(false);
+      });
+
+    fetchPopularShows(1, 10)
+      .then((response) => {
+        if (response.status == 200) {
+          response.data.map((show) => {
+            show.media_type = "tv_show";
+          });
+          setPopularShows(response.data);
+        } else {
+          console.error(response.data);
+          setErrorPopularShows(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorPopularShows(err);
+      })
+      .finally(() => {
+        setLoadingPopularShows(false);
+      });
+  }, []);
 
   const ShowCardsList = ({
     dataArray,
@@ -34,23 +82,23 @@ export default function ShowsPage() {
     <div className="container mx-auto px-4 pt-16">
       <div>
         <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
-          Popular
+          Current
         </h2>
         <ShowCardsList
-          dataArray={response.data.shows}
-          errorMessage={"Could not load popular shows"}
-          loading={response.loading.loadingShows}
+          dataArray={currentShows}
+          errorMessage={"Could not load current shows"}
+          loading={loadingCurrentShows}
           CardComponent={MediaCard}
         />
       </div>
       <div className="py-24">
         <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
-        Popular
+          Popular
         </h2>
         <ShowCardsList
-          dataArray={response.data.shows}
+          dataArray={popularShows}
           errorMessage={"Could not load popular shows"}
-          loading={response.loading.loadingShows}
+          loading={loadingPopularShows}
           CardComponent={MediaCard}
         />
       </div>
