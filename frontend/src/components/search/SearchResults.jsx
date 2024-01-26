@@ -9,10 +9,23 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(true);
   const { title } = useParams();
   const [media, setMedia] = useState([]);
-  
 
   useEffect(() => {
-    fetchMediaForSearchResults(title, setMedia, setLoading);
+    setLoading(true);
+    fetchMediaForSearchResults(1, 30, title)
+      .then((response) => {
+        if (response.status === 200) {
+          setMedia(response.data);
+        } else {
+          console.error(response.data);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const RenderCardsList = ({ dataArray, errorMessage, CardComponent }) => {

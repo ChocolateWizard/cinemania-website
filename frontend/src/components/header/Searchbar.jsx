@@ -16,7 +16,17 @@ export default function Searchbar() {
   //title value changed
   useEffect(() => {
     if (!isEmptyOrSpaces(query)) {
-      fetchMediaForSearchbar(query, setMedia);
+      fetchMediaForSearchbar(1, 10, query)
+        .then((response) => {
+          if (response.status == 200) {
+            setMedia(response.data);
+          } else {
+            console.error(response.data);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [query]);
 

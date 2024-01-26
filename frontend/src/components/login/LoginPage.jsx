@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { login } from "../../utils/Api";
 import { GlobalContext } from "../../context/GlobalState";
 import { toast } from "react-toastify";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [userJsonValues, setUserJsonValues] = useState({
     username: "",
     password: "",
@@ -33,7 +34,7 @@ export default function LoginPage() {
         if (response.status == 200) {
           setSessionData(response.data);
           toast.success("Successful login!");
-          return <Navigate to="/" replace />;
+          navigate(`/`);
         } else {
           console.error(response.data);
           toast.error("Unable to login!");

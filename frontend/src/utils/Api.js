@@ -70,20 +70,31 @@ export function login(data) {
   });
 }
 export function logout() {
-  return axios.post(BASE_URL + `/api/auth/logout`,null, {
+  return axios.post(BASE_URL + `/api/auth/logout`, null, {
     withCredentials: true,
   });
 }
 export function postMediaIntoWatchlist(id) {
-  return axios.post(BASE_URL + `/library/${id}`,{
+  return axios.post(BASE_URL + `/api/users/library/${id}`, {
     withCredentials: true,
   });
 }
 export function deleteMediaFromWatchlist(id) {
-  return axios.delete(BASE_URL + `/library/${id}`, {
+  return axios.delete(BASE_URL + `/api/users/library/${id}`, {
     withCredentials: true,
   });
 }
+export function fetchMediaForSearchbar(page, size, title) {
+  return axios.get(
+    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
+  );
+}
+export function fetchMediaForSearchResults(page, size, title) {
+  return axios.get(
+    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
+  );
+}
+//==================================================================================
 
 // export function fetchHomepageData() {
 //   // const [movies, setMovies] = useState([]);
@@ -427,121 +438,121 @@ export function fetchShowDetailsData(id) {
 //   };
 // }
 
-export function fetchMediaForSearchbar(title, setMedia) {
-  axios
-    .get(BASE_URL + "/search/movie", {
-      headers,
-      params: {
-        query: title,
-      },
-    })
-    .then((movieData) => {
-      //Movies returned successfully
-      return axios
-        .get(BASE_URL + "/search/tv", {
-          headers,
-          params: {
-            query: title,
-          },
-        })
-        .then((showsData) => {
-          setMedia(movieData.data.results.concat(showsData.data.results));
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  //======================================
-}
+// export function fetchMediaForSearchbar(title, setMedia) {
+//   axios
+//     .get(BASE_URL + "/search/movie", {
+//       headers,
+//       params: {
+//         query: title,
+//       },
+//     })
+//     .then((movieData) => {
+//       //Movies returned successfully
+//       return axios
+//         .get(BASE_URL + "/search/tv", {
+//           headers,
+//           params: {
+//             query: title,
+//           },
+//         })
+//         .then((showsData) => {
+//           setMedia(movieData.data.results.concat(showsData.data.results));
+//         });
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+//   //======================================
+// }
 
-export function fetchMediaForSearchResults(title, setMedia, setLoading) {
-  setLoading(true);
-  axios
-    .get(BASE_URL + "/search/movie", {
-      headers,
-      params: {
-        query: title,
-      },
-    })
-    .then((movieData) => {
-      //Movies returned successfully
-      return axios
-        .get(BASE_URL + "/genre/movie/list", {
-          headers,
-        })
-        .then((movieGenresData) => {
-          //Movie genres returned successfully
-          movieData.data.results.map((movie) => {
-            movie.genres = [];
-            movie.genresAsText = "";
-            movie.mediaType = "movie";
-            for (let i = 0; i < movie.genre_ids.length; i++) {
-              for (let j = 0; j < movieGenresData.data.genres.length; j++) {
-                if (movie.genre_ids[i] === movieGenresData.data.genres[j].id) {
-                  movie.genres.push(movieGenresData.data.genres[j]);
-                  movie.genresAsText =
-                    movie.genresAsText +
-                    ", " +
-                    movieGenresData.data.genres[j].name;
-                  break;
-                }
-              }
-            }
-            movie.genresAsText = movie.genresAsText.slice(2);
-            formatForeignAPI(movie, "SearchResults");
-          });
-          //-----------------------------------------------------
-          return axios
-            .get(BASE_URL + "/search/tv", {
-              headers,
-              params: {
-                query: title,
-              },
-            })
-            .then((showsData) => {
-              //TV shows returned successfully
-              return axios
-                .get(BASE_URL + "/genre/tv/list", {
-                  headers,
-                })
-                .then((showGenresData) => {
-                  //TV genres returned successfully
-                  showsData.data.results.map((show) => {
-                    show.genres = [];
-                    show.genresAsText = "";
-                    show.mediaType = "show";
-                    for (let i = 0; i < show.genre_ids.length; i++) {
-                      for (
-                        let j = 0;
-                        j < showGenresData.data.genres.length;
-                        j++
-                      ) {
-                        if (
-                          show.genre_ids[i] === showGenresData.data.genres[j].id
-                        ) {
-                          show.genres.push(showGenresData.data.genres[j]);
-                          show.genresAsText =
-                            show.genresAsText +
-                            ", " +
-                            showGenresData.data.genres[j].name;
-                          break;
-                        }
-                      }
-                    }
-                    show.genresAsText = show.genresAsText.slice(2);
-                    formatForeignAPI(show, "SearchResults");
-                  });
-                  setMedia(
-                    movieData.data.results.concat(showsData.data.results)
-                  );
-                });
-            });
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-}
+// export function fetchMediaForSearchResults(title, setMedia, setLoading) {
+//   setLoading(true);
+//   axios
+//     .get(BASE_URL + "/search/movie", {
+//       headers,
+//       params: {
+//         query: title,
+//       },
+//     })
+//     .then((movieData) => {
+//       //Movies returned successfully
+//       return axios
+//         .get(BASE_URL + "/genre/movie/list", {
+//           headers,
+//         })
+//         .then((movieGenresData) => {
+//           //Movie genres returned successfully
+//           movieData.data.results.map((movie) => {
+//             movie.genres = [];
+//             movie.genresAsText = "";
+//             movie.mediaType = "movie";
+//             for (let i = 0; i < movie.genre_ids.length; i++) {
+//               for (let j = 0; j < movieGenresData.data.genres.length; j++) {
+//                 if (movie.genre_ids[i] === movieGenresData.data.genres[j].id) {
+//                   movie.genres.push(movieGenresData.data.genres[j]);
+//                   movie.genresAsText =
+//                     movie.genresAsText +
+//                     ", " +
+//                     movieGenresData.data.genres[j].name;
+//                   break;
+//                 }
+//               }
+//             }
+//             movie.genresAsText = movie.genresAsText.slice(2);
+//             formatForeignAPI(movie, "SearchResults");
+//           });
+//           //-----------------------------------------------------
+//           return axios
+//             .get(BASE_URL + "/search/tv", {
+//               headers,
+//               params: {
+//                 query: title,
+//               },
+//             })
+//             .then((showsData) => {
+//               //TV shows returned successfully
+//               return axios
+//                 .get(BASE_URL + "/genre/tv/list", {
+//                   headers,
+//                 })
+//                 .then((showGenresData) => {
+//                   //TV genres returned successfully
+//                   showsData.data.results.map((show) => {
+//                     show.genres = [];
+//                     show.genresAsText = "";
+//                     show.mediaType = "show";
+//                     for (let i = 0; i < show.genre_ids.length; i++) {
+//                       for (
+//                         let j = 0;
+//                         j < showGenresData.data.genres.length;
+//                         j++
+//                       ) {
+//                         if (
+//                           show.genre_ids[i] === showGenresData.data.genres[j].id
+//                         ) {
+//                           show.genres.push(showGenresData.data.genres[j]);
+//                           show.genresAsText =
+//                             show.genresAsText +
+//                             ", " +
+//                             showGenresData.data.genres[j].name;
+//                           break;
+//                         }
+//                       }
+//                     }
+//                     show.genresAsText = show.genresAsText.slice(2);
+//                     formatForeignAPI(show, "SearchResults");
+//                   });
+//                   setMedia(
+//                     movieData.data.results.concat(showsData.data.results)
+//                   );
+//                 });
+//             });
+//         });
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     })
+//     .finally(() => {
+//       setLoading(false);
+//     });
+// }

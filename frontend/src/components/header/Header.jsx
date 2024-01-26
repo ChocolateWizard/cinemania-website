@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SiteLogo from "../../assets/SiteLogo";
 import Searchbar from "./Searchbar";
 import { GlobalContext } from "../../context/GlobalState";
@@ -7,6 +7,7 @@ import { logout } from "../../utils/Api";
 import { toast } from "react-toastify";
 
 export default function Header() {
+  const navigate = useNavigate();
   const { sessionData, removeSessionData } = useContext(GlobalContext);
 
   function handleLogout() {
@@ -14,6 +15,7 @@ export default function Header() {
       .then((response) => {
         if (response.status == 200) {
           removeSessionData();
+          navigate(`/`);
           toast.success("You have been logged out!");
         } else {
           console.error(response.data);
