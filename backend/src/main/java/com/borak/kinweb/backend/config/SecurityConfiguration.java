@@ -72,11 +72,12 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/images/**");
-    }
-
+    //this tells spring security to ignore provided path. Its not advised to do it like this
+    //but it works
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring().requestMatchers("/images/**");
+//    }
     //CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -92,7 +93,7 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
+//this is if you wish to set up your own cors filter
 //    @Bean
 //    public CorsFilter corsFilter() {
 //        return new CorsFilter(corsConfigurationSource());
@@ -109,7 +110,8 @@ public class SecurityConfiguration {
                         "/api/movies/**",
                         "/api/tv/**",
                         "/api/persons/**",
-                        "/api/countries/**"
+                        "/api/countries/**",
+                        "/images/**"
                 ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "api/critiques/*"

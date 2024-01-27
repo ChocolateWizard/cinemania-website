@@ -46,22 +46,9 @@ public class ConfigPropertiesTest {
     }
 
 //=======================================================================================================    
-    @Value("${kinweb.property.mediaImagesBackupFolderPath}")
-    private String mediaImagesBackupFolderPath;
-
-    @Value("${kinweb.property.personImagesBackupFolderPath}")
-    private String personImagesBackupFolderPath;
-
-    @Value("${kinweb.property.userImagesBackupFolderPath}")
-    private String userImagesBackupFolderPath;
-
     @Test
     @DisplayName(value = "Tests functionality of ConfigProperties.class and if valid properties are set in application.properties and application-test.properties")
     void configPropertiesAndProperties_InitializedProperly() {
-        assertThat(mediaImagesBackupFolderPath).isEqualTo(DataInitializer.mediaImagesBackupFolderPath);
-        assertThat(personImagesBackupFolderPath).isEqualTo(DataInitializer.personImagesBackupFolderPath);
-        assertThat(userImagesBackupFolderPath).isEqualTo(DataInitializer.userImagesBackupFolderPath);
-
         assertThat(properties).isNotNull();
         assertThat(properties.getMediaImagesFolderPath()).isEqualTo(DataInitializer.mediaImagesFolderPath);
         assertThat(properties.getPersonImagesFolderPath()).isEqualTo(DataInitializer.personImagesFolderPath);
@@ -76,10 +63,6 @@ public class ConfigPropertiesTest {
         assertThat(properties.getJwtCookieName()).isEqualTo(DataInitializer.jwtCookieName);
         assertThat(properties.getJwtExpirationMs()).isNotNull().isEqualTo(DataInitializer.jwtExpirationMs);
         assertThat(properties.getJwtSecret()).isEqualTo(DataInitializer.jwtSecret);
-
-        assertThat(properties.getMediaImagesBaseUrl()).isEqualTo(DataInitializer.mediaImagesBaseUrl);
-        assertThat(properties.getPersonImagesBaseUrl()).isEqualTo(DataInitializer.personImagesBaseUrl);
-        assertThat(properties.getUserImagesBaseUrl()).isEqualTo(DataInitializer.userImagesBaseUrl);
 
         testsPassed.put("configPropertiesAndProperties_InitializedProperly", true);
     }

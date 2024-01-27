@@ -17,6 +17,10 @@ import com.borak.kinweb.backend.seeder.domain.db.PersonWrapperDB;
 import com.borak.kinweb.backend.seeder.domain.db.TVShowDB;
 import com.borak.kinweb.backend.seeder.domain.db.UserDB;
 import com.borak.kinweb.backend.seeder.domain.db.WriterDB;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -31,7 +35,9 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -79,9 +85,17 @@ public class Database {
         jdbc.execute(REMOVE_ALL_GENRES);
     }
 
-    void removeAllImages() {
+    void removeAllImages() throws Exception {
+        //create folders in which to store images later if they dont exist.
+        //if they exist it wont overwrite them
+        Files.createDirectories(Paths.get(config.getMediaImagesFolderPath()));
+        Files.createDirectories(Paths.get(config.getPersonImagesFolderPath()));
+        Files.createDirectories(Paths.get(config.getUserImagesFolderPath()));
+
+        //delete all images if present in folders
         deleteFilesFromFolder(config.getMediaImagesFolderPath());
         deleteFilesFromFolder(config.getPersonImagesFolderPath());
+        deleteFilesFromFolder(config.getUserImagesFolderPath());
     }
 
     void storeAllGenres(List<GenreDB> genres) throws Exception {
@@ -578,6 +592,29 @@ public class Database {
             }
         }
         jdbc.batchUpdate(sql, data, new int[]{Types.VARCHAR, Types.BIGINT});
+    }
+
+    void storeUserImage(UserDB user) throws Exception {
+        Random rand = new Random();
+        String[] parts = user.getProfileImage().split("\\.");
+        String extension = parts[1];
+
+        int width = rand.nextInt(500) + 100; // Random width between 100 and 600
+        int height = rand.nextInt(500) + 100; // Random height between 100 and 600
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = img.createGraphics();
+
+        // Generate a random color
+        Color color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, width, height);
+
+        // Save
+        try {
+            ImageIO.write(img, extension, new File(config.getUserImagesFolderPath() + user.getProfileImage()));
+        } catch (IOException e) {
+            throw new RuntimeException("Error while storing user image");
+        }
     }
 
 //=====================================================================================================

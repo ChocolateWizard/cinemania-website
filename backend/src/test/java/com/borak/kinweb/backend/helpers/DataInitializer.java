@@ -8,15 +8,18 @@ import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -30,6 +33,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +46,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  *
@@ -49,24 +54,16 @@ import javax.imageio.ImageIO;
  */
 public class DataInitializer {
 
-    public static final String mediaImagesBackupFolderPath = "src/test/resources/database/images/media/";
-    public static final String personImagesBackupFolderPath = "src/test/resources/database/images/person/";
-    public static final String userImagesBackupFolderPath = "src/test/resources/database/images/user/";
-
-    public static final String mediaImagesFolderPath = "src/test/resources/static/images/media/";
-    public static final String personImagesFolderPath = "src/test/resources/static/images/person/";
-    public static final String userImagesFolderPath = "src/test/resources/static/images/user/";
+    public static final String mediaImagesFolderPath = "C:/kinweb_images/test/media/";
+    public static final String personImagesFolderPath = "C:/kinweb_images/test/person/";
+    public static final String userImagesFolderPath = "C:/kinweb_images/test/user/";
 
     public static final String address = "http://localhost";
     public static final int port = 8080;
-    
-    public static final String jwtCookieName="kinweb";
-    public static final Integer jwtExpirationMs=86400000;
-    public static final String jwtSecret="Hesaid3BlessedarethepoorinspiritfortheirsiSthekingdomofheaven4BessedarEthosewhomournfortheywillbecomforted5Blessedarethemeekfortheywillinherittheearth6Blessedarethosewhohungerandthirstforrighteousnessfortheywillbefilled7Blessedarethemercifulfortheywillbeshownmercy8BlessedarethepureinheartfortheywillseeGod9BlessedarethepeacemakersfortheywillbecalledchildrenofGod10Blessedarethosewhoarepersecutedbecauseofrighteousnessfortheirsisthekingdomofheaven";
 
-    public static final String mediaImagesBaseUrl = address + ":" + port + "/test/images/media/";
-    public static final String personImagesBaseUrl = address + ":" + port + "/test/images/person/";
-    public static final String userImagesBaseUrl = address + ":" + port + "/test/images/user/";
+    public static final String jwtCookieName = "kinweb";
+    public static final Integer jwtExpirationMs = 86400000;
+    public static final String jwtSecret = "Hesaid3BlessedarethepoorinspiritfortheirsiSthekingdomofheaven4BessedarEthosewhomournfortheywillbecomforted5Blessedarethemeekfortheywillinherittheearth6Blessedarethosewhohungerandthirstforrighteousnessfortheywillbefilled7Blessedarethemercifulfortheywillbeshownmercy8BlessedarethepureinheartfortheywillseeGod9BlessedarethepeacemakersfortheywillbecalledchildrenofGod10Blessedarethosewhoarepersecutedbecauseofrighteousnessfortheirsisthekingdomofheaven";
 
     public static final List<String> MYIMAGE_VALID_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("png", "jpg", "jpeg"));
     public static final long MYIMAGE_IMAGE_MAX_SIZE = 8388608L;
@@ -82,6 +79,8 @@ public class DataInitializer {
 
     private List<PersonJDBC> persons;
 
+    private List<UserJDBC> users;
+
     public DataInitializer() {
         initGenres();
         initDirectors();
@@ -90,6 +89,7 @@ public class DataInitializer {
         initMovies();
         initTVShows();
         initPersons();
+        initUsers();
     }
 
     public List<MediaJDBC> getMedias() {
@@ -152,7 +152,7 @@ public class DataInitializer {
     }
 
     /**
-     * Deletes all files (excluding .gitignore) in:
+     * Deletes all files in:
      * <ul>
      * <li>{@value #mediaImagesFolderPath}</li>
      * <li>{@value #personImagesFolderPath}</li>
@@ -179,6 +179,7 @@ public class DataInitializer {
         if (ConfigPropertiesTest.didAllTestsPass()) {
             initMediaImages();
             initPersonImages();
+            initUserImages();
         } else {
             throw new IllegalStateException("ConfigPropertiesTest class tests must all pass in order to use this method!");
         }
@@ -655,36 +656,82 @@ public class DataInitializer {
         this.persons.sort(Comparator.comparingLong(PersonJDBC::getId));
     }
 
-//==================================================================================================================    
-    private void initMediaImages() throws IllegalArgumentException, RuntimeException {
-        deleteFilesFromFolder(mediaImagesFolderPath);
-        List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
-                .sorted(Comparator.comparingLong(p -> p.getId()))
-                .collect(Collectors.toList());
-        Random rand = new Random();
-        for (MediaJDBC media : medias) {
-            if (media.getCoverImage() != null) {
-                createImage(media.getCoverImage(), mediaImagesFolderPath, rand);
+    private void initUsers() {
+        LocalDateTime now = LocalDateTime.now();
+        users = new ArrayList<UserJDBC>() {
+            {
+                add(new UserJDBC(1l,
+                        "Admin",
+                        "Admin",
+                        Gender.OTHER,
+                        "Admin",
+                        "default.png",
+                        "admin",
+                        "admin@gmail.com",
+                        (new BCryptPasswordEncoder()).encode("admin"),
+                        UserRole.ADMINISTRATOR,
+                        now,
+                        now,
+                        new CountryJDBC(198l)));
             }
-        }
-
+        };
     }
 
-    private void initPersonImages() throws IllegalArgumentException, RuntimeException {
-        deleteFilesFromFolder(personImagesFolderPath);
-        Set<PersonJDBC> personSet = new HashSet<>();
-        personSet.addAll(directors);
-        personSet.addAll(writers);
-        personSet.addAll(actors);
-
-        List<PersonJDBC> people = new ArrayList<>(personSet);
-        people.sort(Comparator.comparingLong(person -> person.getId()));
-
-        Random rand = new Random();
-        for (PersonJDBC person : people) {
-            if (person.getProfilePhoto() != null) {
-                createImage(person.getProfilePhoto(), personImagesFolderPath, rand);
+//==================================================================================================================    
+    private void initMediaImages() throws RuntimeException {
+        try {
+            Files.createDirectories(Paths.get(mediaImagesFolderPath));
+            deleteFilesFromFolder(mediaImagesFolderPath);
+            List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
+                    .sorted(Comparator.comparingLong(p -> p.getId()))
+                    .collect(Collectors.toList());
+            Random rand = new Random();
+            for (MediaJDBC media : medias) {
+                if (media.getCoverImage() != null) {
+                    createImage(media.getCoverImage(), mediaImagesFolderPath, rand);
+                }
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void initPersonImages() throws RuntimeException {
+        try {
+            Files.createDirectories(Paths.get(personImagesFolderPath));
+            deleteFilesFromFolder(personImagesFolderPath);
+            Set<PersonJDBC> personSet = new HashSet<>();
+            personSet.addAll(directors);
+            personSet.addAll(writers);
+            personSet.addAll(actors);
+
+            List<PersonJDBC> people = new ArrayList<>(personSet);
+            people.sort(Comparator.comparingLong(person -> person.getId()));
+
+            Random rand = new Random();
+            for (PersonJDBC person : people) {
+                if (person.getProfilePhoto() != null) {
+                    createImage(person.getProfilePhoto(), personImagesFolderPath, rand);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void initUserImages() throws RuntimeException {
+        try {
+            Files.createDirectories(Paths.get(userImagesFolderPath));
+            deleteFilesFromFolder(userImagesFolderPath);
+
+            Random rand = new Random();
+            for (UserJDBC users : users) {
+                if (users.getProfileImage() != null) {
+                    createImage(users.getProfileImage(), userImagesFolderPath, rand);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -694,9 +741,7 @@ public class DataInitializer {
             Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (!file.getFileName().toString().equals(".gitignore")) {
-                        Files.delete(file);
-                    }
+                    Files.delete(file);
                     return FileVisitResult.CONTINUE;
                 }
             });
@@ -705,7 +750,7 @@ public class DataInitializer {
         }
     }
 
-    private void createImage(String imageName, String folder, Random rand) throws IllegalArgumentException, RuntimeException {
+    private void createImage(String imageName, String folder, Random rand) throws RuntimeException {
         String[] parts = imageName.split("\\.");
         String extension = parts[1];
 

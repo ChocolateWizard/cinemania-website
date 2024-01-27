@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -65,7 +66,7 @@ public class MyImage {
             String[] parts = extractNameAndExtension(fullName);
             this.name = parts[0];
             this.extension = parts[1];
-            this.fullName = parts[0] + "." + parts[1];          
+            this.fullName = parts[0] + "." + parts[1];
             this.bytes = bytes;
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Invalid argument: unable to infer image parameters!");
@@ -138,6 +139,18 @@ public class MyImage {
             throw new IllegalArgumentException("Invalid argument: unrecognized image extension! Image extension must be one of following: " + MyImage.VALID_EXTENSIONS);
         }
         return parts;
+    }
+
+    public static MediaType parseContentType(String extension) throws IllegalArgumentException {
+        switch (extension) {
+            case "jpg":
+            case "jpeg":
+                return MediaType.IMAGE_JPEG;
+            case "png":
+                return MediaType.IMAGE_PNG;
+            default:
+                throw new IllegalArgumentException("Invalid extension!");
+        }
     }
 
 }

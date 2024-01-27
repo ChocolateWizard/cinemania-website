@@ -148,6 +148,9 @@ public class Datastore {
         log.info("----------->Retreiving and persisting persons images...");
         database.storePersonImages(persons);
 
+        log.info("----------->Persisting user image...");
+        database.storeUserImage(user);
+        
         //remove pointers to arrays of data so garbage collector can dispose of them
         genres = new ArrayList<>();
         movies = new ArrayList<>();
