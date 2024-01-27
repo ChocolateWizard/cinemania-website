@@ -140,10 +140,11 @@ public class MovieResponseDTO implements DTO {
         }
 
         @JsonView(JsonVisibilityViews.Heavy.class)
-        @JsonPropertyOrder({"username", "profileImageUrl"})
+        @JsonPropertyOrder({"profileName", "profileImageUrl"})
         public static class Critic {
 
-            private String username;
+             @JsonProperty(value = "profile_name")
+            private String profileName;
 
             @JsonProperty(value = "profile_image_url")
             private String profileImageUrl;
@@ -151,17 +152,17 @@ public class MovieResponseDTO implements DTO {
             public Critic() {
             }
 
-            public Critic(String username, String profileImageUrl) {
-                this.username = username;
+            public Critic(String profileName, String profileImageUrl) {
+                this.profileName = profileName;
                 this.profileImageUrl = profileImageUrl;
             }
 
-            public String getUsername() {
-                return username;
+            public String getProfileName() {
+                return profileName;
             }
 
-            public void setUsername(String username) {
-                this.username = username;
+            public void setProfileName(String profileName) {
+                this.profileName = profileName;
             }
 
             public String getProfileImageUrl() {

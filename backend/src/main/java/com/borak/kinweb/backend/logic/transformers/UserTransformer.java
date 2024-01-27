@@ -93,7 +93,8 @@ public class UserTransformer {
         response.setProfileName(userJDBC.getProfileName());
         response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJDBC.getProfileImage());
         response.setGender(userJDBC.getGender());
-
+        response.setRole(userJDBC.getRole());
+        
         UserResponseDTO.Country country = new UserResponseDTO.Country();
         country.setId(userJDBC.getCountry().getId());
         country.setName(userJDBC.getCountry().getName());

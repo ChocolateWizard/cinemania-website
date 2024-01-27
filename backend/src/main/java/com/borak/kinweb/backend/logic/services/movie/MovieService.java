@@ -88,7 +88,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     
     @Override
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
-        int year = Year.now().getValue();
+        int year = Year.now().getValue()-1;
         List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }

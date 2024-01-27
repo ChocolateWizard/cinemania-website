@@ -7,6 +7,9 @@ package com.borak.kinweb.backend.domain.dto.user;
 import com.borak.kinweb.backend.domain.dto.DTO;
 import com.borak.kinweb.backend.domain.dto.media.MediaResponseDTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,17 +17,32 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
+@JsonPropertyOrder({
+    "firstName",
+    "lastName",
+    "gender",
+    "profileName",
+    "profileImageUrl",
+    "country",
+    "medias",
+    "critiques"})
 public class UserResponseDTO implements DTO {
 
+    @JsonProperty(value = "first_name")
     private String firstName;
 
+    @JsonProperty(value = "last_name")
     private String lastName;
 
     private Gender gender;
 
+    @JsonProperty(value = "profile_name")
     private String profileName;
 
+    @JsonProperty(value = "profile_image_url")
     private String profileImageUrl;
+    
+    private UserRole role;
 
     private Country country;
 
@@ -35,14 +53,25 @@ public class UserResponseDTO implements DTO {
     public UserResponseDTO() {
     }
 
-    public UserResponseDTO(String firstName, String lastName, Gender gender, String profileName, String profileImageUrl, Country country) {
+    public UserResponseDTO(String firstName, String lastName, Gender gender, String profileName, String profileImageUrl, UserRole role, Country country) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
         this.profileName = profileName;
         this.profileImageUrl = profileImageUrl;
+        this.role = role;
         this.country = country;
     }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    
 
     public static class Country {
 

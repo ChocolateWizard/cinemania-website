@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.domain.dto.country.CountryResponseDTO;
 import com.borak.kinweb.backend.logic.services.country.ICountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Mr. Poyo
  */
+//@CrossOrigin(originPatterns = {"http://localhost:*"},maxAge = 3600,allowCredentials = "true")
 @RestController
 @RequestMapping(path = "api/countries")
 public class CountryController {

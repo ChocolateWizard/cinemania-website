@@ -26,6 +26,7 @@ import com.borak.kinweb.backend.logic.services.auth.IAuthService;
  * @author Mr. Poyo
  */
 //@CrossOrigin(origins = "*", maxAge = 3600)
+//@CrossOrigin(originPatterns = {"http://localhost:*"},maxAge = 3600,allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
 @Validated

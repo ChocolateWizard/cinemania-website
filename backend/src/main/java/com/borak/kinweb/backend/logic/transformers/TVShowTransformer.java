@@ -61,7 +61,7 @@ public final class TVShowTransformer {
 
         for (CritiqueJDBC critique : tvShowJdbc.getCritiques()) {
             TVShowResponseDTO.Critique.Critic criticResponse = new TVShowResponseDTO.Critique.Critic();
-            criticResponse.setUsername(critique.getCritic().getUsername());
+            criticResponse.setProfileName(critique.getCritic().getProfileName());
             if (critique.getCritic().getProfileImage() != null && !critique.getCritic().getProfileImage().isEmpty()) {
                 criticResponse.setProfileImageUrl(config.getUserImagesBaseUrl() + critique.getCritic().getProfileImage());
             }

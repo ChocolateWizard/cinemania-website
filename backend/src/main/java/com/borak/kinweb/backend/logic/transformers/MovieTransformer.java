@@ -63,7 +63,7 @@ public final class MovieTransformer {
         
         for (CritiqueJDBC critique : movieJdbc.getCritiques()) {
             MovieResponseDTO.Critique.Critic criticResponse = new MovieResponseDTO.Critique.Critic();
-            criticResponse.setUsername(critique.getCritic().getUsername());
+            criticResponse.setProfileName(critique.getCritic().getProfileName());
             if (critique.getCritic().getProfileImage() != null && !critique.getCritic().getProfileImage().isEmpty()) {
                 criticResponse.setProfileImageUrl(config.getUserImagesBaseUrl() + critique.getCritic().getProfileImage());
             }
