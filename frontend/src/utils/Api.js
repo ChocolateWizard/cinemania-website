@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 const BASE_URL = "" + import.meta.env.VITE_API_URL;
 const TOKEN = "" + import.meta.env.VITE_API_TOKEN;
 
+// const headers = {
+//   Authorization: "bearer " + TOKEN,
+// };
+
 const headers = {
   Authorization: "bearer " + TOKEN,
 };
@@ -75,7 +79,7 @@ export function logout() {
   });
 }
 export function postMediaIntoWatchlist(id) {
-  return axios.post(BASE_URL + `/api/users/library/${id}`, {
+  return axios.post(BASE_URL + `/api/users/library/${id}`, null, {
     withCredentials: true,
   });
 }

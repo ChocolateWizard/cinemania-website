@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../../context/GlobalState";
-import { deleteMediaFromWatchlist } from "../../utils/Api";
+import {
+  deleteMediaFromWatchlist,
+  postMediaIntoWatchlist,
+} from "../../utils/Api";
+import { toast } from "react-toastify";
 
 export default function WatchlistButton({
   isVisible,
@@ -8,7 +12,6 @@ export default function WatchlistButton({
   mediaType,
   data,
 }) {
-  const [loading, setLoading] = useState(false);
 
   const {
     addMovieToWatchlist,
@@ -18,22 +21,29 @@ export default function WatchlistButton({
     sessionData,
   } = useContext(GlobalContext);
 
-  useEffect(() => {}, [loading]);
+  const [loading, setLoading] = useState(false);
+  const [isAdd, setIsAdd] = useState(shouldAdd);
+
+  
+
+  // useEffect(() => {}, [loading]);
 
   function callToAddMovieToWatchlist(movie) {
     setLoading(true);
-    postMediaIntoWatchlist(sessionData.jwt, movie.id)
-      .then((response) => {     
+    postMediaIntoWatchlist(movie.id)
+      .then((response) => {
         if (response.status == 200) {
           addMovieToWatchlist(movie);
+          setIsAdd(false);
+          toast.success("Movie added to watchlist!");
         } else {
-          //TODO: error message when it didnt add
-          console.error("Unable to add movie to watchlist!" + response.data);
+          console.error(response.data);
+          toast.error("Unable to add movie to watchlist!");
         }
       })
       .catch((err) => {
-        //TODO: error message when it didnt add
-        console.error("Unable to add movie to watchlist!" + err);
+        console.error(err);
+        toast.error("Unable to add movie to watchlist!");
       })
       .finally(() => {
         setLoading(false);
@@ -141,7 +151,7 @@ export default function WatchlistButton({
   return (
     <button
       disabled={loading}
-      onClick={buttonAction(shouldAdd, mediaType, data)}
+      onClick={buttonAction(isAdd, mediaType, data)}
       className={
         "flex items-center  rounded font-semibold px-5 py-4  transition ease-in-out duration-150 " +
         buttonStyle(loading, shouldAdd)

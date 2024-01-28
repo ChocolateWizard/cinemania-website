@@ -11,7 +11,7 @@ import {
   concatWriterNames,
   getCoverImageURL,
 } from "../../../utils/Util";
-import WatchlistButton from "../../watchlist/WatchlistButton";
+import MovieWatchlistButton from "./MovieWatchlistButton";
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -34,14 +34,15 @@ export default function MovieDetails() {
     fetchMovieDetails(id)
       .then((response) => {
         if (response.status == 200) {
+          response.data.media_type="movie";          
           setMovie(response.data);
         } else {
-          console.error("Unable to retreive movie details: " + response.data);
+          console.error(response.data);
           setErrorMovie(response.data);
         }
       })
       .catch((err) => {
-        console.error("Unable to retreive movie details: " + err);
+        console.error(err);
         setErrorMovie(err);
       })
       .finally(() => {
@@ -49,6 +50,7 @@ export default function MovieDetails() {
       });
   }, []);
 
+  //does movie already exist in users watchlist. Returns null if it didnt find
   let storedMovie = movieWatchlist.find(
     (o) => movie != null && o.id === movie.id
   );
@@ -142,12 +144,7 @@ export default function MovieDetails() {
             />
 
             <div className="mt-12">
-              <WatchlistButton
-                shouldAdd={shouldAddToWatchlist}
-                isVisible={watchlistVisible}
-                mediaType={"movie"}
-                data={movie}
-              />
+              <MovieWatchlistButton visible={watchlistVisible} movie={movie} />
             </div>
           </div>
         </div>
