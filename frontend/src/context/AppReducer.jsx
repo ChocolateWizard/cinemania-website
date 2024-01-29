@@ -35,7 +35,7 @@ export default (state, action) => {
         mediaCritiques: [
           action.payload,
           ...state.mediaCritiques.filter(
-            (critique) => critique.media_id !== action.payload.media_id
+            (critique) => critique.media.id !== action.payload.media.id
           ),
         ],
       };
@@ -43,7 +43,7 @@ export default (state, action) => {
       return {
         ...state,
         mediaCritiques: state.mediaCritiques.filter(
-          (critique) => critique.media_id !== action.payload
+          (critique) => critique.media.id !== action.payload
         ),
       };
     case "SET_SESSION_DATA":

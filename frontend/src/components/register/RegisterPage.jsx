@@ -15,10 +15,10 @@ export default function RegisterPage() {
     username: "",
     email: "",
     password: "",
-    role: "",
-    country_id: null,
   });
   const [profileImage, setProfileImage] = useState(null);
+  const [role, setRole] = useState("REGULAR");
+  const [countryId, setCountryId] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -27,6 +27,7 @@ export default function RegisterPage() {
       .then((response) => {
         if (response.status == 200) {
           setCountries(response.data);
+          setCountryId("" + response.data[0].id);
         } else {
           console.error("Unable to retreive countries: " + response.data);
           setError(response.data);
@@ -47,10 +48,7 @@ export default function RegisterPage() {
     } else {
       setUserJsonValues({
         ...userJsonValues,
-        [e.target.name]:
-          e.target.name === "country_id"
-            ? parseInt(e.target.value)
-            : e.target.value,
+        [e.target.name]: e.target.value,
       });
     }
   };
@@ -70,8 +68,8 @@ export default function RegisterPage() {
             username: userJsonValues.username,
             email: userJsonValues.email,
             password: userJsonValues.password,
-            role: userJsonValues.role,
-            country_id: userJsonValues.country_id,
+            role: role,
+            country_id: parseInt(countryId),
           }),
         ],
         { type: "application/json" }
@@ -223,9 +221,12 @@ export default function RegisterPage() {
                   <select
                     name="role"
                     id="role"
+                    value={role}
                     required=""
                     className="block w-50 p-2.5 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      setRole(e.target.value);
+                    }}
                   >
                     <option value="REGULAR">Regular</option>
                     <option value="CRITIC">Critic</option>
@@ -243,7 +244,9 @@ export default function RegisterPage() {
                     id="country_id"
                     required=""
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      setCountryId("" + e.target.value);
+                    }}
                   >
                     {countries.map((country, index) => {
                       return (

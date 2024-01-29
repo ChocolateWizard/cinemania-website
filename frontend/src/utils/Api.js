@@ -61,6 +61,17 @@ export function fetchShowDetails(id) {
 export function fetchCountries() {
   return axios.get(BASE_URL + `/api/countries`);
 }
+export function fetchMediaForSearchbar(page, size, title) {
+  return axios.get(
+    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
+  );
+}
+export function fetchMediaForSearchResults(page, size, title) {
+  return axios.get(
+    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
+  );
+}
+
 export function register(data) {
   return axios.post(BASE_URL + `/api/auth/register`, data, {
     withCredentials: true,
@@ -88,16 +99,23 @@ export function deleteMediaFromWatchlist(id) {
     withCredentials: true,
   });
 }
-export function fetchMediaForSearchbar(page, size, title) {
-  return axios.get(
-    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
-  );
+export function postCritique(id, critique) {
+  return axios.post(BASE_URL + `/api/critiques/${id}`, critique, {
+    withCredentials: true,
+    headers: { "Content-Type": "application/json" },
+  });
 }
-export function fetchMediaForSearchResults(page, size, title) {
-  return axios.get(
-    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
-  );
+export function putCritique(id, critique) {
+  return axios.put(BASE_URL + `/api/critiques/${id}`, critique, {
+    withCredentials: true,
+  });
 }
+export function deleteCritique(id) {
+  return axios.delete(BASE_URL + `/api/critiques/${id}`, {
+    withCredentials: true,
+  });
+}
+
 //==================================================================================
 
 // export function fetchHomepageData() {

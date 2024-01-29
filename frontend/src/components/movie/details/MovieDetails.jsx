@@ -12,6 +12,7 @@ import {
   getCoverImageURL,
 } from "../../../utils/Util";
 import MovieWatchlistButton from "./MovieWatchlistButton";
+import DetailsTabs from "./DetailsTabs";
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -19,14 +20,7 @@ export default function MovieDetails() {
   const [loadingMovie, setLoadingMovie] = useState(true);
   const [errorMovie, setErrorMovie] = useState(null);
 
-  const {
-    movieWatchlist,
-    addCritique,
-    updateCritique,
-    removeCritique,
-    mediaCritiques,
-    sessionData,
-  } = useContext(GlobalContext);
+  const { sessionData } = useContext(GlobalContext);
 
   useEffect(() => {
     setLoadingMovie(true);
@@ -34,7 +28,7 @@ export default function MovieDetails() {
     fetchMovieDetails(id)
       .then((response) => {
         if (response.status == 200) {
-          response.data.media_type="movie";          
+          response.data.media_type = "movie";
           setMovie(response.data);
         } else {
           console.error(response.data);
@@ -51,12 +45,12 @@ export default function MovieDetails() {
   }, []);
 
   //does movie already exist in users watchlist. Returns null if it didnt find
-  let storedMovie = movieWatchlist.find(
-    (o) => movie != null && o.id === movie.id
-  );
+  // let storedMovie = movieWatchlist.find(
+  //   (o) => movie != null && o.id === movie.id
+  // );
 
-  const shouldAddToWatchlist = storedMovie ? false : true;
-  const watchlistVisible = sessionData.isLoggedIn;
+  // const shouldAddToWatchlist = storedMovie ? false : true;
+  // const watchlistVisible = sessionData.isLoggedIn;
 
   const DirectorsTab = ({ directorsAsText }) => {
     if (directorsAsText == null || directorsAsText === "") {
@@ -102,7 +96,7 @@ export default function MovieDetails() {
   if (loadingMovie == true) {
     return <CardLoader />;
   }
-  if (movie === null) {
+  if (movie === null || errorMovie != null) {
     return (
       <h2 className="px-4 mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
         Unable to load movie details
@@ -117,7 +111,7 @@ export default function MovieDetails() {
           <img
             className="w-64 md:w-96"
             src={getCoverImageURL(movie.cover_image_url)}
-            alt=""
+            alt="cover image"
           />
           <div className="md:ml-24">
             <h2 className="text-4xl font-semibold">{movie.title}</h2>
@@ -133,6 +127,19 @@ export default function MovieDetails() {
               </svg>
               <span className="ml-1">{movie.audience_rating}%</span>
               <span className="mx-2">|</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                className="bi bi-star-fill fill-blue-400"
+                viewBox="0 0 16 16"
+              >
+                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+              </svg>
+              <span className="ml-1">
+                {movie.critics_rating !== null ? movie.critics_rating : "N/A "}%
+              </span>
+              <span className="mx-2">|</span>
               <span>{movie.release_date}</span>
               <span className="mx-2">|</span>
               <span>{concatGenreNames(movie.genres, ", ")}</span>
@@ -144,14 +151,22 @@ export default function MovieDetails() {
             />
 
             <div className="mt-12">
-              <MovieWatchlistButton visible={watchlistVisible} movie={movie} />
+              <MovieWatchlistButton
+                visible={sessionData.isLoggedIn}
+                movie={movie}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div className="border-b border-onyx-tint">
-        <CastCollection actors={movie.actors} />
+        {/* <CastCollection actors={movie.actors} /> */}
+        <DetailsTabs
+          id={movie.id}
+          actors={movie.actors}
+          critiques={movie.critiques}
+        />
       </div>
     </>
   );
