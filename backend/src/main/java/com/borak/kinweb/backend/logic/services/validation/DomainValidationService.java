@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.logic.services.validation;
 
 import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.classes.MyImage;
+import com.borak.kinweb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.kinweb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
@@ -472,6 +473,26 @@ public class DomainValidationService {
             }
         }
 
+    }
+
+    public void validate(CritiqueRequestDTO critique) throws ValidationException {
+        if (critique == null) {
+            throw new ValidationException("Invalid critique info!");
+        }
+        List<String> messages = new LinkedList<>();
+        if (critique.getRating() == null) {
+            messages.add("Critique rating must not be null!");
+        } else if (critique.getRating() < 0 || critique.getRating() > 100) {
+            messages.add("Critique rating must be between 0 and 100!");
+        }
+        if (critique.getDescription() == null || critique.getDescription().isBlank()) {
+            messages.add("Critique description must not be null or empty!");
+        } else if (critique.getDescription().length() > 500) {
+            messages.add("Critique description must have less than 500 characters!");
+        }
+        if (!messages.isEmpty()) {
+            throw new ValidationException(messages.toArray(String[]::new));
+        }
     }
 
 //---------------------------------------------------------------------------------------------------------

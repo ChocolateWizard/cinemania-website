@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.logic.controllers;
 
 import com.borak.kinweb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.kinweb.backend.logic.services.critique.ICritiqueService;
+import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,21 @@ public class CritiqueController {
     @Autowired
     private ICritiqueService critiqueService;
 
+    @Autowired
+    private DomainValidationService domainValidator;
+
     //=========================POST MAPPINGS==================================
     @PostMapping(path = "/{id}")
-    public ResponseEntity postCritique(@PathVariable @Min(value = 1, message = "Media id must be greater than or equal to 1") long id, @Valid @RequestBody CritiqueRequestDTO critiqueRequest) {
+    public ResponseEntity postCritique(@PathVariable @Min(value = 1, message = "Media id must be greater than or equal to 1") long id, @RequestBody CritiqueRequestDTO critiqueRequest) {
+        domainValidator.validate(critiqueRequest);
         critiqueRequest.setMediaId(id);
         return critiqueService.postCritique(critiqueRequest);
     }
 
     //=========================PUT MAPPINGS==================================
     @PutMapping(path = "/{id}")
-    public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Media id must be greater than or equal to 1") long id, @Valid @RequestBody CritiqueRequestDTO critiqueRequest) {
+    public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Media id must be greater than or equal to 1") long id, @RequestBody CritiqueRequestDTO critiqueRequest) {
+        domainValidator.validate(critiqueRequest);
         critiqueRequest.setMediaId(id);
         return critiqueService.putCritique(critiqueRequest);
     }
