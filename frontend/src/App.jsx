@@ -19,8 +19,7 @@ import LoginPage from "./components/login/LoginPage";
 import RegisterPage from "./components/register/RegisterPage";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-//This is style sheet for react-tabs component. If styling errors occur with tailwind - remove this
-// import "react-tabs/style/react-tabs.css";
+
 function App() {
   return (
     <GlobalProvider>

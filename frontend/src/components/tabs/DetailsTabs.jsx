@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import CastCollection from "../../person/actor/collection/CastCollection";
-import CritiqueCollection from "../../critique/CritiqueCollection";
+import React, { useState } from "react";
+import CastCollection from "../person/actor/collection/CastCollection";
+import CritiqueCollection from "../critique/CritiqueCollection";
 
 export default function DetailsTabs({ id, actors, critiques }) {
   const [castShown, setCastShown] = useState(true);

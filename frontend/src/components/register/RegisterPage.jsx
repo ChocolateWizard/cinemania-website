@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { fetchCountries, register } from "../../utils/Api";
 import CardLoader from "../helpers/loaders/cardLoader/CardLoader";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
+  const navigate = useNavigate();
   const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -83,12 +85,13 @@ export default function RegisterPage() {
       .then((response) => {
         if (response.status == 200) {
           toast.success("Successful registration!");
+          navigate('/login');
         } else {
           console.error(response.data);
           toast.error("Unable to register!");
         }
       })
-      .catch((err) => {
+      .catch((err) => {       
         console.error(err);
         toast.error("Unable to register!");
       });

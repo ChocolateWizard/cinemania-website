@@ -7,10 +7,6 @@ import { toast } from "react-toastify";
 //current media id and its critiques
 export default function CritiqueCollection({ id, critiques }) {
   const { addCritique, sessionData } = useContext(GlobalContext);
-
-  // const [rating, setRating] = useState("");
-  // const [description, setDescription] = useState("");
-
   //it can only add if its critique is not present in all critiques for given movie
   const [canAdd, setCanAdd] = useState(
     sessionData.isLoggedIn &&
@@ -78,21 +74,35 @@ export default function CritiqueCollection({ id, critiques }) {
         JSON.stringify({ rating: rating, description: description })
       )
         .then((response) => {
-          if (response.status === 205) {
-            addCritique({
-              media: { id: id },
-              rating: rating,
-              description: description,
-            });
-            window.location.reload(false);
-          } else {
-            console.error(response.data);
-            toast.error("Unable to add critique!");
+          switch (response.status) {
+            case 205:
+              addCritique({
+                media: { id: id },
+                rating: rating,
+                description: description,
+              });
+              window.location.reload(false);
+              break;
+            default:
+              toast.success("Successfully added critique!");
           }
         })
         .catch((err) => {
-          console.error(err);
-          toast.error("Unable to add critique!");
+          switch (err.response.status) {
+            case 400:
+              console.error(err);
+              toast.error(
+                <div className="flex flex-col">
+                  {err.response.data.details.map((d) => {
+                    return <div>{d}</div>;
+                  })}
+                </div>
+              );
+              break;
+            default:
+              console.error(err);
+              toast.error("Unable to add critique!");
+          }
         });
     }
 

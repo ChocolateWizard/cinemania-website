@@ -1,18 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { GlobalContext } from "../../../context/GlobalState";
 
-import { useParams } from "react-router-dom";
 import { fetchMovieDetails } from "../../../utils/Api";
 import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
-import CastCollection from "../../person/actor/collection/CastCollection";
 import {
   concatDirectorNames,
   concatGenreNames,
   concatWriterNames,
   getCoverImageURL,
 } from "../../../utils/Util";
-import MovieWatchlistButton from "./MovieWatchlistButton";
-import DetailsTabs from "./DetailsTabs";
+import DetailsTabs from "../../tabs/DetailsTabs";
+import WatchlistButton from "../../watchlist/WatchlistButton";
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -24,16 +23,10 @@ export default function MovieDetails() {
 
   useEffect(() => {
     setLoadingMovie(true);
-
     fetchMovieDetails(id)
       .then((response) => {
-        if (response.status == 200) {
-          response.data.media_type = "movie";
-          setMovie(response.data);
-        } else {
-          console.error(response.data);
-          setErrorMovie(response.data);
-        }
+        response.data.media_type = "movie";
+        setMovie(response.data);
       })
       .catch((err) => {
         console.error(err);
@@ -43,14 +36,6 @@ export default function MovieDetails() {
         setLoadingMovie(false);
       });
   }, []);
-
-  //does movie already exist in users watchlist. Returns null if it didnt find
-  // let storedMovie = movieWatchlist.find(
-  //   (o) => movie != null && o.id === movie.id
-  // );
-
-  // const shouldAddToWatchlist = storedMovie ? false : true;
-  // const watchlistVisible = sessionData.isLoggedIn;
 
   const DirectorsTab = ({ directorsAsText }) => {
     if (directorsAsText == null || directorsAsText === "") {
@@ -93,7 +78,7 @@ export default function MovieDetails() {
   };
 
   //=======================================================================================
-  if (loadingMovie == true) {
+  if (loadingMovie) {
     return <CardLoader />;
   }
   if (movie === null || errorMovie != null) {
@@ -151,9 +136,10 @@ export default function MovieDetails() {
             />
 
             <div className="mt-12">
-              <MovieWatchlistButton
+              <WatchlistButton
                 visible={sessionData.isLoggedIn}
-                movie={movie}
+                media={movie}
+                mediaType={"movie"}
               />
             </div>
           </div>
@@ -161,7 +147,6 @@ export default function MovieDetails() {
       </div>
 
       <div className="border-b border-onyx-tint">
-        {/* <CastCollection actors={movie.actors} /> */}
         <DetailsTabs
           id={movie.id}
           actors={movie.actors}

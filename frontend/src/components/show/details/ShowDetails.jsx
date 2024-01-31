@@ -1,21 +1,40 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchShowDetailsData } from "../../../utils/Api";
-import CastCollection from "../../person/actor/collection/CastCollection";
-import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
 import { GlobalContext } from "../../../context/GlobalState";
+
+import { fetchShowDetails } from "../../../utils/Api";
+import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
+import {
+  concatDirectorNames,
+  concatGenreNames,
+  getCoverImageURL,
+} from "../../../utils/Util";
+import WatchlistButton from "../../watchlist/WatchlistButton";
+import DetailsTabs from "../../tabs/DetailsTabs";
 
 export default function ShowDetails() {
   const { id } = useParams();
-  const { addShowToWatchlist, removeShowFromWatchlist, showWatchlist } =
-    useContext(GlobalContext);
-  const { data, loading, error } = fetchShowDetailsData(id);
+  const [show, setShow] = useState(null);
+  const [loadingShow, setLoadingShow] = useState(true);
+  const [errorShow, setErrorShow] = useState(null);
 
-  let storedShow = showWatchlist.find(
-    (o) => data.showData != null && o.id === data.showData.id
-  );
+  const { sessionData } = useContext(GlobalContext);
 
-  const watchlistDisabled = storedShow ? true : false;
+  useEffect(() => {
+    setLoadingShow(true);
+    fetchShowDetails(id)
+      .then((response) => {
+        response.data.media_type = "tv_show";
+        setShow(response.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setErrorShow(err);
+      })
+      .finally(() => {
+        setLoadingShow(false);
+      });
+  }, []);
 
   const CreatorsTab = ({ creatorsAsText }) => {
     if (creatorsAsText == null || creatorsAsText === "") {
@@ -57,42 +76,11 @@ export default function ShowDetails() {
     );
   };
 
-  const ShowButton = ({ disabled }) => {
-    return (
-      <button
-        onClick={
-          disabled
-            ? () => removeShowFromWatchlist(data.showData.id)
-            : () => addShowToWatchlist(data.showData)
-        }
-        className={
-          "flex items-center  rounded font-semibold px-5 py-4  transition ease-in-out duration-150 " +
-          (disabled
-            ? "bg-onyx-tint text-onyx-primary-10 hover:bg-onyx-primary-30"
-            : "bg-mellon-primary text-onyx-tint hover:bg-mellon-shade")
-        }
-      >
-        <svg
-          className="bi bi-play-circle-fill fill-onyx-shade"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 16 16"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
-        </svg>
-        <span className="ml-2">
-          {disabled ? "Remove from watchlist" : "Add to watchlist"}
-        </span>
-      </button>
-    );
-  };
-
-  //======================================================================
-  if (loading.loadingShowData == true) {
+  //==========================================================================================================
+  if (loadingShow) {
     return <CardLoader />;
   }
-  if (data.showData === null) {
+  if (show === null || errorShow != null) {
     return (
       <h2 className="px-4 mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
         Unable to load show details
@@ -104,9 +92,13 @@ export default function ShowDetails() {
     <>
       <div className="border-b border-onyx-tint">
         <div className="container mx-auto px-4 py-16 flex flex-col md:flex-row">
-          <img className="w-64 md:w-96" src={data.showData.coverPath} alt="" />
+          <img
+            className="w-64 md:w-96"
+            src={getCoverImageURL(show.cover_image_url)}
+            alt="cover image"
+          />
           <div className="md:ml-24">
-            <h2 className="text-4xl font-semibold">{data.showData.title}</h2>
+            <h2 className="text-4xl font-semibold">{show.title}</h2>
             <div className="flex flex-wrap items-center text-gray-400 text-sm mt-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -117,29 +109,48 @@ export default function ShowDetails() {
               >
                 <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
               </svg>
-              <span className="ml-1">{data.showData.rating}%</span>
+              <span className="ml-1">{show.audience_rating}%</span>
               <span className="mx-2">|</span>
-              <span>{data.showData.releaseDate}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                className="bi bi-star-fill fill-blue-400"
+                viewBox="0 0 16 16"
+              >
+                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+              </svg>
+              <span className="ml-1">
+                {show.critics_rating !== null ? show.critics_rating : "N/A "}%
+              </span>
               <span className="mx-2">|</span>
-              <span>{data.showData.genresAsText}</span>
+              <span>{show.release_date}</span>
+              <span className="mx-2">|</span>
+              <span>{concatGenreNames(show.genres, ", ")}</span>
             </div>
-            <p className="text-onyx-contrast mt-8">
-              {data.showData.description}
-            </p>
+            <p className="text-onyx-contrast mt-8">{show.description}</p>
             <ShowTabs
-              creatorsAsText={data.showData.creatorsAsText}
-              numberOfSeasons={data.showData.numberOfSeasons}
+              creatorsAsText={concatDirectorNames(show.directors, ", ", 3)}
+              numberOfSeasons={show.number_of_seasons}
             />
 
             <div className="mt-12">
-              <ShowButton disabled={watchlistDisabled} />
+              <WatchlistButton
+                visible={sessionData.isLoggedIn}
+                media={show}
+                mediaType={"tv_show"}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div className="border-b border-onyx-tint">
-        <CastCollection actors={data.showData.cast} />
+        <DetailsTabs
+          id={show.id}
+          actors={show.actors}
+          critiques={show.critiques}
+        />
       </div>
     </>
   );

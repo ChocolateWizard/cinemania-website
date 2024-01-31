@@ -14,7 +14,7 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
     deleteCritique(id)
       .then((response) => {
         if (response.status === 205) {
-          removeCritique(id);         
+          removeCritique(id);
           window.location.reload(false);
         } else {
           console.error(response.data);
@@ -34,21 +34,35 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
   function handleClickSave() {
     putCritique(id, { rating: rating, description: description })
       .then((response) => {
-        if (response.status === 205) {
-          updateCritique({
-            media: { id: id },
-            rating: rating,
-            description: description,
-          });         
-          window.location.reload(false);          
-        } else {
-          console.error(response.data);
-          toast.error("Unable to update critique!");
+        switch (response.status) {
+          case 205:
+            updateCritique({
+              media: { id: id },
+              rating: rating,
+              description: description,
+            });
+            window.location.reload(false);
+            break;
+          default:
+            toast.success("Successfully updated critique!");
         }
       })
       .catch((err) => {
-        console.error(err);
-        toast.error("Unable to update critique!");
+        switch (err.response.status) {
+          case 400:
+            console.error(err);
+            toast.error(
+              <div className="flex flex-col">
+                {err.response.data.details.map((d) => {
+                  return <div>{d}</div>;
+                })}
+              </div>
+            );
+            break;
+          default:
+            console.error(err);
+            toast.error("Unable to update critique!");
+        }
       });
   }
 
