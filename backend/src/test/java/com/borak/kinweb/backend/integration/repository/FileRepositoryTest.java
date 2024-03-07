@@ -6,11 +6,14 @@ package com.borak.kinweb.backend.integration.repository;
 
 import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.classes.MyImage;
+import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
 import com.borak.kinweb.backend.integration.domain.MyImageTest;
 import com.borak.kinweb.backend.repository.util.FileRepository;
+import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,15 +48,19 @@ public class FileRepositoryTest {
     @Autowired
     private FileRepository repo;
 
-    private DataInitializer init = new DataInitializer();
+    private final DataInitializer init = new DataInitializer();
 
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 
     static {
         testsPassed.put("saveMediaCoverImage_Test", false);
         testsPassed.put("savePersonProfilePhoto_Test", false);
+        testsPassed.put("saveUserProfileImage_Test", false);
         testsPassed.put("deleteIfExistsMediaCoverImage_Test", false);
         testsPassed.put("deleteIfExistsPersonPhotoImage_Test", false);
+        testsPassed.put("getMediaCoverImage_Test", false);
+        testsPassed.put("getPersonProfilePhoto_Test", false);
+        testsPassed.put("getUserProfileImage_Test", false);
     }
 
     public static boolean didAllTestsPass() {
@@ -313,6 +320,125 @@ public class FileRepositoryTest {
 
     @Test
     @Order(3)
+    void saveUserProfileImage_Test() {
+        assertThatExceptionOfType(DatabaseException.class).isThrownBy(() -> {
+            repo.saveUserProfileImage(null);
+        }).withMessage("Unable to save user profile image");
+
+        MyImage image = new MyImage(new MockMultipartFile("profile_image", "dummy.jpg", "image/jpg", new byte[10]));
+        repo.saveUserProfileImage(image);
+        File file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        Path path = Paths.get(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        image = new MyImage(new MockMultipartFile("profile_image", "  dum  my  .jpg", "image/jpg", new byte[10]));
+        repo.saveUserProfileImage(image);
+        file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        path = Paths.get(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        image = new MyImage(new MockMultipartFile("profile_image", "http://www.website.com/images/  dum  my  .jpg", "image/jpg", new byte[10]));
+        repo.saveUserProfileImage(image);
+        file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        path = Paths.get(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        String name = "profile_image";
+        String originalFileName = init.getUsers().get(0).getProfileImage();
+        path = Paths.get(DataInitializer.userImagesFolderPath + originalFileName);
+        String contentType = "image/" + originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        byte[] content = null;
+        try {
+            content = Files.readAllBytes(path);
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+        image = new MyImage(new MockMultipartFile(name, originalFileName, contentType, content));
+        repo.saveUserProfileImage(image);
+        file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        name = "profile_image";
+        originalFileName = init.getUsers().get(0).getProfileImage();
+        path = Paths.get(DataInitializer.userImagesFolderPath + originalFileName);
+        contentType = "image/" + originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        content = null;
+        try {
+            content = Files.readAllBytes(path);
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+        image = new MyImage(new MockMultipartFile(name, originalFileName, contentType, content));
+        image.setName("dummy_name_2");
+        repo.saveUserProfileImage(image);
+        file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        path = Paths.get(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        name = "profile_image";
+        originalFileName = init.getUsers().get(0).getProfileImage();
+        path = Paths.get(DataInitializer.userImagesFolderPath + originalFileName);
+        contentType = "image/" + originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        content = null;
+        try {
+            content = Files.readAllBytes(path);
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+        image = new MyImage(new MockMultipartFile(name, originalFileName, contentType, content));
+        image.setName("");
+        repo.saveUserProfileImage(image);
+        file = new File(DataInitializer.userImagesFolderPath + image.getFullName());
+        path = Paths.get(DataInitializer.userImagesFolderPath + image.getFullName());
+        assertThat(file.exists()).isTrue();
+        assertThat(file.isDirectory()).isFalse();
+        assertThat(file.getName()).isEqualTo(image.getFullName());
+        try {
+            assertThat(image.getBytes()).isEqualTo(Files.readAllBytes(path));
+        } catch (IOException e) {
+            fail("Files.readAllBytes() was not supposed to throw exception");
+        }
+
+        testsPassed.put("saveUserProfileImage_Test", true);
+    }
+
+    @Test
+    @Order(4)
     void deleteIfExistsMediaCoverImage_Test() {
         Assumptions.assumeTrue(testsPassed.get("saveMediaCoverImage_Test"));
 
@@ -376,7 +502,7 @@ public class FileRepositoryTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void deleteIfExistsPersonPhotoImage_Test() {
         Assumptions.assumeTrue(testsPassed.get("savePersonProfilePhoto_Test"));
 
@@ -437,6 +563,75 @@ public class FileRepositoryTest {
         }
 
         testsPassed.put("deleteIfExistsPersonPhotoImage_Test", true);
+    }
+
+    @Test
+    @Order(6)
+    void getMediaCoverImage_Test() {
+        File file;
+        Path path;
+        for (MediaJDBC media : init.getMedias()) {
+            if (media.getCoverImage() != null) {
+                Resource image = repo.getMediaCoverImage(media.getCoverImage());
+                assertThat(image).isNotNull();
+                assertThat(image.getFilename()).isEqualTo(media.getCoverImage());
+                file = new File(DataInitializer.mediaImagesFolderPath + media.getCoverImage());
+                path = Paths.get(DataInitializer.mediaImagesFolderPath + media.getCoverImage());
+                assertThat(file.getName()).isEqualTo(image.getFilename());
+                try {
+                    assertThat(image.getContentAsByteArray()).isEqualTo(Files.readAllBytes(path));
+                } catch (IOException e) {
+                    fail("Files.readAllBytes() was not supposed to throw exception");
+                }
+            }
+        }
+        testsPassed.put("getMediaCoverImage_Test", true);
+    }
+
+    @Test
+    @Order(7)
+    void getPersonProfilePhoto_Test() {
+        File file;
+        Path path;
+        for (PersonJDBC person : init.getPersons()) {
+            if (person.getProfilePhoto() != null) {
+                Resource image = repo.getPersonProfilePhoto(person.getProfilePhoto());
+                assertThat(image).isNotNull();
+                assertThat(image.getFilename()).isEqualTo(person.getProfilePhoto());
+                file = new File(DataInitializer.personImagesFolderPath + person.getProfilePhoto());
+                path = Paths.get(DataInitializer.personImagesFolderPath + person.getProfilePhoto());
+                assertThat(file.getName()).isEqualTo(image.getFilename());
+                try {
+                    assertThat(image.getContentAsByteArray()).isEqualTo(Files.readAllBytes(path));
+                } catch (IOException e) {
+                    fail("Files.readAllBytes() was not supposed to throw exception");
+                }
+            }
+        }
+        testsPassed.put("getPersonProfilePhoto_Test", true);
+    }
+
+    @Test
+    @Order(8)
+    void getUserProfileImage_Test() {
+        File file;
+        Path path;
+        for (UserJDBC user : init.getUsers()) {
+            if (user.getProfileImage() != null) {
+                Resource image = repo.getUserProfileImage(user.getProfileImage());
+                assertThat(image).isNotNull();
+                assertThat(image.getFilename()).isEqualTo(user.getProfileImage());
+                file = new File(DataInitializer.userImagesFolderPath + user.getProfileImage());
+                path = Paths.get(DataInitializer.userImagesFolderPath + user.getProfileImage());
+                assertThat(file.getName()).isEqualTo(image.getFilename());
+                try {
+                    assertThat(image.getContentAsByteArray()).isEqualTo(Files.readAllBytes(path));
+                } catch (IOException e) {
+                    fail("Files.readAllBytes() was not supposed to throw exception");
+                }
+            }
+        }
+        testsPassed.put("getUserProfileImage_Test", true);
     }
 
 }

@@ -151,6 +151,10 @@ public class DataInitializer {
         return persons;
     }
 
+    public List<UserJDBC> getUsers() {
+        return users;
+    }
+
     /**
      * Deletes all files in:
      * <ul>
