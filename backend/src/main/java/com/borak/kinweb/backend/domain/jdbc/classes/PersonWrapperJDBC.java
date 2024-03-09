@@ -4,6 +4,8 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
+import java.util.Objects;
+
 /**
  *
  * @author Mr. Poyo
@@ -23,6 +25,19 @@ public class PersonWrapperJDBC implements JDBC {
         this.director = director;
         this.writer = writer;
         this.actor = actor;
+    }
+
+    public void setId(Long id) {
+        person.setId(id);
+        if (director != null) {
+            director.setId(id);
+        }
+        if (writer != null) {
+            writer.setId(id);
+        }
+        if (actor != null) {
+            actor.setId(id);
+        }
     }
 
     public PersonJDBC getPerson() {
@@ -55,6 +70,31 @@ public class PersonWrapperJDBC implements JDBC {
 
     public void setActor(ActorJDBC actor) {
         this.actor = actor;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + Objects.hashCode(this.person);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof PersonJDBC personJDBC) {
+            return personJDBC.getId().equals(this.getPerson().getId());
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PersonWrapperJDBC other = (PersonWrapperJDBC) obj;
+        return Objects.equals(this.person, other.person);
     }
 
 }

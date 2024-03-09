@@ -35,10 +35,35 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<PersonWrapperJDBC, Long> {
-    
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    
+
+//==================================================================================================================
+    @Override
+    public List<PersonWrapperJDBC> findAll() throws DatabaseException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public List<PersonWrapperJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (page < 1 || size < 0) {
+                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
+            }
+            int offset;
+            try {
+                offset = Math.multiplyExact(size, (page - 1));
+            } catch (ArithmeticException e) {
+                offset = Integer.MAX_VALUE;
+            }
+            List<PersonWrapperJDBC> wrappers = jdbcTemplate.query(SQLPersonWrapper.FIND_ALL_PAGINATED_PS, new Object[]{size, offset}, new int[]{Types.INTEGER, Types.INTEGER}, SQLPersonWrapper.personWrapperRM);
+            return wrappers;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving persons", e);
+        }
+    }
+
     @Override
     public List<PersonWrapperJDBC> findAllWithRelationsPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
         try {
@@ -78,75 +103,9 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while retreiving persons", e);
         }
-        
+
     }
-    
-    @Override
-    public PersonWrapperJDBC insert(PersonWrapperJDBC entity) throws DatabaseException, IllegalArgumentException {
-        try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
-            }
-            performInsert(entity);
-            return entity;
-        } catch (NullPointerException | DataAccessException e) {
-            throw new DatabaseException("Error while inserting person", e);
-        }
-    }
-    
-    @Override
-    public void update(PersonWrapperJDBC entity) throws DatabaseException, IllegalArgumentException {
-        try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
-            }
-            performUpdate(entity);
-        } catch (DatabaseException e) {
-            throw new DatabaseException("Error while updating person with id: " + entity.getPerson().getId() + ". " + e.getMessage(), e);
-        } catch (NullPointerException | DataAccessException e) {
-            throw new DatabaseException("Error while updating person with id: " + entity.getPerson().getId(), e);
-        }
-    }
-    
-    @Override
-    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
-    @Override
-    public List<PersonWrapperJDBC> findAll() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
-    @Override
-    public List<PersonWrapperJDBC> findAllPaginated(int page, int size) throws DatabaseException, IllegalArgumentException {
-        try {
-            if (page < 1 || size < 0) {
-                throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
-            }
-            int offset;
-            try {
-                offset = Math.multiplyExact(size, (page - 1));
-            } catch (ArithmeticException e) {
-                offset = Integer.MAX_VALUE;
-            }
-            List<PersonWrapperJDBC> wrappers = jdbcTemplate.query(SQLPersonWrapper.FIND_ALL_PAGINATED_PS, new Object[]{size, offset}, new int[]{Types.INTEGER, Types.INTEGER}, SQLPersonWrapper.personWrapperRM);
-            return wrappers;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while retreiving persons", e);
-        }
-    }
-    
-    @Override
-    public long count() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
-    @Override
-    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
+
     @Override
     public Optional<PersonWrapperJDBC> findById(Long id) throws DatabaseException, IllegalArgumentException {
         try {
@@ -161,7 +120,7 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
             throw new DatabaseException("Error while searching for person with id: " + id, e);
         }
     }
-    
+
     @Override
     public Optional<PersonWrapperJDBC> findByIdWithRelations(Long id) throws DatabaseException, IllegalArgumentException {
         try {
@@ -195,12 +154,54 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while searching for person with id: " + id, e);
         }
-        
+
     }
+
+    @Override
+    public PersonWrapperJDBC insert(PersonWrapperJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (entity == null || entity.getPerson() == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
+            performInsert(entity);
+            return entity;
+        } catch (NullPointerException | DataAccessException e) {
+            throw new DatabaseException("Error while inserting person", e);
+        }
+    }
+
+    @Override
+    public void update(PersonWrapperJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (entity == null || entity.getPerson() == null) {
+                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            }
+            performUpdate(entity);
+        } catch (DatabaseException e) {
+            throw new DatabaseException("Error while updating person with id: " + entity.getPerson().getId() + ". " + e.getMessage(), e);
+        } catch (NullPointerException | DataAccessException e) {
+            throw new DatabaseException("Error while updating person with id: " + entity.getPerson().getId(), e);
+        }
+    }
+
+    @Override
+    public boolean existsById(Long id) throws DatabaseException, IllegalArgumentException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public long count() throws DatabaseException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void deleteById(Long id) throws DatabaseException, IllegalArgumentException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 //=====================================================================================================================
 //=========================================PRIVATE METHODS=============================================================
 //=====================================================================================================================
-
     private void performUpdate(PersonWrapperJDBC entity) {
         int i = jdbcTemplate.update(SQLPersonWrapper.UPDATE_PERSON_PS, new Object[]{entity.getPerson().getFirstName(), entity.getPerson().getLastName(), String.valueOf(entity.getPerson().getGender().getSymbol()), entity.getPerson().getProfilePhoto(), entity.getPerson().getId()}, new int[]{Types.VARCHAR, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.BIGINT});
         if (i <= 0) {
@@ -210,22 +211,22 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
         performUpdateWriter(entity.getWriter(), entity.getPerson().getId());
         performUpdateActor(entity.getActor(), entity.getPerson().getId());
     }
-    
+
     private void performUpdateDirector(DirectorJDBC director, Long id) {
         jdbcTemplate.update(SQLPersonWrapper.DELETE_PERSON_DIRECTOR_PS, new Object[]{id}, new int[]{Types.BIGINT});
         performInsertDirector(director, id);
     }
-    
+
     private void performUpdateWriter(WriterJDBC writer, Long id) {
         jdbcTemplate.update(SQLPersonWrapper.DELETE_PERSON_WRITER_PS, new Object[]{id}, new int[]{Types.BIGINT});
         performInsertWriter(writer, id);
     }
-    
+
     private void performUpdateActor(ActorJDBC actor, Long id) {
         jdbcTemplate.update(SQLPersonWrapper.DELETE_PERSON_ACTOR_PS, new Object[]{id}, new int[]{Types.BIGINT});
         performInsertActor(actor, id);
     }
-    
+
     private void performInsert(PersonWrapperJDBC entity) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -245,7 +246,7 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
         performInsertWriter(entity.getWriter(), entity.getPerson().getId());
         performInsertActor(entity.getActor(), entity.getPerson().getId());
     }
-    
+
     private void performInsertDirector(DirectorJDBC director, Long id) {
         if (director != null) {
             jdbcTemplate.update(SQLPersonWrapper.INSERT_PERSON_DIRECTOR_PS, new Object[]{id}, new int[]{Types.BIGINT});
@@ -255,16 +256,17 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
                     ps.setLong(1, director.getMedias().get(i).getId());
                     ps.setLong(2, id);
                 }
-                
+
                 @Override
                 public int getBatchSize() {
                     return director.getMedias().size();
                 }
             }
             );
+            director.setId(id);
         }
     }
-    
+
     private void performInsertWriter(WriterJDBC writer, Long id) {
         if (writer != null) {
             jdbcTemplate.update(SQLPersonWrapper.INSERT_PERSON_WRITER_PS, new Object[]{id}, new int[]{Types.BIGINT});
@@ -274,17 +276,17 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
                     ps.setLong(1, writer.getMedias().get(i).getId());
                     ps.setLong(2, id);
                 }
-                
+
                 @Override
                 public int getBatchSize() {
                     return writer.getMedias().size();
                 }
             }
             );
+            writer.setId(id);
         }
-        
     }
-    
+
     private void performInsertActor(ActorJDBC actor, Long id) {
         if (actor != null) {
             jdbcTemplate.update(SQLPersonWrapper.INSERT_PERSON_ACTOR_PS, new Object[]{id, actor.isStar()}, new int[]{Types.BIGINT, Types.BOOLEAN});
@@ -295,7 +297,7 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
                     ps.setLong(2, id);
                     ps.setBoolean(3, actor.getActings().get(i).isStarring());
                 }
-                
+
                 @Override
                 public int getBatchSize() {
                     return actor.getActings().size();
@@ -322,15 +324,15 @@ public class PersonWrapperRepositoryJDBC implements IPersonWrapperRepository<Per
                     ps.setLong(3, (Long) data[i][2]);
                     ps.setString(4, (String) data[i][3]);
                 }
-                
+
                 @Override
                 public int getBatchSize() {
                     return n;
                 }
             }
             );
-            
+            actor.setId(id);
         }
     }
-    
+
 }

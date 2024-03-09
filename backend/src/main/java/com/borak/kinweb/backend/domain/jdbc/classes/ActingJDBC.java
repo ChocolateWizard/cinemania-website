@@ -2,6 +2,7 @@ package com.borak.kinweb.backend.domain.jdbc.classes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -64,4 +65,32 @@ public class ActingJDBC implements JDBC {
         }
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + Objects.hashCode(this.media);
+        hash = 37 * hash + Objects.hashCode(this.actor);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ActingJDBC other = (ActingJDBC) obj;
+        if (!Objects.equals(this.media, other.media)) {
+            return false;
+        }
+        return Objects.equals(this.actor, other.actor);
+    }
+
+    
+    
 }

@@ -5,8 +5,6 @@
 package com.borak.kinweb.backend.helpers;
 
 import com.borak.kinweb.backend.ConfigPropertiesTest;
-import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
@@ -18,6 +16,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.PersonWrapperJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
@@ -39,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -70,6 +70,7 @@ public class DataInitializer {
 
     private List<MovieJDBC> movies;
     private List<TVShowJDBC> shows;
+    private List<MediaJDBC> medias;
 
     private List<GenreJDBC> genres;
 
@@ -78,6 +79,7 @@ public class DataInitializer {
     private List<ActorJDBC> actors;
 
     private List<PersonJDBC> persons;
+    private List<PersonWrapperJDBC> personWrappers;
 
     private List<UserJDBC> users;
 
@@ -90,12 +92,11 @@ public class DataInitializer {
         initTVShows();
         initPersons();
         initUsers();
+        initMedias();
+        initPersonsWrappers();
     }
 
     public List<MediaJDBC> getMedias() {
-        List<MediaJDBC> medias = Stream.concat(movies.stream(), shows.stream())
-                .sorted(Comparator.comparingLong(p -> p.getId()))
-                .collect(Collectors.toList());
         return medias;
     }
 
@@ -155,22 +156,56 @@ public class DataInitializer {
         return users;
     }
 
+    public List<PersonWrapperJDBC> getPersonWrappers() {
+        return personWrappers;
+    }
+
+    /**
+     * Retrieves paginated personWrapper subList from the original PersonWrapper
+     * list
+     *
+     * @param page - index of page
+     * @param size - size of page
+     * @return subList of PersonWrapper List
+     * @throws IllegalArgumentException if provided page is less than 1, and
+     * size is less than 0
+     */
+    public List<PersonWrapperJDBC> getPersonWrappers(int page, int size) throws IllegalArgumentException {
+        if (page < 1 || size < 0) {
+            throw new IllegalArgumentException("Invalid parameters: page must be greater than 0 and size must be non-negative");
+        }
+        try {
+            int startIndex = Math.multiplyExact((page - 1), size);
+            if (startIndex >= personWrappers.size()) {
+                return new ArrayList<>();
+            }
+            int endIndex = Math.min(startIndex + size, personWrappers.size());
+            return personWrappers.subList(startIndex, endIndex);
+        } catch (ArithmeticException e) {
+            return new ArrayList<>();
+        }
+    }
+
     /**
      * Deletes all files in:
      * <ul>
-     * <li>{@value #mediaImagesFolderPath}</li>
-     * <li>{@value #personImagesFolderPath}</li>
+     * <li><i>{@value #mediaImagesFolderPath}</i></li>
+     * <li><i>{@value #personImagesFolderPath}</i></li>
+     * <li><i>{@value #userImagesFolderPath}</i></li>
      * </ul>
-     * and populates them with dummy random one-color and size images
+     * if such folders exist and populates them with dummy random one-color and
+     * size images. If folders do not exist, then it creates them.
      * <p>
      * Media image names are got from iterating over a combined list of all
      * media type lists (movie, show), and calling getCoverImage() on each
      * element, while person image names are got from iterating over a combined
      * list of all person type lists (director, writer, actor) and calling
      * getProfilePhoto(). Duplicate person ids are ignored while merging lists.
+     * User image names are got from iterating over a list of users, and calling
+     * getProfileImage().
      * <p>
-     * If media or person contain null as their image name, then it wont be
-     * created.
+     * If media, person or user contain null as their image name, then it wont
+     * create a dummy image for that object.
      *
      * @throws IllegalStateException if this method is called prior to
      * ConfigPropertiesTest class passing all of its tests
@@ -189,7 +224,9 @@ public class DataInitializer {
         }
     }
 
-//==========================================================================================================
+//===============================================================================================================================================
+//============================================PRIVATE METHODS====================================================================================
+//===============================================================================================================================================
     private void initGenres() {
         genres = new ArrayList<GenreJDBC>() {
             {
@@ -333,7 +370,7 @@ public class DataInitializer {
         m1.getActings().add(a14);
         m1.getActings().add(a15);
 
-//-------------------------------------
+        //-------------------------------------
         MovieJDBC m2 = new MovieJDBC(2l, "Inland Empire", "2.jpg", "As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.", LocalDate.of(2006, Month.SEPTEMBER, 6), 68, null, 180);
         m2.getGenres().add(genres.get(5));
         m2.getGenres().add(genres.get(11));
@@ -681,7 +718,50 @@ public class DataInitializer {
         };
     }
 
-//==================================================================================================================    
+    private void initMedias() {
+        medias = Stream.concat(movies.stream(), shows.stream())
+                .sorted(Comparator.comparingLong(p -> p.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private void initPersonsWrappers() {
+        HashMap<Long, PersonWrapperJDBC> map = new HashMap<>();
+        for (DirectorJDBC director : directors) {
+            updatePersonWrapperMap(map, director, DirectorJDBC.class);
+        }
+        for (WriterJDBC writer : writers) {
+            updatePersonWrapperMap(map, writer, WriterJDBC.class);
+        }
+        for (ActorJDBC actor : actors) {
+            updatePersonWrapperMap(map, actor, ActorJDBC.class);
+        }
+        personWrappers = map.values().stream()
+                .sorted(Comparator.comparing(pw -> pw.getPerson().getId()))
+                .collect(Collectors.toList());
+    }
+
+    private void updatePersonWrapperMap(HashMap<Long, PersonWrapperJDBC> map, PersonJDBC person, Class role) {
+        PersonWrapperJDBC pw = map.get(person.getId());
+        if (pw == null) {
+            pw = new PersonWrapperJDBC();
+            pw.setPerson(new PersonJDBC(
+                    person.getId(),
+                    person.getFirstName(),
+                    person.getLastName(),
+                    person.getGender(),
+                    person.getProfilePhoto()));
+            map.put(person.getId(), pw);
+        }
+        if (role == DirectorJDBC.class) {
+            pw.setDirector((DirectorJDBC) person);
+        } else if (role == WriterJDBC.class) {
+            pw.setWriter((WriterJDBC) person);
+        } else if (role == ActorJDBC.class) {
+            pw.setActor((ActorJDBC) person);
+        }
+    }
+
+//====================INIT IMAGES PRIVATE METHODS============================================================================================  
     private void initMediaImages() throws RuntimeException {
         try {
             Files.createDirectories(Paths.get(mediaImagesFolderPath));
