@@ -54,14 +54,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 public class DataInitializer {
 
-    public static final String mediaImagesFolderPath = "C:/kinweb_images/test/media/";
-    public static final String personImagesFolderPath = "C:/kinweb_images/test/person/";
-    public static final String userImagesFolderPath = "C:/kinweb_images/test/user/";
+    public static final String mediaImagesFolderPath = "C:/cinemania_images/test/media/";
+    public static final String personImagesFolderPath = "C:/cinemania_images/test/person/";
+    public static final String userImagesFolderPath = "C:/cinemania_images/test/user/";
 
     public static final String address = "http://localhost";
     public static final int port = 8080;
 
-    public static final String jwtCookieName = "kinweb";
+    public static final String jwtCookieName = "cwt";
     public static final Integer jwtExpirationMs = 86400000;
     public static final String jwtSecret = "Hesaid3BlessedarethepoorinspiritfortheirsiSthekingdomofheaven4BessedarEthosewhomournfortheywillbecomforted5Blessedarethemeekfortheywillinherittheearth6Blessedarethosewhohungerandthirstforrighteousnessfortheywillbefilled7Blessedarethemercifulfortheywillbeshownmercy8BlessedarethepureinheartfortheywillseeGod9BlessedarethepeacemakersfortheywillbecalledchildrenofGod10Blessedarethosewhoarepersecutedbecauseofrighteousnessfortheirsisthekingdomofheaven";
 

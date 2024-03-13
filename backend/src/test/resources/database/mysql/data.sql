@@ -1,6 +1,6 @@
 /*
 SQLyog Community
-MySQL - 8.0.29 : Database - kinomania_backend
+MySQL - 8.0.29 : Database - cinemania_db
 *********************************************************************
 */
 

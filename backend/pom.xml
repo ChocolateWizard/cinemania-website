@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.borak</groupId>
-    <artifactId>kinomania-website-backend</artifactId>
+    <artifactId>cinemania-website-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>kinomania-website-backend</name>
-    <description>Backend for my kinomania website</description>
+    <name>cinemania-website-backend</name>
+    <description>Backend for my cinemania website</description>
     <properties>
         <java.version>17</java.version>
         <io.jsonwebtoken.version>0.12.3</io.jsonwebtoken.version>
@@ -107,7 +107,7 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
-                    <url>jdbc:mysql://localhost/kinomania_backend</url>
+                    <url>jdbc:mysql://localhost/cinemania_db</url>
                     <user>Despot</user>
                     <password>Despy330033!</password>
                     <driver>com.mysql.cj.jdbc.Driver</driver>

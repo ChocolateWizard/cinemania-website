@@ -17,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
  * @author Mr. Poyo
  */
 @Validated
-@ConfigurationProperties(prefix = "kinweb.property")
+@ConfigurationProperties(prefix = "custom.property")
 public class ConfigProperties {
 
     @NotBlank

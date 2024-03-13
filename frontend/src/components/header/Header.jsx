@@ -79,7 +79,7 @@ export default function Header() {
             <a href="/" className="flex flex-row">
               <SiteLogo />
               <h1 className="font-bold text-3xl text-mellon-primary">
-                Kinomania
+                Cinemania
               </h1>
             </a>
           </li>
