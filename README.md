@@ -28,7 +28,7 @@ Before you begin, ensure you have met the following requirements:
 
 ## Running the Backend
 
-You can start the backend of the website either by running it in the IDE with `--seed` as its argument, or by positioning yourself in the recently created target folder with the command prompt and typing `java -jar kinomania-website-backend-0.0.1-SNAPSHOT.jar --seed`. This starts your backend and runs a seeder before starting the app that creates a `kinweb_images` folder in your C drive, starts downloading movies and shows from "https://www.themoviedb.org/" and populates your database tables with their JSON data; the `kinweb_images` folder with image data and creates a user with administrator privilege that has username admin and password admin. Note, you only need to pass `--seed` the first time you run the backend. Every other time you either run it in the IDE without any arguments, or by typing `java -jar kinomania-website-backend-0.0.1-SNAPSHOT.jar` in the command prompt. This is so that your production database doesn't get overwritten.
+You can start the backend of the website either by running it in the IDE with `--seed` as its argument, or by positioning yourself in the recently created target folder with the command prompt and typing `java -jar cinemania-website-backend-0.0.1-SNAPSHOT.jar --seed`. This starts your backend and runs a seeder before starting the app that creates a `cinemania_images` folder in your C drive, starts downloading movies and shows from "https://www.themoviedb.org/" and populates your database tables with their JSON data; the `cinemania_images` folder with image data and creates a user with administrator privilege that has username admin and password admin. Note, you only need to pass `--seed` the first time you run the backend. Every other time you either run it in the IDE without any arguments, or by typing `java -jar cinemania-website-backend-0.0.1-SNAPSHOT.jar` in the command prompt. This is so that your production database doesn't get overwritten.
 
 ## Configuring the Frontend
 
@@ -36,11 +36,11 @@ After configuring the backend, position yourself in the `frontend` folder with t
 
 ## Running the Website
 
-If you wish to see how it all looks, run the backend first either in the IDE without arguments or by the command prompt `java -jar kinomania-website-backend-0.0.1-SNAPSHOT.jar` while being in the target folder of `backend`, and after that type `npm run dev` in the command prompt while being in the `frontend` folder.
+If you wish to see how it all looks, run the backend first either in the IDE without arguments or by the command prompt `java -jar cinemania-website-backend-0.0.1-SNAPSHOT.jar` while being in the target folder of `backend`, and after that type `npm run dev` in the command prompt while being in the `frontend` folder.
 
 ## Stopping the Application
 
-If you wish to stop the backend from running, just type `Ctrl+C` in the same command prompt where the backend is running. The same goes for the frontend - if you wish to stop the frontend from running, type `Ctrl+C` in the same command prompt where the frontend is running.
+If you wish to stop the backend from running, just type `Ctrl+C` in the same command prompt where the backend is running. Similarly for the frontend - if you wish to stop the frontend from running, type `q+Enter` in the same command prompt where the frontend is running.
 
 ## Available API routes
 
