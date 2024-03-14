@@ -573,49 +573,72 @@ public class MovieRepositoryJDBCTest {
         page = 2;
         size = 1;
         treshold = 0;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getTheLighthouse();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
         treshold = 0;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getInlandEmpire();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         treshold = 0;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
         treshold = 0;
-        expectedObject = init.getTheLighthouse();
+        expectedObject = init.getInlandEmpire();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+                add(init.getInlandEmpire());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+                add(init.getInlandEmpire());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
         treshold = 0;
-        expectedList = init.getMovies();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+                add(init.getInlandEmpire());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
@@ -636,41 +659,69 @@ public class MovieRepositoryJDBCTest {
         page = 1;
         size = 2;
         treshold = 68;
-        expectedList = init.getMovies().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         treshold = 68;
-        expectedObject = init.getInlandEmpire();
+        expectedObject = init.getTheLighthouse();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 68;
-        expectedList = init.getMovies();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+                add(init.getInlandEmpire());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 2;
         treshold = 74;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 3;
         treshold = 74;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getMullholadDrive());
+                add(init.getTheLighthouse());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getMullholadDrive(), init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         treshold = 74;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getTheLighthouse());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getTheLighthouse()));
+        checkValuesWithGenres(actualList, expectedList);
         testsPassed.put("findAllByAudienceRatingWithGenresPaginated_Test", true);
     }
 

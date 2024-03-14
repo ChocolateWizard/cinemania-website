@@ -60,7 +60,6 @@ public class DatabaseSeeder {
             datastore.persistData();
             log.info("====>Finished seeding database!");
         } catch (Exception e) {
-            log.error("Unable to seed database!");
             throw new RuntimeException("Unable to seed database!", e);
         }
     }

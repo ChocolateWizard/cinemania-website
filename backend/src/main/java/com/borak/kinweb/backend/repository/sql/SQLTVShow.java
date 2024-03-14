@@ -81,12 +81,12 @@ public final class SQLTVShow {
 
     public static final String FIND_ALL_BY_RATING_PAGINATED_PS = """
                                        SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,tv_show.number_of_seasons 
-                                       FROM media JOIN tv_show ON(media.id=tv_show.media_id) WHERE media.audience_rating>=? LIMIT ? OFFSET ?;
+                                       FROM media JOIN tv_show ON(media.id=tv_show.media_id) WHERE media.audience_rating>=? ORDER BY media.audience_rating DESC LIMIT ? OFFSET ?;
                                        """;
 
     public static final String FIND_ALL_BY_YEAR_PAGINATED_PS = """
                                        SELECT media.id,media.title,media.cover_image,media.description,media.release_date,media.audience_rating,media.critic_rating,tv_show.number_of_seasons 
-                                       FROM media JOIN tv_show ON(media.id=tv_show.media_id) WHERE YEAR(media.release_date)>=? LIMIT ? OFFSET ?;
+                                       FROM media JOIN tv_show ON(media.id=tv_show.media_id) WHERE YEAR(media.release_date)>=? ORDER BY media.release_date ASC LIMIT ? OFFSET ?;
                                        """;
 
     public static final String FIND_ALL_GENRES_PS = """

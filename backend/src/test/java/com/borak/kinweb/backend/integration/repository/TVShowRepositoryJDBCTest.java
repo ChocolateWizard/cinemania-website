@@ -573,49 +573,72 @@ public class TVShowRepositoryJDBCTest {
         page = 2;
         size = 1;
         treshold = 0;
-        expectedObject = init.getLost();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 3;
         size = 1;
         treshold = 0;
-        expectedObject = init.getSouthPark();
+        expectedObject = init.getLost();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         treshold = 0;
-        expectedList = init.getShows().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
         treshold = 0;
-        expectedObject = init.getSouthPark();
+        expectedObject = init.getLost();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 0;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+                add(init.getLost());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
         treshold = 0;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+                add(init.getLost());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
         treshold = 0;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+                add(init.getLost());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
@@ -643,48 +666,82 @@ public class TVShowRepositoryJDBCTest {
         page = 1;
         size = 2;
         treshold = 68;
-        expectedList = init.getShows().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         treshold = 68;
-        expectedObject = init.getLost();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         treshold = 68;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+                add(init.getLost());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 3;
         treshold = 83;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+                add(init.getLost());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 2;
         treshold = 87;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getSouthPark()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 3;
         treshold = 87;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getArcane());
+                add(init.getSouthPark());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getSouthPark()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         treshold = 87;
+        expectedList = new ArrayList<>() {
+            {
+                add(init.getSouthPark());
+            }
+        };
         actualList = repo.findAllByAudienceRatingWithGenresPaginated(page, size, treshold);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getSouthPark()));
+        checkValuesWithGenres(actualList, expectedList);
         testsPassed.put("findAllByAudienceRatingWithGenresPaginated_Test", true);
     }
 
@@ -774,7 +831,7 @@ public class TVShowRepositoryJDBCTest {
         page = 1;
         size = 1;
         year = 1996;
-        expectedObject = init.getArcane();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
@@ -788,91 +845,137 @@ public class TVShowRepositoryJDBCTest {
         page = 3;
         size = 1;
         year = 1996;
-        expectedObject = init.getSouthPark();
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         year = 1996;
-        expectedList = init.getShows().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {              
+                add(init.getSouthPark());         
+                add(init.getLost());              
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 2;
         year = 1996;
-        expectedObject = init.getSouthPark();
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         year = 1996;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {              
+                add(init.getSouthPark());         
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 4;
         year = 1996;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {              
+                add(init.getSouthPark());         
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = Integer.MAX_VALUE;
         year = 1996;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {              
+                add(init.getSouthPark());         
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 1;
         year = 1997;
-        expectedObject = init.getArcane();
+        expectedObject = init.getSouthPark();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 3;
         year = 1997;
-        expectedList = init.getShows();
+        expectedList = new ArrayList<>() {
+            {              
+                add(init.getSouthPark());         
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 2;
         year = 2001;
-        expectedList = init.getShows().subList(0, 2);
+        expectedList = new ArrayList<>() {
+            {                             
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, expectedList);
 
         page = 2;
         size = 1;
         year = 2001;
-        expectedObject = init.getLost();
+        expectedObject = init.getArcane();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 1;
         year = 2004;
-        expectedObject = init.getArcane();
+        expectedObject = init.getLost();
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
         checkValuesWithGenres(actualList, Arrays.asList(expectedObject));
 
         page = 1;
         size = 2;
         year = 2004;
+        expectedList = new ArrayList<>() {
+            {                           
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getLost()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 3;
         year = 2004;
+        expectedList = new ArrayList<>() {
+            {                           
+                add(init.getLost());
+                add(init.getArcane());
+            }
+        };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
-        checkValuesWithGenres(actualList, Arrays.asList(init.getArcane(), init.getLost()));
+        checkValuesWithGenres(actualList, expectedList);
 
         page = 1;
         size = 1;
