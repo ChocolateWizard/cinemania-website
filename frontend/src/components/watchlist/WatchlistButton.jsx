@@ -99,7 +99,7 @@ export default function WatchlistButton({ visible, media, mediaType }) {
       return "bg-onyx-tint text-onyx-primary-10 hover:bg-onyx-primary-30";
     }
     return isAdd
-      ? "bg-mellon-primary text-onyx-tint hover:bg-mellon-shade"
+      ? "bg-mellon-primary-default text-onyx-tint hover:bg-mellon-shade"
       : "bg-onyx-tint text-onyx-primary-10 hover:bg-onyx-primary-30";
   }
   function buttonAction() {

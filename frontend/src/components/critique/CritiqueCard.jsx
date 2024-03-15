@@ -69,7 +69,7 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
   //==========================================================================================================
   if (isUsersCritique) {
     return (
-      <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary p-4 my-3">
+      <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary-default p-4 my-3">
         <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row items-center">
             <img
@@ -85,7 +85,7 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
                   className={
                     updateToggled
                       ? "px-2 py-1 text-white rounded bg-mellon-shade"
-                      : "px-2 py-1 text-white rounded bg-mellon-primary"
+                      : "px-2 py-1 text-white rounded bg-mellon-primary-default"
                   }
                 >
                   Update
@@ -130,7 +130,7 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
           <div className="mt-5 items-end text-right">
             <button
               onClick={handleClickSave}
-              className="px-2 py-1 items-end text-white text-xl rounded bg-mellon-primary "
+              className="px-2 py-1 items-end text-white text-xl rounded bg-mellon-primary-default "
             >
               Save
             </button>

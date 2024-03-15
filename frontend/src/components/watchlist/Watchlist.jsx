@@ -20,7 +20,7 @@ export default function Watchlist() {
   return (
     <div className="container mx-auto px-4 pt-16">
       <div>
-        <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
+        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Movies to watch
         </h2>
         <RenderCardsList
@@ -30,7 +30,7 @@ export default function Watchlist() {
         />
       </div>
       <div className="py-24">
-        <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
+        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Shows to watch
         </h2>
         <RenderCardsList

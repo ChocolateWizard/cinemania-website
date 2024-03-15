@@ -81,7 +81,7 @@ export default function ShowsPage() {
   return (
     <div className="container mx-auto px-4 pt-16">
       <div>
-        <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
+        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Current
         </h2>
         <ShowCardsList
@@ -92,7 +92,7 @@ export default function ShowsPage() {
         />
       </div>
       <div className="py-24">
-        <h2 className="uppercase tracking-wider text-mellon-primary text-lg font-semibold">
+        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Popular
         </h2>
         <ShowCardsList

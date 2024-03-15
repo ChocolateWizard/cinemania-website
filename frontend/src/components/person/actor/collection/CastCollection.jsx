@@ -32,7 +32,7 @@ export default function CastCollection({ actors }) {
         <div className="flex justify-center pt-4">
           <button
             onClick={() => showMoreItems()}
-            className=" text-mellon-primary hover:underline"
+            className=" text-mellon-primary-default hover:underline"
           >
             Show all
           </button>
@@ -44,7 +44,7 @@ export default function CastCollection({ actors }) {
         <div className="flex justify-center pt-4">
           <button
             onClick={() => hideMoreItems()}
-            className=" text-mellon-primary hover:underline"
+            className=" text-mellon-primary-default hover:underline"
           >
             Hide
           </button>

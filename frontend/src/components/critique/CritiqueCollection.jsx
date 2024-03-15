@@ -29,38 +29,6 @@ export default function CritiqueCollection({ id, critiques }) {
     setIsAddSelected(true);
   }
 
-  // function handleAddCritique() {
-  //   e.preventDefault();
-  //   postCritique(id, { rating: rating, description: description })
-  //     .then((response) => {
-  //       if (response.status === 205) {
-  //         addCritique({
-  //           media: { id: id },
-  //           rating: rating,
-  //           description: description,
-  //         });
-  //         toast.success("Successfully added critique!");
-  //         window.location.reload(false);
-  //       } else {
-  //         console.error(response.data);
-  //         toast.error("Unable to add critique!");
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //       toast.error("Unable to add critique!");
-  //     });
-  // }
-
-  // const onRatingChange = (e) => {
-  //   // e.preventDefault();
-  //   setRating(e.target.value);
-  // };
-  // const onDescriptionChange = (e) => {
-  //   // e.preventDefault();
-  //   setDescription(e.target.value);
-  // };
-
   //==================================================================================
 
   const ShowTab = () => {
@@ -175,7 +143,7 @@ export default function CritiqueCollection({ id, critiques }) {
     }
     if (isAddSelected) {
       return (
-        <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary p-4 my-3">
+        <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary-default p-4 my-3">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-center">
               <img
@@ -207,7 +175,7 @@ export default function CritiqueCollection({ id, critiques }) {
           <div className="mt-5 items-end text-right">
             <button
               onClick={handleAddCritique}
-              className="px-2 py-1 items-end text-white text-xl rounded bg-mellon-primary "
+              className="px-2 py-1 items-end text-white text-xl rounded bg-mellon-primary-default "
             >
               Add critique
             </button>
@@ -263,8 +231,8 @@ export default function CritiqueCollection({ id, critiques }) {
         <button onClick={clickShowCritiques}>
           <h2
             className={
-              "text-2xl ml-4 font-semibold hover:text-mellon-primary " +
-              (isShowSelected ? "text-mellon-primary" : "")
+              "text-2xl ml-4 font-semibold hover:text-mellon-primary-default " +
+              (isShowSelected ? "text-mellon-primary-default" : "")
             }
           >
             Show
@@ -275,8 +243,8 @@ export default function CritiqueCollection({ id, critiques }) {
             className={
               canAdd
                 ? isAddSelected
-                  ? "text-2xl ml-4 font-semibold hover:text-mellon-primary text-mellon-primary"
-                  : "text-2xl ml-4 font-semibold hover:text-mellon-primary"
+                  ? "text-2xl ml-4 font-semibold hover:text-mellon-primary-default text-mellon-primary-default"
+                  : "text-2xl ml-4 font-semibold hover:text-mellon-primary-default"
                 : "text-2xl ml-4 font-semibold text-onyx-primary-20"
             }
           >

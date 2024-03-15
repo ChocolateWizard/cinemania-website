@@ -31,7 +31,7 @@ export default function Header() {
   const WatchlistOption = ({ isLoggedIn }) => {
     return isLoggedIn ? (
       <li className="mt-3 md:ml-6 md:mt-0 md:mr-3">
-        <Link to={"/watchlist"} className="hover:text-mellon-primary">
+        <Link to={"/watchlist"} className="hover:text-mellon-primary-default">
           Watchlist
         </Link>
       </li>
@@ -42,7 +42,7 @@ export default function Header() {
     return sessionData.isLoggedIn ? (
       <ul className="flex flex-col md:flex-row items-center ml-auto">
         <li>
-          <button onClick={handleLogout} className="hover:text-mellon-primary">
+          <button onClick={handleLogout} className="hover:text-mellon-primary-default">
             Logout
           </button>
         </li>
@@ -58,12 +58,12 @@ export default function Header() {
     ) : (
       <ul className="flex flex-col md:flex-row items-center ml-auto">
         <li>
-          <Link to={"/login"} className="hover:text-mellon-primary">
+          <Link to={"/login"} className="hover:text-mellon-primary-default">
             Login
           </Link>
         </li>
         <li className="ml-5">
-          <Link to={"/register"} className="hover:text-mellon-primary">
+          <Link to={"/register"} className="hover:text-mellon-primary-default">
             Register
           </Link>
         </li>
@@ -78,18 +78,18 @@ export default function Header() {
           <li className="md:pl-10">
             <a href="/" className="flex flex-row">
               <SiteLogo />
-              <h1 className="font-bold text-3xl text-mellon-primary">
+              <h1 className="font-bold text-3xl text-mellon-primary-default">
                 Cinemania
               </h1>
             </a>
           </li>
           <li className="mt-3 md:ml-16 md:mt-0">
-            <Link to={"/movies"} className="hover:text-mellon-primary">
+            <Link to={"/movies"} className="hover:text-mellon-primary-default">
               Movies
             </Link>
           </li>
           <li className="mt-3 md:ml-6 md:mt-0">
-            <Link to={"/shows"} className="hover:text-mellon-primary">
+            <Link to={"/shows"} className="hover:text-mellon-primary-default">
               TV Shows
             </Link>
           </li>

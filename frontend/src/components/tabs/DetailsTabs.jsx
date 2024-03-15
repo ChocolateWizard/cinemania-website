@@ -31,8 +31,8 @@ export default function DetailsTabs({ id, actors, critiques }) {
         <button onClick={showCastTab}>
           <h2
             className={
-              "text-4xl ml-4 font-semibold hover:text-mellon-primary " +
-              (castShown ? "text-mellon-primary" : "")
+              "text-4xl ml-4 font-semibold hover:text-mellon-primary-default " +
+              (castShown ? "text-mellon-primary-default" : "")
             }
           >
             Cast
@@ -41,8 +41,8 @@ export default function DetailsTabs({ id, actors, critiques }) {
         <button onClick={showCritiquesTab}>
           <h2
             className={
-              "text-4xl ml-4 font-semibold hover:text-mellon-primary " +
-              (critiquesShown ? "text-mellon-primary" : "")
+              "text-4xl ml-4 font-semibold hover:text-mellon-primary-default " +
+              (critiquesShown ? "text-mellon-primary-default" : "")
             }
           >
             Critiques
