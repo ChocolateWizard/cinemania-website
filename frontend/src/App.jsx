@@ -41,7 +41,7 @@ function App() {
           <Header />
           <main>
             <Routes>
-              <Route path="/" exact element={<Home />} />        
+              <Route path="/" exact element={<Home />} />                   
               <Route path="/movies" exact element={<MoviesPage />} />
               <Route path="/shows" exact element={<ShowsPage />} />
               <Route

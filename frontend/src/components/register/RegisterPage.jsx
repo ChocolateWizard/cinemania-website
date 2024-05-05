@@ -268,13 +268,13 @@ function Form({ countries }) {
   return (
     <section className="flex justify-center my-5 text-black">
       <div className="flex flex-col bg-white rounded-lg px-5 py-5">
-        <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
           Sign up
         </h1>
         <h2 className="text-gray-500 mb-8 mt-1">
           Enter your details to register
         </h2>
-        <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="flex flex-row space-x-4">
             <TextInput
               className={"max-w-[200px]"}
