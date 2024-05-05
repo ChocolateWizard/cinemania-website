@@ -1,364 +1,370 @@
-import React, { useState, useEffect } from "react";
-import { fetchCountries, register } from "../../utils/Api";
+import React, { useEffect, useState } from "react";
 import CardLoader from "../helpers/loaders/cardLoader/CardLoader";
+import TextInput from "../helpers/form/TextInput";
+import Select from "../helpers/form/Select";
+import { fetchCountries, register } from "../../utils/Api";
+import FileInput from "../helpers/form/FileInput";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export default function RegisterPage() {
-  const navigate = useNavigate();
-  const [countries, setCountries] = useState([]);
+//===========CONSTANTS=================================================================
+const genders = [
+  {
+    value: "male",
+    label: "Male",
+  },
+  {
+    value: "female",
+    label: "Female",
+  },
+  {
+    value: "other",
+    label: "Other",
+  },
+];
+const roles = [
+  {
+    value: "REGULAR",
+    label: "Regular",
+  },
+  {
+    value: "CRITIC",
+    label: "Critic",
+  },
+];
+const profileNameRegex = /^[a-zA-Z0-9_]*$/;
+const extraSpaceRegex = / +(?= )/g;
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const validExtensions = [".jpg", ".jpeg", ".png"];
+const maxImageFileSize = 8388608;
+
+//=====================================================================================
+export default function RegisterPageTest() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [userJsonValues, setUserJsonValues] = useState({
-    first_name: "",
-    last_name: "",
-    gender: "male",
-    profile_name: "",
-    username: "",
-    email: "",
-    password: "",
-  });
-  const [profileImage, setProfileImage] = useState(null);
-  const [role, setRole] = useState("REGULAR");
-  const [countryId, setCountryId] = useState(null);
+  const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    setLoading(true);
-
     fetchCountries()
-      .then((response) => {
-        if (response.status == 200) {
-          setCountries(response.data);
-          setCountryId("" + response.data[0].id);
-        } else {
-          console.error("Unable to retreive countries: " + response.data);
-          setError(response.data);
-        }
-      })
+      .then((res) =>
+        setCountries(
+          res.data.map((c) => {
+            return { value: c.id, label: c.name };
+          })
+        )
+      )
       .catch((err) => {
         console.error("Unable to retreive countries: " + err);
-        setError(err);
       })
       .finally(() => {
         setLoading(false);
       });
   }, []);
 
-  const handleChange = (e) => {
-    if (e.target.type === "file") {
-      setProfileImage(e.target.files[0]);
-    } else {
-      setUserJsonValues({
-        ...userJsonValues,
-        [e.target.name]: e.target.value,
-      });
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append(
-      "user",
-      new Blob(
-        [
-          JSON.stringify({
-            first_name: userJsonValues.first_name,
-            last_name: userJsonValues.last_name,
-            gender: userJsonValues.gender,
-            profile_name: userJsonValues.profile_name,
-            username: userJsonValues.username,
-            email: userJsonValues.email,
-            password: userJsonValues.password,
-            role: role,
-            country_id: parseInt(countryId),
-          }),
-        ],
-        { type: "application/json" }
-      )
-    );
-
-    if (profileImage != null) {
-      formData.append("profile_image", profileImage);
-    }
-    register(formData)
-      .then((response) => {
-        if (response.status == 200) {
-          toast.success("Successful registration!");
-          navigate('/login');
-        } else {
-          console.error(response.data);
-          toast.error("Unable to register!");
-        }
-      })
-      .catch((err) => {       
-        console.error(err);
-        toast.error("Unable to register!");
-      });
-  };
-  //============================================================================================
-
   if (loading) {
     return <CardLoader />;
   }
-  if (error != null) {
-    return (
-      <h2 className="px-4 mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
-        Unable to load register form
-      </h2>
-    );
+  return <Form countries={countries} />;
+}
+
+function Form({ countries }) {
+  const navigate = useNavigate();
+  const [btnEnabled, setBtnEnabled] = useState(countries.length > 0);
+  const [country, setCountry] = useState(null);
+  const [gender, setGender] = useState(null);
+  const [role, setRole] = useState(null);
+
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    gender: "",
+    role: "",
+    country: countries.length > 0 ? "" : "Unable to load countries",
+    profileName: "",
+    profileImage: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setBtnEnabled(false);
+    const formErrors = {
+      firstName: "",
+      lastName: "",
+      gender: "",
+      role: "",
+      country: "",
+      profileName: "",
+      profileImage: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+    };
+    const firstName = e.target.firstName.value
+      .trim()
+      .replace(extraSpaceRegex, "");
+    const lastName = e.target.lastName.value
+      .trim()
+      .replace(extraSpaceRegex, "");
+    const profileName = e.target.profileName.value.trim();
+    const profileImage = e.target.profileImage.files[0];
+    const email = e.target.email.value.trim();
+    const username = e.target.username.value.trim();
+    const password = e.target.password.value.trim();
+    const confirmPassword = e.target.confirmPassword.value.trim();
+
+    let isValid = true;
+
+    //validate first name
+    if (firstName.length == 0) {
+      formErrors.firstName = "This field is mandatory";
+      isValid = false;
+    } else if (firstName.length >= 100) {
+      formErrors.firstName = "First name must be less than 100 characters";
+      isValid = false;
+    }
+    //validate last name
+    if (lastName.length == 0) {
+      formErrors.lastName = "This field is mandatory";
+      isValid = false;
+    } else if (lastName.length >= 100) {
+      formErrors.lastName = "Last name must be less than 100 characters";
+      isValid = false;
+    }
+
+    //validate gender
+    if (gender == null) {
+      formErrors.gender = "This field is mandatory";
+      isValid = false;
+    }
+    //validate role
+    if (role == null) {
+      formErrors.role = "This field is mandatory";
+      isValid = false;
+    }
+    //validate country
+    if (country == null) {
+      formErrors.country = "This field is mandatory";
+      isValid = false;
+    }
+    //validate profile name
+    if (profileName.length == 0) {
+      formErrors.profileName = "This field is mandatory";
+      isValid = false;
+    } else if (profileName.length >= 100) {
+      formErrors.profileName = "Profile name must be less than 100 characters";
+      isValid = false;
+    } else if (!profileNameRegex.test(profileName)) {
+      formErrors.profileName =
+        "Profile name must only contain letters, numbers and _";
+      isValid = false;
+    }
+
+    //validate profile image
+    if (profileImage) {
+      const profileImageName = profileImage.name;
+      if (
+        !validExtensions.some((type) =>
+          profileImageName.toLowerCase().endsWith(type)
+        )
+      ) {
+        formErrors.profileImage =
+          "Profile image must be of type .jpg, .jpeg or .png";
+        isValid = false;
+      } else if (profileImage.size > maxImageFileSize) {
+        formErrors.profileImage = "Max allowed image size is 8 MB";
+        isValid = false;
+      }
+    }
+
+    //validate email
+    if (email.length == 0) {
+      formErrors.email = "This field is mandatory";
+      isValid = false;
+    } else if (email.length >= 300) {
+      formErrors.email = "Email must be less than 300 characters";
+      isValid = false;
+    } else if (!emailRegex.test(email)) {
+      formErrors.email = "Invalid email structure";
+      isValid = false;
+    }
+
+    //validate username
+    if (username.length == 0) {
+      formErrors.username = "This field is mandatory";
+      isValid = false;
+    } else if (username.length >= 300) {
+      formErrors.username = "Username must be less than 300 characters";
+      isValid = false;
+    }
+
+    //validate password
+    if (password.length == 0) {
+      formErrors.password = "This field is mandatory";
+      isValid = false;
+    } else if (password.length < 6) {
+      formErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    } else if (password.length >= 300) {
+      formErrors.password = "Password must be less than 300 characters";
+      isValid = false;
+    }
+
+    //confirm password
+    if (!formErrors.password) {
+      if (confirmPassword !== password) {
+        formErrors.confirmPassword = "Password does not match";
+        isValid = false;
+      }
+    }
+
+    setErrors(formErrors);
+    if (!isValid) {
+      setBtnEnabled(true);
+    } else {
+      const formData = new FormData();
+      formData.append(
+        "user",
+        new Blob(
+          [
+            JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              gender: gender,
+              profile_name: profileName,
+              username: username,
+              email: email,
+              password: password,
+              role: role,
+              country_id: parseInt(country),
+            }),
+          ],
+          { type: "application/json" }
+        )
+      );
+
+      if (profileImage) {
+        formData.append("profile_image", profileImage);
+      }
+
+      register(formData)
+        .then((response) => {
+          toast.success("Successful registration!");
+          navigate("/login");
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error("Unable to register!");
+        })
+        .finally(() => {
+          setBtnEnabled(true);
+        });
+    }
   }
 
   return (
-    <section>
-      <div className="flex flex-col items-center justify-center px-6 my-4 mx-autos">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create and account
-            </h1>
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              {/* first and last name */}
-              <div className="flex flex-row justify-between">
-                <div>
-                  <label
-                    htmlFor="first_name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    First name
-                  </label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    id="first_name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="First name"
-                    required=""
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="last_name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    id="last_name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Last name"
-                    required=""
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              {/* gender */}
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Gender
-                </label>
-                <div className="flex flex-row ">
-                  <div className="">
-                    <input
-                      type="radio"
-                      name="gender"
-                      id="gender_male"
-                      className=""
-                      value="male"
-                      onChange={handleChange}
-                      defaultChecked={userJsonValues.gender === "male"}
-                    />
-                    <label
-                      htmlFor="gender_male"
-                      className="pl-1 text-gray-900 dark:text-white"
-                    >
-                      Male
-                    </label>
-                  </div>
-                  <div className="pl-7">
-                    <input
-                      type="radio"
-                      name="gender"
-                      id="gender_female"
-                      className=""
-                      value="female"
-                      onChange={handleChange}
-                    />
-                    <label
-                      htmlFor="gender_female"
-                      className="pl-1 text-gray-900 dark:text-white"
-                    >
-                      Female
-                    </label>
-                  </div>
-                  <div className="pl-7">
-                    <input
-                      type="radio"
-                      name="gender"
-                      id="gender_other"
-                      className=""
-                      value="other"
-                      onChange={handleChange}
-                    />
-                    <label
-                      htmlFor="gender_other"
-                      className="pl-1 text-gray-900 dark:text-white"
-                    >
-                      Other
-                    </label>
-                  </div>
-                </div>
-              </div>
-              {/* role and country */}
-              <div className="flex flex-row justify-between">
-                <div>
-                  <label
-                    htmlFor="role"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Role
-                  </label>
-                  <select
-                    name="role"
-                    id="role"
-                    value={role}
-                    required=""
-                    className="block w-50 p-2.5 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    onChange={(e) => {
-                      setRole(e.target.value);
-                    }}
-                  >
-                    <option value="REGULAR">Regular</option>
-                    <option value="CRITIC">Critic</option>
-                  </select>
-                </div>
-                <div className="pl-5">
-                  <label
-                    htmlFor="country_id"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Country
-                  </label>
-                  <select
-                    name="country_id"
-                    id="country_id"
-                    required=""
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    onChange={(e) => {
-                      setCountryId("" + e.target.value);
-                    }}
-                  >
-                    {countries.map((country, index) => {
-                      return (
-                        <option key={index} value={country.id}>
-                          {country.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              </div>
-              {/* profile name */}
-              <div>
-                <label
-                  htmlFor="profile_name"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Profile name
-                </label>
-                <input
-                  type="text"
-                  name="profile_name"
-                  id="profile_name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Profile name"
-                  required=""
-                  onChange={handleChange}
-                />
-              </div>
-              {/* profile image */}
-              <div>
-                <label
-                  htmlFor="profile_image"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Profile image
-                </label>
-                <input
-                  type="file"
-                  name="profile_image"
-                  id="profile_image"
-                  className="text-gray-900 mt-2 "
-                  accept=".png, .jpg, .jpeg"
-                  onChange={handleChange}
-                />
-              </div>
-              {/* email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com"
-                  required=""
-                  onChange={handleChange}
-                />
-              </div>
-              {/* username */}
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  id="username"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Username"
-                  required=""
-                  onChange={handleChange}
-                />
-              </div>
-              {/* password */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required=""
-                  onChange={handleChange}
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Create an account
-              </button>
-            </form>
+    <section className="flex justify-center my-5 text-black">
+      <div className="flex flex-col bg-white rounded-lg px-5 py-5">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+          Sign up
+        </h1>
+        <h2 className="text-gray-500 mb-8 mt-1">
+          Enter your details to register
+        </h2>
+        <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+          <div className="flex flex-row space-x-4">
+            <TextInput
+              className={"max-w-[200px]"}
+              autoComplete="off"
+              type={"text"}
+              placeholder={"First name"}
+              name={"firstName"}
+              error={errors.firstName}
+            />
+            <TextInput
+              className={"max-w-[200px]"}
+              autoComplete="off"
+              type={"text"}
+              placeholder={"Last name"}
+              name={"lastName"}
+              error={errors.lastName}
+            />
           </div>
-        </div>
+          <div className="flex flex-row space-x-4">
+            <Select
+              placeholder={"Gender"}
+              data={genders}
+              disabled={false}
+              error={errors.gender}
+              setter={setGender}
+            />
+            <Select
+              placeholder={"Role"}
+              data={roles}
+              disabled={false}
+              error={errors.role}
+              setter={setRole}
+            />
+          </div>
+          <Select
+            placeholder={"Country"}
+            data={countries}
+            disabled={countries.length === 0}
+            error={errors.country}
+            setter={setCountry}
+          />
+          <TextInput
+            autoComplete="off"
+            type={"text"}
+            placeholder={"Profile name"}
+            name={"profileName"}
+            error={errors.profileName}
+          />
+          <FileInput
+            name={"profileImage"}
+            placeholder={"Profile image"}
+            error={errors.profileImage}
+          />
+
+          <TextInput
+            autoComplete="off"
+            type={"email"}
+            placeholder={"Email"}
+            name={"email"}
+            error={errors.email}
+          />
+          <TextInput
+            autoComplete="off"
+            type={"text"}
+            placeholder={"Username"}
+            name={"username"}
+            error={errors.username}
+          />
+          <TextInput
+            autoComplete="off"
+            type={"password"}
+            placeholder={"Password"}
+            name={"password"}
+            error={errors.password}
+          />
+          <TextInput
+            autoComplete="off"
+            type={"password"}
+            placeholder={"Confirm password"}
+            name={"confirmPassword"}
+            error={errors.confirmPassword}
+          />
+          <button
+            type="submit"
+            disabled={!btnEnabled}
+            className="w-full font-bold rounded-lg text-sm px-5 py-2.5 text-center text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-300 disabled:bg-primary-200"
+          >
+            {btnEnabled ? "Create an account" : "Signing up..."}
+          </button>
+        </form>
       </div>
     </section>
   );

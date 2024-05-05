@@ -19,7 +19,8 @@ export default function MediaCard({ data }) {
     <div className="mt-8 px-2">
       <Link to={detailsPageURL}>
         <img
-          className="h-[350px] hover:opacity-75 transition ease-in-out duration-150"
+          className="hover:opacity-75 transition ease-in-out duration-150"
+          height={350}
           src={getCoverImageURL(data.cover_image_url)}
           alt=""
         />
@@ -43,7 +44,7 @@ export default function MediaCard({ data }) {
           <span>{data.release_date}</span>
         </div>
         <div className="text-gray-400 text-sm">
-          {concatGenreNames(data.genres,", ")}
+          {concatGenreNames(data.genres, ", ")}
         </div>
       </div>
     </div>
