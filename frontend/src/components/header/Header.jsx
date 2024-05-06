@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import SiteLogo from "../../assets/SiteLogo";
 import Searchbar from "./Searchbar";
 import { GlobalContext } from "../../context/GlobalState";
 import { logout } from "../../utils/Api";
 import { toast } from "react-toastify";
+import SiteLogoSVG from "../helpers/svg/SiteLogoSVG";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -77,7 +77,7 @@ export default function Header() {
         <ul className="flex flex-col md:flex-row items-center">
           <li className="md:pl-10">
             <a href="/" className="flex flex-row">
-              <SiteLogo />
+              <SiteLogoSVG />
               <h1 className="font-bold text-3xl text-mellon-primary-default">
                 Cinemania
               </h1>
