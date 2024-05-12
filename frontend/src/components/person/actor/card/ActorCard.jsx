@@ -25,7 +25,7 @@ function ProfilePhoto({ actor }) {
   if (!actor.profile_photo_url) {
     return (
       <div className="bg-onyx-tint h-[325px] w-[216px] flex items-center justify-center hover:opacity-75 transition">
-        <PersonSVG />
+        <PersonSVG className="fill-onyx-primary-default" />
       </div>
     );
   }

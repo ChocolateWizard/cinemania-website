@@ -1,0 +1,31 @@
+.user-dropdown-menu {
+  transition: height 500ms ease;
+}
+
+.header-menu-primary-enter {
+  position: absolute;
+  transform: translateX(-110%);
+}
+.header-menu-primary-enter-active {
+  transform: translateX(0%);
+  transition: all 500ms ease;
+}
+.header-menu-primary-exit {
+  position: absolute;
+}
+.header-menu-primary-exit-active {
+  transform: translateX(-110%);
+  transition: all 500ms ease;
+}
+
+.header-menu-secondary-enter {
+  transform: translateX(110%);
+}
+.header-menu-secondary-enter-active {
+  transform: translateX(0%);
+  transition: all 500ms ease;
+}
+.header-menu-secondary-exit-active {
+  transform: translateX(110%);
+  transition: all 500ms ease;
+}

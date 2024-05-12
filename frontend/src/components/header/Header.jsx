@@ -1,107 +1,155 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import Searchbar from "./Searchbar";
 import { GlobalContext } from "../../context/GlobalState";
-import { logout } from "../../utils/Api";
-import { toast } from "react-toastify";
 import SiteLogoSVG from "../helpers/svg/SiteLogoSVG";
+import Person2SVG from "../helpers/svg/Person2SVG";
+import UserDropdownMenu from "./UserDropdownMenu";
 
 export default function Header() {
-  const navigate = useNavigate();
-  const { sessionData, removeSessionData } = useContext(GlobalContext);
+  const { sessionData } = useContext(GlobalContext);
 
-  function handleLogout() {
-    logout()
-      .then((response) => {
-        if (response.status == 200) {
-          removeSessionData();
-          navigate(`/`);
-          toast.success("You have been logged out!");
-        } else {
-          console.error(response.data);
-          toast.error("Unable to logout!");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Unable to logout!");
-      });
+  return (
+    <header className="bg-onyx-tint">
+      <nav>
+        <ul className="flex flex-col md:flex-row justify-between">
+          <li>
+            <ul className="flex flex-col md:flex-row">
+              <li>
+                <Link
+                  to={"/"}
+                  className="group flex flex-row justify-center items-center pr-4 pl-3 py-2 h-full"
+                >
+                  <SiteLogoSVG
+                    height="40"
+                    className="fill-mellon-primary-default group-hover:opacity-75 "
+                  />
+                  <span className="font-bold text-4xl text-mellon-primary-default group-hover:opacity-75">
+                    Cinemania
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"/movies"}
+                  className="text-lg flex justify-center items-center md:pt-2 px-2 h-full 
+                  hover:text-mellon-primary-default  hover:bg-onyx-primary-20 
+                  "
+                >
+                  Movies
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"/shows"}
+                  className="text-lg flex justify-center items-center md:pt-2 px-2 h-full 
+                  hover:text-mellon-primary-default  hover:bg-onyx-primary-20 
+                  "
+                >
+                  TV Shows
+                </Link>
+              </li>
+            </ul>
+          </li>
+          {/* Searcbar, login and register */}
+          <li>
+            <ul className="flex flex-col md:flex-row h-full">
+              <li className="flex justify-center items-center">
+                <Searchbar />
+              </li>
+              <UserMenu sessionData={sessionData} />
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
+}
+
+function UserMenu({ sessionData }) {
+  const [open, setOpen] = useState(false);
+  const node = useRef();
+
+  function exitMenu() {
+    setOpen(false);
   }
 
-  const WatchlistOption = ({ isLoggedIn }) => {
-    return isLoggedIn ? (
-      <li className="mt-3 md:ml-6 md:mt-0 md:mr-3">
-        <Link to={"/watchlist"} className="hover:text-mellon-primary-default">
-          Watchlist
-        </Link>
-      </li>
-    ) : null;
-  };
+  //This is so whenever user clicks outside of dropdown menu, it closes if its open
+  useEffect(() => {
+    // Function to handle click events
+    const handleClick = (e) => {
+      if (node.current.contains(e.target)) {
+        // Inside click
+        return;
+      }
+      // Outside click
+      setOpen(false);
+    };
 
-  const LoginRegisterOptions = ({ sessionData }) => {
-    return sessionData.isLoggedIn ? (
-      <ul className="flex flex-col md:flex-row items-center ml-auto">
+    // Add the event listener when the component mounts
+    if (open) {
+      document.addEventListener("mousedown", handleClick);
+    } else {
+      document.removeEventListener("mousedown", handleClick);
+    }
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [open]);
+
+  if (!sessionData.isLoggedIn) {
+    return (
+      <>
         <li>
-          <button onClick={handleLogout} className="hover:text-mellon-primary-default">
-            Logout
-          </button>
-        </li>
-        <li className="flex flex-row items-center ml-5">
-          <div>{sessionData.user.profileName}</div>
-          <img
-            src={sessionData.user.profileImageUrl}
-            alt="avatar"
-            className="rounded-full w-8 h-8 ml-2"
-          />
-        </li>
-      </ul>
-    ) : (
-      <ul className="flex flex-col md:flex-row items-center ml-auto">
-        <li>
-          <Link to={"/login"} className="hover:text-mellon-primary-default">
+          <Link
+            to={"/login"}
+            className="text-lg flex justify-center items-center md:pt-2  px-4 h-full 
+      hover:text-mellon-primary-default  hover:bg-onyx-primary-20"
+          >
             Login
           </Link>
         </li>
-        <li className="ml-5">
-          <Link to={"/register"} className="hover:text-mellon-primary-default">
+        <li>
+          <Link
+            to={"/register"}
+            className="text-lg flex justify-center items-center md:pt-2 px-4  h-full 
+      hover:text-mellon-primary-default  hover:bg-onyx-primary-20"
+          >
             Register
           </Link>
         </li>
-      </ul>
+      </>
     );
-  };
-
+  }
   return (
-    <header className="border-b border-onyx-tint bg-onyx-tint">
-      <nav className="container flex flex-col md:flex-row items-center justify-between py-2">
-        <ul className="flex flex-col md:flex-row items-center">
-          <li className="md:pl-10">
-            <a href="/" className="flex flex-row">
-              <SiteLogoSVG />
-              <h1 className="font-bold text-3xl text-mellon-primary-default">
-                Cinemania
-              </h1>
-            </a>
-          </li>
-          <li className="mt-3 md:ml-16 md:mt-0">
-            <Link to={"/movies"} className="hover:text-mellon-primary-default">
-              Movies
-            </Link>
-          </li>
-          <li className="mt-3 md:ml-6 md:mt-0">
-            <Link to={"/shows"} className="hover:text-mellon-primary-default">
-              TV Shows
-            </Link>
-          </li>
-          <WatchlistOption isLoggedIn={sessionData.isLoggedIn} />
-        </ul>
-        <div className="flex flex-col md:flex-row items-center">
-          <Searchbar />
-          <div className="mt-3 md:ml-4 md:mt-0 flex flex-col md:flex-row">
-            <LoginRegisterOptions sessionData={sessionData} />
+    <li
+      className="flex justify-center items-center md:mr-5 md:ml-10"
+      ref={node}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(!open);
+        }}
+        className="group flex flex-row justify-center items-center space-x-2 h-full"
+      >
+        <span className="group-hover:opacity-75">
+          {sessionData.user.profileName}
+        </span>
+        {sessionData.user.profileImageUrl ? (
+          <img
+            src={sessionData.user.profileImageUrl}
+            className="rounded-full w-10 h-10 group-hover:opacity-75"
+          />
+        ) : (
+          <div className="flex items-center justify-center rounded-full w-10 h-10 group-hover:opacity-75 bg-onyx-primary-35">
+            <Person2SVG className="fill-onyx-primary-50 p-2" />
           </div>
-        </div>
-      </nav>
-    </header>
+        )}
+      </button>
+      {open && <UserDropdownMenu exitMenu={exitMenu} />}
+    </li>
   );
 }

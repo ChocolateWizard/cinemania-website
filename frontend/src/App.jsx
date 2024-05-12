@@ -41,7 +41,7 @@ function App() {
           <Header />
           <main>
             <Routes>
-              <Route path="/" exact element={<Home />} />                   
+              <Route path="/" exact element={<Home />} />
               <Route path="/movies" exact element={<MoviesPage />} />
               <Route path="/shows" exact element={<ShowsPage />} />
               <Route
@@ -74,6 +74,7 @@ function App() {
               <Route path="/movie/:id" element={<MovieDetails />} />
               <Route path="/show/:id" element={<ShowDetails />} />
               <Route path="/search/:title" element={<SearchResults />} />
+              <Route path="/page-not-found" element={<PageNotFound />} />
               <Route path="/*" element={<PageNotFound />} />
             </Routes>
           </main>

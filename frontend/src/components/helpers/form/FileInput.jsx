@@ -42,7 +42,7 @@ export default function FileInput({ name, placeholder, error }) {
         </div>
         {/* SVG PART */}
         <div className="flex justify-center items-center bg-[#d4d7d9] w-[40px] rounded-r-[6px]">
-          <UploadSVG width={30} height={30} />
+          <UploadSVG width="30" height="30" className="stroke-white" />
         </div>
       </label>
       <input
