@@ -554,7 +554,11 @@ public class Database {
             ps.setString(3, user.getLastName());
             ps.setString(4, String.valueOf(user.getGender().getSymbol()));
             ps.setString(5, user.getProfileName());
-            ps.setString(6, user.getProfileImage());
+            if(user.getProfileImage()==null){
+                ps.setNull(6, Types.VARCHAR);
+            }else{
+                ps.setString(6, user.getProfileImage());
+            }         
             ps.setString(7, user.getUsername());
             ps.setString(8, user.getEmail());
             ps.setString(9, user.getPassword());

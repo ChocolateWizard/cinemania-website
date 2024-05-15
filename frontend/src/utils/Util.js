@@ -1,6 +1,4 @@
-export function isEmptyOrSpaces(str) {
-  return str === null || str.match(/^\s*$/) !== null;
-}
+
 export function concatGenreNames(genres, delimiter) {
   let gs = "";
   for (let i = 0; i < genres.length; i++) {
@@ -49,11 +47,6 @@ export function concatActorRoleNames(roles, delimiter, number) {
   return rs;
 }
 
-export function getCoverImageURL(coverImage) {
-  return coverImage === null
-    ? "https://picsum.photos/id/237/200/300"
-    : coverImage;
-}
 
 
 

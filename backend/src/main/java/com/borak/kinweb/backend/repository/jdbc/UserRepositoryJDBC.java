@@ -233,7 +233,11 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long> {
             ps.setString(2, user.getLastName());
             ps.setString(3, String.valueOf(user.getGender().getSymbol()));
             ps.setString(4, user.getProfileName());
-            ps.setString(5, user.getProfileImage());
+            if(user.getProfileImage()==null){
+                ps.setNull(5, Types.VARCHAR);
+            }else{
+                ps.setString(5, user.getProfileImage());
+            }        
             ps.setString(6, user.getUsername());
             ps.setString(7, user.getEmail());
             ps.setString(8, user.getPassword());

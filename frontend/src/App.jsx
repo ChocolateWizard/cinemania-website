@@ -19,6 +19,7 @@ import LoginPage from "./components/login/LoginPage";
 import RegisterPage from "./components/register/RegisterPage";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NoImageSVG from "./components/helpers/svg/NoImageSVG";
 
 function App() {
   return (
@@ -73,7 +74,7 @@ function App() {
               />
               <Route path="/movie/:id" element={<MovieDetails />} />
               <Route path="/show/:id" element={<ShowDetails />} />
-              <Route path="/search/:title" element={<SearchResults />} />
+              <Route path="/search" element={<SearchResults />} />
               <Route path="/page-not-found" element={<PageNotFound />} />
               <Route path="/*" element={<PageNotFound />} />
             </Routes>

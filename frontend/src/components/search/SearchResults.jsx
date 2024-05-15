@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import CardLoader from "../helpers/loaders/cardLoader/CardLoader";
 import { fetchMediaForSearchResults } from "../../utils/Api";
 import MediaCard from "../cards/MediaCard";
@@ -7,54 +7,53 @@ import CardGrid from "../cards/grid/CardGrid";
 
 export default function SearchResults() {
   const [loading, setLoading] = useState(true);
-  const { title } = useParams();
   const [media, setMedia] = useState([]);
+  const title = useSearchParams()[0].get("title");
 
   useEffect(() => {
     setLoading(true);
-    fetchMediaForSearchResults(1, 30, title)
-      .then((response) => {
-        if (response.status === 200) {
-          setMedia(response.data);
-        } else {
-          console.error(response.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  const RenderCardsList = ({ dataArray, errorMessage, CardComponent }) => {
-    if (dataArray.length === 0) {
-      return (
-        <h2 className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
-          {errorMessage}
-        </h2>
-      );
+    if (title) {
+      fetchMediaForSearchResults(1, 30, title)
+        .then((res) => {
+          setMedia(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setMedia([]);
+      setLoading(false);
     }
-    return <CardGrid dataArray={dataArray} CardComponent={CardComponent} />;
-  };
-  //=======================================================================================================
-  if (loading == true) {
+  }, [title]);
+
+  if (loading) {
     return <CardLoader />;
   }
-
   return (
-    <div className="container mx-auto px-4 pt-16">
-      <div>
-        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
-          Results for: {title}
-        </h2>
-        <RenderCardsList
-          dataArray={media}
-          errorMessage={"No media found"}
-          CardComponent={MediaCard}
-        />
-      </div>
-    </div>
+    <section className="container mx-auto px-4 pt-16 pb-6">
+      <p className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
+        Results for: "
+        <span className="normal-case text-onyx-contrast">{title}</span>"
+      </p>
+      <MediaCardsList
+        media={media}
+        errorMessage={"No media found"}
+        CardComponent={MediaCard}
+      />
+    </section>
   );
+}
+
+function MediaCardsList({ media, errorMessage, CardComponent }) {
+  if (media.length === 0) {
+    return (
+      <p className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
+        {errorMessage}
+      </p>
+    );
+  }
+  return <CardGrid dataArray={media} CardComponent={CardComponent} />;
 }

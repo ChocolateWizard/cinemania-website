@@ -48,8 +48,6 @@ public class UserTransformer {
         user.setProfileName(registerForm.getProfileName());
         if (registerForm.getProfileImage() != null) {
             user.setProfileImage(registerForm.getProfileName() + "." + registerForm.getProfileImage().getExtension());
-        } else {
-            user.setProfileImage("default.png");
         }
         user.setUsername(registerForm.getUsername());
         user.setPassword(encoder.encode(registerForm.getPassword()));
@@ -91,10 +89,12 @@ public class UserTransformer {
         response.setFirstName(userJDBC.getFirstName());
         response.setLastName(userJDBC.getLastName());
         response.setProfileName(userJDBC.getProfileName());
-        response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJDBC.getProfileImage());
+        if (userJDBC.getProfileImage() != null) {
+            response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJDBC.getProfileImage());
+        }
         response.setGender(userJDBC.getGender());
         response.setRole(userJDBC.getRole());
-        
+
         UserResponseDTO.Country country = new UserResponseDTO.Country();
         country.setId(userJDBC.getCountry().getId());
         country.setName(userJDBC.getCountry().getName());

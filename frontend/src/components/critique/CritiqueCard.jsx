@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { GlobalContext } from "../../context/GlobalState";
 import { deleteCritique, putCritique } from "../../utils/Api";
 import { toast } from "react-toastify";
+import Person2SVG from "../helpers/svg/Person2SVG";
 
 export default function CritiqueCard({ id, critique, isUsersCritique }) {
   const { updateCritique, removeCritique } = useContext(GlobalContext);
@@ -72,11 +73,7 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
       <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary-default p-4 my-3">
         <div className="flex flex-row justify-between items-center">
           <div className="flex flex-row items-center">
-            <img
-              className="w-12 h-12 rounded-full"
-              src={critique.critic.profile_image_url}
-              alt="User Image"
-            />
+            <UserProfilePicture url={critique.critic.profile_image_url} />
             <div className="flex flex-row ml-4">
               <p className="font-bold">{critique.critic.profile_name}</p>
               <div className="flex flex-row space-x-2 ml-4">
@@ -144,11 +141,12 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
     <div className="flex flex-col border-2 bg-onyx-primary-20 border-onyx-primary-20 p-4 my-3">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
-          <img
+          <UserProfilePicture url={critique.critic.profile_image_url} />
+          {/* <img
             className="w-12 h-12 rounded-full"
             src={critique.critic.profile_image_url}
             alt="User Image"
-          />
+          /> */}
           <div className="ml-4">
             <p className="font-bold">{critique.critic.profile_name}</p>
           </div>
@@ -158,6 +156,17 @@ export default function CritiqueCard({ id, critique, isUsersCritique }) {
         </div>
       </div>
       <p className="mt-4 text-wrap break-all">{critique.description}</p>
+    </div>
+  );
+}
+
+function UserProfilePicture({ url }) {
+  if (url) {
+    return <img className="w-12 h-12 rounded-full" src={url} />;
+  }
+  return (
+    <div className="flex items-center justify-center rounded-full w-12 h-12 bg-onyx-primary-35">
+      <Person2SVG className="fill-onyx-primary-50 p-2.5" />
     </div>
   );
 }

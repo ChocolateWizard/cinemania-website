@@ -39,7 +39,7 @@ const validExtensions = [".jpg", ".jpeg", ".png"];
 const maxImageFileSize = 8388608;
 
 //=====================================================================================
-export default function RegisterPageTest() {
+export default function RegisterPage() {
   const [loading, setLoading] = useState(true);
   const [countries, setCountries] = useState([]);
 

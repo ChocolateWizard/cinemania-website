@@ -458,9 +458,6 @@ public class DomainValidationService {
         if (registerForm.getProfileName().contains(" ")) {
             throw new ValidationException("Profile name must not contain blank spaces!");
         }
-        if (registerForm.getProfileName().equals("default")) {
-            throw new ValidationException("Profile name is already reserved!");
-        }
         //ADMINISTRATOR roles should be given manually, not by client choise
         if (registerForm.getRole() == UserRole.ADMINISTRATOR) {
             throw new ValidationException("Special permision is needed for an ADMINISTRATOR role!");

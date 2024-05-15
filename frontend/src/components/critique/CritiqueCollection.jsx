@@ -3,6 +3,7 @@ import { GlobalContext } from "../../context/GlobalState";
 import CritiqueCard from "./CritiqueCard";
 import { postCritique } from "../../utils/Api";
 import { toast } from "react-toastify";
+import Person2SVG from "../helpers/svg/Person2SVG";
 
 //current media id and its critiques
 export default function CritiqueCollection({ id, critiques }) {
@@ -146,11 +147,7 @@ export default function CritiqueCollection({ id, critiques }) {
         <div className="flex flex-col border-2 bg-onyx-primary-20 border-mellon-primary-default p-4 my-3">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-center">
-              <img
-                className="w-12 h-12 rounded-full"
-                src={sessionData.user.profileImageUrl}
-                alt="User Image"
-              />
+              <UserProfilePicture url={sessionData.user.profileImageUrl} />
               <div className="flex flex-row ml-4">
                 <p className="font-bold">{sessionData.user.profileName}</p>
               </div>
@@ -253,6 +250,17 @@ export default function CritiqueCollection({ id, critiques }) {
         </button>
       </div>
       <ShowTab />
+    </div>
+  );
+}
+
+function UserProfilePicture({ url }) {
+  if (url) {
+    return <img className="w-12 h-12 rounded-full" src={url} />;
+  }
+  return (
+    <div className="flex items-center justify-center rounded-full w-12 h-12 bg-onyx-primary-35">
+      <Person2SVG className="fill-onyx-primary-50 p-2.5" />
     </div>
   );
 }

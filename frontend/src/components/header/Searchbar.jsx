@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { isEmptyOrSpaces } from "../../utils/Util";
 import { fetchMediaForSearchbar } from "../../utils/Api";
 import { useNavigate } from "react-router-dom";
 import SearchSVG from "../helpers/svg/SearchSVG";
@@ -9,21 +8,13 @@ export default function Searchbar() {
   const [query, setQuery] = useState("");
   const [media, setMedia] = useState([]);
 
-  //value entered in searchbar
-  const onChange = (e) => {
-    e.preventDefault();
-    setQuery(e.target.value);
-  };
-  //title value changed
+  //query value changed
   useEffect(() => {
-    if (!isEmptyOrSpaces(query)) {
-      fetchMediaForSearchbar(1, 10, query)
-        .then((response) => {
-          if (response.status == 200) {
-            setMedia(response.data);
-          } else {
-            console.error(response.data);
-          }
+    const title = query.trim();
+    if (title) {
+      fetchMediaForSearchbar(1, 10, title)
+        .then((res) => {
+          setMedia(res.data);
         })
         .catch((err) => {
           console.error(err);
@@ -31,40 +22,37 @@ export default function Searchbar() {
     }
   }, [query]);
 
-  //TODO: implement searchbar dropdown menu
   //media array changed
   useEffect(() => {
-    if (media.length !== 0) {
-      console.log(media);
-    } else {
-      console.log("No results");
-    }
+    //TODO: implement searchbar dropdown menu
   }, [media]);
 
+  //value entered in searchbar
+  function onChange(e) {
+    setQuery(e.target.value);
+  }
   //enter pressed in searchbar
-  const onSubmit = (e) => {
-    if (isEmptyOrSpaces(query)) {
-      e.preventDefault();
-    } else {
-      navigate(`/search/${query}`);
-    }
-  };
+  function onSubmit(e) {
+    e.preventDefault();
+    navigate(`/search?title=${query.trim()}`);
+  }
 
   return (
-    <div className="relative mt-3 md:mt-0">
+    <div className="relative w-full m-3 md:m-0">
       <form onSubmit={onSubmit}>
         <input
           type="text"
-          className="bg-onyx-contrast text-onyx-tint rounded-full w-64 px-4 pl-8 py-1"
+          className="bg-onyx-contrast text-onyx-tint rounded-full w-full md:w-64 pr-4 pl-8 py-1 focus:outline-none focus:ring-[3px] focus:ring-mellon-primary-default"
           placeholder="Search"
           value={query}
           onChange={onChange}
         />
       </form>
-
-      <div className="absolute top-0">
-        <SearchSVG className="fill-current w-4 text-gray-500 mt-2 ml-2" />
-      </div>
+      <SearchSVG
+        width="16"
+        height="16"
+        className="absolute top-2 left-2 fill-onyx-primary-40"
+      />
     </div>
   );
 }

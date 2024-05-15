@@ -8,11 +8,11 @@ import {
   concatDirectorNames,
   concatGenreNames,
   concatWriterNames,
-  getCoverImageURL,
 } from "../../../utils/Util";
 import DetailsTabs from "../../tabs/DetailsTabs";
 import WatchlistButton from "../../watchlist/WatchlistButton";
 import StarSVG from "../../helpers/svg/StarSVG";
+import NoImageSVG from "../../helpers/svg/NoImageSVG";
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -94,11 +94,7 @@ export default function MovieDetails() {
     <>
       <div className="border-b border-onyx-tint">
         <div className="container mx-auto px-4 py-16 flex flex-col md:flex-row">
-          <img
-            className="w-64 md:w-96"
-            src={getCoverImageURL(movie.cover_image_url)}
-            alt="cover image"
-          />
+          <CoverImage url={movie.cover_image_url} />
           <div className="md:ml-24">
             <h2 className="text-4xl font-semibold">{movie.title}</h2>
             <div className="flex flex-wrap items-center text-gray-400 text-sm mt-2">
@@ -147,5 +143,16 @@ export default function MovieDetails() {
         />
       </div>
     </>
+  );
+}
+
+function CoverImage({ url }) {
+  if (url) {
+    return <img className="w-64 md:w-96" src={url} />;
+  }
+  return (
+    <div className="bg-onyx-tint w-64 md:w-[450px] md:h-[560px] flex items-center justify-center hover:opacity-75 transition">
+      <NoImageSVG className="fill-onyx-primary-default p-10" />
+    </div>
   );
 }

@@ -71,7 +71,7 @@ public class Datastore {
                 "Admin",
                 Gender.OTHER,
                 "Admin",
-                "default.png",
+                null,
                 "admin",
                 "admin@gmail.com",
                 passwordEncoder.encode("admin"),
@@ -148,9 +148,11 @@ public class Datastore {
         log.info("----------->Retreiving and persisting persons images...");
         database.storePersonImages(persons);
 
-        log.info("----------->Persisting user image...");
-        database.storeUserImage(user);
-        
+        if (user.getProfileImage() != null) {
+            log.info("----------->Persisting user image...");
+            database.storeUserImage(user);
+        }
+
         //remove pointers to arrays of data so garbage collector can dispose of them
         genres = new ArrayList<>();
         movies = new ArrayList<>();

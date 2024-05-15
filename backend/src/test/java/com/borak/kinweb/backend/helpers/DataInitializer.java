@@ -706,7 +706,7 @@ public class DataInitializer {
                         "Admin",
                         Gender.OTHER,
                         "Admin",
-                        "default.png",
+                        null,
                         "admin",
                         "admin@gmail.com",
                         (new BCryptPasswordEncoder()).encode("admin"),
@@ -809,9 +809,9 @@ public class DataInitializer {
             deleteFilesFromFolder(userImagesFolderPath);
 
             Random rand = new Random();
-            for (UserJDBC users : users) {
-                if (users.getProfileImage() != null) {
-                    createImage(users.getProfileImage(), userImagesFolderPath, rand);
+            for (UserJDBC user : users) {
+                if (user.getProfileImage() != null) {
+                    createImage(user.getProfileImage(), userImagesFolderPath, rand);
                 }
             }
         } catch (Exception e) {
