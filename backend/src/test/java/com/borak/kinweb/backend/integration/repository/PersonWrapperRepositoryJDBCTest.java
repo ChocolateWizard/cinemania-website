@@ -16,6 +16,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.PersonWrapperJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.PersonWrapperRepositoryJDBC;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public class PersonWrapperRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+       Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     //============================================================================================================ 

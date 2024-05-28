@@ -541,33 +541,41 @@ public class Database {
 
     }
 
-    void storeUser(UserDB user) throws Exception {
+    void storeAllUsers(List<UserDB> users) throws Exception {
         String sql = """
                INSERT INTO user(id,
                first_name,last_name,gender,profile_name,profile_image,
                username,email,password,role,created_at,updated_at,country_id       
                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);
                """;
-        jdbc.update(sql, (PreparedStatement ps) -> {
-            ps.setLong(1, user.getId());
-            ps.setString(2, user.getFirstName());
-            ps.setString(3, user.getLastName());
-            ps.setString(4, String.valueOf(user.getGender().getSymbol()));
-            ps.setString(5, user.getProfileName());
-            if(user.getProfileImage()==null){
-                ps.setNull(6, Types.VARCHAR);
-            }else{
-                ps.setString(6, user.getProfileImage());
-            }         
-            ps.setString(7, user.getUsername());
-            ps.setString(8, user.getEmail());
-            ps.setString(9, user.getPassword());
-            ps.setString(10, user.getRole().toString());
-            ps.setTimestamp(11, Timestamp.valueOf(user.getCreatedAt()));
-            ps.setTimestamp(12, Timestamp.valueOf(user.getUpdatedAt()));
-            ps.setLong(13, user.getCountry().getId());
-        });
+        jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, users.get(i).getId());
+                ps.setString(2, users.get(i).getFirstName());
+                ps.setString(3, users.get(i).getLastName());
+                ps.setString(4, String.valueOf(users.get(i).getGender().getSymbol()));
+                ps.setString(5, users.get(i).getProfileName());
+                if (users.get(i).getProfileImage() == null) {
+                    ps.setNull(6, Types.VARCHAR);
+                } else {
+                    ps.setString(6, users.get(i).getProfileImage());
+                }
+                ps.setString(7, users.get(i).getUsername());
+                ps.setString(8, users.get(i).getEmail());
+                ps.setString(9, users.get(i).getPassword());
+                ps.setString(10, users.get(i).getRole().toString());
+                ps.setTimestamp(11, Timestamp.valueOf(users.get(i).getCreatedAt()));
+                ps.setTimestamp(12, Timestamp.valueOf(users.get(i).getUpdatedAt()));
+                ps.setLong(13, users.get(i).getCountry().getId());
+            }
 
+            @Override
+            public int getBatchSize() {
+                return users.size();
+            }
+        }
+        );
     }
 
     void storeMediaImages(List<MediaDB> medias) throws Exception {
@@ -598,26 +606,30 @@ public class Database {
         jdbc.batchUpdate(sql, data, new int[]{Types.VARCHAR, Types.BIGINT});
     }
 
-    void storeUserImage(UserDB user) throws Exception {
+    void storeUserImages(List<UserDB> users) throws Exception {
         Random rand = new Random();
-        String[] parts = user.getProfileImage().split("\\.");
-        String extension = parts[1];
+        for (UserDB user : users) {
+            if (user.getProfileImage() != null) {
+                String[] parts = user.getProfileImage().split("\\.");
+                String extension = parts[1];
 
-        int width = rand.nextInt(500) + 100; // Random width between 100 and 600
-        int height = rand.nextInt(500) + 100; // Random height between 100 and 600
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = img.createGraphics();
+                int width = rand.nextInt(500) + 100; // Random width between 100 and 600
+                int height = rand.nextInt(500) + 100; // Random height between 100 and 600
+                BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                Graphics2D graphics = img.createGraphics();
 
-        // Generate a random color
-        Color color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-        graphics.setColor(color);
-        graphics.fillRect(0, 0, width, height);
+                // Generate a random color
+                Color color = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+                graphics.setColor(color);
+                graphics.fillRect(0, 0, width, height);
 
-        // Save
-        try {
-            ImageIO.write(img, extension, new File(config.getUserImagesFolderPath() + user.getProfileImage()));
-        } catch (IOException e) {
-            throw new RuntimeException("Error while storing user image");
+                // Save
+                try {
+                    ImageIO.write(img, extension, new File(config.getUserImagesFolderPath() + user.getProfileImage()));
+                } catch (IOException e) {
+                    throw new RuntimeException("Error while storing user image");
+                }
+            }
         }
     }
 

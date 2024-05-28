@@ -815,6 +815,11 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `user` */
+insert  into `user`(`id`,`first_name`,`last_name`,`gender`,`profile_name`,`profile_image`,`username`,`email`,`password`,`role`,`created_at`,`updated_at`,`country_id`) values 
+(1,'Admin','Admin','O','Admin',NULL,'admin','admin@gmail.com','$2a$10$lLpAEM3iq6LLKhfBID8YhOcd8DCLj9HYO5VeMXcIFlM0C/myvjsnW','ADMINISTRATOR',STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),198),
+(2,'Regular','Regular','M','Regular','Regular.jpg','regular','regular@gmail.com','$2a$10$psEbqp2bRsmgxpVQ.Wj/hOH5Czj8ce9MQ05vz9BS21xJr0A4HEIRi','REGULAR',STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),15),
+(3,'Critic','Critic','F','Critic','Critic.jpg','critic','critic@gmail.com','$2a$10$BigpH6HHGlSn1//5rsIqhOCJOJ/TSHxtXQc7X43VJAStjayk9Hwh6','CRITIC',STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),57);
+
 
 /*Table structure for table `user_media` */
 

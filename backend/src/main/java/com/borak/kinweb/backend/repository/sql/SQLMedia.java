@@ -23,7 +23,7 @@ public final class SQLMedia {
                                        """;
 
     public static final String FIND_ALL_BY_TITLE_PAGINATED_PS = """
-                                       SELECT media.id,media.title,media.release_date,media.cover_image,media.description,media.audience_rating,media.critic_rating,movie.media_id AS movie_id,tv_show.media_id AS tv_show_id 
+                                       SELECT media.id,media.title,media.release_date,media.cover_image,media.description,media.audience_rating,media.critic_rating,movie.media_id AS movie_id,movie.length,tv_show.media_id AS tv_show_id,tv_show.number_of_seasons 
                                        FROM media LEFT JOIN movie ON(media.id=movie.media_id) LEFT JOIN tv_show ON(media.id=tv_show.media_id) 
                                        WHERE title LIKE ? LIMIT ? OFFSET ?;
                                        """;
@@ -50,6 +50,7 @@ public final class SQLMedia {
             movie.setReleaseDate(rs.getDate("release_date").toLocalDate());
             movie.setAudienceRating(rs.getInt("audience_rating"));
             movie.setCriticRating(rs.getObject("critic_rating", Integer.class));
+            movie.setLength(rs.getInt("length"));
             return movie;
         }
         if (tvShowID != null) {
@@ -61,6 +62,7 @@ public final class SQLMedia {
             tvShow.setReleaseDate(rs.getDate("release_date").toLocalDate());
             tvShow.setAudienceRating(rs.getInt("audience_rating"));
             tvShow.setCriticRating(rs.getObject("critic_rating", Integer.class));
+            tvShow.setNumberOfSeasons(rs.getInt("number_of_seasons"));
             return tvShow;
         }
         MediaJDBC media = new MediaJDBC();

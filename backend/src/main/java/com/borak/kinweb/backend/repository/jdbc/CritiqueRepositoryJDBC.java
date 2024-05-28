@@ -28,14 +28,38 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
     private JdbcTemplate jdbcTemplate;
 
     @Override
+    public boolean exists(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            validateIds(entity);
+            jdbcTemplate.queryForObject(SQLCritique.FIND_ID_PS, new Object[]{entity.getCritic().getId(), entity.getMedia().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, Long.class);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return false;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while checking if critique with userId:" + entity.getCritic().getId() + ", and mediaId: " + entity.getMedia().getId() + " exists", e);
+        }
+    }
+
+    @Override
+    public Optional<CritiqueJDBC> find(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
+        try {
+            validateIds(entity);
+            CritiqueJDBC critique = jdbcTemplate.queryForObject(SQLCritique.FIND_BY_ID_PS, new Object[]{entity.getCritic().getId(), entity.getMedia().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, SQLCritique.critiqueRM);
+            return Optional.of(critique);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return Optional.empty();
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving critique with userId: " + entity.getCritic().getId() + ", and mediaId: " + entity.getMedia().getId(), e);
+        }
+    }
+
+    @Override
     public CritiqueJDBC insert(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
         try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
-            }
+            validateIds(entity);
             performInsert(entity);
             return entity;
-        } catch (NullPointerException | DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DatabaseException("Error while inserting critique", e);
         }
     }
@@ -43,11 +67,9 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
     @Override
     public void update(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
         try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
-            }
+            validateIds(entity);
             performUpdate(entity);
-        } catch (NullPointerException | DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DatabaseException("Error while updating critique", e);
         }
     }
@@ -83,25 +105,12 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
     }
 
     @Override
-    public boolean exists(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
-        try {
-            validateIds(entity);
-            jdbcTemplate.queryForObject(SQLCritique.FIND_ID_PS, new Object[]{entity.getCritic().getId(), entity.getMedia().getId()}, new int[]{Types.BIGINT, Types.BIGINT}, Long.class);
-            return true;
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return false;
-        } catch (DataAccessException e) {
-            throw new DatabaseException("Error while checking if users critique with media id: " + entity.getMedia().getId() + " exists", e);
-        }
-    }
-
-    @Override
     public void delete(CritiqueJDBC entity) throws DatabaseException, IllegalArgumentException {
         try {
             validateIds(entity);
             int i = jdbcTemplate.update(SQLCritique.DELETE_CRITIQUE_PS, new Object[]{entity.getCritic().getId(), entity.getMedia().getId()}, new int[]{Types.BIGINT, Types.BIGINT});
-            if (i <= 0) {
-                throw new DatabaseException("Error while deleting users critique for media with id: " + entity.getMedia().getId() + ". No media found with given id");
+            if (i < 1) {
+                throw new DatabaseException("No critique found with userId: " + entity.getCritic().getId() + ", and mediaId: " + entity.getMedia().getId());
             }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while deleting users critique for media with id: " + entity.getMedia().getId(), e);
@@ -112,10 +121,9 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
 //=========================================PRIVATE METHODS=============================================================
 //=====================================================================================================================
     private void validateIds(CritiqueJDBC entity) throws IllegalArgumentException {
-        if (entity == null || entity.getCritic() == null
-                || entity.getMedia() == null || entity.getCritic().getId() == null
-                || entity.getCritic().getId() <= 0 || entity.getMedia().getId() == null
-                || entity.getMedia().getId() <= 0) {
+        if (entity == null || entity.getCritic() == null || entity.getMedia() == null
+                || entity.getCritic().getId() == null || entity.getCritic().getId() < 1
+                || entity.getMedia().getId() == null || entity.getMedia().getId() < 1) {
             throw new IllegalArgumentException("Invalid parameter: critique, media and critic must not be null, and must have non-null ids greater than 0");
         }
     }
@@ -127,11 +135,16 @@ public class CritiqueRepositoryJDBC implements ICritiqueRepository<CritiqueJDBC,
         });
     }
 
-    private void performUpdate(CritiqueJDBC critique) {
-        jdbcTemplate.update(SQLCritique.UPDATE_CRITIQUE_PS, new Object[]{
+    private void performUpdate(CritiqueJDBC critique) throws DatabaseException {
+        int i = jdbcTemplate.update(SQLCritique.UPDATE_CRITIQUE_PS, new Object[]{
             critique.getDescription(), critique.getRating(), critique.getCritic().getId(),
             critique.getMedia().getId()}, new int[]{
             Types.VARCHAR, Types.INTEGER, Types.BIGINT, Types.BIGINT
         });
+        if (i < 1) {
+            throw new DatabaseException("No critique found with userId: " + critique.getCritic().getId() + ", and mediaId: " + critique.getMedia().getId());
+        }
+
     }
+
 }

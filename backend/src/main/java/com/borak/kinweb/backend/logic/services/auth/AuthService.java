@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> {
 
     @Autowired
-    private IUserRepository<UserJDBC, Long> userRepo;
+    private IUserRepository<UserJDBC, Long, Long> userRepo;
     @Autowired
     private ICountryRepository<CountryJDBC, Long> countryRepo;
 
@@ -77,7 +77,7 @@ public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> 
         userRepo.insert(userJDBC);
         if (registerForm.getProfileImage() != null) {
             registerForm.getProfileImage().setName(userJDBC.getProfileName());
-            fileRepo.saveUserProfileImage(registerForm.getProfileImage());
+            fileRepo.saveUserProfileImage(registerForm.getProfileImage());   
         }
         return new ResponseEntity<>(new MessageResponseDTO("User registered successfully!"), HttpStatus.OK);
     }

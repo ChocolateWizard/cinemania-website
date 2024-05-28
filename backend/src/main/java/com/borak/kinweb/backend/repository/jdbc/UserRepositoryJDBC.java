@@ -4,28 +4,17 @@
  */
 package com.borak.kinweb.backend.repository.jdbc;
 
-import com.borak.kinweb.backend.domain.enums.Gender;
-import com.borak.kinweb.backend.domain.enums.UserRole;
-import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
-import com.borak.kinweb.backend.domain.security.SecurityUser;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.repository.api.IUserRepository;
-import com.borak.kinweb.backend.repository.sql.SQLMovie;
 import com.borak.kinweb.backend.repository.sql.SQLUser;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +30,7 @@ import org.springframework.stereotype.Repository;
  * @author Mr. Poyo
  */
 @Repository
-public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long> {
+public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long, Long> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -183,44 +172,53 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long> {
     }
 
     @Override
-    public void addMediaToLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
+    public boolean existsMediaInLibrary(Long userId, Long mediaId) throws DatabaseException, IllegalArgumentException {
         try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            if (userId == null || userId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: userId must be non-null and greater than 0");
             }
-            jdbcTemplate.update(SQLUser.INSERT_MEDIA_PIVOT_PS, new Object[]{
-                entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT});
-
-        } catch (NullPointerException | IndexOutOfBoundsException | DataAccessException e) {
-            throw new DatabaseException("Error while adding media to users library", e);
-        }
-    }
-
-    @Override
-    public boolean existsMediaInLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
-        try {
-            jdbcTemplate.queryForObject(SQLUser.EXISTS_MEDIA_IN_LIBRARY, new Object[]{entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT}, Long.class);
+            if (mediaId == null || mediaId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: mediaId must be non-null and greater than 0");
+            }
+            jdbcTemplate.queryForObject(SQLUser.EXISTS_MEDIA_IN_LIBRARY, new Object[]{userId, mediaId}, new int[]{Types.BIGINT, Types.BIGINT}, Long.class);
             return true;
         } catch (IncorrectResultSizeDataAccessException e) {
             return false;
         } catch (DataAccessException e) {
-            throw new DatabaseException("Error while checking if user has media with id: " + entity.getMedias().get(0).getId() + " in library", e);
+            throw new DatabaseException("Error while checking if user has media with id: " + mediaId + " in library", e);
         }
     }
 
     @Override
-    public void removeMediaFromLibrary(UserJDBC entity) throws DatabaseException, IllegalArgumentException {
+    public void addMediaToLibrary(Long userId, Long mediaId) throws DatabaseException, IllegalArgumentException {
         try {
-            if (entity == null) {
-                throw new IllegalArgumentException("Invalid parameter: entity must be non-null");
+            if (userId == null || userId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: userId must be non-null and greater than 0");
             }
-            int i = jdbcTemplate.update(SQLUser.DELETE_MEDIA_PIVOT_PS, new Object[]{
-                entity.getId(), entity.getMedias().get(0).getId()}, new int[]{Types.BIGINT, Types.BIGINT});
+            if (mediaId == null || mediaId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: mediaId must be non-null and greater than 0");
+            }
+            jdbcTemplate.update(SQLUser.INSERT_MEDIA_PIVOT_PS, new Object[]{userId, mediaId}, new int[]{Types.BIGINT, Types.BIGINT});
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while adding media with id: " + mediaId + " to users library", e);
+        }
+    }
+
+    @Override
+    public void removeMediaFromLibrary(Long userId, Long mediaId) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (userId == null || userId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: userId must be non-null and greater than 0");
+            }
+            if (mediaId == null || mediaId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: mediaId must be non-null and greater than 0");
+            }
+            int i = jdbcTemplate.update(SQLUser.DELETE_MEDIA_PIVOT_PS, new Object[]{userId, mediaId}, new int[]{Types.BIGINT, Types.BIGINT});
             if (i <= 0) {
-                throw new DatabaseException("Error while removing media with id: " + entity.getMedias().get(0).getId() + " from users library");
+                throw new DatabaseException("Error while removing media with id: " + mediaId + " from users library");
             }
-        } catch (NullPointerException | IndexOutOfBoundsException | DataAccessException e) {
-            throw new DatabaseException("Error while adding media to users library", e);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while removing media with id: " + mediaId + " from users library", e);
         }
     }
 
@@ -233,11 +231,11 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long> {
             ps.setString(2, user.getLastName());
             ps.setString(3, String.valueOf(user.getGender().getSymbol()));
             ps.setString(4, user.getProfileName());
-            if(user.getProfileImage()==null){
+            if (user.getProfileImage() == null) {
                 ps.setNull(5, Types.VARCHAR);
-            }else{
+            } else {
                 ps.setString(5, user.getProfileImage());
-            }        
+            }
             ps.setString(6, user.getUsername());
             ps.setString(7, user.getEmail());
             ps.setString(8, user.getPassword());

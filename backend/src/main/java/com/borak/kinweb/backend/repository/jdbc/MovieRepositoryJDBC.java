@@ -95,6 +95,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
                     }
                     acting.setRoles(roles);
                 }
+                for (CritiqueJDBC critique : critiques) {
+                    critique.setMedia(movie);
+                }
                 movie.setGenres(genres);
                 movie.setDirectors(directors);
                 movie.setWriters(writers);
@@ -133,6 +136,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
                         role.setActing(acting);
                     }
                     acting.setRoles(roles);
+                }
+                for (CritiqueJDBC critique : critiques) {
+                    critique.setMedia(movie);
                 }
                 movie.setGenres(genres);
                 movie.setDirectors(directors);
@@ -300,6 +306,9 @@ public class MovieRepositoryJDBC implements IMovieRepository<MovieJDBC, Long> {
                     role.setActing(acting);
                 }
                 acting.setRoles(roles);
+            }
+            for (CritiqueJDBC critique : critiques) {
+                critique.setMedia(movie);
             }
             movie.setGenres(genres);
             movie.setDirectors(directors);

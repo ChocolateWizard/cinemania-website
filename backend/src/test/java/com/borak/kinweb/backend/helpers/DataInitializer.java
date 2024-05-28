@@ -11,6 +11,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
@@ -58,6 +59,8 @@ public class DataInitializer {
     public static final String personImagesFolderPath = "C:/cinemania_images/test/person/";
     public static final String userImagesFolderPath = "C:/cinemania_images/test/user/";
 
+    public static final String jsonResponsesPropertiesFilePath = "/routes/json-responses.properties";
+
     public static final String address = "http://localhost";
     public static final int port = 8080;
 
@@ -82,6 +85,7 @@ public class DataInitializer {
     private List<PersonWrapperJDBC> personWrappers;
 
     private List<UserJDBC> users;
+    private List<CritiqueJDBC> critiques;
 
     public DataInitializer() {
         initGenres();
@@ -92,6 +96,8 @@ public class DataInitializer {
         initTVShows();
         initPersons();
         initUsers();
+        initUserMedias();
+        initCritiques();
         initMedias();
         initPersonsWrappers();
     }
@@ -332,7 +338,7 @@ public class DataInitializer {
 
     private void initMovies() {
         movies = new ArrayList<>();
-        MovieJDBC m1 = new MovieJDBC(1l, "Mulholland Drive", "1.jpg", "After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.", LocalDate.of(2001, Month.MAY, 16), 79, null, 147);
+        MovieJDBC m1 = new MovieJDBC(1l, "Mulholland Drive", "1.jpg", "After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.", LocalDate.of(2001, Month.MAY, 16), 79, 91, 147);
         m1.getGenres().add(genres.get(5));
         m1.getGenres().add(genres.get(10));
         m1.getGenres().add(genres.get(11));
@@ -371,7 +377,7 @@ public class DataInitializer {
         m1.getActings().add(a15);
 
         //-------------------------------------
-        MovieJDBC m2 = new MovieJDBC(2l, "Inland Empire", "2.jpg", "As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.", LocalDate.of(2006, Month.SEPTEMBER, 6), 68, null, 180);
+        MovieJDBC m2 = new MovieJDBC(2l, "Inland Empire", "2.jpg", "As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.", LocalDate.of(2006, Month.SEPTEMBER, 6), 68, 70, 180);
         m2.getGenres().add(genres.get(5));
         m2.getGenres().add(genres.get(11));
         m2.getGenres().add(genres.get(12));
@@ -420,7 +426,7 @@ public class DataInitializer {
         m2.getActings().add(a27);
 
         //-------------------------------------
-        MovieJDBC m3 = new MovieJDBC(4l, "The Lighthouse", null, "Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.", LocalDate.of(2019, Month.MAY, 19), 74, null, 109);
+        MovieJDBC m3 = new MovieJDBC(4l, "The Lighthouse", null, "Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.", LocalDate.of(2019, Month.MAY, 19), 74, 80, 109);
         m3.getGenres().add(genres.get(5));
         m3.getGenres().add(genres.get(7));
         m3.getGenres().add(genres.get(12));
@@ -514,7 +520,7 @@ public class DataInitializer {
         s1.getActings().add(a16);
         s1.getActings().add(a17);
         //-------------------------------------
-        TVShowJDBC s2 = new TVShowJDBC(5l, "Lost", null, "The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.", LocalDate.of(2004, Month.SEPTEMBER, 22), 83, null, 6);
+        TVShowJDBC s2 = new TVShowJDBC(5l, "Lost", null, "The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.", LocalDate.of(2004, Month.SEPTEMBER, 22), 83, 75, 6);
         s2.getGenres().add(genres.get(1));
         s2.getGenres().add(genres.get(5));
         s2.getGenres().add(genres.get(12));
@@ -591,7 +597,7 @@ public class DataInitializer {
         s2.getActings().add(a210);
         s2.getActings().add(a211);
         //-------------------------------------
-        TVShowJDBC s3 = new TVShowJDBC(6l, "South Park", "6.jpg", "Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.", LocalDate.of(1997, Month.AUGUST, 13), 87, null, 26);
+        TVShowJDBC s3 = new TVShowJDBC(6l, "South Park", "6.jpg", "Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.", LocalDate.of(1997, Month.AUGUST, 13), 87, 89, 26);
         s3.getGenres().add(genres.get(2));
         s3.getGenres().add(genres.get(3));
 
@@ -698,24 +704,75 @@ public class DataInitializer {
     }
 
     private void initUsers() {
-        LocalDateTime now = LocalDateTime.now();
         users = new ArrayList<UserJDBC>() {
             {
-                add(new UserJDBC(1l,
-                        "Admin",
-                        "Admin",
+                add(new UserJDBC(1l, "Admin", "Admin",
                         Gender.OTHER,
-                        "Admin",
-                        null,
+                        "Admin", null,
+                        "admin", "admin@gmail.com",
                         "admin",
-                        "admin@gmail.com",
-                        (new BCryptPasswordEncoder()).encode("admin"),
                         UserRole.ADMINISTRATOR,
-                        now,
-                        now,
-                        new CountryJDBC(198l)));
+                        LocalDateTime.of(2024, Month.JANUARY, 25, 14, 49, 36),
+                        LocalDateTime.of(2024, Month.JANUARY, 25, 14, 49, 36),
+                        new CountryJDBC(198l,"Serbia","The Republic of Serbia","RS")));
+                add(new UserJDBC(2l, "Regular", "Regular",
+                        Gender.MALE,
+                        "Regular", "Regular.jpg",
+                        "regular", "regular@gmail.com",
+                        "regular",
+                        UserRole.REGULAR,
+                        LocalDateTime.of(2024, Month.FEBRUARY, 28, 14, 49, 36),
+                        LocalDateTime.of(2024, Month.FEBRUARY, 28, 14, 49, 36),
+                        new CountryJDBC(15l,"Austria","The Republic of Austria","AT")));
+                add(new UserJDBC(3l, "Critic", "Critic",
+                        Gender.FEMALE,
+                        "Critic", "Critic.jpg",
+                        "critic", "critic@gmail.com",
+                        "critic",
+                        UserRole.CRITIC,
+                        LocalDateTime.of(2023, Month.NOVEMBER, 25, 14, 49, 36),
+                        LocalDateTime.of(2023, Month.NOVEMBER, 25, 14, 49, 36),
+                        new CountryJDBC(57l,"Cuba","The Republic of Cuba","CU")));
             }
         };
+    }
+
+    private void initUserMedias() {
+        this.users.get(0).getMedias().add(this.movies.get(0));
+        this.users.get(0).getMedias().add(this.shows.get(0));
+        this.users.get(0).getMedias().add(this.movies.get(2));
+
+        this.users.get(1).getMedias().add(this.movies.get(0));
+        this.users.get(1).getMedias().add(this.movies.get(1));
+        this.users.get(1).getMedias().add(this.shows.get(1));
+    }
+
+    private void initCritiques() {
+        this.critiques = new ArrayList<CritiqueJDBC>() {
+            {
+                add(new CritiqueJDBC(users.get(0), movies.get(0), "Very nice movie", 95));
+                add(new CritiqueJDBC(users.get(0), movies.get(2), "Good and mysterious movie. Left me puzzled at the end", 80));
+                add(new CritiqueJDBC(users.get(0), shows.get(1), "Starts off good, but falls of in the end", 75));
+                add(new CritiqueJDBC(users.get(2), movies.get(0), "Very nice movie. Kind of unexpected end that left me confused. Overall very nice!", 87));
+                add(new CritiqueJDBC(users.get(2), movies.get(1), "Very similar to other movies of David Lynch but i felt like it lasted way longer than it should have", 70));
+                add(new CritiqueJDBC(users.get(2), shows.get(2), "Comedy gold and perhapts one of the best satirical shows", 89));
+            }
+        };
+        this.users.get(0).getCritiques().add(this.critiques.get(0));
+        this.users.get(0).getCritiques().add(this.critiques.get(1));
+        this.users.get(0).getCritiques().add(this.critiques.get(2));
+
+        this.users.get(2).getCritiques().add(this.critiques.get(3));
+        this.users.get(2).getCritiques().add(this.critiques.get(4));
+        this.users.get(2).getCritiques().add(this.critiques.get(5));
+
+        this.movies.get(0).getCritiques().add(this.critiques.get(0));
+        this.movies.get(0).getCritiques().add(this.critiques.get(3));
+        this.movies.get(1).getCritiques().add(this.critiques.get(4));
+        this.movies.get(2).getCritiques().add(this.critiques.get(1));
+
+        this.shows.get(1).getCritiques().add(this.critiques.get(2));
+        this.shows.get(2).getCritiques().add(this.critiques.get(5));
     }
 
     private void initMedias() {

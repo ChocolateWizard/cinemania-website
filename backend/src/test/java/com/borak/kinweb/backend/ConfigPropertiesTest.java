@@ -30,6 +30,9 @@ public class ConfigPropertiesTest {
     @Autowired
     private ConfigProperties properties;
 
+    @Value("${custom.property.jsonResponsesPropertiesFilePath}")
+    private String jsonResponsesPropertiesFilePath;
+
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 
     static {
@@ -63,6 +66,8 @@ public class ConfigPropertiesTest {
         assertThat(properties.getJwtCookieName()).isEqualTo(DataInitializer.jwtCookieName);
         assertThat(properties.getJwtExpirationMs()).isNotNull().isEqualTo(DataInitializer.jwtExpirationMs);
         assertThat(properties.getJwtSecret()).isEqualTo(DataInitializer.jwtSecret);
+
+        assertThat(jsonResponsesPropertiesFilePath).isEqualTo(DataInitializer.jsonResponsesPropertiesFilePath);
 
         testsPassed.put("configPropertiesAndProperties_InitializedProperly", true);
     }

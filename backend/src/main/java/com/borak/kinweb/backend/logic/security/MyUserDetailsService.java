@@ -6,7 +6,6 @@ package com.borak.kinweb.backend.logic.security;
 
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.security.SecurityUser;
-import com.borak.kinweb.backend.logic.transformers.UserTransformer;
 import com.borak.kinweb.backend.repository.api.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private IUserRepository<UserJDBC, Long> userRepo;
+    private IUserRepository<UserJDBC, Long, Long> userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -51,6 +51,10 @@ public class UserJDBC implements Serializable {
     public UserJDBC() {
     }
 
+    public UserJDBC(Long id) {
+        this.id = id;
+    }
+
     public UserJDBC(String username, String password) {
         this.username = username;
         this.password = password;
@@ -226,6 +230,4 @@ public class UserJDBC implements Serializable {
         return Objects.equals(this.password, other.password);
     }
 
-    
-    
 }

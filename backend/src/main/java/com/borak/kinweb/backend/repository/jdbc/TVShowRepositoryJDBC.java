@@ -72,6 +72,9 @@ public class TVShowRepositoryJDBC implements ITVShowRepository<TVShowJDBC, Long>
                     }
                     acting.setRoles(roles);
                 }
+                for (CritiqueJDBC critique : critiques) {
+                    critique.setMedia(tvShow);
+                }
                 tvShow.setGenres(genres);
                 tvShow.setDirectors(directors);
                 tvShow.setWriters(writers);
@@ -133,6 +136,9 @@ public class TVShowRepositoryJDBC implements ITVShowRepository<TVShowJDBC, Long>
                         role.setActing(acting);
                     }
                     acting.setRoles(roles);
+                }
+                for (CritiqueJDBC critique : critiques) {
+                    critique.setMedia(tvShow);
                 }
                 tvShow.setGenres(genres);
                 tvShow.setDirectors(directors);
@@ -243,6 +249,9 @@ public class TVShowRepositoryJDBC implements ITVShowRepository<TVShowJDBC, Long>
                     role.setActing(acting);
                 }
                 acting.setRoles(roles);
+            }
+            for (CritiqueJDBC critique : critiques) {
+                critique.setMedia(tvShow);
             }
             tvShow.setGenres(genres);
             tvShow.setDirectors(directors);

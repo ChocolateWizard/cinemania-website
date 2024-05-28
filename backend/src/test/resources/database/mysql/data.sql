@@ -565,8 +565,6 @@ insert  into `acting_role`(`acting_id`,`id`,`name`) values
 (37,1,'Sheila Broflovski'),
 (37,2,'Linda Stotch');
 
-/*Data for the table `critique` */
-
 
 /*Data for the table `media_directors` */
 
@@ -624,10 +622,23 @@ insert  into `media_writers`(`media_id`,`writer_id`) values
 
 
 /*Data for the table `user` */
+insert  into `user`(`id`,`first_name`,`last_name`,`gender`,`profile_name`,`profile_image`,`username`,`email`,`password`,`role`,`created_at`,`updated_at`,`country_id`) values 
+(1,'Admin','Admin','O','Admin',NULL,'admin','admin@gmail.com','$2a$10$lLpAEM3iq6LLKhfBID8YhOcd8DCLj9HYO5VeMXcIFlM0C/myvjsnW','ADMINISTRATOR',STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),198),
+(2,'Regular','Regular','M','Regular','Regular.jpg','regular','regular@gmail.com','$2a$10$psEbqp2bRsmgxpVQ.Wj/hOH5Czj8ce9MQ05vz9BS21xJr0A4HEIRi','REGULAR',STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),15),
+(3,'Critic','Critic','F','Critic','Critic.jpg','critic','critic@gmail.com','$2a$10$BigpH6HHGlSn1//5rsIqhOCJOJ/TSHxtXQc7X43VJAStjayk9Hwh6','CRITIC',STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),57);
 
 /*Data for the table `user_media` */
+insert  into `user_media`(`user_id`,`media_id`) values
+(2,1),(2,2),(2,5),(1,1),(1,3),(1,4);
 
-
+/*Data for the table `critique` */
+insert into `critique`(`user_critic_id`,`media_id`,`description`,`rating`) values
+(3,1,'Very nice movie. Kind of unexpected end that left me confused. Overall very nice!',87),
+(3,2,'Very similar to other movies of David Lynch but i felt like it lasted way longer than it should have',70),
+(3,6,'Comedy gold and perhapts one of the best satirical shows',89),
+(1,1,'Very nice movie',95),
+(1,4,'Good and mysterious movie. Left me puzzled at the end',80),
+(1,5,'Starts off good, but falls of in the end',75);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

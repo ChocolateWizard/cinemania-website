@@ -26,40 +26,36 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService implements IUserService<Long> {
-    
+
     @Autowired
-    private IUserRepository<UserJDBC, Long> userRepo;
+    private IUserRepository<UserJDBC, Long, Long> userRepo;
     @Autowired
     private IMediaRepository<MediaJDBC, Long> mediaRepo;
-    @Autowired
-    private UserTransformer userTransformer;
-    
+
     @Override
     public ResponseEntity postMediaIntoLibrary(Long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserJDBC user = userTransformer.toUserJDBC(loggedUser, mediaId);
-        if (userRepo.existsMediaInLibrary(user)) {
+        if (userRepo.existsMediaInLibrary(loggedUser.getId(), mediaId)) {
             throw new DuplicateResourceException("Duplicate user library entry! Media with id: " + mediaId + " already present!");
         }
-        userRepo.addMediaToLibrary(user);
+        userRepo.addMediaToLibrary(loggedUser.getId(), mediaId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-    
+
     @Override
     public ResponseEntity deleteMediaFromLibrary(Long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserJDBC user = userTransformer.toUserJDBC(loggedUser, mediaId);
-        if (!userRepo.existsMediaInLibrary(user)) {
+        if (!userRepo.existsMediaInLibrary(loggedUser.getId(), mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " not present in users library!");
         }
-        userRepo.removeMediaFromLibrary(user);
+        userRepo.removeMediaFromLibrary(loggedUser.getId(), mediaId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
-    
+
 }

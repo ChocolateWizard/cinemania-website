@@ -17,6 +17,7 @@ import com.borak.kinweb.backend.seeder.domain.db.TVShowDB;
 import com.borak.kinweb.backend.seeder.domain.db.UserDB;
 import com.borak.kinweb.backend.seeder.domain.db.WriterDB;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,7 @@ public class Datastore {
     private List<MovieDB> movies = new ArrayList<>();
     private List<TVShowDB> shows = new ArrayList<>();
     private List<PersonWrapperDB> persons = new ArrayList<>();
-    private UserDB user;
+    private List<UserDB> users = new ArrayList<>();
 
     private final Database database;
     private static final Logger log = LoggerFactory.getLogger(Datastore.class);
@@ -64,21 +65,39 @@ public class Datastore {
         this.persons = personsApi;
     }
 
-    void createAndStoreUser(PasswordEncoder passwordEncoder) {
-        LocalDateTime now = LocalDateTime.now();
-        this.user = new UserDB(1l,
-                "Admin",
-                "Admin",
-                Gender.OTHER,
-                "Admin",
-                null,
-                "admin",
-                "admin@gmail.com",
-                passwordEncoder.encode("admin"),
-                UserRole.ADMINISTRATOR,
-                now,
-                now,
-                new CountryDB(198l));
+    void createAndStoreUsers(PasswordEncoder passwordEncoder) {
+        this.users = new ArrayList<UserDB>() {
+            {
+                add(new UserDB(1l, "Admin", "Admin",
+                        Gender.OTHER,
+                        "Admin", null,
+                        "admin", "admin@gmail.com",
+                        passwordEncoder.encode("admin"),
+                        UserRole.ADMINISTRATOR,
+                        LocalDateTime.of(2024, Month.JANUARY, 25, 14, 49, 36),
+                        LocalDateTime.of(2024, Month.JANUARY, 25, 14, 49, 36),
+                        new CountryDB(198l)));
+                add(new UserDB(2l, "Regular", "Regular",
+                        Gender.MALE,
+                        "Regular", "Regular.jpg",
+                        "regular", "regular@gmail.com",
+                        passwordEncoder.encode("regular"),
+                        UserRole.REGULAR,
+                        LocalDateTime.of(2024, Month.FEBRUARY, 28, 14, 49, 36),
+                        LocalDateTime.of(2024, Month.FEBRUARY, 28, 14, 49, 36),
+                        new CountryDB(15l)));
+                add(new UserDB(3l, "Critic", "Critic",
+                        Gender.FEMALE,
+                        "Critic", "Critic.jpg",
+                        "critic", "critic@gmail.com",
+                        passwordEncoder.encode("critic"),
+                        UserRole.CRITIC,
+                        LocalDateTime.of(2023, Month.NOVEMBER, 25, 14, 49, 36),
+                        LocalDateTime.of(2023, Month.NOVEMBER, 25, 14, 49, 36),
+                        new CountryDB(57l)));
+            }
+        };
+
     }
 
     void connectData() throws Exception {
@@ -122,7 +141,9 @@ public class Datastore {
             person.setId(i++);
         }
         i = 1;
-        user.setId(i);
+        for (UserDB user : users) {
+            user.setId(i++);
+        }
     }
 
     void persistData() throws Exception {
@@ -137,7 +158,7 @@ public class Datastore {
         log.info("----------->Storing tv shows table data...");
         database.storeAllShows(shows);
         log.info("----------->Storing user table data...");
-        database.storeUser(user);
+        database.storeAllUsers(users);
         log.info("----------->Removing all images...");
         database.removeAllImages();
         List<MediaDB> medias = new ArrayList<>();
@@ -147,18 +168,15 @@ public class Datastore {
         database.storeMediaImages(medias);
         log.info("----------->Retreiving and persisting persons images...");
         database.storePersonImages(persons);
-
-        if (user.getProfileImage() != null) {
-            log.info("----------->Persisting user image...");
-            database.storeUserImage(user);
-        }
+        log.info("----------->Creating and persisting user images...");
+        database.storeUserImages(users);
 
         //remove pointers to arrays of data so garbage collector can dispose of them
         genres = new ArrayList<>();
         movies = new ArrayList<>();
         shows = new ArrayList<>();
         persons = new ArrayList<>();
-        user = null;
+        users=new ArrayList<>();
     }
 //==============================================================================================================
 

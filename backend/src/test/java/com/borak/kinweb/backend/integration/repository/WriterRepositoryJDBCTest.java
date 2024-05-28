@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.WriterRepositoryJDBC;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class WriterRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     @Test

@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.integration.repository;
 import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.GenreRepositoryJDBC;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class GenreRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     @Test

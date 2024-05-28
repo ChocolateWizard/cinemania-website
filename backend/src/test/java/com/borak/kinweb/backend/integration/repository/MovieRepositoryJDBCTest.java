@@ -4,8 +4,9 @@
  */
 package com.borak.kinweb.backend.integration.repository;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
+import static org.assertj.core.api.Assertions.*;
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
@@ -15,6 +16,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.MovieRepositoryJDBC;
 import java.time.LocalDate;
 import java.time.Year;
@@ -31,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -86,7 +87,7 @@ public class MovieRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     //============================================================================================================ 
@@ -1306,9 +1307,11 @@ public class MovieRepositoryJDBCTest {
         MovieJDBC returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         Optional<MovieJDBC> actual = repo.findById(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
+        checkCritiques(actual.get(), returnedInput);
         checkValues(actual.get(), returnedInput);
 
         //2. ID is given as already present one in DB; rest values are valid; No relations
@@ -1316,9 +1319,11 @@ public class MovieRepositoryJDBCTest {
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findById(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
+        checkCritiques(actual.get(), returnedInput);
         checkValues(actual.get(), returnedInput);
 
         //3. ID is given as already present one in DB; rest values are valid; With relations
@@ -1350,9 +1355,11 @@ public class MovieRepositoryJDBCTest {
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findByIdWithRelations(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
+        checkCritiques(actual.get(), returnedInput);
         checkValues(actual.get(), returnedInput);
 
         //4. Check if returned movie after insert ordered ids correctly
@@ -1384,6 +1391,7 @@ public class MovieRepositoryJDBCTest {
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findByIdWithRelations(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
@@ -1571,10 +1579,14 @@ public class MovieRepositoryJDBCTest {
         repo.update(validInput);
         Optional<MovieJDBC> actual = repo.findByIdWithRelations(1l);
         assertThat(actual.isPresent()).isTrue();
+        assertThat(validInput.getCriticRating()).isNull();
+        assertThat(actual.get().getCriticRating()).isNotNull().isEqualTo(init.getMovies().get(0).getCriticRating());
+        checkCritiques(actual.get(), init.getMovies().get(0));
+        validInput.setCriticRating(init.getMovies().get(0).getCriticRating());
         checkValues(actual.get(), validInput);
 
         //2. ID is given as already present one in DB; rest values are valid; With relations
-        validInput = new MovieJDBC(1l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 140);
+        validInput = new MovieJDBC(1l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, 10, 140);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
@@ -1602,6 +1614,10 @@ public class MovieRepositoryJDBCTest {
         repo.update(validInput);
         actual = repo.findByIdWithRelations(1l);
         assertThat(actual.isPresent()).isTrue();
+        assertThat(validInput.getCriticRating()).isEqualTo(10);
+        assertThat(actual.get().getCriticRating()).isNotNull().isEqualTo(init.getMovies().get(0).getCriticRating());
+        checkCritiques(actual.get(), init.getMovies().get(0));
+        validInput.setCriticRating(init.getMovies().get(0).getCriticRating());
         checkValues(actual.get(), validInput);
 
         //4. Check if returned movie after update ordered ids correctly
@@ -1778,7 +1794,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isEmpty();
             assertThat(actual.get(i).getDirectors()).isNotNull().isEmpty();
@@ -1801,7 +1817,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
@@ -1832,7 +1848,7 @@ public class MovieRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
@@ -1894,7 +1910,32 @@ public class MovieRepositoryJDBCTest {
                 }
             }
 
-            assertThat(actual.get(i).getCritiques()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getCritiques()).isNotNull();
+            assertThat(actual.get(i).getCritiques().size() == expected.get(i).getCritiques().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getCritiques().size(); j++) {
+                assertThat(actual.get(i).getCritiques().get(j)).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileName());
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileImage());
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getRole()).isEqualTo(UserRole.CRITIC);
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getFirstName()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getLastName()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getGender()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCountry()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUsername()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getPassword()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getEmail()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCreatedAt()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUpdatedAt()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getMedias()).isNotNull().isEmpty();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCritiques()).isNotNull().isEmpty();
+
+                assertThat(actual.get(i).getCritiques().get(j).getMedia()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getMedia() == actual.get(i)).isTrue();
+
+                assertThat(actual.get(i).getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getDescription());
+                assertThat(actual.get(i).getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getRating());
+            }
 
         }
     }
@@ -1908,7 +1949,7 @@ public class MovieRepositoryJDBCTest {
         assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getLength()).isEqualTo(expected.getLength());
-        assertThat(actual.getCriticRating()).isNull();
+        assertThat(actual.getCriticRating()).isEqualTo(expected.getCriticRating());
 
         assertThat(actual.getGenres()).isNotNull();
         assertThat(actual.getGenres().size() == expected.getGenres().size()).isTrue();
@@ -1970,8 +2011,36 @@ public class MovieRepositoryJDBCTest {
             }
         }
 
-        assertThat(actual.getCritiques()).isNotNull().isEmpty();
+    }
 
+    private void checkCritiques(MovieJDBC actual, MovieJDBC expected) {
+        assertThat(actual.getCritiques()).isNotNull();
+        assertThat(actual.getCritiques().size() == expected.getCritiques().size()).isTrue();
+        for (int j = 0; j < actual.getCritiques().size(); j++) {
+            assertThat(actual.getCritiques().get(j)).isNotNull();
+            assertThat(actual.getCritiques().get(j).getCritic()).isNotNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.getCritiques().get(j).getCritic().getProfileName());
+            assertThat(actual.getCritiques().get(j).getCritic().getProfileImage()).isEqualTo(expected.getCritiques().get(j).getCritic().getProfileImage());
+            assertThat(actual.getCritiques().get(j).getCritic().getRole()).isEqualTo(UserRole.CRITIC);
+            assertThat(actual.getCritiques().get(j).getCritic().getFirstName()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getLastName()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getGender()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getCountry()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getUsername()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getPassword()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getEmail()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getCreatedAt()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getUpdatedAt()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getMedias()).isNotNull().isEmpty();
+            assertThat(actual.getCritiques().get(j).getCritic().getCritiques()).isNotNull().isEmpty();
+
+            assertThat(actual.getCritiques().get(j).getMedia()).isNotNull();
+            assertThat(actual.getCritiques().get(j).getMedia() == actual).isTrue();
+
+            assertThat(actual.getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.getCritiques().get(j).getDescription());
+            assertThat(actual.getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.getCritiques().get(j).getRating());
+
+        }
     }
 
 }

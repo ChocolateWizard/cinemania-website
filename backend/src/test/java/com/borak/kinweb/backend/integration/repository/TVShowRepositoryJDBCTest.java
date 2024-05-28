@@ -6,6 +6,7 @@ package com.borak.kinweb.backend.integration.repository;
 
 import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.enums.Gender;
+import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingRoleJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
@@ -15,6 +16,7 @@ import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.TVShowRepositoryJDBC;
 import java.time.LocalDate;
 import java.time.Year;
@@ -86,7 +88,7 @@ public class TVShowRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 //============================================================================================================ 
 //===========================================TESTS============================================================ 
@@ -853,9 +855,9 @@ public class TVShowRepositoryJDBCTest {
         size = 2;
         year = 1996;
         expectedList = new ArrayList<>() {
-            {              
-                add(init.getSouthPark());         
-                add(init.getLost());              
+            {
+                add(init.getSouthPark());
+                add(init.getLost());
             }
         };
         actualList = repo.findAllByReleaseYearWithGenresPaginated(page, size, year);
@@ -872,8 +874,8 @@ public class TVShowRepositoryJDBCTest {
         size = 3;
         year = 1996;
         expectedList = new ArrayList<>() {
-            {              
-                add(init.getSouthPark());         
+            {
+                add(init.getSouthPark());
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -885,8 +887,8 @@ public class TVShowRepositoryJDBCTest {
         size = 4;
         year = 1996;
         expectedList = new ArrayList<>() {
-            {              
-                add(init.getSouthPark());         
+            {
+                add(init.getSouthPark());
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -898,8 +900,8 @@ public class TVShowRepositoryJDBCTest {
         size = Integer.MAX_VALUE;
         year = 1996;
         expectedList = new ArrayList<>() {
-            {              
-                add(init.getSouthPark());         
+            {
+                add(init.getSouthPark());
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -918,8 +920,8 @@ public class TVShowRepositoryJDBCTest {
         size = 3;
         year = 1997;
         expectedList = new ArrayList<>() {
-            {              
-                add(init.getSouthPark());         
+            {
+                add(init.getSouthPark());
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -931,7 +933,7 @@ public class TVShowRepositoryJDBCTest {
         size = 2;
         year = 2001;
         expectedList = new ArrayList<>() {
-            {                             
+            {
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -957,7 +959,7 @@ public class TVShowRepositoryJDBCTest {
         size = 2;
         year = 2004;
         expectedList = new ArrayList<>() {
-            {                           
+            {
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -969,7 +971,7 @@ public class TVShowRepositoryJDBCTest {
         size = 3;
         year = 2004;
         expectedList = new ArrayList<>() {
-            {                           
+            {
                 add(init.getLost());
                 add(init.getArcane());
             }
@@ -1381,19 +1383,23 @@ public class TVShowRepositoryJDBCTest {
         TVShowJDBC returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         Optional<TVShowJDBC> actual = repo.findById(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
-        checkValues(actual.get(), validInput);
+        checkCritiques(actual.get(), returnedInput);
+        checkValues(actual.get(), returnedInput);
 
         //2. ID is given as already present one in DB; rest values are valid; No relations
         validInput = new TVShowJDBC(5l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 0);
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findById(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
+        checkCritiques(actual.get(), returnedInput);
         checkValues(actual.get(), returnedInput);
 
         //3. ID is given as already present one in DB; rest values are valid; With relations
@@ -1425,9 +1431,11 @@ public class TVShowRepositoryJDBCTest {
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findByIdWithRelations(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
+        checkCritiques(actual.get(), returnedInput);
         checkValues(actual.get(), returnedInput);
 
         //4. Check if returned tv show after insert ordered ids correctly
@@ -1459,6 +1467,7 @@ public class TVShowRepositoryJDBCTest {
         returnedInput = repo.insert(validInput);
         assertThat(returnedInput).isNotNull();
         assertThat(returnedInput.getId()).isNotNull().isEqualTo(validInput.getId());
+        checkCritiques(returnedInput, validInput);
         checkValues(returnedInput, validInput);
         actual = repo.findByIdWithRelations(returnedInput.getId());
         assertThat(actual.isPresent()).isTrue();
@@ -1642,14 +1651,18 @@ public class TVShowRepositoryJDBCTest {
 
         //VALID inputs to update method
         //1. ID is given as already present one in DB; rest values are valid; No relations
-        TVShowJDBC validInput = new TVShowJDBC(3l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, null, 0);
+        TVShowJDBC validInput = new TVShowJDBC(3l, "Dummy title 33", null, "Dummy description 33", LocalDate.now(), 15, 15, 0);
         repo.update(validInput);
         Optional<TVShowJDBC> actual = repo.findByIdWithRelations(3l);
         assertThat(actual.isPresent()).isTrue();
+        assertThat(validInput.getCriticRating()).isEqualTo(15);
+        assertThat(actual.get().getCriticRating()).isNull();
+        validInput.setCriticRating(null);
+        checkCritiques(actual.get(), validInput);
         checkValues(actual.get(), validInput);
 
         //2. ID is given as already present one in DB; rest values are valid; With relations
-        validInput = new TVShowJDBC(3l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
+        validInput = new TVShowJDBC(6l, "Dummy title 33", "2.png", "Dummy description 33", LocalDate.now(), 15, null, 0);
         validInput.getGenres().add(new GenreJDBC(1l, "Action"));
         validInput.getGenres().add(new GenreJDBC(3l, "Animation"));
         validInput.getGenres().add(new GenreJDBC(4l, "Comedy"));
@@ -1675,8 +1688,12 @@ public class TVShowRepositoryJDBCTest {
         validActing.getRoles().add(new ActingRoleJDBC(validActing, 6l, "Dummy name 0"));
 
         repo.update(validInput);
-        actual = repo.findByIdWithRelations(3l);
+        actual = repo.findByIdWithRelations(6l);
         assertThat(actual.isPresent()).isTrue();
+        assertThat(validInput.getCriticRating()).isNull();
+        assertThat(actual.get().getCriticRating()).isNotNull().isEqualTo(init.getShows().get(2).getCriticRating());
+        checkCritiques(actual.get(), init.getShows().get(2));
+        validInput.setCriticRating(init.getShows().get(2).getCriticRating());
         checkValues(actual.get(), validInput);
 
         //4. Check if returned movie after update ordered ids correctly
@@ -1853,7 +1870,7 @@ public class TVShowRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isEmpty();
             assertThat(actual.get(i).getDirectors()).isNotNull().isEmpty();
@@ -1876,7 +1893,7 @@ public class TVShowRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
@@ -1907,7 +1924,7 @@ public class TVShowRepositoryJDBCTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
@@ -1969,7 +1986,32 @@ public class TVShowRepositoryJDBCTest {
                 }
             }
 
-            assertThat(actual.get(i).getCritiques()).isNotNull().isEmpty();
+            assertThat(actual.get(i).getCritiques()).isNotNull();
+            assertThat(actual.get(i).getCritiques().size() == expected.get(i).getCritiques().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getCritiques().size(); j++) {
+                assertThat(actual.get(i).getCritiques().get(j)).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileName());
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileImage());
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getRole()).isEqualTo(UserRole.CRITIC);
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getFirstName()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getLastName()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getGender()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCountry()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUsername()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getPassword()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getEmail()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCreatedAt()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUpdatedAt()).isNull();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getMedias()).isNotNull().isEmpty();
+                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCritiques()).isNotNull().isEmpty();
+
+                assertThat(actual.get(i).getCritiques().get(j).getMedia()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getMedia() == actual.get(i)).isTrue();
+
+                assertThat(actual.get(i).getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getDescription());
+                assertThat(actual.get(i).getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getRating());
+            }
 
         }
     }
@@ -1983,7 +2025,7 @@ public class TVShowRepositoryJDBCTest {
         assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getNumberOfSeasons()).isEqualTo(expected.getNumberOfSeasons());
-        assertThat(actual.getCriticRating()).isNull();
+        assertThat(actual.getCriticRating()).isEqualTo(expected.getCriticRating());
 
         assertThat(actual.getGenres()).isNotNull();
         assertThat(actual.getGenres().size() == expected.getGenres().size()).isTrue();
@@ -2045,8 +2087,36 @@ public class TVShowRepositoryJDBCTest {
             }
         }
 
-        assertThat(actual.getCritiques()).isNotNull().isEmpty();
+    }
 
+    private void checkCritiques(TVShowJDBC actual, TVShowJDBC expected) {
+        assertThat(actual.getCritiques()).isNotNull();
+        assertThat(actual.getCritiques().size() == expected.getCritiques().size()).isTrue();
+        for (int j = 0; j < actual.getCritiques().size(); j++) {
+            assertThat(actual.getCritiques().get(j)).isNotNull();
+            assertThat(actual.getCritiques().get(j).getCritic()).isNotNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.getCritiques().get(j).getCritic().getProfileName());
+            assertThat(actual.getCritiques().get(j).getCritic().getProfileImage()).isEqualTo(expected.getCritiques().get(j).getCritic().getProfileImage());
+            assertThat(actual.getCritiques().get(j).getCritic().getRole()).isEqualTo(UserRole.CRITIC);
+            assertThat(actual.getCritiques().get(j).getCritic().getFirstName()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getLastName()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getGender()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getCountry()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getUsername()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getPassword()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getEmail()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getCreatedAt()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getUpdatedAt()).isNull();
+            assertThat(actual.getCritiques().get(j).getCritic().getMedias()).isNotNull().isEmpty();
+            assertThat(actual.getCritiques().get(j).getCritic().getCritiques()).isNotNull().isEmpty();
+
+            assertThat(actual.getCritiques().get(j).getMedia()).isNotNull();
+            assertThat(actual.getCritiques().get(j).getMedia() == actual).isTrue();
+
+            assertThat(actual.getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.getCritiques().get(j).getDescription());
+            assertThat(actual.getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.getCritiques().get(j).getRating());
+
+        }
     }
 
 }

@@ -8,25 +8,29 @@ import com.borak.kinweb.backend.exceptions.DatabaseException;
 import java.util.Optional;
 
 /**
+ * Interface of User entity repositories.
  *
  * @author Mr. Poyo
+ * @param <U> User entity class
+ * @param <UID> Identifier of User entity
+ * @param <MID> Identifier of Media entity
  */
-public interface IUserRepository<U, ID> extends IRepository<U, ID> {
-
-    Optional<U> findByUsername(String username) throws DatabaseException, IllegalArgumentException;
-
-    boolean existsUsername(String username) throws DatabaseException, IllegalArgumentException;
+public interface IUserRepository<U, UID, MID> extends IRepository<U, UID> {
 
     boolean existsEmail(String email) throws DatabaseException, IllegalArgumentException;
 
+    boolean existsUsername(String username) throws DatabaseException, IllegalArgumentException;
+
     boolean existsProfileName(String profileName) throws DatabaseException, IllegalArgumentException;
 
-    Optional<U> findByIdWithRelations(ID id) throws DatabaseException, IllegalArgumentException;
+    Optional<U> findByUsername(String username) throws DatabaseException, IllegalArgumentException;
 
-    void addMediaToLibrary(U user) throws DatabaseException, IllegalArgumentException;
+    Optional<U> findByIdWithRelations(UID id) throws DatabaseException, IllegalArgumentException;
 
-    void removeMediaFromLibrary(U user) throws DatabaseException, IllegalArgumentException;
+    boolean existsMediaInLibrary(UID userId, MID mediaId) throws DatabaseException, IllegalArgumentException;
 
-    boolean existsMediaInLibrary(U user) throws DatabaseException, IllegalArgumentException;
+    void addMediaToLibrary(UID userId, MID mediaId) throws DatabaseException, IllegalArgumentException;
+
+    void removeMediaFromLibrary(UID userId, MID mediaId) throws DatabaseException, IllegalArgumentException;
 
 }

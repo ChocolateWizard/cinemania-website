@@ -8,6 +8,7 @@ import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
 import com.borak.kinweb.backend.exceptions.DatabaseException;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.MovieRepositoryJDBC;
 import com.borak.kinweb.backend.repository.jdbc.PersonRepositoryJDBC;
 import java.util.Arrays;
@@ -65,7 +66,7 @@ public class PersonRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     //============================================================================================================ 

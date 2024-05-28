@@ -4,9 +4,11 @@
  */
 package com.borak.kinweb.backend.integration.repository;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.repository.jdbc.MediaRepositoryJDBC;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,7 +60,7 @@ public class MediaRepositoryJDBCTest {
 
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(ConfigPropertiesTest.didAllTestsPass());
+        Assumptions.assumeTrue(TestResultsHelper.didConfigPropertiesTestsPass());
     }
 
     //============================================================================================================ 
@@ -268,12 +270,22 @@ public class MediaRepositoryJDBCTest {
         for (int i = 0; i < actual.size(); i++) {
             assertThat(actual.get(i)).isNotNull();
             assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
-            assertThat(actual.get(i).getTitle()).isEqualTo(expected.get(i).getTitle());
+            assertThat(actual.get(i).getTitle()).isNotEmpty().isEqualTo(expected.get(i).getTitle());
             assertThat(actual.get(i).getCoverImage()).isEqualTo(expected.get(i).getCoverImage());
-            assertThat(actual.get(i).getReleaseDate()).isEqualTo(expected.get(i).getReleaseDate());
-            assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
-            assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
-            assertThat(actual.get(i).getCriticRating()).isNull();
+            assertThat(actual.get(i).getReleaseDate()).isNotNull().isEqualTo(expected.get(i).getReleaseDate());
+            assertThat(actual.get(i).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getAudienceRating()).isNotNull().isEqualTo(expected.get(i).getAudienceRating());
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
+
+            if (expected.get(i) instanceof MovieJDBC) {
+                assertThat(actual.get(i) instanceof MovieJDBC).isTrue();
+                assertThat(((MovieJDBC) actual.get(i)).getLength()).isNotNull().isEqualTo(((MovieJDBC) expected.get(i)).getLength());
+            } else if (expected.get(i) instanceof TVShowJDBC) {
+                assertThat(actual.get(i) instanceof TVShowJDBC).isTrue();
+                assertThat(((TVShowJDBC) actual.get(i)).getNumberOfSeasons()).isNotNull().isEqualTo(((TVShowJDBC) expected.get(i)).getNumberOfSeasons());
+            } else {
+                assertThat(actual.get(i) instanceof MediaJDBC).isTrue();
+            }
 
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();

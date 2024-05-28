@@ -53,7 +53,7 @@ public class DatabaseSeeder {
             datastore.storeMovies(moviesApi);
             datastore.storeTVShows(showsApi);
             datastore.storePersons(personsApi);
-            datastore.createAndStoreUser(passwordEncoder);
+            datastore.createAndStoreUsers(passwordEncoder);
             datastore.connectData();
             datastore.resetIDs();
             log.info("========>Persisting data...");
