@@ -66,10 +66,6 @@ public class JwtUtils {
         return Jwts.parser().verifyWith(key()).build().parseSignedClaims(token).getPayload().getSubject();
     }
 
-    private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(config.getJwtSecret()));
-    }
-
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().verifyWith(key()).build().parse(authToken);
@@ -98,6 +94,10 @@ public class JwtUtils {
                 .expiration(new Date((new Date()).getTime() + config.getJwtExpirationMs()))
                 .signWith(key(), Jwts.SIG.HS256)
                 .compact();
+    }
+
+    private SecretKey key() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(config.getJwtSecret()));
     }
 
 }

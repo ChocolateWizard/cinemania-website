@@ -57,4 +57,7 @@ public final class TestJsonResponseReader {
         return properties.getProperty("person." + number);
     }
 
+    public String getUserJson(int number) {
+        return properties.getProperty("user." + number);
+    }
 }

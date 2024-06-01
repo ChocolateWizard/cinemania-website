@@ -53,6 +53,11 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
@@ -65,11 +70,6 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     //this tells spring security to ignore provided path. Its not advised to do it like this
@@ -141,6 +141,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/users/library/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/library/*").authenticated()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -35,11 +35,11 @@ public class UserRegisterDTO implements DTO {
     @JsonProperty(value = "last_name")
     private String lastName;
 
+    @NotNull
     private Gender gender;
 
-    
     @NotBlank(message = "Profile name must not be null or empty!")
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$",message = "Profile name must only contain letters, numbers and _")
+    @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Profile name must only contain letters, numbers and _")
     @Size(max = 100, message = "Profile name must have less than 100 characters!")
     @JsonProperty(value = "profile_name")
     private String profileName;
@@ -60,6 +60,7 @@ public class UserRegisterDTO implements DTO {
     @Size(max = 300, message = "Invalid password!")
     private String password;
 
+    @NotNull
     private UserRole role = UserRole.REGULAR;
 
     @NotNull(message = "Country id must not be null!")
@@ -162,6 +163,4 @@ public class UserRegisterDTO implements DTO {
         this.countryId = countryId;
     }
 
-    
-    
 }
