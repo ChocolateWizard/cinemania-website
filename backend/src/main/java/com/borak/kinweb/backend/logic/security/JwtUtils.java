@@ -24,7 +24,10 @@ import org.springframework.web.util.WebUtils;
 
 //import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.DecodingException;
+import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.WeakKeyException;
 
 //import io.jsonwebtoken.security.SignatureAlgorithm;
 import javax.crypto.SecretKey;
@@ -37,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class JwtUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
 
     @Autowired
     private ConfigProperties config;
@@ -71,17 +74,17 @@ public class JwtUtils {
             Jwts.parser().verifyWith(key()).build().parse(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            log.debug("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            log.debug("JWT token is expired: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            log.debug("JWT token is unsupported: {}", e.getMessage());
         } catch (SignatureException e) {
-            logger.error("JWS signature was discovered, but could not be verified: {}", e.getMessage());
+            log.debug("JWS signature was discovered, but could not be verified: {}", e.getMessage());
         } catch (SecurityException e) {
-            logger.error("JWT string is a JWE which is unsupported: {}", e.getMessage());
+            log.debug("JWT string is a JWE which is unsupported: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            log.debug("JWT claims string is empty: {}", e.getMessage());
         }
 
         return false;
@@ -96,7 +99,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    private SecretKey key() {
+    private SecretKey key() throws DecodingException, WeakKeyException {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(config.getJwtSecret()));
     }
 
