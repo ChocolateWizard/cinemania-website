@@ -117,7 +117,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = {
         DatabaseException.class
     })
-    public ResponseEntity<?> handleUnexpectedExceptions(RuntimeException ex, HttpServletRequest request) {
+    public ResponseEntity<?> handleUnexpectedExceptions(DatabaseException ex, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();
         errorDetail.setTimestamp(new Date().getTime());
         errorDetail.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

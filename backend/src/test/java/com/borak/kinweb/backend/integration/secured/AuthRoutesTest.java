@@ -18,7 +18,6 @@ import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.logic.security.JwtUtils;
 import com.borak.kinweb.backend.repository.jdbc.UserRepositoryJDBC;
 import com.borak.kinweb.backend.repository.util.FileRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.HttpCookie;
 import java.nio.charset.StandardCharsets;
@@ -32,11 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -57,9 +53,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.core.io.ByteArrayResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import org.springframework.core.io.ByteArrayResource;
 
 /**
  *
@@ -820,7 +816,7 @@ public class AuthRoutesTest {
                     assertThat(cookie.getPath()).isEqualTo("/api");
                     assertThat(cookie.isHttpOnly()).isTrue();
                     assertThat(cookie.getMaxAge()).isEqualTo(24 * 60 * 60);
-                    assertThat(cookie.getValue()).isEqualTo(jwtUtils.generateTokenFromUsername(input.getKey().getUsername()));
+                    assertThat(jwtUtils.getUserNameFromJwtToken(cookie.getValue())).isEqualTo(input.getKey().getUsername());
                 }
 
                 //check user data

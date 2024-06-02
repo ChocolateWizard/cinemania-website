@@ -6,10 +6,12 @@ package com.borak.kinweb.backend;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.helpers.DataInitializer;
+import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import java.util.HashMap;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -48,7 +50,12 @@ public class ConfigPropertiesTest {
         return true;
     }
 
-//=======================================================================================================    
+//=======================================================================================================
+    @BeforeEach
+    void beforeEach() {
+        Assumptions.assumeTrue(TestResultsHelper.didContextLoadsTestPass());
+    }
+
     @Test
     @DisplayName(value = "Tests functionality of ConfigProperties.class and if valid properties are set in application.properties and application-test.properties")
     void configPropertiesAndProperties_InitializedProperly() {
