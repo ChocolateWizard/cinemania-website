@@ -5,6 +5,7 @@
 package com.borak.kinweb.backend.repository.api;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,9 +14,10 @@ import java.util.Optional;
  * @author Mr. Poyo
  * @param <U> User entity class
  * @param <UID> Identifier of User entity
+ * @param <M> Media entity class
  * @param <MID> Identifier of Media entity
  */
-public interface IUserRepository<U, UID, MID> extends IRepository<U, UID> {
+public interface IUserRepository<U, UID, M, MID> extends IRepository<U, UID> {
 
     boolean existsEmail(String email) throws DatabaseException, IllegalArgumentException;
 
@@ -32,5 +34,7 @@ public interface IUserRepository<U, UID, MID> extends IRepository<U, UID> {
     void addMediaToLibrary(UID userId, MID mediaId) throws DatabaseException, IllegalArgumentException;
 
     void removeMediaFromLibrary(UID userId, MID mediaId) throws DatabaseException, IllegalArgumentException;
+
+    List<M> findAllLibraryMediaByUserId(UID userId) throws DatabaseException, IllegalArgumentException;
 
 }

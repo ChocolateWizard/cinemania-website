@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements IUserService<Long> {
 
     @Autowired
-    private IUserRepository<UserJDBC, Long, Long> userRepo;
+    private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
     @Autowired
     private IMediaRepository<MediaJDBC, Long> mediaRepo;
 

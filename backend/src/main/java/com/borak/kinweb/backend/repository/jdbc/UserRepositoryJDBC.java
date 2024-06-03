@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
  * @author Mr. Poyo
  */
 @Repository
-public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long, Long> {
+public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long, MediaJDBC, Long> {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -80,7 +80,12 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long, Long>
 
     @Override
     public List<UserJDBC> findAll() throws DatabaseException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        try {
+            List<UserJDBC> users = jdbcTemplate.query(SQLUser.FIND_ALL_S, SQLUser.userRM);
+            return users;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving users", e);
+        }
     }
 
     @Override
@@ -219,6 +224,23 @@ public class UserRepositoryJDBC implements IUserRepository<UserJDBC, Long, Long>
             }
         } catch (DataAccessException e) {
             throw new DatabaseException("Error while removing media with id: " + mediaId + " from users library", e);
+        }
+    }
+
+    @Override
+    public List<MediaJDBC> findAllLibraryMediaByUserId(Long userId) throws DatabaseException, IllegalArgumentException {
+        try {
+            if (userId == null || userId < 1) {
+                throw new IllegalArgumentException("Invalid parameter: userId must be non-null and greater than 0");
+            }
+            List<MediaJDBC> medias = jdbcTemplate.query(SQLUser.FIND_ALL_MEDIA_BY_USER_ID_PS, new Object[]{userId}, new int[]{Types.BIGINT}, SQLUser.mediaRM);
+            for (MediaJDBC media : medias) {
+                List<GenreJDBC> genres = jdbcTemplate.query(SQLUser.FIND_ALL_GENRES_PS, new Object[]{media.getId()}, new int[]{Types.BIGINT}, SQLUser.genreRM);
+                media.setGenres(genres);
+            }
+            return medias;
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Error while retreiving medias from users library", e);
         }
     }
 

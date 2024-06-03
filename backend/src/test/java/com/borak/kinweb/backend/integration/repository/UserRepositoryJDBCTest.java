@@ -7,6 +7,7 @@ package com.borak.kinweb.backend.integration.repository;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
@@ -66,6 +67,8 @@ public class UserRepositoryJDBCTest {
         testsPassed.put("existsMediaInLibrary_Test", false);
         testsPassed.put("addMediaToLibrary_Test", false);
         testsPassed.put("removeMediaFromLibrary_Test", false);
+        testsPassed.put("findAll_Test", false);
+        testsPassed.put("findAllLibraryMediaByUserId_Test", false);
     }
 
     public static boolean didAllTestsPass() {
@@ -530,9 +533,72 @@ public class UserRepositoryJDBCTest {
         testsPassed.put("removeMediaFromLibrary_Test", true);
     }
 
+    @Test
+    @Order(10)
+    @DisplayName("Tests normal functionality of findAll method of UserRepositoryJDBC class")
+    void findAll_Test() {
+        List<UserJDBC> actualUsers = repo.findAll();
+        List<UserJDBC> expectedUsers = init.getUsers();
+        assertThat(actualUsers).isNotNull();
+        assertThat(actualUsers.size()).isEqualTo(expectedUsers.size());
+        for (int i = 0; i < actualUsers.size(); i++) {
+            checkValues(expectedUsers.get(i), actualUsers.get(i), false);
+            assertThat(actualUsers.get(i).getMedias()).isNotNull().isEmpty();
+            assertThat(actualUsers.get(i).getCritiques()).isNotNull().isEmpty();
+        }
+
+        testsPassed.put("findAll_Test", true);
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("Tests normal functionality of findAllLibraryMediaByUserId method of UserRepositoryJDBC class")
+    void findAllLibraryMediaByUserId_Test() {
+        final Long[] invalidInput = {null, 0l, -1l, -2l, Long.MIN_VALUE};
+        for (int iter = 0; iter < invalidInput.length; iter++) {
+            final int i = iter;
+            assertThatExceptionOfType(IllegalArgumentException.class).as("Code input value (%s)", invalidInput[i]).isThrownBy(() -> {
+                repo.findAllLibraryMediaByUserId(invalidInput[i]);
+            }).withMessage("Invalid parameter: userId must be non-null and greater than 0");
+        }
+        for (UserJDBC user : init.getUsers()) {
+            List<MediaJDBC> actual = repo.findAllLibraryMediaByUserId(user.getId());
+            assertThat(actual).isNotNull();
+            checkMediaValues(user.getMedias(), actual);
+        }
+        Long[] noResultInputs = new Long[]{4l, 5l, 6l, 7l, 50l, 150l, Long.MAX_VALUE};
+        for (Long input : noResultInputs) {
+            List<MediaJDBC> actual = repo.findAllLibraryMediaByUserId(input);
+            assertThat(actual).isNotNull().isEmpty();
+        }
+        testsPassed.put("findAllLibraryMediaByUserId_Test", true);
+    }
+
 //=========================================================================================================
 //PRIVATE METHODS
-    void checkValues(UserJDBC expected, UserJDBC actual, boolean hasRelations) {
+    private void checkInsertUpdateValues(UserJDBC expected, UserJDBC actual) {
+        assertThat(expected).isNotNull();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
+        assertThat(actual.getFirstName()).isNotEmpty().isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isNotEmpty().isEqualTo(expected.getLastName());
+        assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
+        assertThat(actual.getRole()).isNotNull().isEqualTo(expected.getRole());
+        assertThat(actual.getProfileName()).isNotEmpty().isEqualTo(expected.getProfileName());
+        assertThat(actual.getProfileImage()).isEqualTo(expected.getProfileImage());
+        assertThat(actual.getEmail()).isNotEmpty().isEqualTo(expected.getEmail());
+        assertThat(actual.getUsername()).isNotEmpty().isEqualTo(expected.getUsername());
+        assertThat(actual.getPassword()).isNotEmpty().isEqualTo(expected.getPassword());
+        assertThat(actual.getCreatedAt()).isNotNull().isEqualTo(expected.getCreatedAt());
+        assertThat(actual.getUpdatedAt()).isNotNull().isEqualTo(expected.getUpdatedAt());
+        assertThat(actual.getCountry()).isNotNull();
+        assertThat(actual.getCountry().getId()).isNotNull().isEqualTo(expected.getCountry().getId());
+
+        assertThat(actual.getMedias()).isNotNull().isEmpty();
+        assertThat(actual.getCritiques()).isNotNull().isEmpty();
+    }
+
+    private void checkValues(UserJDBC expected, UserJDBC actual, boolean hasRelations) {
         assertThat(expected).isNotNull();
         assertThat(actual).isNotNull();
         assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
@@ -556,97 +622,81 @@ public class UserRepositoryJDBCTest {
         assertThat(actual.getMedias()).isNotNull();
         assertThat(actual.getCritiques()).isNotNull();
         if (hasRelations) {
-            assertThat(actual.getMedias().size() == expected.getMedias().size()).isTrue();
-            for (int i = 0; i < actual.getMedias().size(); i++) {
-                assertThat(actual.getMedias().get(i)).isNotNull();
-                assertThat(actual.getMedias().get(i).getId()).isNotNull().isEqualTo(expected.getMedias().get(i).getId());
-                assertThat(actual.getMedias().get(i).getTitle()).isNotEmpty().isEqualTo(expected.getMedias().get(i).getTitle());
-                assertThat(actual.getMedias().get(i).getCoverImage()).isEqualTo(expected.getMedias().get(i).getCoverImage());
-                assertThat(actual.getMedias().get(i).getDescription()).isNotEmpty().isEqualTo(expected.getMedias().get(i).getDescription());
-                assertThat(actual.getMedias().get(i).getReleaseDate()).isNotNull().isEqualTo(expected.getMedias().get(i).getReleaseDate());
-                assertThat(actual.getMedias().get(i).getAudienceRating()).isNotNull().isEqualTo(expected.getMedias().get(i).getAudienceRating());
-                assertThat(actual.getMedias().get(i).getCriticRating()).isEqualTo(expected.getMedias().get(i).getCriticRating());
-                if (expected.getMedias().get(i) instanceof MovieJDBC) {
-                    assertThat(actual.getMedias().get(i) instanceof MovieJDBC).isTrue();
-                    assertThat(((MovieJDBC) actual.getMedias().get(i)).getLength()).isNotNull().isEqualTo(((MovieJDBC) expected.getMedias().get(i)).getLength());
-                } else if (expected.getMedias().get(i) instanceof TVShowJDBC) {
-                    assertThat(actual.getMedias().get(i) instanceof TVShowJDBC).isTrue();
-                    assertThat(((TVShowJDBC) actual.getMedias().get(i)).getNumberOfSeasons()).isNotNull().isEqualTo(((TVShowJDBC) expected.getMedias().get(i)).getNumberOfSeasons());
-                } else {
-                    assertThat(actual.getMedias().get(i) instanceof MediaJDBC).isTrue();
-                }
-                assertThat(actual.getMedias().get(i).getGenres()).isNotNull();
-                assertThat(actual.getMedias().get(i).getGenres().size() == expected.getMedias().get(i).getGenres().size()).isTrue();
-                for (int j = 0; j < actual.getMedias().get(i).getGenres().size(); j++) {
-                    assertThat(actual.getMedias().get(i).getGenres().get(j)).isNotNull();
-                    assertThat(actual.getMedias().get(i).getGenres().get(j).getId()).isNotNull().isEqualTo(expected.getMedias().get(i).getGenres().get(j).getId());
-                    assertThat(actual.getMedias().get(i).getGenres().get(j).getName()).isNotEmpty().isEqualTo(expected.getMedias().get(i).getGenres().get(j).getName());
-                }
-
-            }
-
-            assertThat(actual.getCritiques().size() == expected.getCritiques().size()).isTrue();
-            for (int i = 0; i < actual.getCritiques().size(); i++) {
-                assertThat(actual.getCritiques().get(i)).isNotNull();
-                assertThat(actual.getCritiques().get(i).getDescription()).isNotEmpty().isEqualTo(expected.getCritiques().get(i).getDescription());
-                assertThat(actual.getCritiques().get(i).getRating()).isNotNull().isEqualTo(expected.getCritiques().get(i).getRating());
-
-                assertThat(actual.getCritiques().get(i).getCritic()).isNotNull();
-                assertThat(actual.getCritiques().get(i).getCritic() == actual).isTrue();
-
-                assertThat(actual.getCritiques().get(i).getMedia()).isNotNull();
-                assertThat(actual.getCritiques().get(i).getMedia().getId()).isNotNull().isEqualTo(expected.getCritiques().get(i).getMedia().getId());
-                assertThat(actual.getCritiques().get(i).getMedia().getTitle()).isNotEmpty().isEqualTo(expected.getCritiques().get(i).getMedia().getTitle());
-                assertThat(actual.getCritiques().get(i).getMedia().getCoverImage()).isEqualTo(expected.getCritiques().get(i).getMedia().getCoverImage());
-                assertThat(actual.getCritiques().get(i).getMedia().getDescription()).isNotEmpty().isEqualTo(expected.getCritiques().get(i).getMedia().getDescription());
-                assertThat(actual.getCritiques().get(i).getMedia().getReleaseDate()).isNotNull().isEqualTo(expected.getCritiques().get(i).getMedia().getReleaseDate());
-                assertThat(actual.getCritiques().get(i).getMedia().getAudienceRating()).isNotNull().isEqualTo(expected.getCritiques().get(i).getMedia().getAudienceRating());
-                assertThat(actual.getCritiques().get(i).getMedia().getCriticRating()).isEqualTo(expected.getCritiques().get(i).getMedia().getCriticRating());
-                if (expected.getCritiques().get(i).getMedia() instanceof MovieJDBC) {
-                    assertThat(actual.getCritiques().get(i).getMedia() instanceof MovieJDBC).isTrue();
-                    assertThat(((MovieJDBC) actual.getCritiques().get(i).getMedia()).getLength()).isNotNull().isEqualTo(((MovieJDBC) expected.getCritiques().get(i).getMedia()).getLength());
-                } else if (expected.getCritiques().get(i).getMedia() instanceof TVShowJDBC) {
-                    assertThat(actual.getCritiques().get(i).getMedia() instanceof TVShowJDBC).isTrue();
-                    assertThat(((TVShowJDBC) actual.getCritiques().get(i).getMedia()).getNumberOfSeasons()).isNotNull().isEqualTo(((TVShowJDBC) expected.getCritiques().get(i).getMedia()).getNumberOfSeasons());
-                } else {
-                    assertThat(actual.getCritiques().get(i).getMedia() instanceof MediaJDBC).isTrue();
-                }
-                assertThat(actual.getCritiques().get(i).getMedia().getGenres()).isNotNull();
-                assertThat(actual.getCritiques().get(i).getMedia().getGenres().size() == expected.getCritiques().get(i).getMedia().getGenres().size()).isTrue();
-                for (int j = 0; j < actual.getCritiques().get(i).getMedia().getGenres().size(); j++) {
-                    assertThat(actual.getCritiques().get(i).getMedia().getGenres().get(j)).isNotNull();
-                    assertThat(actual.getCritiques().get(i).getMedia().getGenres().get(j).getId()).isNotNull().isEqualTo(expected.getCritiques().get(i).getMedia().getGenres().get(j).getId());
-                    assertThat(actual.getCritiques().get(i).getMedia().getGenres().get(j).getName()).isNotEmpty().isEqualTo(expected.getCritiques().get(i).getMedia().getGenres().get(j).getName());
-                }
-
-            }
+            checkMediaValues(expected.getMedias(), actual.getMedias());
+            checkCritiqueValues(expected.getCritiques(), actual.getCritiques(), actual);
 
         } else {
-            assertThat(actual.getMedias()).isEmpty();
-            assertThat(actual.getCritiques()).isEmpty();
+            assertThat(actual.getMedias()).isNotNull().isEmpty();
+            assertThat(actual.getCritiques()).isNotNull().isEmpty();
         }
     }
 
-    void checkInsertUpdateValues(UserJDBC expected, UserJDBC actual) {
-        assertThat(expected).isNotNull();
-        assertThat(actual).isNotNull();
-        assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
-        assertThat(actual.getFirstName()).isNotEmpty().isEqualTo(expected.getFirstName());
-        assertThat(actual.getLastName()).isNotEmpty().isEqualTo(expected.getLastName());
-        assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
-        assertThat(actual.getRole()).isNotNull().isEqualTo(expected.getRole());
-        assertThat(actual.getProfileName()).isNotEmpty().isEqualTo(expected.getProfileName());
-        assertThat(actual.getProfileImage()).isEqualTo(expected.getProfileImage());
-        assertThat(actual.getEmail()).isNotEmpty().isEqualTo(expected.getEmail());
-        assertThat(actual.getUsername()).isNotEmpty().isEqualTo(expected.getUsername());
-        assertThat(actual.getPassword()).isNotEmpty().isEqualTo(expected.getPassword());
-        assertThat(actual.getCreatedAt()).isNotNull().isEqualTo(expected.getCreatedAt());
-        assertThat(actual.getUpdatedAt()).isNotNull().isEqualTo(expected.getUpdatedAt());
-        assertThat(actual.getCountry()).isNotNull();
-        assertThat(actual.getCountry().getId()).isNotNull().isEqualTo(expected.getCountry().getId());
+    private void checkMediaValues(List<MediaJDBC> expected, List<MediaJDBC> actual) {
+        assertThat(actual.size() == expected.size()).isTrue();
+        for (int i = 0; i < actual.size(); i++) {
+            assertThat(actual.get(i)).isNotNull();
+            assertThat(actual.get(i).getId()).isNotNull().isEqualTo(expected.get(i).getId());
+            assertThat(actual.get(i).getTitle()).isNotEmpty().isEqualTo(expected.get(i).getTitle());
+            assertThat(actual.get(i).getCoverImage()).isEqualTo(expected.get(i).getCoverImage());
+            assertThat(actual.get(i).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getReleaseDate()).isNotNull().isEqualTo(expected.get(i).getReleaseDate());
+            assertThat(actual.get(i).getAudienceRating()).isNotNull().isEqualTo(expected.get(i).getAudienceRating());
+            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
+            if (expected.get(i) instanceof MovieJDBC) {
+                assertThat(actual.get(i) instanceof MovieJDBC).isTrue();
+                assertThat(((MovieJDBC) actual.get(i)).getLength()).isNotNull().isEqualTo(((MovieJDBC) expected.get(i)).getLength());
+            } else if (expected.get(i) instanceof TVShowJDBC) {
+                assertThat(actual.get(i) instanceof TVShowJDBC).isTrue();
+                assertThat(((TVShowJDBC) actual.get(i)).getNumberOfSeasons()).isNotNull().isEqualTo(((TVShowJDBC) expected.get(i)).getNumberOfSeasons());
+            } else {
+                assertThat(actual.get(i) instanceof MediaJDBC).isTrue();
+            }
+            assertThat(actual.get(i).getGenres()).isNotNull();
+            assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
+                assertThat(actual.get(i).getGenres().get(j)).isNotNull();
+                assertThat(actual.get(i).getGenres().get(j).getId()).isNotNull().isEqualTo(expected.get(i).getGenres().get(j).getId());
+                assertThat(actual.get(i).getGenres().get(j).getName()).isNotEmpty().isEqualTo(expected.get(i).getGenres().get(j).getName());
+            }
+        }
+    }
 
-        assertThat(actual.getMedias()).isNotNull().isEmpty();
-        assertThat(actual.getCritiques()).isNotNull().isEmpty();
+    private void checkCritiqueValues(List<CritiqueJDBC> expected, List<CritiqueJDBC> actual, UserJDBC actualCritic) {
+        assertThat(actual.size() == expected.size()).isTrue();
+        for (int i = 0; i < actual.size(); i++) {
+            assertThat(actual.get(i)).isNotNull();
+            assertThat(actual.get(i).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getDescription());
+            assertThat(actual.get(i).getRating()).isNotNull().isEqualTo(expected.get(i).getRating());
+
+            assertThat(actual.get(i).getCritic()).isNotNull();
+            assertThat(actual.get(i).getCritic() == actualCritic).isTrue();
+
+            assertThat(actual.get(i).getMedia()).isNotNull();
+            assertThat(actual.get(i).getMedia().getId()).isNotNull().isEqualTo(expected.get(i).getMedia().getId());
+            assertThat(actual.get(i).getMedia().getTitle()).isNotEmpty().isEqualTo(expected.get(i).getMedia().getTitle());
+            assertThat(actual.get(i).getMedia().getCoverImage()).isEqualTo(expected.get(i).getMedia().getCoverImage());
+            assertThat(actual.get(i).getMedia().getDescription()).isNotEmpty().isEqualTo(expected.get(i).getMedia().getDescription());
+            assertThat(actual.get(i).getMedia().getReleaseDate()).isNotNull().isEqualTo(expected.get(i).getMedia().getReleaseDate());
+            assertThat(actual.get(i).getMedia().getAudienceRating()).isNotNull().isEqualTo(expected.get(i).getMedia().getAudienceRating());
+            assertThat(actual.get(i).getMedia().getCriticRating()).isEqualTo(expected.get(i).getMedia().getCriticRating());
+            if (expected.get(i).getMedia() instanceof MovieJDBC) {
+                assertThat(actual.get(i).getMedia() instanceof MovieJDBC).isTrue();
+                assertThat(((MovieJDBC) actual.get(i).getMedia()).getLength()).isNotNull().isEqualTo(((MovieJDBC) expected.get(i).getMedia()).getLength());
+            } else if (expected.get(i).getMedia() instanceof TVShowJDBC) {
+                assertThat(actual.get(i).getMedia() instanceof TVShowJDBC).isTrue();
+                assertThat(((TVShowJDBC) actual.get(i).getMedia()).getNumberOfSeasons()).isNotNull().isEqualTo(((TVShowJDBC) expected.get(i).getMedia()).getNumberOfSeasons());
+            } else {
+                assertThat(actual.get(i).getMedia() instanceof MediaJDBC).isTrue();
+            }
+            assertThat(actual.get(i).getMedia().getGenres()).isNotNull();
+            assertThat(actual.get(i).getMedia().getGenres().size() == expected.get(i).getMedia().getGenres().size()).isTrue();
+            for (int j = 0; j < actual.get(i).getMedia().getGenres().size(); j++) {
+                assertThat(actual.get(i).getMedia().getGenres().get(j)).isNotNull();
+                assertThat(actual.get(i).getMedia().getGenres().get(j).getId()).isNotNull().isEqualTo(expected.get(i).getMedia().getGenres().get(j).getId());
+                assertThat(actual.get(i).getMedia().getGenres().get(j).getName()).isNotEmpty().isEqualTo(expected.get(i).getMedia().getGenres().get(j).getName());
+            }
+
+        }
     }
 
 //=========================================================================================================
