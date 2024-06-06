@@ -949,6 +949,7 @@ public class CritiqueSecuredRoutesTest {
             HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwt);
             cookie.setPath("/api");
             cookie.setHttpOnly(true);
+            cookie.setMaxAge(24 * 60 * 60);
             requestHeaders.set(HttpHeaders.COOKIE, cookie.toString());
         }
         if (critique == null) {

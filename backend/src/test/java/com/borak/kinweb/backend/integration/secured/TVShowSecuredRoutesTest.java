@@ -28,7 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
-@Order(7)
+@Order(10)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TVShowSecuredRoutesTest {
 
