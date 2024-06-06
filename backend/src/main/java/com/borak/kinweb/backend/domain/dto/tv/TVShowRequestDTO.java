@@ -100,6 +100,12 @@ public class TVShowRequestDTO implements DTO {
         public Actor() {
         }
 
+        public Actor(Long id, Boolean starring, List<String> roles) {
+            this.id = id;
+            this.starring = starring;
+            this.roles = roles;
+        }
+
         public Long getId() {
             return id;
         }
