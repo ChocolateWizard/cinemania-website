@@ -46,7 +46,7 @@ public class DatabaseSeeder {
             log.info("========>Retreiving json data from API...");
             List<GenreDB> genresApi = retreiver.getGenres();
             List<MovieDB> moviesApi = retreiver.getMovies();
-            List<TVShowDB> showsApi = retreiver.getTVShows();           
+            List<TVShowDB> showsApi = retreiver.getTVShows();
             List<PersonWrapperDB> personsApi = transformer.extractPersons(moviesApi, showsApi);
             log.info("========>Collecting data...");
             datastore.storeGenres(genresApi);

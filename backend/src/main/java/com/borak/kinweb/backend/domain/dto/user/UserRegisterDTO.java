@@ -8,7 +8,6 @@ import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.dto.DTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;
-import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
@@ -17,7 +16,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 /**
  *

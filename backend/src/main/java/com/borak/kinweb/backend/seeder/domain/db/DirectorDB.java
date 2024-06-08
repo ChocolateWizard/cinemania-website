@@ -4,13 +4,10 @@
  */
 package com.borak.kinweb.backend.seeder.domain.db;
 
-
 /**
  *
  * @author Mr. Poyo
  */
 public class DirectorDB extends PersonDB {
-
-    
 
 }

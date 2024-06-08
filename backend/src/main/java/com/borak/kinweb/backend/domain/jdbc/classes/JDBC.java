@@ -9,5 +9,5 @@ package com.borak.kinweb.backend.domain.jdbc.classes;
  * @author Mr. Poyo
  */
 public interface JDBC {
-    
+
 }

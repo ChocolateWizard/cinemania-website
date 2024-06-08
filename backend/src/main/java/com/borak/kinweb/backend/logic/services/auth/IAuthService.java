@@ -5,7 +5,6 @@
 package com.borak.kinweb.backend.logic.services.auth;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  *

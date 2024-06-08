@@ -18,7 +18,7 @@ public final class SQLGenre {
                                        FROM genre 
                                        WHERE id=?;
                                        """;
-    
+
     public static final RowMapper<GenreJDBC> genreRM = (rs, num) -> {
         GenreJDBC genre = new GenreJDBC();
         genre.setId(rs.getLong("id"));

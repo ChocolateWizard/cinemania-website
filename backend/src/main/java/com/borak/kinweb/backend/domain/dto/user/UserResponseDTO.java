@@ -41,7 +41,7 @@ public class UserResponseDTO implements DTO {
 
     @JsonProperty(value = "profile_image_url")
     private String profileImageUrl;
-    
+
     private UserRole role;
 
     private Country country;
@@ -70,8 +70,6 @@ public class UserResponseDTO implements DTO {
     public void setRole(UserRole role) {
         this.role = role;
     }
-
-    
 
     public static class Country {
 

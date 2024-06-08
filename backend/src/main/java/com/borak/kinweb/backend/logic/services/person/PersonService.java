@@ -5,7 +5,6 @@
 package com.borak.kinweb.backend.logic.services.person;
 
 import com.borak.kinweb.backend.domain.dto.person.PersonRequestDTO;
-import com.borak.kinweb.backend.domain.dto.person.PersonResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.PersonWrapperJDBC;

@@ -13,7 +13,6 @@ import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverTV;
 import com.borak.kinweb.backend.seeder.domain.api.ApiDiscoverTVResponse;
 import com.borak.kinweb.backend.seeder.domain.api.ApiGenre;
 import com.borak.kinweb.backend.seeder.domain.api.ApiGenreResponse;
-import com.borak.kinweb.backend.seeder.domain.db.GenreDB;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;

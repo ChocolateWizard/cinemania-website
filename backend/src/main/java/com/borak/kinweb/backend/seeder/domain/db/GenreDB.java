@@ -66,6 +66,4 @@ public class GenreDB {
         return Objects.equals(this.id, other.id);
     }
 
-    
-    
 }

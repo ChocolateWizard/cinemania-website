@@ -20,12 +20,12 @@ public interface IMovieService<D extends DTO> {
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size);
 
     public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size);
-    
+
     public ResponseEntity getMovieWithGenres(Long id);
 
     public ResponseEntity getAllMoviesWithGenres();
 
-    public ResponseEntity getAllMoviesWithDetails(); 
+    public ResponseEntity getAllMoviesWithDetails();
 
     public ResponseEntity getMovieWithDetails(Long id);
 
@@ -40,7 +40,7 @@ public interface IMovieService<D extends DTO> {
     public ResponseEntity deleteMovieById(long id);
 
     public ResponseEntity postMovie(D movie);
-    
+
     public ResponseEntity putMovie(D movie);
 
 }

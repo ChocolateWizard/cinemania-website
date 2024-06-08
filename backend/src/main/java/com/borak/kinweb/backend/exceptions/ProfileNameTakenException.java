@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.exceptions;
  *
  * @author Mr. Poyo
  */
-public class ProfileNameTakenException extends RuntimeException{
+public class ProfileNameTakenException extends RuntimeException {
 
     public ProfileNameTakenException() {
     }
@@ -20,7 +20,5 @@ public class ProfileNameTakenException extends RuntimeException{
     public ProfileNameTakenException(String message, Throwable cause) {
         super(message, cause);
     }
-    
-    
-    
+
 }

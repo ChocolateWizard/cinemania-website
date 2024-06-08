@@ -8,6 +8,6 @@ package com.borak.kinweb.backend.repository.api;
  *
  * @author Mr. Poyo
  */
-public interface ICountryRepository<C,ID> extends IRepository<C, ID> {
-    
+public interface ICountryRepository<C, ID> extends IRepository<C, ID> {
+
 }

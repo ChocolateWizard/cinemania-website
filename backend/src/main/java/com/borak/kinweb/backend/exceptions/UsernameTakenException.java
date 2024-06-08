@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.exceptions;
  *
  * @author Mr. Poyo
  */
-public class UsernameTakenException extends RuntimeException{
+public class UsernameTakenException extends RuntimeException {
 
     public UsernameTakenException() {
     }
@@ -20,7 +20,5 @@ public class UsernameTakenException extends RuntimeException{
     public UsernameTakenException(String message, Throwable cause) {
         super(message, cause);
     }
-    
-    
-    
+
 }

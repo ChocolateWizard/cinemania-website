@@ -7,7 +7,6 @@ package com.borak.kinweb.backend.domain.security;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;

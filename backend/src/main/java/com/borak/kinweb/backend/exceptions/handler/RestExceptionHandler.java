@@ -50,7 +50,7 @@ public class RestExceptionHandler {
         errorDetail.setDeveloperMessage(ex.getClass().getName());
         return new ResponseEntity<>(errorDetail, null, HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(value = InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex, HttpServletRequest request) {
         ErrorDetail errorDetail = new ErrorDetail();

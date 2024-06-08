@@ -9,7 +9,7 @@ package com.borak.kinweb.backend.domain.jdbc.classes;
  * @author Mr. Poyo
  */
 public class CoverImage {
-    
+
     private String relativeURL;
     private String extension;
     private String fileName;
@@ -37,8 +37,5 @@ public class CoverImage {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    
-    
-    
-    
+
 }

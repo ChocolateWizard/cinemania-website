@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.integration.repository;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
@@ -92,6 +91,8 @@ public class ActingRepositoryJDBCTest {
 
         testsPassed.put("findAllByMediaId_Test", true);
     }
+//=================================================================================================
+//PRIVATE METHODS
 
     private void checkValues(List<ActingJDBC> actual, List<ActingJDBC> expected) {
         assertThat(actual).isNotNull();

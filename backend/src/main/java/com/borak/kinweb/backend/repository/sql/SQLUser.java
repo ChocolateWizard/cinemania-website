@@ -13,7 +13,6 @@ import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
-import java.time.LocalDateTime;
 import org.springframework.jdbc.core.RowMapper;
 
 /**

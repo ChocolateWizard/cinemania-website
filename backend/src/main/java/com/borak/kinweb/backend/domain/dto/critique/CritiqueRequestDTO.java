@@ -11,23 +11,22 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 /**
  *
  * @author Mr. Poyo
  */
-public class CritiqueRequestDTO implements DTO{
-    
+public class CritiqueRequestDTO implements DTO {
+
     @JsonIgnore
     private Long mediaId;
-    
+
     @NotBlank(message = "Description must not be null or empty!")
     @Size(max = 500, message = "Description must have less than 500 characters!")
     @JsonProperty(value = "description")
     private String description;
-    
+
     @NotNull(message = "Media rating must not be null!")
     @Min(value = 0, message = "Media rating must be greater than or equal to 0!")
     @Max(value = 100, message = "Media rating must be lower than or equal to 100!")
@@ -66,8 +65,5 @@ public class CritiqueRequestDTO implements DTO{
     public void setRating(Integer rating) {
         this.rating = rating;
     }
-    
-    
-    
-    
+
 }

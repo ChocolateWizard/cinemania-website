@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.integration.repository;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.helpers.DataInitializer;
 import com.borak.kinweb.backend.helpers.TestResultsHelper;

@@ -18,12 +18,10 @@ public class MovieDB extends MediaDB {
     public MovieDB() {
     }
 
-    public MovieDB(Long id, String title, String coverImageName, String coverImagePath, MyImage coverImage, String description, LocalDate releaseDate, Integer audienceRating,Integer length) {
+    public MovieDB(Long id, String title, String coverImageName, String coverImagePath, MyImage coverImage, String description, LocalDate releaseDate, Integer audienceRating, Integer length) {
         super(id, title, coverImageName, coverImagePath, coverImage, description, releaseDate, audienceRating);
         this.length = length;
     }
-
-    
 
     public Integer getLength() {
         return length;

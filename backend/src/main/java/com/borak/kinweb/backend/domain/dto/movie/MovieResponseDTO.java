@@ -143,7 +143,7 @@ public class MovieResponseDTO implements DTO {
         @JsonPropertyOrder({"profileName", "profileImageUrl"})
         public static class Critic {
 
-             @JsonProperty(value = "profile_name")
+            @JsonProperty(value = "profile_name")
             private String profileName;
 
             @JsonProperty(value = "profile_image_url")

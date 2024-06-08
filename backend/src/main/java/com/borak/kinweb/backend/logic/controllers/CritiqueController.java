@@ -7,12 +7,10 @@ package com.borak.kinweb.backend.logic.controllers;
 import com.borak.kinweb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.kinweb.backend.logic.services.critique.ICritiqueService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Mr. Poyo
  */
-//@CrossOrigin(originPatterns = {"http://localhost:*"},maxAge = 3600,allowCredentials = "true")
 @RestController
 @RequestMapping(path = "api/critiques")
 @Validated

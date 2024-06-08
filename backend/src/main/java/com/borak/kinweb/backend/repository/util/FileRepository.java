@@ -13,9 +13,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -29,7 +26,7 @@ import org.springframework.stereotype.Repository;
 public class FileRepository {
 
     @Autowired
-    ConfigProperties config;
+    private ConfigProperties config;
 
     public void saveMediaCoverImage(MyImage image) throws DatabaseException {
         try {

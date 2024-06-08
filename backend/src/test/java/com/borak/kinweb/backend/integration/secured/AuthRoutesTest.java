@@ -7,7 +7,6 @@ package com.borak.kinweb.backend.integration.secured;
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.domain.dto.user.UserLoginDTO;
-
 import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;

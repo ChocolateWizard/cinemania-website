@@ -12,10 +12,10 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
-public class WriterJDBC extends PersonJDBC{
+public class WriterJDBC extends PersonJDBC {
 
-    private List<MediaJDBC> medias=new ArrayList<>();
-    
+    private List<MediaJDBC> medias = new ArrayList<>();
+
     public WriterJDBC() {
     }
 
@@ -26,8 +26,8 @@ public class WriterJDBC extends PersonJDBC{
     public WriterJDBC(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
         super(id, firstName, lastName, gender, profilePhotoURL);
     }
-    
-     public List<MediaJDBC> getMedias() {
+
+    public List<MediaJDBC> getMedias() {
         return medias;
     }
 
@@ -38,5 +38,5 @@ public class WriterJDBC extends PersonJDBC{
             this.medias = medias;
         }
     }
-    
+
 }

@@ -8,9 +8,8 @@ package com.borak.kinweb.backend.domain.dto;
  *
  * @author Mr. Poyo
  */
-public class MessageResponseDTO implements DTO{
-    
-    
+public class MessageResponseDTO implements DTO {
+
     private String message;
 
     public MessageResponseDTO() {
@@ -27,7 +26,5 @@ public class MessageResponseDTO implements DTO{
     public void setMessage(String message) {
         this.message = message;
     }
-    
-    
-    
+
 }

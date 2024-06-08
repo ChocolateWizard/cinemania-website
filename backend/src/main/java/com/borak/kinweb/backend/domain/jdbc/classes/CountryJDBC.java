@@ -4,8 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
-import java.io.Serializable;
-
 /**
  *
  * @author Mr Poyo
@@ -26,7 +24,7 @@ public class CountryJDBC implements JDBC {
     public CountryJDBC(Long id) {
         this.id = id;
     }
-  
+
     public CountryJDBC(String name, String officialStateName, String code) {
         this.name = name;
         this.officialStateName = officialStateName;

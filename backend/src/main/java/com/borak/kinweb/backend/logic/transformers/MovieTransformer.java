@@ -17,13 +17,8 @@ import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.logic.util.Util;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,18 +28,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public final class MovieTransformer {
-    
+
     @Autowired
     private ConfigProperties config;
-    
+
     @Autowired
     private Util util;
-    
+
     public MovieResponseDTO toMovieResponseDTO(MovieJDBC movieJdbc) throws IllegalArgumentException {
         if (movieJdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
-        
+
         MovieResponseDTO movieResponse = new MovieResponseDTO();
         movieResponse.setId(movieJdbc.getId());
         movieResponse.setTitle(movieJdbc.getTitle());
@@ -56,11 +51,11 @@ public final class MovieTransformer {
         movieResponse.setLength(movieJdbc.getLength());
         movieResponse.setAudienceRating(movieJdbc.getAudienceRating());
         movieResponse.setCriticsRating(movieJdbc.getCriticRating());
-        
+
         for (GenreJDBC genre : movieJdbc.getGenres()) {
             movieResponse.getGenres().add(new MovieResponseDTO.Genre(genre.getId(), genre.getName()));
         }
-        
+
         for (CritiqueJDBC critique : movieJdbc.getCritiques()) {
             MovieResponseDTO.Critique.Critic criticResponse = new MovieResponseDTO.Critique.Critic();
             criticResponse.setProfileName(critique.getCritic().getProfileName());
@@ -69,7 +64,7 @@ public final class MovieTransformer {
             }
             movieResponse.getCritiques().add(new MovieResponseDTO.Critique(criticResponse, critique.getRating(), critique.getDescription()));
         }
-        
+
         for (DirectorJDBC director : movieJdbc.getDirectors()) {
             MovieResponseDTO.Director directorResponse = new MovieResponseDTO.Director();
             directorResponse.setId(director.getId());
@@ -108,10 +103,10 @@ public final class MovieTransformer {
             }
             movieResponse.getActors().add(actorResponse);
         }
-        
+
         return movieResponse;
     }
-    
+
     public MovieJDBC toMovieJDBC(MovieRequestDTO movie) throws IllegalArgumentException {
         if (movie == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
@@ -122,7 +117,7 @@ public final class MovieTransformer {
         List<MovieRequestDTO.Actor> pom = new ArrayList<>(movie.getActors());
         pom.sort(Comparator.comparingLong(MovieRequestDTO.Actor::getId));
         movie.setActors(pom);
-        
+
         MovieJDBC jdbc = new MovieJDBC();
         jdbc.setId(movie.getId());
         jdbc.setTitle(movie.getTitle());
@@ -165,5 +160,5 @@ public final class MovieTransformer {
         }
         return list;
     }
-    
+
 }

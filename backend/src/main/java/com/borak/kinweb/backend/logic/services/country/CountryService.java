@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.logic.services.country;
 
-import com.borak.kinweb.backend.domain.dto.country.CountryResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.CountryJDBC;
 import com.borak.kinweb.backend.logic.transformers.CountryTransformer;
 import com.borak.kinweb.backend.repository.api.ICountryRepository;
@@ -21,23 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class CountryService implements ICountryService{
-    
+public class CountryService implements ICountryService {
+
     @Autowired
     private CountryTransformer countryTransformer;
-    
+
     @Autowired
-    private ICountryRepository<CountryJDBC,Long>countryRepo;
+    private ICountryRepository<CountryJDBC, Long> countryRepo;
 
     @Override
     public ResponseEntity getAll() {
-        List<CountryJDBC> countries=countryRepo.findAll();
+        List<CountryJDBC> countries = countryRepo.findAll();
         return new ResponseEntity(countryTransformer.toCountryResponseDTO(countries), HttpStatus.OK);
     }
 
-    
-    
-    
-    
-    
 }

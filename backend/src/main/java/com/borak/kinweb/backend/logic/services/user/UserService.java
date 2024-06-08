@@ -9,7 +9,6 @@ import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.security.SecurityUser;
 import com.borak.kinweb.backend.exceptions.DuplicateResourceException;
 import com.borak.kinweb.backend.exceptions.ResourceNotFoundException;
-import com.borak.kinweb.backend.logic.transformers.UserTransformer;
 import com.borak.kinweb.backend.repository.api.IMediaRepository;
 import com.borak.kinweb.backend.repository.api.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

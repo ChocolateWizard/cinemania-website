@@ -4,33 +4,21 @@
  */
 package com.borak.kinweb.backend.logic.controllers;
 
-import com.borak.kinweb.backend.domain.dto.user.UserLoginDTO;
-import com.borak.kinweb.backend.domain.dto.user.UserRegisterDTO;
-import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.borak.kinweb.backend.logic.services.auth.IAuthService;
 import com.borak.kinweb.backend.logic.services.user.IUserService;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
  * @author Mr. Poyo
  */
-//@CrossOrigin(originPatterns = {"http://localhost:*"},
-//        maxAge = 3600,
-//        allowCredentials = "true",
-//        allowedHeaders = "*",
-//        methods = {RequestMethod.PUT, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE},
-//        exposedHeaders = "*")
 @RestController
 @RequestMapping(path = "api/users")
 @Validated

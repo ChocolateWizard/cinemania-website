@@ -5,9 +5,7 @@
 package com.borak.kinweb.backend.logic.controllers;
 
 import com.borak.kinweb.backend.domain.classes.MyImage;
-import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
-import com.borak.kinweb.backend.logic.services.movie.IMovieService;
 import com.borak.kinweb.backend.logic.services.tv.ITVShowService;
 import com.borak.kinweb.backend.logic.services.validation.DomainValidationService;
 import com.borak.kinweb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Mr. Poyo
  */
-//@CrossOrigin(originPatterns = {"http://localhost:*"},maxAge = 3600,allowCredentials = "true")
 @RestController
 @RequestMapping(path = "api/tv")
 @Validated

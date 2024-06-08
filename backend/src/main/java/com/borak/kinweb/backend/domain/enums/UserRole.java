@@ -14,7 +14,7 @@ public enum UserRole {
 
     REGULAR("REGULAR"), CRITIC("CRITIC"), ADMINISTRATOR("ADMINISTRATOR");
 
-    private String name;
+    private final String name;
 
     private UserRole(String name) {
         this.name = name;

@@ -23,7 +23,9 @@ public class PersonDB {
     private Gender gender;
 
     private String profilePhotoName;
+
     private String profilePhotoPath;
+
     private MyImage profilePhoto;
 
     public PersonDB() {

@@ -28,7 +28,7 @@ public class MovieActorResponseDTO implements DTO {
     private String firstName;
 
     @JsonView(JsonVisibilityViews.Lite.class)
-    @JsonProperty(value = "last_name")   
+    @JsonProperty(value = "last_name")
     private String lastName;
 
     @JsonView(JsonVisibilityViews.Lite.class)
@@ -39,11 +39,11 @@ public class MovieActorResponseDTO implements DTO {
     private Gender gender;
 
     @JsonView(JsonVisibilityViews.Lite.class)
-    @JsonProperty(value = "is_star")   
+    @JsonProperty(value = "is_star")
     private Boolean star;
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    @JsonProperty(value = "is_starring")   
+    @JsonProperty(value = "is_starring")
     private Boolean starring;
 
     @JsonView(JsonVisibilityViews.Heavy.class)

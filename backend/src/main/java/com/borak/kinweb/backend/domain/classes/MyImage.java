@@ -4,12 +4,10 @@
  */
 package com.borak.kinweb.backend.domain.classes;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 

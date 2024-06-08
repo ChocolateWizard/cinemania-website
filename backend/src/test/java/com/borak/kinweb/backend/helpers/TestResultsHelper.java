@@ -4,8 +4,8 @@
  */
 package com.borak.kinweb.backend.helpers;
 
-import com.borak.kinweb.backend.ContextLoadsTest;
-import com.borak.kinweb.backend.ConfigPropertiesTest;
+import com.borak.kinweb.backend.InitialTest;
+import com.borak.kinweb.backend.integration.domain.ConfigPropertiesTest;
 import com.borak.kinweb.backend.integration.domain.MyImageTest;
 import com.borak.kinweb.backend.integration.nonsecured.CountryRoutesTest;
 import com.borak.kinweb.backend.integration.nonsecured.ImageRoutesTest;
@@ -43,13 +43,13 @@ public final class TestResultsHelper {
 //=========================================================================================================
 
     /**
-     * Checks if all tests in ContextLoadsTest have passed
+     * Checks if all tests in InitialTest has passed
      *
      * @return Returns false if any test in ContextLoadsTest has not passed.
      * Else returns true.
      */
-    public static boolean didContextLoadsTestPass() {
-        return ContextLoadsTest.didAllTestsPass();
+    public static boolean didInitialTestPass() {
+        return InitialTest.didAllTestsPass();
     }
 
     /**
@@ -114,7 +114,7 @@ public final class TestResultsHelper {
      */
     public static boolean didAllPreControllerTestsPass() {
         boolean[] testsPassed = new boolean[]{
-            ContextLoadsTest.didAllTestsPass(),
+            InitialTest.didAllTestsPass(),
             ConfigPropertiesTest.didAllTestsPass(),
             MyImageTest.didAllTestsPass(),
             ActingRepositoryJDBCTest.didAllTestsPass(),
@@ -157,7 +157,7 @@ public final class TestResultsHelper {
      */
     public static boolean didAllTestsPass() {
         boolean[] testsPassed = new boolean[]{
-            ContextLoadsTest.didAllTestsPass(),
+            InitialTest.didAllTestsPass(),
             ConfigPropertiesTest.didAllTestsPass(),
             MyImageTest.didAllTestsPass(),
             ActingRepositoryJDBCTest.didAllTestsPass(),
@@ -194,4 +194,48 @@ public final class TestResultsHelper {
         return true;
     }
 
+    /**
+     * Checks if all tests from all test classes have failed
+     *
+     * @return Returns false if any test in any test class has passed. Else
+     * returns true.
+     */
+    public static boolean didAllTestsFail() {
+        boolean[] testsPassed = new boolean[]{
+            InitialTest.didAllTestsPass(),
+            ConfigPropertiesTest.didAllTestsPass(),
+            MyImageTest.didAllTestsPass(),
+            ActingRepositoryJDBCTest.didAllTestsPass(),
+            ActorRepositoryJDBCTest.didAllTestsPass(),
+            DirectorRepositoryJDBCTest.didAllTestsPass(),
+            FileRepositoryTest.didAllTestsPass(),
+            GenreRepositoryJDBCTest.didAllTestsPass(),
+            MediaRepositoryJDBCTest.didAllTestsPass(),
+            MovieRepositoryJDBCTest.didAllTestsPass(),
+            PersonRepositoryJDBCTest.didAllTestsPass(),
+            PersonWrapperRepositoryJDBCTest.didAllTestsPass(),
+            TVShowRepositoryJDBCTest.didAllTestsPass(),
+            WriterRepositoryJDBCTest.didAllTestsPass(),
+            UserRepositoryJDBCTest.didAllTestsPass(),
+            CritiqueRepositoryJDBCTest.didAllTestsPass(),
+            CountryRoutesTest.didAllTestsPass(),
+            ImageRoutesTest.didAllTestsPass(),
+            MediaRoutesTest.didAllTestsPass(),
+            MovieRoutesTest.didAllTestsPass(),
+            PersonRoutesTest.didAllTestsPass(),
+            TVShowRepositoryJDBCTest.didAllTestsPass(),
+            AuthRoutesTest.didAllTestsPass(),
+            CritiqueSecuredRoutesTest.didAllTestsPass(),
+            MovieSecuredRoutesTest.didAllTestsPass(),
+            PersonSecuredRoutesTest.didAllTestsPass(),
+            TVShowSecuredRoutesTest.didAllTestsPass(),
+            UserSecuredRoutesTest.didAllTestsPass()
+        };
+        for (boolean isPassed : testsPassed) {
+            if (isPassed) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

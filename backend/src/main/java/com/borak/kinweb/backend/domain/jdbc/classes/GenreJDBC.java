@@ -4,11 +4,6 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
-import java.sql.Types;
-import java.util.ArrayList;
-
-import java.util.List;
-
 /**
  *
  * @author Mr Poyo
@@ -25,8 +20,6 @@ public class GenreJDBC implements JDBC {
     public GenreJDBC(Long id) {
         this.id = id;
     }
-    
-    
 
     public GenreJDBC(Long id, String name) {
         this.id = id;

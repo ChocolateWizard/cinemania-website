@@ -5,8 +5,6 @@
 package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.dto.movie.MovieRequestDTO;
-import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.kinweb.backend.domain.dto.tv.TVShowResponseDTO;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
@@ -15,7 +13,6 @@ import com.borak.kinweb.backend.domain.jdbc.classes.ActorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.DirectorJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
-import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
 import com.borak.kinweb.backend.logic.util.Util;

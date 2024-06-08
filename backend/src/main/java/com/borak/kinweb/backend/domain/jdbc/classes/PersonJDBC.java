@@ -4,17 +4,14 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
-
-
 import com.borak.kinweb.backend.domain.enums.Gender;
 import java.util.Objects;
-
 
 /**
  *
  * @author Mr Poyo
  */
-public class PersonJDBC implements JDBC{
+public class PersonJDBC implements JDBC {
 
     private Long id;
 
@@ -32,8 +29,6 @@ public class PersonJDBC implements JDBC{
     public PersonJDBC(Long id) {
         this.id = id;
     }
-    
-    
 
     public PersonJDBC(Long id, String firstName, String lastName, Gender gender, String profilePhotoURL) {
         this.id = id;
@@ -42,8 +37,6 @@ public class PersonJDBC implements JDBC{
         this.gender = gender;
         this.profilePhoto = profilePhotoURL;
     }
-
-   
 
     public Long getId() {
         return id;
@@ -106,8 +99,5 @@ public class PersonJDBC implements JDBC{
     public void setProfilePhoto(String profilePhoto) {
         this.profilePhoto = profilePhoto;
     }
-    
-    
-
 
 }

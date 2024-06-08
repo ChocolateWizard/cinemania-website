@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiTVCreator {
- 
+
     @JsonProperty("id")
     private int id;
 
@@ -21,7 +21,7 @@ public class ApiTVCreator {
     private String name;
 
     @JsonProperty("gender")
-    private int gender;  
+    private int gender;
 
     @JsonProperty("profile_path")
     private String profilePath;
@@ -102,6 +102,4 @@ public class ApiTVCreator {
         return this.id == other.id;
     }
 
-    
-    
 }

@@ -9,14 +9,14 @@ package com.borak.kinweb.backend.logic.transformers.serializers.views;
  * @author Mr. Poyo
  */
 public class JsonVisibilityViews {
-    
-    public static class Lite{}
-    
-    public static class Medium extends Lite{}
-    
-    public static class Heavy extends Medium{}
-    
-//    public static class POST{}
-//    
-//    public static class PUT extends POST{}
+
+    public static class Lite {
+    }
+
+    public static class Medium extends Lite {
+    }
+
+    public static class Heavy extends Medium {
+    }
+
 }

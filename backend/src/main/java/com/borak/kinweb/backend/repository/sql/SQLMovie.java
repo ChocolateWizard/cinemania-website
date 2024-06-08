@@ -15,16 +15,12 @@ import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.WriterJDBC;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Mr. Poyo
  */
-//@Component
 public final class SQLMovie {
 
 //================================================================================================

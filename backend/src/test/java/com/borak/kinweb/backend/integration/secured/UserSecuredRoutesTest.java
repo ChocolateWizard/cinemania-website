@@ -5,16 +5,12 @@
 package com.borak.kinweb.backend.integration.secured;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
-import com.borak.kinweb.backend.domain.dto.critique.CritiqueRequestDTO;
-import com.borak.kinweb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.kinweb.backend.helpers.TestResultsHelper;
 import com.borak.kinweb.backend.logic.security.JwtUtils;
-import com.borak.kinweb.backend.repository.jdbc.CritiqueRepositoryJDBC;
 import com.borak.kinweb.backend.repository.jdbc.UserRepositoryJDBC;
 import java.net.HttpCookie;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +21,6 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;

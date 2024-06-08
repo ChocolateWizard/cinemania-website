@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.logic.services.country;
 
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -12,9 +11,7 @@ import org.springframework.http.ResponseEntity;
  * @author Mr. Poyo
  */
 public interface ICountryService {
-    
-    
+
     ResponseEntity getAll();
-    
-    
+
 }

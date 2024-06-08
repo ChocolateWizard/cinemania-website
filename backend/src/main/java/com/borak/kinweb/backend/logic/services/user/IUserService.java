@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
  * @author Mr. Poyo
  */
 public interface IUserService<ID> {
-    
+
     ResponseEntity postMediaIntoLibrary(ID mediaId);
-    
+
     ResponseEntity deleteMediaFromLibrary(ID mediaId);
-    
+
 }

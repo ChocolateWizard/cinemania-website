@@ -9,5 +9,5 @@ package com.borak.kinweb.backend.domain.dto;
  * @author Mr. Poyo
  */
 public interface DTO {
-    
+
 }

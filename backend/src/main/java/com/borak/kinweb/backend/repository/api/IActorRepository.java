@@ -11,8 +11,8 @@ import java.util.List;
  *
  * @author Mr. Poyo
  */
-public interface IActorRepository<A,ID> extends IRepository<A, ID> {
-    
-    public List<A> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
-    
+public interface IActorRepository<A, ID> extends IRepository<A, ID> {
+
+    public List<A> findAllByMediaId(ID id) throws DatabaseException, IllegalArgumentException;
+
 }

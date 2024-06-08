@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiGenre {
-    
+
     private Long id;
     private String name;
 
@@ -63,8 +63,4 @@ public class ApiGenre {
         return Objects.equals(this.id, other.id);
     }
 
-   
-    
-    
-    
 }

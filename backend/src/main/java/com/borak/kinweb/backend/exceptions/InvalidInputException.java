@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.exceptions;
  *
  * @author Mr. Poyo
  */
-public class InvalidInputException extends RuntimeException{
+public class InvalidInputException extends RuntimeException {
 
     public InvalidInputException() {
     }
@@ -20,7 +20,5 @@ public class InvalidInputException extends RuntimeException{
     public InvalidInputException(String message, Throwable cause) {
         super(message, cause);
     }
-    
-    
-    
+
 }

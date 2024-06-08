@@ -4,7 +4,7 @@
  */
 package com.borak.kinweb.backend.helpers;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
+import com.borak.kinweb.backend.integration.domain.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.enums.Gender;
 import com.borak.kinweb.backend.domain.enums.UserRole;
 import com.borak.kinweb.backend.domain.jdbc.classes.ActingJDBC;
@@ -47,7 +47,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  *

@@ -6,7 +6,6 @@ package com.borak.kinweb.backend.logic.transformers;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.domain.dto.media.MediaResponseDTO;
-import com.borak.kinweb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.kinweb.backend.domain.enums.MediaType;
 import com.borak.kinweb.backend.domain.jdbc.classes.GenreJDBC;
 import com.borak.kinweb.backend.domain.jdbc.classes.MediaJDBC;

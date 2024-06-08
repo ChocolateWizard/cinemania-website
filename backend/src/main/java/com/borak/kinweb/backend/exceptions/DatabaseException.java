@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.exceptions;
  *
  * @author Mr. Poyo
  */
-public class DatabaseException extends RuntimeException{
+public class DatabaseException extends RuntimeException {
 
     public DatabaseException() {
     }
@@ -20,7 +20,5 @@ public class DatabaseException extends RuntimeException{
     public DatabaseException(String message, Throwable cause) {
         super(message, cause);
     }
-    
-    
-    
+
 }

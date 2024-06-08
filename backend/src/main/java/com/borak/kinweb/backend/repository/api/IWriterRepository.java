@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface IWriterRepository<W, ID> extends IRepository<W, ID> {
 
-    public List<W> findAllByMediaId(ID id) throws DatabaseException,IllegalArgumentException;
-    
+    public List<W> findAllByMediaId(ID id) throws DatabaseException, IllegalArgumentException;
+
 }

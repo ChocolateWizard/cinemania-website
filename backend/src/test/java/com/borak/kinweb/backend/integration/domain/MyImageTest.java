@@ -4,7 +4,6 @@
  */
 package com.borak.kinweb.backend.integration.domain;
 
-import com.borak.kinweb.backend.ConfigPropertiesTest;
 import com.borak.kinweb.backend.domain.classes.MyImage;
 import com.borak.kinweb.backend.helpers.DataInitializer;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MyImageTest {
 
-    private DataInitializer init = new DataInitializer();
+    private final DataInitializer init = new DataInitializer();
 
     private static final Map<String, Boolean> testsPassed = new HashMap<>();
 

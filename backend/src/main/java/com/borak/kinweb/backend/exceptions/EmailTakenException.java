@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.exceptions;
  *
  * @author Mr. Poyo
  */
-public class EmailTakenException extends RuntimeException{
+public class EmailTakenException extends RuntimeException {
 
     public EmailTakenException() {
     }
@@ -20,7 +20,5 @@ public class EmailTakenException extends RuntimeException{
     public EmailTakenException(String message, Throwable cause) {
         super(message, cause);
     }
-    
-    
-    
+
 }

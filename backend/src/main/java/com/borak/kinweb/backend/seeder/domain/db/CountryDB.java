@@ -8,7 +8,7 @@ package com.borak.kinweb.backend.seeder.domain.db;
  *
  * @author Mr Poyo
  */
-public class CountryDB  {
+public class CountryDB {
 
     private Long id;
 
@@ -24,7 +24,7 @@ public class CountryDB  {
     public CountryDB(Long id) {
         this.id = id;
     }
-  
+
     public CountryDB(String name, String officialStateName, String code) {
         this.name = name;
         this.officialStateName = officialStateName;

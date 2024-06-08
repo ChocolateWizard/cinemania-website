@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.kinweb.backend;
+package com.borak.kinweb.backend.integration.domain;
 
 import com.borak.kinweb.backend.config.ConfigProperties;
 import com.borak.kinweb.backend.helpers.DataInitializer;
@@ -53,7 +53,7 @@ public class ConfigPropertiesTest {
 //=======================================================================================================
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(TestResultsHelper.didContextLoadsTestPass());
+        Assumptions.assumeTrue(TestResultsHelper.didInitialTestPass());
     }
 
     @Test

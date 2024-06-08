@@ -21,7 +21,9 @@ public class MediaDB {
     private String title;
 
     private String coverImageName;
+
     private String coverImagePath;
+
     private MyImage coverImage;
 
     private String description;

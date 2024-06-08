@@ -4,13 +4,11 @@
  */
 package com.borak.kinweb.backend.domain.jdbc.classes;
 
-import java.util.List;
-
 /**
  *
  * @author Mr Poyo
  */
-public class ActingRoleJDBC implements JDBC{
+public class ActingRoleJDBC implements JDBC {
 
     private ActingJDBC acting;
     private Long id;
@@ -58,14 +56,5 @@ public class ActingRoleJDBC implements JDBC{
     public String toString() {
         return "ActingRoleJDBC{" + "id=" + id + ", name=" + name + '}';
     }
-
-   
-
-   
-
-    
-    
-    
-    
 
 }

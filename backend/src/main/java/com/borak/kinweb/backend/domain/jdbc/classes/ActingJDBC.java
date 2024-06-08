@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Mr. Poyo
  */
 public class ActingJDBC implements JDBC {
-   
+
     private MediaJDBC media;
     private ActorJDBC actor;
     private Boolean starring;
@@ -27,7 +27,7 @@ public class ActingJDBC implements JDBC {
         this.media = media;
         this.actor = actor;
         this.starring = starring;
-    }   
+    }
 
     public MediaJDBC getMedia() {
         return media;
@@ -91,6 +91,4 @@ public class ActingJDBC implements JDBC {
         return Objects.equals(this.actor, other.actor);
     }
 
-    
-    
 }

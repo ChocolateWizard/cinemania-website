@@ -78,7 +78,7 @@ public final class ActorTransformer {
         return list;
     }
 
-     public TVShowActorResponseDTO toTVShowActorResponseDTO(ActorJDBC jdbc) throws IllegalArgumentException {
+    public TVShowActorResponseDTO toTVShowActorResponseDTO(ActorJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
@@ -105,6 +105,4 @@ public final class ActorTransformer {
         return list;
     }
 
-    
-    
 }

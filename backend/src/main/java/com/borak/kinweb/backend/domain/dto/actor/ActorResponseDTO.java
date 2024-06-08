@@ -92,7 +92,4 @@ public class ActorResponseDTO implements DTO {
         this.star = star;
     }
 
-    
-    
-    
 }

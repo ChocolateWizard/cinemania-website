@@ -174,8 +174,4 @@ public class ApiCreditsCrew {
         return this.id == other.id;
     }
 
-    
-    
-    
-    
 }

@@ -5,7 +5,6 @@
 package com.borak.kinweb.backend.repository.api;
 
 import com.borak.kinweb.backend.exceptions.DatabaseException;
-import java.util.List;
 import java.util.Optional;
 
 /**

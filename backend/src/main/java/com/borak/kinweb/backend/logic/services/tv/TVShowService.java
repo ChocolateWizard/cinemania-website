@@ -85,7 +85,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
 
     @Override
     public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size) {
-        int year = Year.now().getValue()-1;
+        int year = Year.now().getValue() - 1;
         List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }

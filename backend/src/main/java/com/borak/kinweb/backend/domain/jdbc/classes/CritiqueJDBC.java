@@ -60,6 +60,4 @@ public class CritiqueJDBC implements JDBC {
         this.rating = rating;
     }
 
-    
-
 }

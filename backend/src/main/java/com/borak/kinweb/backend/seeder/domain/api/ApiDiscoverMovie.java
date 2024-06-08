@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.borak.kinweb.backend.seeder.domain.api;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
