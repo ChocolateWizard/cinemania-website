@@ -61,7 +61,7 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
         }
         personRepo.deleteById(id);
         if (wrapper.get().getPerson().getProfilePhoto() != null && !wrapper.get().getPerson().getProfilePhoto().isEmpty()) {
-            fileRepo.deleteIfExistsMediaCoverImage(wrapper.get().getPerson().getProfilePhoto());
+            fileRepo.deleteIfExistsPersonPhotoImage(wrapper.get().getPerson().getProfilePhoto());
         }
         return new ResponseEntity(personWrapperTransformer.toPersonResponseDTO(wrapper.get()), HttpStatus.OK);
     }

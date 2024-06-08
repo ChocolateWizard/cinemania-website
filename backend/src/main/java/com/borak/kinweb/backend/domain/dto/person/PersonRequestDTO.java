@@ -49,6 +49,10 @@ public class PersonRequestDTO implements DTO {
 
         private String name;
 
+        public Profession(String name) {
+            this.name = name;
+        }
+
         public String getName() {
             return name;
         }
@@ -63,6 +67,20 @@ public class PersonRequestDTO implements DTO {
 
         @JsonProperty(value = "worked_on")
         private List<Long> workedOn = new ArrayList<>();
+
+        public Director() {
+            super("director");
+        }
+
+        public Director(List<Long> workedOn) {
+            super("director");
+            this.workedOn = workedOn;
+        }
+
+        public Director(String name, List<Long> workedOn) {
+            super(name);
+            this.workedOn = workedOn;
+        }
 
         public List<Long> getWorkedOn() {
             return workedOn;
@@ -82,6 +100,20 @@ public class PersonRequestDTO implements DTO {
 
         @JsonProperty(value = "worked_on")
         private List<Long> workedOn = new ArrayList<>();
+
+        public Writer() {
+            super("writer");
+        }
+
+        public Writer(List<Long> workedOn) {
+            super("writer");
+            this.workedOn = workedOn;
+        }
+
+        public Writer(String name, List<Long> workedOn) {
+            super(name);
+            this.workedOn = workedOn;
+        }
 
         public List<Long> getWorkedOn() {
             return workedOn;
@@ -105,6 +137,27 @@ public class PersonRequestDTO implements DTO {
         @JsonProperty(value = "worked_on")
         private List<Acting> workedOn = new ArrayList<>();
 
+        public Actor() {
+            super("actor");
+        }
+
+        public Actor(Boolean star) {
+            super("actor");
+            this.star = star;
+        }
+
+        public Actor(Boolean star, List<Acting> workedOn) {
+            super("actor");
+            this.star = star;
+            this.workedOn = workedOn;
+        }
+
+        public Actor(String name, Boolean star, List<Acting> workedOn) {
+            super(name);
+            this.star = star;
+            this.workedOn = workedOn;
+        }
+
         public static class Acting {
 
             @JsonProperty(value = "media_id")
@@ -112,6 +165,15 @@ public class PersonRequestDTO implements DTO {
             @JsonProperty(value = "is_starring")
             private Boolean starring;
             private List<String> roles = new ArrayList<>();
+
+            public Acting() {
+            }
+
+            public Acting(Long mediaId, Boolean starring, List<String> roles) {
+                this.mediaId = mediaId;
+                this.starring = starring;
+                this.roles = roles;
+            }
 
             public Long getMediaId() {
                 return mediaId;
