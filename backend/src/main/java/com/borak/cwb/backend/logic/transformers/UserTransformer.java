@@ -16,6 +16,13 @@ import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.MovieJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.CountryJPA;
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
+import com.borak.cwb.backend.domain.jpa.GenreJPA;
+import com.borak.cwb.backend.domain.jpa.MediaJPA;
+import com.borak.cwb.backend.domain.jpa.MovieJPA;
+import com.borak.cwb.backend.domain.jpa.TVShowJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,6 +64,29 @@ public class UserTransformer {
         return user;
     }
 
+    public UserJPA toUserJPA(UserRegisterDTO registerForm) throws IllegalArgumentException {
+        if (registerForm == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        UserJPA user = new UserJPA();
+        user.setFirstName(registerForm.getFirstName());
+        user.setLastName(registerForm.getLastName());
+        user.setGender(registerForm.getGender());
+        user.setRole(registerForm.getRole());
+        user.setProfileName(registerForm.getProfileName());
+        if (registerForm.getProfileImage() != null) {
+            user.setProfileImage(registerForm.getProfileName() + "." + registerForm.getProfileImage().getExtension());
+        }
+        user.setUsername(registerForm.getUsername());
+        user.setPassword(encoder.encode(registerForm.getPassword()));
+        user.setEmail(registerForm.getEmail());
+        LocalDateTime nowTime = LocalDateTime.now();
+        user.setCreatedAt(nowTime);
+        user.setUpdatedAt(nowTime);
+        user.setCountry(new CountryJPA(registerForm.getCountryId()));
+        return user;
+    }
+
     public UserResponseDTO toUserResponseDTO(UserJDBC userJDBC) throws IllegalArgumentException {
         if (userJDBC == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
@@ -91,8 +121,43 @@ public class UserTransformer {
 
         return response;
     }
-//===================================================================================================================
 
+    public UserResponseDTO toUserResponseDTO(UserJPA userJPA) throws IllegalArgumentException {
+        if (userJPA == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        UserResponseDTO response = new UserResponseDTO();
+        response.setFirstName(userJPA.getFirstName());
+        response.setLastName(userJPA.getLastName());
+        response.setProfileName(userJPA.getProfileName());
+        if (userJPA.getProfileImage() != null) {
+            response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJPA.getProfileImage());
+        }
+        response.setGender(userJPA.getGender());
+        response.setRole(userJPA.getRole());
+
+        UserResponseDTO.Country country = new UserResponseDTO.Country();
+        country.setId(userJPA.getCountry().getId());
+        country.setName(userJPA.getCountry().getName());
+        country.setOfficialStateName(userJPA.getCountry().getOfficialStateName());
+        country.setCode(userJPA.getCountry().getCode());
+        response.setCountry(country);
+
+        for (MediaJPA media : userJPA.getMedias()) {
+            response.getMedias().add(toMediaResponseDTO(media));
+        }
+        for (CritiqueJPA critique : userJPA.getCritiques()) {
+            UserResponseDTO.Critique critiqueResponse = new UserResponseDTO.Critique();
+            critiqueResponse.setDescription(critique.getDescription());
+            critiqueResponse.setRating(critique.getRating());
+            critiqueResponse.setMedia(toMediaResponseDTO(critique.getId().getMedia()));
+            response.getCritiques().add(critiqueResponse);
+        }
+
+        return response;
+    }
+
+//===================================================================================================================
     private MediaResponseDTO toMediaResponseDTO(MediaJDBC media) {
         MediaResponseDTO mediaResponse = new MediaResponseDTO();
         mediaResponse.setId(media.getId());
@@ -110,6 +175,30 @@ public class UserTransformer {
         if (media instanceof MovieJDBC) {
             mediaResponse.setMediaType(MediaType.MOVIE);
         } else if (media instanceof TVShowJDBC) {
+            mediaResponse.setMediaType(MediaType.TV_SHOW);
+        } else {
+            throw new IllegalArgumentException("Unknown media type!");
+        }
+        return mediaResponse;
+    }
+
+    private MediaResponseDTO toMediaResponseDTO(MediaJPA media) {
+        MediaResponseDTO mediaResponse = new MediaResponseDTO();
+        mediaResponse.setId(media.getId());
+        mediaResponse.setTitle(media.getTitle());
+        mediaResponse.setReleaseDate(media.getReleaseDate());
+        mediaResponse.setDescription(media.getDescription());
+        mediaResponse.setAudienceRating(media.getAudienceRating());
+        mediaResponse.setCriticsRating(media.getCriticRating());
+        if (media.getCoverImage() != null) {
+            mediaResponse.setCoverImageUrl(config.getMediaImagesBaseUrl() + media.getCoverImage());
+        }
+        for (GenreJPA genre : media.getGenres()) {
+            mediaResponse.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
+        }
+        if (media instanceof MovieJPA) {
+            mediaResponse.setMediaType(MediaType.MOVIE);
+        } else if (media instanceof TVShowJPA) {
             mediaResponse.setMediaType(MediaType.TV_SHOW);
         } else {
             throw new IllegalArgumentException("Unknown media type!");

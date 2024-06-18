@@ -6,8 +6,10 @@ package com.borak.cwb.backend.logic.security;
 
 import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.repository.api.IUserRepository;
+import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,12 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MyUserDetailsService implements UserDetailsService {
 
+//    @Autowired
+//    private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
     @Autowired
-    private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
+    private UserRepositoryJPA userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserJDBC userDB = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        UserJPA userDB = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
         return toSecurityUser(userDB);
     }
 
@@ -51,6 +55,27 @@ public class MyUserDetailsService implements UserDetailsService {
                 userJDBC.getCountry().getName(),
                 userJDBC.getCountry().getOfficialStateName(),
                 userJDBC.getCountry().getCode()));
+        return user;
+    }
+
+    private SecurityUser toSecurityUser(UserJPA userJPA) throws IllegalArgumentException {
+        SecurityUser user = new SecurityUser();
+        user.setId(userJPA.getId());
+        user.setFirstName(userJPA.getFirstName());
+        user.setLastName(userJPA.getLastName());
+        user.setGender(userJPA.getGender());
+        user.setRole(userJPA.getRole());
+        user.setProfileName(userJPA.getProfileName());
+        user.setProfileImage(userJPA.getProfileImage());
+        user.setUsername(userJPA.getUsername());
+        user.setPassword(userJPA.getPassword());
+        user.setEmail(userJPA.getEmail());
+        user.setCreatedAt(userJPA.getCreatedAt());
+        user.setUpdatedAt(userJPA.getUpdatedAt());
+        user.setCountry(new SecurityUser.Country(userJPA.getCountry().getId(),
+                userJPA.getCountry().getName(),
+                userJPA.getCountry().getOfficialStateName(),
+                userJPA.getCountry().getCode()));
         return user;
     }
 

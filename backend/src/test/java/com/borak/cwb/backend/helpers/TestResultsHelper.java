@@ -150,6 +150,77 @@ public final class TestResultsHelper {
     }
 
     /**
+     * Checks if all necessary tests for MovieSecuredRoutesTest have passed.
+     * This includes:
+     * <ul>
+     * <li>AuthRoutesTest</li>
+     * <li>CritiqueSecuredRoutesTest</li>
+     * <li>UserSecuredRoutesTest</li>
+     * </ul>
+     *
+     * @return Returns false if any test has not passed. Else returns true.
+     */
+    public static boolean didMovieSecuredRoutesRequiredTestsPass() {
+        boolean[] testsPassed = new boolean[]{
+            AuthRoutesTest.didAllTestsPass(),
+            CritiqueSecuredRoutesTest.didAllTestsPass(),
+            UserSecuredRoutesTest.didAllTestsPass()
+        };
+        for (boolean isPassed : testsPassed) {
+            if (!isPassed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if all necessary tests for TVShowSecuredRoutesTest have passed.
+     * This includes:
+     * <ul>
+     * <li>AuthRoutesTest</li>
+     * <li>MovieSecuredRoutesTest</li>
+     * </ul>
+     *
+     * @return Returns false if any test has not passed. Else returns true.
+     */
+    public static boolean didTVShowSecuredRoutesRequiredTestsPass() {
+        boolean[] testsPassed = new boolean[]{
+            didAuthRoutesTestPass(),
+            MovieSecuredRoutesTest.didAllTestsPass()
+        };
+        for (boolean isPassed : testsPassed) {
+            if (!isPassed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if all necessary tests for PersonSecuredRoutesTest have passed.
+     * This includes:
+     * <ul>
+     * <li>AuthRoutesTest</li>
+     * <li>TVShowSecuredRoutesTest</li>
+     * </ul>
+     *
+     * @return Returns false if any test has not passed. Else returns true.
+     */
+    public static boolean didPersonSecuredRoutesRequiredTestsPass() {
+        boolean[] testsPassed = new boolean[]{
+            didTVShowSecuredRoutesRequiredTestsPass(),
+            TVShowSecuredRoutesTest.didAllTestsPass()
+        };
+        for (boolean isPassed : testsPassed) {
+            if (!isPassed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Checks if all tests from all test classes have passed
      *
      * @return Returns false if any test in any test class has not passed. Else

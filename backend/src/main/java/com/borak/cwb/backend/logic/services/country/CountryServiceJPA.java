@@ -4,9 +4,9 @@
  */
 package com.borak.cwb.backend.logic.services.country;
 
-import com.borak.cwb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.cwb.backend.domain.jpa.CountryJPA;
 import com.borak.cwb.backend.logic.transformers.CountryTransformer;
-import com.borak.cwb.backend.repository.api.ICountryRepository;
+import com.borak.cwb.backend.repository.jpa.CountryRepositoryJPA;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,20 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-//@Service
-//@Transactional
-public class CountryService implements ICountryService {
+@Service
+@Transactional
+public class CountryServiceJPA implements ICountryService {
 
     @Autowired
     private CountryTransformer countryTransformer;
 
     @Autowired
-    private ICountryRepository<CountryJDBC, Long> countryRepo;
+    private CountryRepositoryJPA countryRepo;
 
     @Override
     public ResponseEntity getAll() {
-        List<CountryJDBC> countries = countryRepo.findAll();
-        return new ResponseEntity(countryTransformer.toResponseFromJDBC(countries), HttpStatus.OK);
+        List<CountryJPA> countries = countryRepo.findAll();
+        return new ResponseEntity(countryTransformer.toResponseFromJPA(countries), HttpStatus.OK);
     }
 
 }

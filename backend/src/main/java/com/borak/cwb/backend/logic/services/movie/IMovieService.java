@@ -23,10 +23,6 @@ public interface IMovieService<D extends DTO> {
 
     public ResponseEntity getMovieWithGenres(Long id);
 
-    public ResponseEntity getAllMoviesWithGenres();
-
-    public ResponseEntity getAllMoviesWithDetails();
-
     public ResponseEntity getMovieWithDetails(Long id);
 
     public ResponseEntity getMovieDirectors(Long id);

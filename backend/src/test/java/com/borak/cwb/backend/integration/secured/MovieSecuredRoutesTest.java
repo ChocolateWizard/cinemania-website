@@ -114,7 +114,7 @@ public class MovieSecuredRoutesTest {
 //=========================================================================================================
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(TestResultsHelper.didAuthRoutesTestPass());
+        Assumptions.assumeTrue(TestResultsHelper.didMovieSecuredRoutesRequiredTestsPass());
     }
 
     //=========================================================================================================

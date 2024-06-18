@@ -38,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-@Service
-@Transactional
+//@Service
+//@Transactional
 public class TVShowService implements ITVShowService<TVShowRequestDTO> {
 
     private static final int POPULARITY_TRESHOLD = 80;
@@ -73,26 +73,26 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
 //----------------------------------------------------------------------------------------------------
     @Override
     public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllWithGenresPaginated(page, size));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllWithRelationsPaginated(page, size));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
@@ -100,28 +100,16 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowWithGenres(Long id) {
         Optional<TVShowJDBC> tvShow = tvShowRepo.findByIdWithGenres(id);
         if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
+            return new ResponseEntity<>(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getAllTVShowsWithGenres() {
-        List<TVShowResponseDTO> tvShow = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllWithGenres());
-        return new ResponseEntity<>(tvShow, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity getAllTVShowsWithDetails() {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toTVShowResponseDTO(tvShowRepo.findAllWithRelations());
-        return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getTVShowWithDetails(Long id) {
         Optional<TVShowJDBC> tvShow = tvShowRepo.findByIdWithRelations(id);
         if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
+            return new ResponseEntity<>(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -172,7 +160,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
         if (tvShow.get().getCoverImage() != null && !tvShow.get().getCoverImage().isEmpty()) {
             fileRepo.deleteIfExistsMediaCoverImage(tvShow.get().getCoverImage());
         }
-        return new ResponseEntity(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
+        return new ResponseEntity(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
     }
 
     @Override
@@ -209,7 +197,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
         } else {
             tvShow = tvShowRepo.findByIdWithRelations(tvShowDB.getId());
         }
-        return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(tvShow.get()), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
     }
 
     @Override
@@ -260,7 +248,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
                 fileRepo.deleteIfExistsMediaCoverImage(beforeUpdateCoverImage.get());
             }
         }
-        return new ResponseEntity<>(tvShowTransformer.toTVShowResponseDTO(response.get()), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.toResponseFromJDBC(response.get()), HttpStatus.OK);
     }
 
 }

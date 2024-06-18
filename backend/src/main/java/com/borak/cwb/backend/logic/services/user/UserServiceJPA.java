@@ -6,11 +6,17 @@ package com.borak.cwb.backend.logic.services.user;
 
 import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.MediaJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
 import com.borak.cwb.backend.repository.api.IUserRepository;
+import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
+import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-//@Service
-//@Transactional
-public class UserService implements IUserService<Long> {
+@Service
+@Transactional
+public class UserServiceJPA implements IUserService<Long> {
 
     @Autowired
-    private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
+    private UserRepositoryJPA userRepo;
     @Autowired
-    private IMediaRepository<MediaJDBC, Long> mediaRepo;
+    private MediaRepositoryJPA mediaRepo;
 
     @Override
     public ResponseEntity postMediaIntoLibrary(Long mediaId) {
@@ -37,10 +43,13 @@ public class UserService implements IUserService<Long> {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (userRepo.existsMediaInLibrary(loggedUser.getId(), mediaId)) {
+        Optional<UserJPA> userDB = userRepo.findByUsername(loggedUser.getUsername());
+        MediaJPA media = new MediaJPA(mediaId);
+        if (userDB.get().getMedias().contains(media)) {
             throw new DuplicateResourceException("Duplicate user library entry! Media with id: " + mediaId + " already present!");
         }
-        userRepo.addMediaToLibrary(loggedUser.getId(), mediaId);
+        userDB.get().getMedias().add(media);
+        userRepo.save(userDB.get());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -50,10 +59,13 @@ public class UserService implements IUserService<Long> {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!userRepo.existsMediaInLibrary(loggedUser.getId(), mediaId)) {
+        Optional<UserJPA> userDB = userRepo.findByUsername(loggedUser.getUsername());
+        MediaJPA media = new MediaJPA(mediaId);
+        if (!userDB.get().getMedias().contains(media)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " not present in users library!");
         }
-        userRepo.removeMediaFromLibrary(loggedUser.getId(), mediaId);
+        userDB.get().getMedias().remove(media);
+        userRepo.save(userDB.get());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

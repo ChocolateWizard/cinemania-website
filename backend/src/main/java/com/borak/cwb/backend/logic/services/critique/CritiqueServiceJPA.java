@@ -7,12 +7,15 @@ package com.borak.cwb.backend.logic.services.critique;
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.logic.transformers.CritiqueTransformer;
 import com.borak.cwb.backend.repository.api.ICritiqueRepository;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
+import com.borak.cwb.backend.repository.jpa.CritiqueRepositoryJPA;
+import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-//@Service
-//@Transactional
-public class CritiqueService implements ICritiqueService<CritiqueRequestDTO, Long> {
+@Service
+@Transactional
+public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, Long> {
 
     @Autowired
-    private ICritiqueRepository<CritiqueJDBC, Long> critiqueRepo;
+    private CritiqueRepositoryJPA critiqueRepo;
     @Autowired
-    private IMediaRepository<MediaJDBC, Long> mediaRepo;
+    private MediaRepositoryJPA mediaRepo;
 
     @Autowired
     private CritiqueTransformer critiqueTransformer;
@@ -42,11 +45,11 @@ public class CritiqueService implements ICritiqueService<CritiqueRequestDTO, Lon
             throw new ResourceNotFoundException("Media with id: " + critiqueRequest.getMediaId() + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CritiqueJDBC critique = critiqueTransformer.toCritiqueJDBC(critiqueRequest, loggedUser.getId());
-        if (critiqueRepo.exists(critique)) {
+        CritiqueJPA critique = critiqueTransformer.toCritiqueJPA(critiqueRequest, loggedUser.getId());
+        if (critiqueRepo.existsById(critique.getId())) {
             throw new DuplicateResourceException("Duplicate critique for media with id: " + critiqueRequest.getMediaId());
         }
-        critiqueRepo.insert(critique);
+        critiqueRepo.save(critique);
         return new ResponseEntity(HttpStatus.RESET_CONTENT);
     }
 
@@ -56,11 +59,11 @@ public class CritiqueService implements ICritiqueService<CritiqueRequestDTO, Lon
             throw new ResourceNotFoundException("Media with id: " + critiqueRequest.getMediaId() + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CritiqueJDBC critique = critiqueTransformer.toCritiqueJDBC(critiqueRequest, loggedUser.getId());
-        if (!critiqueRepo.exists(critique)) {
+        CritiqueJPA critique = critiqueTransformer.toCritiqueJPA(critiqueRequest, loggedUser.getId());
+        if (!critiqueRepo.existsById(critique.getId())) {
             throw new ResourceNotFoundException("Users critique for media with id: " + critiqueRequest.getMediaId() + " does not exist in database!");
         }
-        critiqueRepo.update(critique);
+        critiqueRepo.save(critique);
         return new ResponseEntity(HttpStatus.RESET_CONTENT);
     }
 
@@ -70,8 +73,8 @@ public class CritiqueService implements ICritiqueService<CritiqueRequestDTO, Lon
             throw new ResourceNotFoundException("Media with id: " + id + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CritiqueJDBC critique = critiqueTransformer.toCritiqueJDBC(id, loggedUser.getId());
-        if (!critiqueRepo.exists(critique)) {
+        CritiqueJPA critique = critiqueTransformer.toCritiqueJPA(id, loggedUser.getId());
+        if (!critiqueRepo.existsById(critique.getId())) {
             throw new ResourceNotFoundException("Users critique for media with id: " + id + " does not exist in database!");
         }
         critiqueRepo.delete(critique);

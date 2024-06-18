@@ -23,10 +23,6 @@ public interface ITVShowService<D extends DTO> {
 
     public ResponseEntity getTVShowWithGenres(Long id);
 
-    public ResponseEntity getAllTVShowsWithGenres();
-
-    public ResponseEntity getAllTVShowsWithDetails();
-
     public ResponseEntity getTVShowWithDetails(Long id);
 
     public ResponseEntity getTVShowDirectors(Long id);

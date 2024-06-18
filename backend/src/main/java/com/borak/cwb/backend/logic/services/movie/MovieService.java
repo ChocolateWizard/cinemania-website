@@ -38,8 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-@Service
-@Transactional
+//@Service
+//@Transactional
 public class MovieService implements IMovieService<MovieRequestDTO> {
 
     private static final int POPULARITY_TRESHOLD = 80;
@@ -73,26 +73,26 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
 
     @Override
     public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithGenresPaginated(page, size));
+        List<MovieResponseDTO> movies = movieTransformer.toResponseFromJDBC(movieRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
+        List<MovieResponseDTO> movies = movieTransformer.toResponseFromJDBC(movieRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
+        List<MovieResponseDTO> movies = movieTransformer.toResponseFromJDBC(movieRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size) {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithRelationsPaginated(page, size));
+        List<MovieResponseDTO> movies = movieTransformer.toResponseFromJDBC(movieRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
@@ -100,7 +100,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     public ResponseEntity getMovieWithGenres(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdWithGenres(id);
         if (movie.isPresent()) {
-            return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+            return new ResponseEntity<>(movieTransformer.toResponseFromJDBC(movie.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
@@ -109,28 +109,16 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     public ResponseEntity getMovieWithDetails(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdWithRelations(id);
         if (movie.isPresent()) {
-            return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+            return new ResponseEntity<>(movieTransformer.toResponseFromJDBC(movie.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getAllMoviesWithGenres() {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithGenres());
-        return new ResponseEntity<>(movies, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity getAllMoviesWithDetails() {
-        List<MovieResponseDTO> movies = movieTransformer.toMovieResponseDTO(movieRepo.findAllWithRelations());
-        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getMovieDirectors(Long id) {
         if (movieRepo.existsById(id)) {
             List<DirectorJDBC> directors = directorRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(directorTransformer.toMovieDirectorResponseDTO(directors), HttpStatus.OK);
+            return new ResponseEntity<>(directorTransformer.toMovieDirectorResponseFromJDBC(directors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
@@ -139,7 +127,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     public ResponseEntity getMovieWriters(Long id) {
         if (movieRepo.existsById(id)) {
             List<WriterJDBC> writers = writerRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(writerTransformer.toMovieWriterResponseDTO(writers), HttpStatus.OK);
+            return new ResponseEntity<>(writerTransformer.toMovieWriterResponseFromJDBC(writers), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
@@ -148,7 +136,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     public ResponseEntity getMovieActors(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActorJDBC> actors = actorRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(actorTransformer.toMovieActorResponseDTO(actors), HttpStatus.OK);
+            return new ResponseEntity<>(actorTransformer.toMovieActorResponseFromJDBC(actors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
@@ -157,7 +145,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
     public ResponseEntity getMovieActorsWithRoles(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActingJDBC> actings = actingRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(actingTransformer.toMovieActorResponseDTO(actings), HttpStatus.OK);
+            return new ResponseEntity<>(actingTransformer.toMovieActorResponseFromJDBC(actings), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
@@ -172,7 +160,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
         if (movie.get().getCoverImage() != null && !movie.get().getCoverImage().isEmpty()) {
             fileRepo.deleteIfExistsMediaCoverImage(movie.get().getCoverImage());
         }
-        return new ResponseEntity(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+        return new ResponseEntity(movieTransformer.toResponseFromJDBC(movie.get()), HttpStatus.OK);
 
     }
 
@@ -210,7 +198,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
         } else {
             movie = movieRepo.findByIdWithRelations(movieDB.getId());
         }
-        return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(movie.get()), HttpStatus.OK);
+        return new ResponseEntity<>(movieTransformer.toResponseFromJDBC(movie.get()), HttpStatus.OK);
     }
 
     @Override
@@ -261,7 +249,7 @@ public class MovieService implements IMovieService<MovieRequestDTO> {
                 fileRepo.deleteIfExistsMediaCoverImage(beforeUpdateCoverImage.get());
             }
         }
-        return new ResponseEntity<>(movieTransformer.toMovieResponseDTO(response.get()), HttpStatus.OK);
+        return new ResponseEntity<>(movieTransformer.toResponseFromJDBC(response.get()), HttpStatus.OK);
 
     }
 

@@ -6,6 +6,7 @@ package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.domain.dto.country.CountryResponseDTO;
 import com.borak.cwb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.cwb.backend.domain.jpa.CountryJPA;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountryTransformer {
 
-    public CountryResponseDTO toCountryResponseDTO(CountryJDBC jdbc) {
+    public CountryResponseDTO toResponseFromJDBC(CountryJDBC jdbc) {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
@@ -29,13 +30,36 @@ public class CountryTransformer {
         return response;
     }
 
-    public List<CountryResponseDTO> toCountryResponseDTO(List<CountryJDBC> jdbcList) {
+    public CountryResponseDTO toResponseFromJPA(CountryJPA jpa) {
+        if (jpa == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        CountryResponseDTO response = new CountryResponseDTO();
+        response.setId(jpa.getId());
+        response.setName(jpa.getName());
+        response.setOfficialStateName(jpa.getOfficialStateName());
+        response.setCode(jpa.getCode());
+        return response;
+    }
+
+    public List<CountryResponseDTO> toResponseFromJDBC(List<CountryJDBC> jdbcList) {
         if (jdbcList == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         List<CountryResponseDTO> list = new ArrayList<>();
         for (CountryJDBC jd : jdbcList) {
-            list.add(toCountryResponseDTO(jd));
+            list.add(toResponseFromJDBC(jd));
+        }
+        return list;
+    }
+
+    public List<CountryResponseDTO> toResponseFromJPA(List<CountryJPA> jpaList) {
+        if (jpaList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<CountryResponseDTO> list = new ArrayList<>();
+        for (CountryJPA jd : jpaList) {
+            list.add(toResponseFromJPA(jd));
         }
         return list;
     }

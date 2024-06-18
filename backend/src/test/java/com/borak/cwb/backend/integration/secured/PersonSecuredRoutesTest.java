@@ -117,7 +117,7 @@ public class PersonSecuredRoutesTest {
 //=========================================================================================================
     @BeforeEach
     void beforeEach() {
-        Assumptions.assumeTrue(TestResultsHelper.didAuthRoutesTestPass());
+        Assumptions.assumeTrue(TestResultsHelper.didPersonSecuredRoutesRequiredTestsPass());
     }
 
     //=========================================================================================================

@@ -11,6 +11,7 @@ import com.borak.cwb.backend.domain.dto.tv.TVShowResponseDTO;
 import com.borak.cwb.backend.domain.enums.UserRole;
 import com.borak.cwb.backend.domain.jdbc.classes.TVShowJDBC;
 import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.logic.security.JwtUtils;
 import com.borak.cwb.backend.repository.jdbc.TVShowRepositoryJDBC;
 import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
@@ -113,7 +114,7 @@ public class TVShowSecuredRoutesTest {
 //=========================================================================================================
     @BeforeEach
     void beforeEach() {
-//        Assumptions.assumeTrue(TestResultsHelper.didAuthRoutesTestPass());
+        Assumptions.assumeTrue(TestResultsHelper.didTVShowSecuredRoutesRequiredTestsPass());
     }
 
     //=========================================================================================================

@@ -8,9 +8,7 @@ import com.borak.cwb.backend.domain.dto.MessageResponseDTO;
 import com.borak.cwb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.cwb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.cwb.backend.domain.dto.user.UserResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.CountryJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.exceptions.EmailTakenException;
 import com.borak.cwb.backend.exceptions.ProfileNameTakenException;
@@ -18,8 +16,8 @@ import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.exceptions.UsernameTakenException;
 import com.borak.cwb.backend.logic.security.JwtUtils;
 import com.borak.cwb.backend.logic.transformers.UserTransformer;
-import com.borak.cwb.backend.repository.api.ICountryRepository;
-import com.borak.cwb.backend.repository.api.IUserRepository;
+import com.borak.cwb.backend.repository.jpa.CountryRepositoryJPA;
+import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
 import com.borak.cwb.backend.repository.util.FileRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +36,15 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-//@Service
-//@Transactional
-public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> {
+@Service
+@Transactional
+public class AuthServiceJPA implements IAuthService<UserRegisterDTO, UserLoginDTO> {
 
     @Autowired
-    private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
+    private UserRepositoryJPA userRepo;
+    
     @Autowired
-    private ICountryRepository<CountryJDBC, Long> countryRepo;
+    private CountryRepositoryJPA countryRepo;
 
     @Autowired
     private UserTransformer userTransformer;
@@ -62,22 +61,22 @@ public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> 
 
     @Override
     public ResponseEntity register(UserRegisterDTO registerForm) {
-        if (userRepo.existsUsername(registerForm.getUsername())) {
+        if (userRepo.existsByUsername(registerForm.getUsername())) {
             throw new UsernameTakenException("Username is already taken!");
         }
-        if (userRepo.existsEmail(registerForm.getEmail())) {
+        if (userRepo.existsByEmail(registerForm.getEmail())) {
             throw new EmailTakenException("Email is already in use!");
         }
-        if (userRepo.existsProfileName(registerForm.getProfileName())) {
+        if (userRepo.existsByProfileName(registerForm.getProfileName())) {
             throw new ProfileNameTakenException("Profile name is already taken!");
         }
         if (!countryRepo.existsById(registerForm.getCountryId())) {
             throw new ResourceNotFoundException("Country with id: " + registerForm.getCountryId() + " does not exist in database!");
         }
-        UserJDBC userJDBC = userTransformer.toUserJDBC(registerForm);
-        userRepo.insert(userJDBC);
+        UserJPA userJPA = userTransformer.toUserJPA(registerForm);
+        userRepo.save(userJPA);
         if (registerForm.getProfileImage() != null) {
-            registerForm.getProfileImage().setName(userJDBC.getProfileName());
+            registerForm.getProfileImage().setName(userJPA.getProfileName());
             fileRepo.saveUserProfileImage(registerForm.getProfileImage());
         }
         return new ResponseEntity<>(new MessageResponseDTO("User registered successfully!"), HttpStatus.OK);
@@ -96,7 +95,7 @@ public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> 
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        Optional<UserJDBC> userDB = userRepo.findByIdWithRelations(userDetails.getId());
+        Optional<UserJPA> userDB = userRepo.findById(userDetails.getId());
 
         UserResponseDTO userInfoResponse = userTransformer.toUserResponseDTO(userDB.get());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -109,5 +108,4 @@ public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponseDTO("You've been logged out!"));
     }
-
 }

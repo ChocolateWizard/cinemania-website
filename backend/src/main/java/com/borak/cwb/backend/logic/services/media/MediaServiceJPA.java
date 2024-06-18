@@ -4,11 +4,13 @@
  */
 package com.borak.cwb.backend.logic.services.media;
 
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.logic.transformers.MediaTransformer;
-import com.borak.cwb.backend.repository.api.IMediaRepository;
-import java.util.List;
+import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,21 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
-//@Service
-//@Transactional
-public class MediaService implements IMediaService {
+@Service
+@Transactional
+public class MediaServiceJPA implements IMediaService {
 
     @Autowired
-    private IMediaRepository<MediaJDBC, Long> mediaRepo;
+    private MediaRepositoryJPA mediaRepo;
 
     @Autowired
     private MediaTransformer mediaTransformer;
 
     @Override
     public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title) {
-//        title = title.replace("%", "\\%").replace("_", "\\_");
-        List<MediaJDBC> medias = mediaRepo.findAllByTitleWithGenresPaginated(page, size, title);
-        return new ResponseEntity(mediaTransformer.toResponseFromJDBC(medias), HttpStatus.OK);
+        Pageable p = PageRequest.of(page - 1, size);
+        Page<MediaJPA> medias = mediaRepo.findByTitleContaining(title, p);
+        return new ResponseEntity(mediaTransformer.toResponseFromJPA(medias.getContent()), HttpStatus.OK);
     }
 
 }
