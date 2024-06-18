@@ -7,6 +7,7 @@ package com.borak.cwb.backend.logic.transformers;
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.person.PersonResponseDTO;
 import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.cwb.backend.domain.jpa.PersonJPA;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class PersonTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public PersonResponseDTO toPersonResponseDTO(PersonJDBC jdbc) throws IllegalArgumentException {
+    public PersonResponseDTO toResponseFromJDBC(PersonJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
@@ -36,16 +37,45 @@ public class PersonTransformer {
         }
         return person;
     }
+  
 
-    public List<PersonResponseDTO> toPersonResponseDTO(List<PersonJDBC> jdbcList) throws IllegalArgumentException {
+    public PersonResponseDTO toResponseFromJPA(PersonJPA jpa) throws IllegalArgumentException {
+        if (jpa == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        PersonResponseDTO person = new PersonResponseDTO();
+        person.setId(jpa.getId());
+        person.setFirstName(jpa.getFirstName());
+        person.setLastName(jpa.getLastName());
+        person.setGender(jpa.getGender());
+        if (jpa.getProfilePhoto() != null && !jpa.getProfilePhoto().isEmpty()) {
+            person.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jpa.getProfilePhoto());
+        }
+        return person;
+    }
+    
+    //=========================================================================================================
+    
+    public List<PersonResponseDTO> toResponseFromJDBC(List<PersonJDBC> jdbcList) throws IllegalArgumentException {
         if (jdbcList == null) {
             throw new IllegalArgumentException("Null passed as method parameter");
         }
         List<PersonResponseDTO> list = new ArrayList<>();
         for (PersonJDBC jd : jdbcList) {
-            list.add(toPersonResponseDTO(jd));
+            list.add(PersonTransformer.this.toResponseFromJDBC(jd));
         }
         return list;
     }
-
+    
+    public List<PersonResponseDTO> toResponseFromJPA(List<PersonJPA> jpaList) throws IllegalArgumentException {
+        if (jpaList == null) {
+            throw new IllegalArgumentException("Null passed as method parameter");
+        }
+        List<PersonResponseDTO> list = new ArrayList<>();
+        for (PersonJPA jp : jpaList) {
+            list.add(toResponseFromJPA(jp));
+        }
+        return list;
+    }
+    
 }

@@ -7,11 +7,14 @@ package com.borak.cwb.backend.domain.jpa;
 import com.borak.cwb.backend.domain.enums.Gender;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +53,13 @@ public class PersonJPA implements Serializable {
     @Column(name = "profile_photo", length = 500)
     private String profilePhoto;
 
+    @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    private DirectorJPA directorInfo;
+    @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    private WriterJPA writerInfo;
+    @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ActorJPA actorInfo;
+
     public PersonJPA() {
     }
 
@@ -70,6 +80,17 @@ public class PersonJPA implements Serializable {
         this.lastName = lastName;
         this.gender = gender;
         this.profilePhoto = profilePhoto;
+    }
+
+    public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhoto, DirectorJPA directorInfo, WriterJPA writerInfo, ActorJPA actorInfo) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profilePhoto = profilePhoto;
+        this.directorInfo = directorInfo;
+        this.writerInfo = writerInfo;
+        this.actorInfo = actorInfo;
     }
 
     public Long getId() {
@@ -117,6 +138,30 @@ public class PersonJPA implements Serializable {
         int hash = 7;
         hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
+    }
+
+    public DirectorJPA getDirectorInfo() {
+        return directorInfo;
+    }
+
+    public void setDirectorInfo(DirectorJPA directorInfo) {
+        this.directorInfo = directorInfo;
+    }
+
+    public WriterJPA getWriterInfo() {
+        return writerInfo;
+    }
+
+    public void setWriterInfo(WriterJPA writerInfo) {
+        this.writerInfo = writerInfo;
+    }
+
+    public ActorJPA getActorInfo() {
+        return actorInfo;
+    }
+
+    public void setActorInfo(ActorJPA actorInfo) {
+        this.actorInfo = actorInfo;
     }
 
     @Override

@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -35,7 +36,7 @@ public class ActorJPA implements Serializable {
     private Long personId;
 
     @OneToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId
     private PersonJPA person;
 
     @NotNull

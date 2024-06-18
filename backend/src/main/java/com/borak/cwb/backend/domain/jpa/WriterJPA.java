@@ -5,12 +5,15 @@
 package com.borak.cwb.backend.domain.jpa;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -34,10 +37,13 @@ public class WriterJPA implements Serializable {
     private Long personId;
 
     @OneToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "person_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId
     private PersonJPA person;
 
-    @ManyToMany(mappedBy = "writers", fetch = FetchType.LAZY)
+    @ManyToMany(targetEntity = MediaJPA.class, fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @JoinTable(name = "media_writers",
+            joinColumns = @JoinColumn(name = "writer_id", referencedColumnName = "person_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id", nullable = false))
     private List<MediaJPA> medias = new ArrayList<>();
 
     public WriterJPA() {
