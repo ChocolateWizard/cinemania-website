@@ -4,18 +4,13 @@
  */
 package com.borak.cwb.backend.logic.services.user;
 
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
-import com.borak.cwb.backend.repository.api.IMediaRepository;
-import com.borak.cwb.backend.repository.api.IUserRepository;
 import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

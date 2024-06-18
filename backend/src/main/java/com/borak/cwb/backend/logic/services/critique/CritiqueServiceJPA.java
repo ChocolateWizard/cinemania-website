@@ -5,15 +5,11 @@
 package com.borak.cwb.backend.logic.services.critique;
 
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.security.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.logic.transformers.CritiqueTransformer;
-import com.borak.cwb.backend.repository.api.ICritiqueRepository;
-import com.borak.cwb.backend.repository.api.IMediaRepository;
 import com.borak.cwb.backend.repository.jpa.CritiqueRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
 import org.springframework.beans.factory.annotation.Autowired;
