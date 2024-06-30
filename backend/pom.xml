@@ -26,11 +26,6 @@
             <artifactId>spring-boot-starter-security</artifactId>           
         </dependency>
         
-<!--        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jdbc</artifactId>
-        </dependency>-->
-        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -56,13 +51,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        
-        <!--<dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>-->
+        </dependency>       
         
         <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
         <dependency>
@@ -96,15 +85,7 @@
             <version>${io.jsonwebtoken.version}</version>
             <scope>runtime</scope>
         </dependency>
-             
-        <!--         https://mvnrepository.com/artifact/commons-io/commons-io 
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.15.0</version>
-        </dependency>-->
-        
-        
+                          
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5 -->
         <!--This here is so TestRestTemplate doesn't throw IOException upon 401 response from server -->     
         <dependency>
@@ -124,8 +105,8 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <configuration>
                     <url>jdbc:mysql://localhost/cinemania_db</url>
-                    <user>Despot</user>
-                    <password>Despy330033!</password>
+                    <user>admin</user>
+                    <password>StoneLemon330033!</password>
                     <driver>com.mysql.cj.jdbc.Driver</driver>
                     <cleanDisabled>false</cleanDisabled>
                 </configuration>
