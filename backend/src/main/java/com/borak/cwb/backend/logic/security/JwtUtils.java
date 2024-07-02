@@ -5,7 +5,7 @@
 package com.borak.cwb.backend.logic.security;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.SecurityUser;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

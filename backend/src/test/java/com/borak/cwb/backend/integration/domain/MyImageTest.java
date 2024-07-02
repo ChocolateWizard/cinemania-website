@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.integration.domain;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import java.io.IOException;
 import java.nio.file.Files;

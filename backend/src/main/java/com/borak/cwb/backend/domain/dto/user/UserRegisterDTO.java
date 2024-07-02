@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.domain.dto.user;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.DTO;
 import com.borak.cwb.backend.domain.enums.Gender;
 import com.borak.cwb.backend.domain.enums.UserRole;

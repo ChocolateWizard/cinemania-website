@@ -5,9 +5,9 @@
 package com.borak.cwb.backend.logic.services.critique;
 
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.logic.transformers.CritiqueTransformer;

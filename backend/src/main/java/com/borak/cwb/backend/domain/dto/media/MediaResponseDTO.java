@@ -5,7 +5,7 @@
 package com.borak.cwb.backend.domain.dto.media;
 
 import com.borak.cwb.backend.domain.enums.MediaType;
-import com.borak.cwb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

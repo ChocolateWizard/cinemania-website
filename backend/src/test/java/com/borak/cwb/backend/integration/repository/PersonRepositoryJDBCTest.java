@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.integration.repository;
 
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;

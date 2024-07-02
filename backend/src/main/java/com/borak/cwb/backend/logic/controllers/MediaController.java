@@ -5,7 +5,7 @@
 package com.borak.cwb.backend.logic.controllers;
 
 import com.borak.cwb.backend.logic.services.media.IMediaService;
-import com.borak.cwb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;

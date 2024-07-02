@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.logic.services.media;
 
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.logic.transformers.MediaTransformer;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
 import java.util.List;

@@ -4,10 +4,10 @@
  */
 package com.borak.cwb.backend.logic.controllers;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.exceptions.InvalidInputException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;

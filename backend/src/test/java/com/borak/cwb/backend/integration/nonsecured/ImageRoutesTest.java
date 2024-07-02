@@ -5,12 +5,12 @@
 package com.borak.cwb.backend.integration.nonsecured;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

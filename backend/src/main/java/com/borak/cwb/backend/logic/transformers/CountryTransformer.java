@@ -5,7 +5,7 @@
 package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.domain.dto.country.CountryResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.cwb.backend.domain.jdbc.CountryJDBC;
 import com.borak.cwb.backend.domain.jpa.CountryJPA;
 import java.util.ArrayList;
 import java.util.List;

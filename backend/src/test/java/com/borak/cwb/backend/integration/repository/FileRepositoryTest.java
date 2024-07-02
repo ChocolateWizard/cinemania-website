@@ -4,14 +4,14 @@
  */
 package com.borak.cwb.backend.integration.repository;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.MyImage;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import org.springframework.core.io.Resource;
 import java.io.File;
 import java.io.IOException;

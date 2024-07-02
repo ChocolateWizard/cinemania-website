@@ -6,7 +6,7 @@ package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.person.PersonResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
 import com.borak.cwb.backend.domain.jpa.PersonJPA;
 import java.util.ArrayList;
 import java.util.List;

@@ -4,11 +4,11 @@
  */
 package com.borak.cwb.backend.logic.controllers;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.cwb.backend.logic.services.person.IPersonService;
 import com.borak.cwb.backend.logic.services.validation.DomainValidationService;
-import com.borak.cwb.backend.logic.transformers.serializers.views.JsonVisibilityViews;
+import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,7 +7,7 @@ package com.borak.cwb.backend.logic.transformers;
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.movie.MovieWriterResponseDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowWriterResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.cwb.backend.domain.jdbc.WriterJDBC;
 import com.borak.cwb.backend.domain.jpa.PersonJPA;
 import com.borak.cwb.backend.domain.jpa.WriterJPA;
 import java.util.ArrayList;

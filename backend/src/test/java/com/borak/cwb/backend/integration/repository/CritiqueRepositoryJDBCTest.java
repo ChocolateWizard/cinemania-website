@@ -6,9 +6,9 @@ package com.borak.cwb.backend.integration.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;

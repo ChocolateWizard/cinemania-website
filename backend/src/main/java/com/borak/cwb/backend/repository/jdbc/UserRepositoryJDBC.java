@@ -4,13 +4,13 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.GenreJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.GenreJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.IUserRepository;
-import com.borak.cwb.backend.repository.sql.SQLUser;
+import com.borak.cwb.backend.repository.query.SQLUser;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Timestamp;

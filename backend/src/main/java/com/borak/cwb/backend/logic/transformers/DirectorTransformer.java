@@ -7,7 +7,7 @@ package com.borak.cwb.backend.logic.transformers;
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.movie.MovieDirectorResponseDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowDirectorResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.DirectorJDBC;
+import com.borak.cwb.backend.domain.jdbc.DirectorJDBC;
 import com.borak.cwb.backend.domain.jpa.DirectorJPA;
 import com.borak.cwb.backend.domain.jpa.PersonJPA;
 import java.util.ArrayList;

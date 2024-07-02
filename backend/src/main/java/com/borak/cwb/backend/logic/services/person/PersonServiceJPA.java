@@ -12,7 +12,7 @@ import com.borak.cwb.backend.logic.transformers.PersonTransformer;
 import com.borak.cwb.backend.logic.transformers.PersonWrapperTransformer;
 import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.PersonRepositoryJPA;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.Objects;
@@ -96,25 +96,6 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
 
     @Override
     public ResponseEntity postPerson(PersonRequestDTO personClient) {
-//        PersonJPA personToSave = personWrapperTransformer.toPersonJPA(personClient);
-//        
-//        if(personToSave.getDirectorInfo()!=null){
-//            for (MediaJPA directorMedia : personToSave.getDirectorInfo().getMedias()) {
-//                Optional<MediaJPA> media=mediaRepo.findById(directorMedia.getId());
-//                if(media.isPresent()){
-//                    
-//                }else{
-//                
-//                }                
-//            }           
-//        }
-//        if(personToSave.getWriterInfo()!=null){
-//            //TODO
-//        }
-//        if(personToSave.getActorInfo()!=null){
-//            //TODO
-//        }
-        //=========================================================================================================
         if (personClient.getProfessions() != null) {
             for (PersonRequestDTO.Profession profession : personClient.getProfessions()) {
                 if (profession instanceof PersonRequestDTO.Director director) {
@@ -237,7 +218,7 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
                         acting.setId(actingDB.getId());
                     }
                 }
-            }          
+            }
             person = personRepo.saveAndFlush(personToSave);
             manager.refresh(person);
             if (profilePhotoDB != null) {

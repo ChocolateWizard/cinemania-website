@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.logic.controllers;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.cwb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.cwb.backend.logic.services.validation.DomainValidationService;

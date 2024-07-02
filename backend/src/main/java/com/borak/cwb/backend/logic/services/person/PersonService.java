@@ -5,16 +5,16 @@
 package com.borak.cwb.backend.logic.services.person;
 
 import com.borak.cwb.backend.domain.dto.person.PersonRequestDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonWrapperJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonWrapperJDBC;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.logic.transformers.PersonTransformer;
 import com.borak.cwb.backend.logic.transformers.PersonWrapperTransformer;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
 import com.borak.cwb.backend.repository.api.IPersonRepository;
 import com.borak.cwb.backend.repository.api.IPersonWrapperRepository;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;

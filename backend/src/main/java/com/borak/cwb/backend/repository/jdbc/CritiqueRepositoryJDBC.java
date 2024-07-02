@@ -4,10 +4,10 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.ICritiqueRepository;
-import com.borak.cwb.backend.repository.sql.SQLCritique;
+import com.borak.cwb.backend.repository.query.SQLCritique;
 import java.sql.Types;
 import java.util.List;
 import java.util.Optional;

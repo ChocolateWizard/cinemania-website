@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.seeder;
 
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.seeder.domain.api.ApiDetailsMovie;
 import com.borak.cwb.backend.seeder.domain.api.ApiDetailsTV;
 import com.borak.cwb.backend.seeder.domain.api.ApiDiscoverMovie;

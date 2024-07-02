@@ -4,10 +4,10 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.IPersonRepository;
-import com.borak.cwb.backend.repository.sql.SQLPerson;
+import com.borak.cwb.backend.repository.query.SQLPerson;
 import java.sql.Types;
 import java.util.List;
 import java.util.Optional;

@@ -5,7 +5,7 @@
 package com.borak.cwb.backend.logic.services.validation;
 
 import com.borak.cwb.backend.domain.dto.movie.MovieRequestDTO;
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.cwb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowRequestDTO;

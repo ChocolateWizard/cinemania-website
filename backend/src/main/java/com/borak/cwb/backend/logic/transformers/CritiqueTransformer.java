@@ -5,9 +5,9 @@
 package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.UserJPA;

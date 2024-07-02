@@ -4,11 +4,11 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.GenreJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.GenreJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
-import com.borak.cwb.backend.repository.sql.SQLMedia;
+import com.borak.cwb.backend.repository.query.SQLMedia;
 import java.sql.Types;
 import java.util.List;
 import java.util.Optional;

@@ -6,7 +6,7 @@ package com.borak.cwb.backend.logic.services.critique;
 
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.logic.transformers.CritiqueTransformer;

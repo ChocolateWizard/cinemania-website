@@ -24,7 +24,7 @@ import com.borak.cwb.backend.repository.jpa.DirectorRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.GenreRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.TVShowRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.WriterRepositoryJPA;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.Year;

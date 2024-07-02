@@ -4,16 +4,16 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.ActingJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.ActingRoleJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.DirectorJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.GenreJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.TVShowJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActingJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActingRoleJDBC;
+import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
+import com.borak.cwb.backend.domain.jdbc.DirectorJDBC;
+import com.borak.cwb.backend.domain.jdbc.GenreJDBC;
+import com.borak.cwb.backend.domain.jdbc.TVShowJDBC;
+import com.borak.cwb.backend.domain.jdbc.WriterJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.ITVShowRepository;
-import com.borak.cwb.backend.repository.sql.SQLTVShow;
+import com.borak.cwb.backend.repository.query.SQLTVShow;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

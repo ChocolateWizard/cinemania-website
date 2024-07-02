@@ -5,18 +5,18 @@
 package com.borak.cwb.backend.integration.secured;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.classes.MyImage;
+import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.cwb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.cwb.backend.domain.enums.Gender;
 import com.borak.cwb.backend.domain.enums.UserRole;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.helpers.TestJsonResponseReader;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.logic.security.JwtUtils;
 import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import java.io.IOException;
 import java.net.HttpCookie;
 import java.nio.charset.StandardCharsets;

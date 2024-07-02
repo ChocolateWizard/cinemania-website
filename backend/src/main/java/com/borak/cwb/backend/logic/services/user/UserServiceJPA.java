@@ -6,7 +6,7 @@ package com.borak.cwb.backend.logic.services.user;
 
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.UserJPA;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.exceptions.DuplicateResourceException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
 import com.borak.cwb.backend.repository.jpa.MediaRepositoryJPA;

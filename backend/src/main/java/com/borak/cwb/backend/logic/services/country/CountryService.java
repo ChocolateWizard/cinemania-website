@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.logic.services.country;
 
-import com.borak.cwb.backend.domain.jdbc.classes.CountryJDBC;
+import com.borak.cwb.backend.domain.jdbc.CountryJDBC;
 import com.borak.cwb.backend.logic.transformers.CountryTransformer;
 import com.borak.cwb.backend.repository.api.ICountryRepository;
 import java.util.List;

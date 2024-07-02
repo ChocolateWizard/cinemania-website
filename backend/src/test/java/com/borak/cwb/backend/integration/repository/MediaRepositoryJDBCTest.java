@@ -4,9 +4,9 @@
  */
 package com.borak.cwb.backend.integration.repository;
 
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MovieJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.TVShowJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.MovieJDBC;
+import com.borak.cwb.backend.domain.jdbc.TVShowJDBC;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.repository.jdbc.MediaRepositoryJDBC;

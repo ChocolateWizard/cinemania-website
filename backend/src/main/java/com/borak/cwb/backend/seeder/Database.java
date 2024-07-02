@@ -5,8 +5,8 @@
 package com.borak.cwb.backend.seeder;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.classes.MyImage;
-import com.borak.cwb.backend.repository.util.FileRepository;
+import com.borak.cwb.backend.domain.MyImage;
+import com.borak.cwb.backend.repository.file.FileRepository;
 import com.borak.cwb.backend.seeder.domain.db.ActingDB;
 import com.borak.cwb.backend.seeder.domain.db.ActingRoleDB;
 import com.borak.cwb.backend.seeder.domain.db.DirectorDB;

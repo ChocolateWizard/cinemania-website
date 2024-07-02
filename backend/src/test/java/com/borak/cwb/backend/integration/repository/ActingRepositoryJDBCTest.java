@@ -4,8 +4,8 @@
  */
 package com.borak.cwb.backend.integration.repository;
 
-import com.borak.cwb.backend.domain.jdbc.classes.ActingJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActingJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.repository.jdbc.ActingRepositoryJDBC;

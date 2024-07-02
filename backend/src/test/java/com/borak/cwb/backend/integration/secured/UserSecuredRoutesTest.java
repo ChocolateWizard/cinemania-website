@@ -5,8 +5,8 @@
 package com.borak.cwb.backend.integration.secured;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.logic.security.JwtUtils;
 import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;

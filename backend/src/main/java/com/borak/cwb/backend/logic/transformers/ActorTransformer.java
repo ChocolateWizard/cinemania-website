@@ -5,10 +5,9 @@
 package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.dto.actor.ActorResponseDTO;
 import com.borak.cwb.backend.domain.dto.movie.MovieActorResponseDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowActorResponseDTO;
-import com.borak.cwb.backend.domain.jdbc.classes.ActorJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActorJDBC;
 import com.borak.cwb.backend.domain.jpa.ActorJPA;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,33 +23,6 @@ public final class ActorTransformer {
 
     @Autowired
     private ConfigProperties config;
-
-    public ActorResponseDTO toActorResponseFromJDBC(ActorJDBC jdbc) throws IllegalArgumentException {
-        if (jdbc == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        ActorResponseDTO actor = new ActorResponseDTO();
-        actor.setId(jdbc.getId());
-        actor.setFirstName(jdbc.getFirstName());
-        actor.setLastName(jdbc.getLastName());
-        actor.setGender(jdbc.getGender());
-        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            actor.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
-        }
-        actor.setStar(jdbc.isStar());
-        return actor;
-    }
-
-    public List<ActorResponseDTO> toActorResponseFromJDBC(List<ActorJDBC> jdbcList) throws IllegalArgumentException {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<ActorResponseDTO> list = new ArrayList<>();
-        for (ActorJDBC jd : jdbcList) {
-            list.add(ActorTransformer.this.toActorResponseFromJDBC(jd));
-        }
-        return list;
-    }
 
     public MovieActorResponseDTO toMovieActorResponseFromJDBC(ActorJDBC jdbc) throws IllegalArgumentException {
         if (jdbc == null) {

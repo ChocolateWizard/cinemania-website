@@ -5,14 +5,14 @@
 package com.borak.cwb.backend.integration.repository;
 
 import com.borak.cwb.backend.domain.enums.Gender;
-import com.borak.cwb.backend.domain.jdbc.classes.ActingJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.ActingRoleJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.ActorJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.DirectorJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.PersonWrapperJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.WriterJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActingJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActingRoleJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActorJDBC;
+import com.borak.cwb.backend.domain.jdbc.DirectorJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
+import com.borak.cwb.backend.domain.jdbc.PersonWrapperJDBC;
+import com.borak.cwb.backend.domain.jdbc.WriterJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;

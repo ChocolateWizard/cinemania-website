@@ -4,10 +4,10 @@
  */
 package com.borak.cwb.backend.repository.jdbc;
 
-import com.borak.cwb.backend.domain.jdbc.classes.ActorJDBC;
+import com.borak.cwb.backend.domain.jdbc.ActorJDBC;
 import com.borak.cwb.backend.exceptions.DatabaseException;
 import com.borak.cwb.backend.repository.api.IActorRepository;
-import com.borak.cwb.backend.repository.sql.SQLActor;
+import com.borak.cwb.backend.repository.query.SQLActor;
 import java.sql.Types;
 import java.util.List;
 import java.util.Optional;

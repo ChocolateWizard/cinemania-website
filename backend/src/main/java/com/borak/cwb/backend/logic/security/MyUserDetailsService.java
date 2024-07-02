@@ -4,10 +4,10 @@
  */
 package com.borak.cwb.backend.logic.security;
 
-import com.borak.cwb.backend.domain.jdbc.classes.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.classes.UserJDBC;
+import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.domain.jpa.UserJPA;
-import com.borak.cwb.backend.domain.security.SecurityUser;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.repository.api.IUserRepository;
 import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,7 +4,7 @@
  */
 package com.borak.cwb.backend.integration.repository;
 
-import com.borak.cwb.backend.domain.jdbc.classes.GenreJDBC;
+import com.borak.cwb.backend.domain.jdbc.GenreJDBC;
 import com.borak.cwb.backend.helpers.DataInitializer;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import com.borak.cwb.backend.repository.jdbc.GenreRepositoryJDBC;
