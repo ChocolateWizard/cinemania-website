@@ -4,12 +4,8 @@
  */
 package com.borak.cwb.backend.logic.controllers;
 
-import com.borak.cwb.backend.domain.MyImage;
-import com.borak.cwb.backend.exceptions.InvalidInputException;
-import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
-import com.borak.cwb.backend.repository.file.FileRepository;
+import com.borak.cwb.backend.logic.services.image.IImageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,54 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageController {
 
     @Autowired
-    private FileRepository fileRepo;
+    private IImageService imageService;
 
     @GetMapping("/media/{filename:.+}")
     public ResponseEntity getMediaImage(@PathVariable String filename) {
-        String[] pom;
-        try {
-            pom = MyImage.extractNameAndExtension(filename);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("Invalid image name!");
-        }
-        Resource file = fileRepo.getMediaCoverImage(filename);
-        if (file.exists() || file.isReadable()) {
-            return ResponseEntity.ok().contentType(MyImage.parseContentType(pom[1])).body(file);
-        } else {
-            throw new ResourceNotFoundException("No such image found!");
-        }
+        return imageService.getMediaImage(filename);
     }
 
     @GetMapping("/person/{filename:.+}")
     public ResponseEntity getPersonImage(@PathVariable String filename) {
-        String[] pom;
-        try {
-            pom = MyImage.extractNameAndExtension(filename);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("Invalid image name!");
-        }
-        Resource file = fileRepo.getPersonProfilePhoto(filename);
-        if (file.exists() || file.isReadable()) {
-            return ResponseEntity.ok().contentType(MyImage.parseContentType(pom[1])).body(file);
-        } else {
-            throw new ResourceNotFoundException("No such image found!");
-        }
+        return imageService.getPersonImage(filename);
     }
 
     @GetMapping("/user/{filename:.+}")
     public ResponseEntity getUserImage(@PathVariable String filename) {
-        String[] pom;
-        try {
-            pom = MyImage.extractNameAndExtension(filename);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("Invalid image name!");
-        }
-        Resource file = fileRepo.getUserProfileImage(filename);
-        if (file.exists() || file.isReadable()) {
-            return ResponseEntity.ok().contentType(MyImage.parseContentType(pom[1])).body(file);
-        } else {
-            throw new ResourceNotFoundException("No such image found!");
-        }
+        return imageService.getUserImage(filename);
     }
 
 }

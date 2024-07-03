@@ -73,7 +73,7 @@ public class FileRepository {
 //===================================================================================================
     public Resource getMediaCoverImage(String filename) throws InvalidInputException {
         try {
-            return new UrlResource(Paths.get(config.getMediaImagesFolderPath() + filename).toUri());
+            return new UrlResource(Path.of(config.getMediaImagesFolderPath() + filename).toUri());
         } catch (MalformedURLException ex) {
             throw new InvalidInputException("Invalid image name!");
         }
@@ -81,7 +81,7 @@ public class FileRepository {
 
     public Resource getPersonProfilePhoto(String filename) throws InvalidInputException {
         try {
-            return new UrlResource(Paths.get(config.getPersonImagesFolderPath() + filename).toUri());
+            return new UrlResource(Path.of(config.getPersonImagesFolderPath() + filename).toUri());
         } catch (MalformedURLException ex) {
             throw new InvalidInputException("Invalid image name!");
         }
@@ -89,7 +89,7 @@ public class FileRepository {
 
     public Resource getUserProfileImage(String filename) throws InvalidInputException {
         try {
-            return new UrlResource(Paths.get(config.getUserImagesFolderPath() + filename).toUri());
+            return new UrlResource(Path.of(config.getUserImagesFolderPath() + filename).toUri());
         } catch (MalformedURLException ex) {
             throw new InvalidInputException("Invalid image name!");
         }
