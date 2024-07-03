@@ -41,6 +41,10 @@ public final class TestJsonResponseReader {
         return properties.getProperty("country." + number);
     }
 
+    public String getGenreJson(int number) {
+        return properties.getProperty("genre." + number);
+    }
+
     public String getMovieJson(int number) {
         return properties.getProperty("movie." + number);
     }

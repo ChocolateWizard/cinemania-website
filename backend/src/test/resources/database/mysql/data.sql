@@ -275,13 +275,13 @@ insert  into `genre`(`id`,`name`) values
 (4,'Comedy'),
 (5,'Devotional'),
 (6,'Drama'),
-(13,'Fantasy'),
 (7,'Historical'),
 (8,'Horror'),
-(12,'Mystery'),
 (9,'Science fiction'),
+(10,'Western'),
 (11,'Thriller'),
-(10,'Western');
+(12,'Mystery'),
+(13,'Fantasy');
 
 /*Data for the table `media` */
 

@@ -105,6 +105,7 @@ public class SecurityConfiguration {
                         "/api/medias/**",
                         "/api/movies/**",
                         "/api/tv/**",
+                        "/api/genres/**",
                         "/api/persons/**",
                         "/api/countries/**",
                         "/images/**"

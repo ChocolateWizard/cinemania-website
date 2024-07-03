@@ -8,6 +8,7 @@ import com.borak.cwb.backend.InitialTest;
 import com.borak.cwb.backend.integration.domain.ConfigPropertiesTest;
 import com.borak.cwb.backend.integration.domain.MyImageTest;
 import com.borak.cwb.backend.integration.nonsecured.CountryRoutesTest;
+import com.borak.cwb.backend.integration.nonsecured.GenreRoutesTest;
 import com.borak.cwb.backend.integration.nonsecured.ImageRoutesTest;
 import com.borak.cwb.backend.integration.nonsecured.MediaRoutesTest;
 import com.borak.cwb.backend.integration.nonsecured.MovieRoutesTest;
@@ -245,6 +246,7 @@ public final class TestResultsHelper {
             UserRepositoryJDBCTest.didAllTestsPass(),
             CritiqueRepositoryJDBCTest.didAllTestsPass(),
             CountryRoutesTest.didAllTestsPass(),
+            GenreRoutesTest.didAllTestsPass(),
             ImageRoutesTest.didAllTestsPass(),
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
@@ -290,6 +292,7 @@ public final class TestResultsHelper {
             UserRepositoryJDBCTest.didAllTestsPass(),
             CritiqueRepositoryJDBCTest.didAllTestsPass(),
             CountryRoutesTest.didAllTestsPass(),
+            GenreRoutesTest.didAllTestsPass(),
             ImageRoutesTest.didAllTestsPass(),
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
