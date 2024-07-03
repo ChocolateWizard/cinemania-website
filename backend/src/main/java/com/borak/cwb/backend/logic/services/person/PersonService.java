@@ -49,7 +49,7 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
     @Override
     public ResponseEntity getAllPersonsPaginated(int page, int size) {
         List<PersonJDBC> persons = personRepo.findAllPaginated(page, size);
-        return new ResponseEntity(personTransformer.toResponseFromJDBC(persons), HttpStatus.OK);
+        return new ResponseEntity(personTransformer.jdbcToPersonResponse(persons), HttpStatus.OK);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
         if (wrapper.get().getPerson().getProfilePhoto() != null && !wrapper.get().getPerson().getProfilePhoto().isEmpty()) {
             fileRepo.deleteIfExistsPersonPhotoImage(wrapper.get().getPerson().getProfilePhoto());
         }
-        return new ResponseEntity(personWrapperTransformer.toResponseFromJDBC(wrapper.get()), HttpStatus.OK);
+        return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(wrapper.get()), HttpStatus.OK);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
         } else {
             person = personWrapperRepo.findByIdWithRelations(wrapperDB.getPerson().getId());
         }
-        return new ResponseEntity<>(personWrapperTransformer.toResponseFromJDBC(person.get()), HttpStatus.OK);
+        return new ResponseEntity<>(personWrapperTransformer.jdbcToPersonResponse(person.get()), HttpStatus.OK);
     }
 
     @Override
@@ -161,21 +161,21 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
                 fileRepo.deleteIfExistsPersonPhotoImage(beforeUpdatePhotoName.get());
             }
         }
-        return new ResponseEntity<>(personWrapperTransformer.toResponseFromJDBC(response.get()), HttpStatus.OK);
+        return new ResponseEntity<>(personWrapperTransformer.jdbcToPersonResponse(response.get()), HttpStatus.OK);
 
     }
 
     @Override
     public ResponseEntity getAllPersonsWithDetailsPaginated(int page, int size) {
         List<PersonWrapperJDBC> persons = personWrapperRepo.findAllWithRelationsPaginated(page, size);
-        return new ResponseEntity(personWrapperTransformer.toResponseFromJDBC(persons), HttpStatus.OK);
+        return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(persons), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getPersonWithProfessions(Long id) {
         Optional<PersonWrapperJDBC> person = personWrapperRepo.findById(id);
         if (person.isPresent()) {
-            return new ResponseEntity(personWrapperTransformer.toResponseFromJDBC(person.get()), HttpStatus.OK);
+            return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(person.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No person found with id: " + id);
     }
@@ -184,7 +184,7 @@ public class PersonService implements IPersonService<PersonRequestDTO> {
     public ResponseEntity getPersonWithDetails(Long id) {
         Optional<PersonWrapperJDBC> person = personWrapperRepo.findByIdWithRelations(id);
         if (person.isPresent()) {
-            return new ResponseEntity(personWrapperTransformer.toResponseFromJDBC(person.get()), HttpStatus.OK);
+            return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(person.get()), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No person found with id: " + id);
     }

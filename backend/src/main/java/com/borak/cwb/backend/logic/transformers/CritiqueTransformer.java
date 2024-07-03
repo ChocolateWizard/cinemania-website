@@ -20,27 +20,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class CritiqueTransformer {
 
-    public CritiqueJDBC toCritiqueJDBC(CritiqueRequestDTO critiqueRequest, Long userId) {
+    public CritiqueJDBC toCritiqueJDBC(CritiqueRequestDTO request, Long userId) {
         CritiqueJDBC critique = new CritiqueJDBC();
         UserJDBC user = new UserJDBC();
         MediaJDBC media = new MediaJDBC();
-        critique.setDescription(critiqueRequest.getDescription());
-        critique.setRating(critiqueRequest.getRating());
+        critique.setDescription(request.getDescription());
+        critique.setRating(request.getRating());
         user.setId(userId);
-        media.setId(critiqueRequest.getMediaId());
+        media.setId(request.getMediaId());
         critique.setMedia(media);
         critique.setCritic(user);
         return critique;
     }
 
-    public CritiqueJPA toCritiqueJPA(CritiqueRequestDTO critiqueRequest, Long userId) {
+    public CritiqueJPA toCritiqueJPA(CritiqueRequestDTO request, Long userId) {
         CritiqueJPA critique = new CritiqueJPA();
         UserJPA user = new UserJPA();
         MediaJPA media = new MediaJPA();
-        critique.setDescription(critiqueRequest.getDescription());
-        critique.setRating(critiqueRequest.getRating());
+        critique.setDescription(request.getDescription());
+        critique.setRating(request.getRating());
         user.setId(userId);
-        media.setId(critiqueRequest.getMediaId());
+        media.setId(request.getMediaId());
         critique.setId(new CritiqueJPA.ID(user, media));
         return critique;
     }

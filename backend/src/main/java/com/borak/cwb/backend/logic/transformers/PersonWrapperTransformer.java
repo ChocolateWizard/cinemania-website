@@ -42,33 +42,30 @@ public class PersonWrapperTransformer {
     @Autowired
     private Util util;
 
-    public PersonResponseDTO toResponseFromJDBC(PersonWrapperJDBC wrapper) throws IllegalArgumentException {
-        if (wrapper == null || wrapper.getPerson() == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public PersonResponseDTO jdbcToPersonResponse(PersonWrapperJDBC person) {
+        PersonResponseDTO response = new PersonResponseDTO();
+        response.setId(person.getPerson().getId());
+        response.setFirstName(person.getPerson().getFirstName());
+        response.setLastName(person.getPerson().getLastName());
+        response.setGender(person.getPerson().getGender());
+        if (person.getPerson().getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getPerson().getProfilePhoto());
         }
-        PersonResponseDTO person = new PersonResponseDTO();
-        person.setId(wrapper.getPerson().getId());
-        person.setFirstName(wrapper.getPerson().getFirstName());
-        person.setLastName(wrapper.getPerson().getLastName());
-        person.setGender(wrapper.getPerson().getGender());
-        if (wrapper.getPerson().getProfilePhoto() != null && !wrapper.getPerson().getProfilePhoto().isEmpty()) {
-            person.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + wrapper.getPerson().getProfilePhoto());
-        }
-        if (wrapper.getDirector() != null && wrapper.getDirector() instanceof DirectorJDBC) {
+        if (person.getDirector() != null) {
             PersonResponseDTO.Director director = new PersonResponseDTO.Director();
-            director.setWorkedOn(wrapper.getDirector().getMedias().stream().map(MediaJDBC::getId).collect(Collectors.toList()));
-            person.getProfessions().add(director);
+            director.setWorkedOn(person.getDirector().getMedias().stream().map(MediaJDBC::getId).collect(Collectors.toList()));
+            response.getProfessions().add(director);
         }
-        if (wrapper.getWriter() != null && wrapper.getWriter() instanceof WriterJDBC) {
+        if (person.getWriter() != null) {
             PersonResponseDTO.Writer writer = new PersonResponseDTO.Writer();
-            writer.setWorkedOn(wrapper.getWriter().getMedias().stream().map(MediaJDBC::getId).collect(Collectors.toList()));
-            person.getProfessions().add(writer);
+            writer.setWorkedOn(person.getWriter().getMedias().stream().map(MediaJDBC::getId).collect(Collectors.toList()));
+            response.getProfessions().add(writer);
         }
-        if (wrapper.getActor() != null && wrapper.getActor() instanceof ActorJDBC) {
+        if (person.getActor() != null) {
             PersonResponseDTO.Actor actor = new PersonResponseDTO.Actor();
-            actor.setStar(wrapper.getActor().isStar());
+            actor.setStar(person.getActor().isStar());
             List<PersonResponseDTO.Actor.Acting> actings = new ArrayList<>();
-            for (ActingJDBC acting : wrapper.getActor().getActings()) {
+            for (ActingJDBC acting : person.getActor().getActings()) {
                 PersonResponseDTO.Actor.Acting responseActing = new PersonResponseDTO.Actor.Acting();
                 responseActing.setMediaId(acting.getMedia().getId());
                 responseActing.setStarring(acting.isStarring());
@@ -78,62 +75,70 @@ public class PersonWrapperTransformer {
                 actings.add(responseActing);
             }
             actor.setWorkedOn(actings);
-            person.getProfessions().add(actor);
-        }
-        return person;
-    }
-
-    public PersonResponseDTO toResponseFromJPA(PersonJPA wrapper, String option) throws IllegalArgumentException {
-        if (wrapper == null || option == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        PersonResponseDTO response = new PersonResponseDTO();
-        response.setId(wrapper.getId());
-        response.setFirstName(wrapper.getFirstName());
-        response.setLastName(wrapper.getLastName());
-        response.setGender(wrapper.getGender());
-        if (wrapper.getProfilePhoto() != null && !wrapper.getProfilePhoto().isEmpty()) {
-            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + wrapper.getProfilePhoto());
-        }
-        if (wrapper.getDirectorInfo() != null) {
-            PersonResponseDTO.Director director = new PersonResponseDTO.Director();
-            if (option.equals("workedOn")) {
-                director.setWorkedOn(wrapper.getDirectorInfo().getMedias().stream().map(MediaJPA::getId).collect(Collectors.toList()));
-            }
-            response.getProfessions().add(director);
-        }
-        if (wrapper.getWriterInfo() != null) {
-            PersonResponseDTO.Writer writer = new PersonResponseDTO.Writer();
-            if (option.equals("workedOn")) {
-                writer.setWorkedOn(wrapper.getWriterInfo().getMedias().stream().map(MediaJPA::getId).collect(Collectors.toList()));
-            }
-            response.getProfessions().add(writer);
-        }
-        if (wrapper.getActorInfo() != null) {
-            PersonResponseDTO.Actor actor = new PersonResponseDTO.Actor();
-            actor.setStar(wrapper.getActorInfo().getStar());
-            if (option.equals("workedOn")) {
-                List<PersonResponseDTO.Actor.Acting> actings = new ArrayList<>();
-                for (ActingJPA acting : wrapper.getActorInfo().getActings()) {
-                    PersonResponseDTO.Actor.Acting responseActing = new PersonResponseDTO.Actor.Acting();
-                    responseActing.setMediaId(acting.getMedia().getId());
-                    responseActing.setStarring(acting.getStarring());
-                    for (ActingRoleJPA role : acting.getRoles()) {
-                        responseActing.getRoles().add(new PersonResponseDTO.Actor.Acting.Role(role.getId().getId(), role.getName()));
-                    }
-                    actings.add(responseActing);
-                }
-                actor.setWorkedOn(actings);
-            }
             response.getProfessions().add(actor);
         }
         return response;
     }
 
-    public PersonWrapperJDBC toPersonWrapperJDBC(PersonRequestDTO request) throws IllegalArgumentException {
-        if (request == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public PersonResponseDTO jpaToPersonResponse(PersonJPA person, String option) throws IllegalArgumentException {
+        PersonResponseDTO response = new PersonResponseDTO();
+        response.setId(person.getId());
+        response.setFirstName(person.getFirstName());
+        response.setLastName(person.getLastName());
+        response.setGender(person.getGender());
+        if (person.getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getProfilePhoto());
         }
+        switch (option) {
+            case "professions" -> {
+                if (person.getDirectorInfo() != null) {
+                    response.getProfessions().add(new PersonResponseDTO.Director());
+                }
+                if (person.getWriterInfo() != null) {
+                    response.getProfessions().add(new PersonResponseDTO.Writer());
+                }
+                if (person.getActorInfo() != null) {
+                    PersonResponseDTO.Actor actor = new PersonResponseDTO.Actor();
+                    actor.setStar(person.getActorInfo().getStar());
+                    response.getProfessions().add(actor);
+                }
+                return response;
+            }
+            case "details" -> {
+                if (person.getDirectorInfo() != null) {
+                    PersonResponseDTO.Director director = new PersonResponseDTO.Director();
+                    director.setWorkedOn(person.getDirectorInfo().getMedias().stream().map(MediaJPA::getId).collect(Collectors.toList()));
+                    response.getProfessions().add(director);
+                }
+                if (person.getWriterInfo() != null) {
+                    PersonResponseDTO.Writer writer = new PersonResponseDTO.Writer();
+                    writer.setWorkedOn(person.getWriterInfo().getMedias().stream().map(MediaJPA::getId).collect(Collectors.toList()));
+                    response.getProfessions().add(writer);
+                }
+                if (person.getActorInfo() != null) {
+                    PersonResponseDTO.Actor actor = new PersonResponseDTO.Actor();
+                    actor.setStar(person.getActorInfo().getStar());
+                    List<PersonResponseDTO.Actor.Acting> actings = new ArrayList<>();
+                    for (ActingJPA acting : person.getActorInfo().getActings()) {
+                        PersonResponseDTO.Actor.Acting responseActing = new PersonResponseDTO.Actor.Acting();
+                        responseActing.setMediaId(acting.getMedia().getId());
+                        responseActing.setStarring(acting.getStarring());
+                        for (ActingRoleJPA role : acting.getRoles()) {
+                            responseActing.getRoles().add(new PersonResponseDTO.Actor.Acting.Role(role.getId().getId(), role.getName()));
+                        }
+                        actings.add(responseActing);
+                    }
+                    actor.setWorkedOn(actings);
+                    response.getProfessions().add(actor);
+                }
+                return response;
+            }
+            default ->
+                throw new IllegalArgumentException("Invalid option set!");
+        }
+    }
+
+    public PersonWrapperJDBC toPersonWrapperJDBC(PersonRequestDTO request) throws IllegalArgumentException {
         PersonJDBC p = new PersonJDBC();
         p.setId(request.getId());
         p.setFirstName(request.getFirstName());
@@ -147,38 +152,43 @@ public class PersonWrapperTransformer {
         ActorJDBC a = null;
         if (request.getProfessions() != null) {
             for (PersonRequestDTO.Profession profession : request.getProfessions()) {
-                if (profession instanceof PersonRequestDTO.Director director) {
-                    List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
-                    List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
-                    d = new DirectorJDBC(request.getId());
-                    d.setMedias(medias);
-                }
-                if (profession instanceof PersonRequestDTO.Writer writer) {
-                    List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
-                    List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
-                    w = new WriterJDBC(request.getId());
-                    w.setMedias(medias);
-                }
-                if (profession instanceof PersonRequestDTO.Actor actor) {
-                    List<PersonRequestDTO.Actor.Acting> pomActings = new ArrayList<>(actor.getWorkedOn());
-                    pomActings.sort(Comparator.comparingLong(PersonRequestDTO.Actor.Acting::getMediaId));
-                    a = new ActorJDBC(request.getId());
-
-                    List<ActingJDBC> actings = new ArrayList<>(pomActings.size());
-                    for (PersonRequestDTO.Actor.Acting pomActing : pomActings) {
-                        ActingJDBC acting = new ActingJDBC(new MediaJDBC(pomActing.getMediaId()), a, pomActing.isStarring());
-
-                        List<ActingRoleJDBC> roles = new ArrayList<>(pomActing.getRoles().size());
-                        Long rId = 1l;
-                        for (String role : pomActing.getRoles()) {
-                            roles.add(new ActingRoleJDBC(acting, rId, role));
-                            rId++;
-                        }
-                        acting.setRoles(roles);
-                        actings.add(acting);
+                switch (profession) {
+                    case PersonRequestDTO.Director director -> {
+                        List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
+                        List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
+                        d = new DirectorJDBC(request.getId());
+                        d.setMedias(medias);
                     }
-                    a.setStar(actor.isStar());
-                    a.setActings(actings);
+                    case PersonRequestDTO.Writer writer -> {
+                        List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
+                        List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
+                        w = new WriterJDBC(request.getId());
+                        w.setMedias(medias);
+                    }
+                    case PersonRequestDTO.Actor actor -> {
+                        List<PersonRequestDTO.Actor.Acting> pomActings = new ArrayList<>(actor.getWorkedOn());
+                        pomActings.sort(Comparator.comparingLong(PersonRequestDTO.Actor.Acting::getMediaId));
+                        a = new ActorJDBC(request.getId());
+
+                        List<ActingJDBC> actings = new ArrayList<>(pomActings.size());
+                        for (PersonRequestDTO.Actor.Acting pomActing : pomActings) {
+                            ActingJDBC acting = new ActingJDBC(new MediaJDBC(pomActing.getMediaId()), a, pomActing.isStarring());
+
+                            List<ActingRoleJDBC> roles = new ArrayList<>(pomActing.getRoles().size());
+                            Long rId = 1l;
+                            for (String role : pomActing.getRoles()) {
+                                roles.add(new ActingRoleJDBC(acting, rId, role));
+                                rId++;
+                            }
+                            acting.setRoles(roles);
+                            actings.add(acting);
+                        }
+                        a.setStar(actor.isStar());
+                        a.setActings(actings);
+                    }
+                    default -> {
+                        throw new IllegalArgumentException("Unknown profession!");
+                    }
                 }
             }
         }
@@ -186,9 +196,6 @@ public class PersonWrapperTransformer {
     }
 
     public PersonJPA toPersonJPA(PersonRequestDTO request) throws IllegalArgumentException {
-        if (request == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
         PersonJPA person = new PersonJPA();
         person.setId(request.getId());
         person.setFirstName(request.getFirstName());
@@ -202,39 +209,42 @@ public class PersonWrapperTransformer {
         ActorJPA a = null;
         if (request.getProfessions() != null) {
             for (PersonRequestDTO.Profession profession : request.getProfessions()) {
-                if (profession instanceof PersonRequestDTO.Director director) {
-                    List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
-                    List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
-                    d = new DirectorJPA(request.getId(), person);
-                    d.setMedias(medias);
-                    continue;
-                }
-                if (profession instanceof PersonRequestDTO.Writer writer) {
-                    List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
-                    List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
-                    w = new WriterJPA(request.getId(), person);
-                    w.setMedias(medias);
-                    continue;
-                }
-                if (profession instanceof PersonRequestDTO.Actor actor) {
-                    List<PersonRequestDTO.Actor.Acting> pomActings = new ArrayList<>(actor.getWorkedOn());
-                    pomActings.sort(Comparator.comparingLong(PersonRequestDTO.Actor.Acting::getMediaId));
-                    a = new ActorJPA(request.getId(), person, actor.isStar());
-
-                    List<ActingJPA> actings = new ArrayList<>(pomActings.size());
-                    for (PersonRequestDTO.Actor.Acting pomActing : pomActings) {
-                        ActingJPA acting = new ActingJPA(new MediaJPA(pomActing.getMediaId()), a, pomActing.isStarring());
-
-                        List<ActingRoleJPA> roles = new ArrayList<>(pomActing.getRoles().size());
-                        Long rId = 1l;
-                        for (String role : pomActing.getRoles()) {
-                            roles.add(new ActingRoleJPA(new ActingRoleJPA.ID(acting, rId), role));
-                            rId++;
-                        }
-                        acting.setRoles(roles);
-                        actings.add(acting);
+                switch (profession) {
+                    case PersonRequestDTO.Director director -> {
+                        List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
+                        List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
+                        d = new DirectorJPA(request.getId(), person);
+                        d.setMedias(medias);
                     }
-                    a.setActings(actings);
+                    case PersonRequestDTO.Writer writer -> {
+                        List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
+                        List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
+                        w = new WriterJPA(request.getId(), person);
+                        w.setMedias(medias);
+                    }
+                    case PersonRequestDTO.Actor actor -> {
+                        List<PersonRequestDTO.Actor.Acting> pomActings = new ArrayList<>(actor.getWorkedOn());
+                        pomActings.sort(Comparator.comparingLong(PersonRequestDTO.Actor.Acting::getMediaId));
+                        a = new ActorJPA(request.getId(), person, actor.isStar());
+
+                        List<ActingJPA> actings = new ArrayList<>(pomActings.size());
+                        for (PersonRequestDTO.Actor.Acting pomActing : pomActings) {
+                            ActingJPA acting = new ActingJPA(new MediaJPA(pomActing.getMediaId()), a, pomActing.isStarring());
+
+                            List<ActingRoleJPA> roles = new ArrayList<>(pomActing.getRoles().size());
+                            Long rId = 1l;
+                            for (String role : pomActing.getRoles()) {
+                                roles.add(new ActingRoleJPA(new ActingRoleJPA.ID(acting, rId), role));
+                                rId++;
+                            }
+                            acting.setRoles(roles);
+                            actings.add(acting);
+                        }
+                        a.setActings(actings);
+                    }
+                    default -> {
+                        throw new IllegalArgumentException("Unknown profession!");
+                    }
                 }
             }
         }
@@ -245,24 +255,18 @@ public class PersonWrapperTransformer {
     }
 
     //=========================================================================================================
-    public List<PersonResponseDTO> toResponseFromJDBC(List<PersonWrapperJDBC> wrapperList) throws IllegalArgumentException {
-        if (wrapperList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<PersonResponseDTO> list = new ArrayList<>();
-        for (PersonWrapperJDBC wr : wrapperList) {
-            list.add(toResponseFromJDBC(wr));
+    public List<PersonResponseDTO> jdbcToPersonResponse(List<PersonWrapperJDBC> persons) {
+        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
+        for (PersonWrapperJDBC person : persons) {
+            list.add(jdbcToPersonResponse(person));
         }
         return list;
     }
 
-    public List<PersonResponseDTO> toResponseFromJPA(List<PersonJPA> personList, String option) throws IllegalArgumentException {
-        if (personList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<PersonResponseDTO> list = new ArrayList<>();
-        for (PersonJPA p : personList) {
-            list.add(toResponseFromJPA(p, option));
+    public List<PersonResponseDTO> jpaToPersonResponse(List<PersonJPA> persons, String option) throws IllegalArgumentException {
+        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
+        for (PersonJPA person : persons) {
+            list.add(jpaToPersonResponse(person, option));
         }
         return list;
     }

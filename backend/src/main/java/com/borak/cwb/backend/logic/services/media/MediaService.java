@@ -32,7 +32,7 @@ public class MediaService implements IMediaService {
     public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title) {
 //        title = title.replace("%", "\\%").replace("_", "\\_");
         List<MediaJDBC> medias = mediaRepo.findAllByTitleWithGenresPaginated(page, size, title);
-        return new ResponseEntity(mediaTransformer.toResponseFromJDBC(medias), HttpStatus.OK);
+        return new ResponseEntity(mediaTransformer.jdbcToMediaResponse(medias), HttpStatus.OK);
     }
 
 }

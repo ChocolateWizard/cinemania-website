@@ -8,9 +8,7 @@ import com.borak.cwb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowResponseDTO;
 import com.borak.cwb.backend.domain.jpa.ActingJPA;
 import com.borak.cwb.backend.domain.jpa.ActorJPA;
-import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.DirectorJPA;
-import com.borak.cwb.backend.domain.jpa.GenreJPA;
 import com.borak.cwb.backend.domain.jpa.TVShowJPA;
 import com.borak.cwb.backend.domain.jpa.WriterJPA;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
@@ -81,7 +79,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<TVShowJPA> t = tvShowRepo.findAll(p);
-        List<TVShowResponseDTO> response = tvShowTransformer.toResponseFromJPA(t.getContent(), new Class[]{GenreJPA.class});
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -89,7 +87,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<TVShowJPA> t = tvShowRepo.findAllByAudienceRatingGreaterThanEqual(POPULARITY_TRESHOLD, p);
-        List<TVShowResponseDTO> response = tvShowTransformer.toResponseFromJPA(t.getContent(), new Class[]{GenreJPA.class});
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -98,7 +96,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         int year = Year.now().getValue() - 1;
         Pageable p = PageRequest.of(page - 1, size);
         Page<TVShowJPA> t = tvShowRepo.findAllByReleaseDateYearGreaterThanEqual(year, p);
-        List<TVShowResponseDTO> response = tvShowTransformer.toResponseFromJPA(t.getContent(), new Class[]{GenreJPA.class});
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -106,8 +104,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<TVShowJPA> t = tvShowRepo.findAll(p);
-        List<TVShowResponseDTO> response = tvShowTransformer.toResponseFromJPA(t.getContent(),
-                new Class[]{GenreJPA.class, DirectorJPA.class, WriterJPA.class, ActingJPA.class, CritiqueJPA.class});
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "details");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -115,7 +112,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowWithGenres(Long id) {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(), new Class[]{GenreJPA.class}), HttpStatus.OK);
+            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(), "genres"), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -124,8 +121,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowWithDetails(Long id) {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(),
-                    new Class[]{GenreJPA.class, DirectorJPA.class, WriterJPA.class, ActingJPA.class, CritiqueJPA.class}), HttpStatus.OK);
+            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(), "details"), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -135,7 +131,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
             List<DirectorJPA> directors = tvShow.get().getDirectors();
-            return new ResponseEntity<>(directorTransformer.toMovieDirectorResponseFromJPA(directors), HttpStatus.OK);
+            return new ResponseEntity<>(directorTransformer.jpaToDirectorResponse(directors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -145,7 +141,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
             List<WriterJPA> writers = tvShow.get().getWriters();
-            return new ResponseEntity<>(writerTransformer.toMovieWriterResponseFromJPA(writers), HttpStatus.OK);
+            return new ResponseEntity<>(writerTransformer.jpaToWriterResponse(writers), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -155,7 +151,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
             List<ActorJPA> actors = tvShow.get().getActings().stream().map(e -> e.getActor()).toList();
-            return new ResponseEntity<>(actorTransformer.toMovieActorResponseFromJPA(actors), HttpStatus.OK);
+            return new ResponseEntity<>(actorTransformer.jpaToActorResponse(actors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -165,7 +161,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isPresent()) {
             List<ActingJPA> actings = tvShow.get().getActings();
-            return new ResponseEntity<>(actingTransformer.toMovieActorResponseFromJPA(actings), HttpStatus.OK);
+            return new ResponseEntity<>(actingTransformer.jpaToActorResponse(actings), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -180,8 +176,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
         if (tvShow.get().getCoverImage() != null && !tvShow.get().getCoverImage().isEmpty()) {
             fileRepo.deleteIfExistsMediaCoverImage(tvShow.get().getCoverImage());
         }
-        return new ResponseEntity(tvShowTransformer.toResponseFromJPA(tvShow.get(),
-                new Class[]{GenreJPA.class, DirectorJPA.class, WriterJPA.class, ActingJPA.class, CritiqueJPA.class}), HttpStatus.OK);
+        return new ResponseEntity(tvShowTransformer.toResponseFromJPA(tvShow.get(), "details"), HttpStatus.OK);
     }
 
     @Override
@@ -220,8 +215,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
             tvShow = tvShowRepo.saveAndFlush(tvShowToSave);
             manager.refresh(tvShow);
         }
-        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow,
-                new Class[]{GenreJPA.class, DirectorJPA.class, WriterJPA.class, ActingJPA.class, CritiqueJPA.class}), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow, "details"), HttpStatus.OK);
     }
 
     @Override
@@ -287,8 +281,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
                 fileRepo.deleteIfExistsMediaCoverImage(coverImageDB);
             }
         }
-        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow,
-                new Class[]{GenreJPA.class, DirectorJPA.class, WriterJPA.class, ActingJPA.class, CritiqueJPA.class}), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow, "details"), HttpStatus.OK);
     }
 
 }

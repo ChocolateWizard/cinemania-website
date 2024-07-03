@@ -73,26 +73,26 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
 //----------------------------------------------------------------------------------------------------
     @Override
     public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllWithGenresPaginated(page, size));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size) {
-        List<TVShowResponseDTO> tvShows = tvShowTransformer.toResponseFromJDBC(tvShowRepo.findAllWithRelationsPaginated(page, size));
+        List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
@@ -118,7 +118,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowDirectors(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<DirectorJDBC> directors = directorRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(directorTransformer.toTVShowDirectorResponseDTO(directors), HttpStatus.OK);
+            return new ResponseEntity<>(directorTransformer.jdbcToDirectorResponse(directors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -127,7 +127,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowWriters(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<WriterJDBC> writers = writerRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(writerTransformer.toTVShowWriterResponseDTO(writers), HttpStatus.OK);
+            return new ResponseEntity<>(writerTransformer.jdbcToWriterResponse(writers), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -136,7 +136,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowActors(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<ActorJDBC> actors = actorRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(actorTransformer.toTVShowActorResponseDTO(actors), HttpStatus.OK);
+            return new ResponseEntity<>(actorTransformer.jdbcToActorResponse(actors), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
@@ -145,7 +145,7 @@ public class TVShowService implements ITVShowService<TVShowRequestDTO> {
     public ResponseEntity getTVShowActorsWithRoles(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<ActingJDBC> actings = actingRepo.findAllByMediaId(id);
-            return new ResponseEntity<>(actingTransformer.toTVShowActorResponseDTO(actings), HttpStatus.OK);
+            return new ResponseEntity<>(actingTransformer.jdbcToActorResponse(actings), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }

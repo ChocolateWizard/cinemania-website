@@ -23,59 +23,45 @@ public class PersonTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public PersonResponseDTO toResponseFromJDBC(PersonJDBC jdbc) throws IllegalArgumentException {
-        if (jdbc == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public PersonResponseDTO jdbcToPersonResponse(PersonJDBC person) {
+        PersonResponseDTO response = new PersonResponseDTO();
+        response.setId(person.getId());
+        response.setFirstName(person.getFirstName());
+        response.setLastName(person.getLastName());
+        response.setGender(person.getGender());
+        if (person.getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getProfilePhoto());
         }
-        PersonResponseDTO person = new PersonResponseDTO();
-        person.setId(jdbc.getId());
-        person.setFirstName(jdbc.getFirstName());
-        person.setLastName(jdbc.getLastName());
-        person.setGender(jdbc.getGender());
-        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            person.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
-        }
-        return person;
+        return response;
     }
-  
 
-    public PersonResponseDTO toResponseFromJPA(PersonJPA jpa) throws IllegalArgumentException {
-        if (jpa == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public PersonResponseDTO jpaToPersonResponse(PersonJPA person) {
+        PersonResponseDTO response = new PersonResponseDTO();
+        response.setId(person.getId());
+        response.setFirstName(person.getFirstName());
+        response.setLastName(person.getLastName());
+        response.setGender(person.getGender());
+        if (person.getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getProfilePhoto());
         }
-        PersonResponseDTO person = new PersonResponseDTO();
-        person.setId(jpa.getId());
-        person.setFirstName(jpa.getFirstName());
-        person.setLastName(jpa.getLastName());
-        person.setGender(jpa.getGender());
-        if (jpa.getProfilePhoto() != null && !jpa.getProfilePhoto().isEmpty()) {
-            person.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jpa.getProfilePhoto());
-        }
-        return person;
+        return response;
     }
-    
+
     //=========================================================================================================
-    
-    public List<PersonResponseDTO> toResponseFromJDBC(List<PersonJDBC> jdbcList) throws IllegalArgumentException {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<PersonResponseDTO> list = new ArrayList<>();
-        for (PersonJDBC jd : jdbcList) {
-            list.add(PersonTransformer.this.toResponseFromJDBC(jd));
+    public List<PersonResponseDTO> jdbcToPersonResponse(List<PersonJDBC> persons) {
+        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
+        for (PersonJDBC person : persons) {
+            list.add(jdbcToPersonResponse(person));
         }
         return list;
     }
-    
-    public List<PersonResponseDTO> toResponseFromJPA(List<PersonJPA> jpaList) throws IllegalArgumentException {
-        if (jpaList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<PersonResponseDTO> list = new ArrayList<>();
-        for (PersonJPA jp : jpaList) {
-            list.add(toResponseFromJPA(jp));
+
+    public List<PersonResponseDTO> jpaToPersonResponse(List<PersonJPA> persons) {
+        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
+        for (PersonJPA person : persons) {
+            list.add(jpaToPersonResponse(person));
         }
         return list;
     }
-    
+
 }

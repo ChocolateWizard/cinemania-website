@@ -41,10 +41,7 @@ public class UserTransformer {
     @Autowired
     private PasswordEncoder encoder;
 
-    public UserJDBC toUserJDBC(UserRegisterDTO registerForm) throws IllegalArgumentException {
-        if (registerForm == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public UserJDBC toUserJDBC(UserRegisterDTO registerForm) {
         UserJDBC user = new UserJDBC();
         user.setFirstName(registerForm.getFirstName());
         user.setLastName(registerForm.getLastName());
@@ -64,10 +61,7 @@ public class UserTransformer {
         return user;
     }
 
-    public UserJPA toUserJPA(UserRegisterDTO registerForm) throws IllegalArgumentException {
-        if (registerForm == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public UserJPA toUserJPA(UserRegisterDTO registerForm) {
         UserJPA user = new UserJPA();
         user.setFirstName(registerForm.getFirstName());
         user.setLastName(registerForm.getLastName());
@@ -87,10 +81,7 @@ public class UserTransformer {
         return user;
     }
 
-    public UserResponseDTO toUserResponseDTO(UserJDBC userJDBC) throws IllegalArgumentException {
-        if (userJDBC == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public UserResponseDTO jdbcToUserResponse(UserJDBC userJDBC) {
         UserResponseDTO response = new UserResponseDTO();
         response.setFirstName(userJDBC.getFirstName());
         response.setLastName(userJDBC.getLastName());
@@ -122,31 +113,28 @@ public class UserTransformer {
         return response;
     }
 
-    public UserResponseDTO toUserResponseDTO(UserJPA userJPA) throws IllegalArgumentException {
-        if (userJPA == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public UserResponseDTO jpaToUserResponse(UserJPA user) {
         UserResponseDTO response = new UserResponseDTO();
-        response.setFirstName(userJPA.getFirstName());
-        response.setLastName(userJPA.getLastName());
-        response.setProfileName(userJPA.getProfileName());
-        if (userJPA.getProfileImage() != null) {
-            response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJPA.getProfileImage());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setProfileName(user.getProfileName());
+        if (user.getProfileImage() != null) {
+            response.setProfileImageUrl(config.getUserImagesBaseUrl() + user.getProfileImage());
         }
-        response.setGender(userJPA.getGender());
-        response.setRole(userJPA.getRole());
+        response.setGender(user.getGender());
+        response.setRole(user.getRole());
 
         UserResponseDTO.Country country = new UserResponseDTO.Country();
-        country.setId(userJPA.getCountry().getId());
-        country.setName(userJPA.getCountry().getName());
-        country.setOfficialStateName(userJPA.getCountry().getOfficialStateName());
-        country.setCode(userJPA.getCountry().getCode());
+        country.setId(user.getCountry().getId());
+        country.setName(user.getCountry().getName());
+        country.setOfficialStateName(user.getCountry().getOfficialStateName());
+        country.setCode(user.getCountry().getCode());
         response.setCountry(country);
 
-        for (MediaJPA media : userJPA.getMedias()) {
+        for (MediaJPA media : user.getMedias()) {
             response.getMedias().add(toMediaResponseDTO(media));
         }
-        for (CritiqueJPA critique : userJPA.getCritiques()) {
+        for (CritiqueJPA critique : user.getCritiques()) {
             UserResponseDTO.Critique critiqueResponse = new UserResponseDTO.Critique();
             critiqueResponse.setDescription(critique.getDescription());
             critiqueResponse.setRating(critique.getRating());
@@ -158,6 +146,7 @@ public class UserTransformer {
     }
 
 //===================================================================================================================
+//PRIVATE METHODS
     private MediaResponseDTO toMediaResponseDTO(MediaJDBC media) {
         MediaResponseDTO mediaResponse = new MediaResponseDTO();
         mediaResponse.setId(media.getId());
@@ -176,8 +165,6 @@ public class UserTransformer {
             mediaResponse.setMediaType(MediaType.MOVIE);
         } else if (media instanceof TVShowJDBC) {
             mediaResponse.setMediaType(MediaType.TV_SHOW);
-        } else {
-            throw new IllegalArgumentException("Unknown media type!");
         }
         return mediaResponse;
     }
@@ -200,8 +187,6 @@ public class UserTransformer {
             mediaResponse.setMediaType(MediaType.MOVIE);
         } else if (media instanceof TVShowJPA) {
             mediaResponse.setMediaType(MediaType.TV_SHOW);
-        } else {
-            throw new IllegalArgumentException("Unknown media type!");
         }
         return mediaResponse;
     }

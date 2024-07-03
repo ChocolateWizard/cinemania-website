@@ -31,7 +31,7 @@ public class CountryService implements ICountryService {
     @Override
     public ResponseEntity getAll() {
         List<CountryJDBC> countries = countryRepo.findAll();
-        return new ResponseEntity(countryTransformer.toResponseFromJDBC(countries), HttpStatus.OK);
+        return new ResponseEntity(countryTransformer.jdbcToCountryResponse(countries), HttpStatus.OK);
     }
 
 }

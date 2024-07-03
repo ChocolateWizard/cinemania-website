@@ -98,7 +98,7 @@ public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> 
 
         Optional<UserJDBC> userDB = userRepo.findByIdWithRelations(userDetails.getId());
 
-        UserResponseDTO userInfoResponse = userTransformer.toUserResponseDTO(userDB.get());
+        UserResponseDTO userInfoResponse = userTransformer.jdbcToUserResponse(userDB.get());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(userInfoResponse);
     }

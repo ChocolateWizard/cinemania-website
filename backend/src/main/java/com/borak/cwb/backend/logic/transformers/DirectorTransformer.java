@@ -5,11 +5,9 @@
 package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.dto.movie.MovieDirectorResponseDTO;
-import com.borak.cwb.backend.domain.dto.tv.TVShowDirectorResponseDTO;
+import com.borak.cwb.backend.domain.dto.person.DirectorResponseDTO;
 import com.borak.cwb.backend.domain.jdbc.DirectorJDBC;
 import com.borak.cwb.backend.domain.jpa.DirectorJPA;
-import com.borak.cwb.backend.domain.jpa.PersonJPA;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,80 +23,43 @@ public class DirectorTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public MovieDirectorResponseDTO toMovieDirectorResponseFromJDBC(DirectorJDBC jdbc) throws IllegalArgumentException {
-        if (jdbc == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public DirectorResponseDTO jdbcToDirectorResponse(DirectorJDBC director) {
+        DirectorResponseDTO response = new DirectorResponseDTO();
+        response.setId(director.getId());
+        response.setFirstName(director.getFirstName());
+        response.setLastName(director.getLastName());
+        response.setGender(director.getGender());
+        if (director.getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + director.getProfilePhoto());
         }
-        MovieDirectorResponseDTO director = new MovieDirectorResponseDTO();
-        director.setId(jdbc.getId());
-        director.setFirstName(jdbc.getFirstName());
-        director.setLastName(jdbc.getLastName());
-        director.setGender(jdbc.getGender());
-        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            director.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
-        }
-        return director;
+        return response;
     }
 
-    public MovieDirectorResponseDTO toMovieDirectorResponseFromJPA(DirectorJPA jpa) throws IllegalArgumentException {
-        if (jpa == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public DirectorResponseDTO jpaToDirectorResponse(DirectorJPA director) {
+        DirectorResponseDTO response = new DirectorResponseDTO();
+        response.setId(director.getPersonId());
+        response.setFirstName(director.getPerson().getFirstName());
+        response.setLastName(director.getPerson().getLastName());
+        response.setGender(director.getPerson().getGender());
+        if (director.getPerson().getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + director.getPerson().getProfilePhoto());
         }
-        MovieDirectorResponseDTO director = new MovieDirectorResponseDTO();
-        director.setId(jpa.getPersonId());
-        director.setFirstName(jpa.getPerson().getFirstName());
-        director.setLastName(jpa.getPerson().getLastName());
-        director.setGender(jpa.getPerson().getGender());
-        if (jpa.getPerson().getProfilePhoto() != null && !jpa.getPerson().getProfilePhoto().isEmpty()) {
-            director.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jpa.getPerson().getProfilePhoto());
-        }
-        return director;
+        return response;
     }
 
-    public List<MovieDirectorResponseDTO> toMovieDirectorResponseFromJDBC(List<DirectorJDBC> jdbcList) throws IllegalArgumentException {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<MovieDirectorResponseDTO> list = new ArrayList<>();
-        for (DirectorJDBC jd : jdbcList) {
-            list.add(DirectorTransformer.this.toMovieDirectorResponseFromJDBC(jd));
+//=================================================================================================================================
+    public List<DirectorResponseDTO> jdbcToDirectorResponse(List<DirectorJDBC> directors) {
+        List<DirectorResponseDTO> list = new ArrayList<>(directors.size());
+        for (DirectorJDBC director : directors) {
+            list.add(jdbcToDirectorResponse(director));
         }
         return list;
     }
 
-    public List<MovieDirectorResponseDTO> toMovieDirectorResponseFromJPA(List<DirectorJPA> jpaList) throws IllegalArgumentException {
-        if (jpaList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<MovieDirectorResponseDTO> list = new ArrayList<>();
-        for (DirectorJPA jp : jpaList) {
-            list.add(toMovieDirectorResponseFromJPA(jp));
-        }
-        return list;
-    }
-
-    public TVShowDirectorResponseDTO toTVShowDirectorResponseDTO(DirectorJDBC jdbc) throws IllegalArgumentException {
-        if (jdbc == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        TVShowDirectorResponseDTO director = new TVShowDirectorResponseDTO();
-        director.setId(jdbc.getId());
-        director.setFirstName(jdbc.getFirstName());
-        director.setLastName(jdbc.getLastName());
-        director.setGender(jdbc.getGender());
-        if (jdbc.getProfilePhoto() != null && !jdbc.getProfilePhoto().isEmpty()) {
-            director.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + jdbc.getProfilePhoto());
-        }
-        return director;
-    }
-
-    public List<TVShowDirectorResponseDTO> toTVShowDirectorResponseDTO(List<DirectorJDBC> jdbcList) throws IllegalArgumentException {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<TVShowDirectorResponseDTO> list = new ArrayList<>();
-        for (DirectorJDBC jd : jdbcList) {
-            list.add(toTVShowDirectorResponseDTO(jd));
+    public List<DirectorResponseDTO> jpaToDirectorResponse(List<DirectorJPA> directors) {
+        List<DirectorResponseDTO> list = new ArrayList<>(directors.size());
+        for (DirectorJPA director : directors) {
+            list.add(jpaToDirectorResponse(director));
         }
         return list;
     }

@@ -50,8 +50,8 @@ public class MediaJPA implements Serializable {
     @Column(name = "title", nullable = false, length = 300)
     private String title;
 
-    @Size(max = 500)
-    @Column(name = "cover_image", length = 500)
+    @Size(max = 30)
+    @Column(name = "cover_image", length = 30)
     private String coverImage;
 
     @NotBlank

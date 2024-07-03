@@ -49,8 +49,8 @@ public class PersonJPA implements Serializable {
     @Column(name = "gender", nullable = false, length = 1)
     private Gender gender;
 
-    @Size(max = 500)
-    @Column(name = "profile_photo", length = 500)
+    @Size(max = 30)
+    @Column(name = "profile_photo", length = 30)
     private String profilePhoto;
 
     @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)

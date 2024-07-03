@@ -18,48 +18,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class CountryTransformer {
 
-    public CountryResponseDTO toResponseFromJDBC(CountryJDBC jdbc) {
-        if (jdbc == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public CountryResponseDTO jdbcToCountryResponse(CountryJDBC country) {
         CountryResponseDTO response = new CountryResponseDTO();
-        response.setId(jdbc.getId());
-        response.setName(jdbc.getName());
-        response.setOfficialStateName(jdbc.getOfficialStateName());
-        response.setCode(jdbc.getCode());
+        response.setId(country.getId());
+        response.setName(country.getName());
+        response.setOfficialStateName(country.getOfficialStateName());
+        response.setCode(country.getCode());
         return response;
     }
 
-    public CountryResponseDTO toResponseFromJPA(CountryJPA jpa) {
-        if (jpa == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public CountryResponseDTO jpaToCountryResponse(CountryJPA country) {
         CountryResponseDTO response = new CountryResponseDTO();
-        response.setId(jpa.getId());
-        response.setName(jpa.getName());
-        response.setOfficialStateName(jpa.getOfficialStateName());
-        response.setCode(jpa.getCode());
+        response.setId(country.getId());
+        response.setName(country.getName());
+        response.setOfficialStateName(country.getOfficialStateName());
+        response.setCode(country.getCode());
         return response;
     }
+//=================================================================================================================================
 
-    public List<CountryResponseDTO> toResponseFromJDBC(List<CountryJDBC> jdbcList) {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<CountryResponseDTO> list = new ArrayList<>();
-        for (CountryJDBC jd : jdbcList) {
-            list.add(toResponseFromJDBC(jd));
+    public List<CountryResponseDTO> jdbcToCountryResponse(List<CountryJDBC> countries) {
+        List<CountryResponseDTO> list = new ArrayList<>(countries.size());
+        for (CountryJDBC country : countries) {
+            list.add(jdbcToCountryResponse(country));
         }
         return list;
     }
 
-    public List<CountryResponseDTO> toResponseFromJPA(List<CountryJPA> jpaList) {
-        if (jpaList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<CountryResponseDTO> list = new ArrayList<>();
-        for (CountryJPA jd : jpaList) {
-            list.add(toResponseFromJPA(jd));
+    public List<CountryResponseDTO> jpaToCountryResponse(List<CountryJPA> countries) {
+        List<CountryResponseDTO> list = new ArrayList<>(countries.size());
+        for (CountryJPA country : countries) {
+            list.add(jpaToCountryResponse(country));
         }
         return list;
     }

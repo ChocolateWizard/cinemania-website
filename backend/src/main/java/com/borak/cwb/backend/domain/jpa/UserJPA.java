@@ -63,8 +63,8 @@ public class UserJPA implements Serializable {
     @Column(name = "profile_name", nullable = false, unique = true, length = 100)
     private String profileName;
 
-    @Size(max = 500)
-    @Column(name = "profile_image", length = 500)
+    @Size(max = 110)
+    @Column(name = "profile_image", length = 110)
     private String profileImage;
 
     @NotBlank

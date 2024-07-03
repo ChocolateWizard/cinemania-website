@@ -53,21 +53,21 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
     public ResponseEntity getAllPersonsPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<PersonJPA> persons = personRepo.findAll(p);
-        return new ResponseEntity(personTransformer.toResponseFromJPA(persons.getContent()), HttpStatus.OK);
+        return new ResponseEntity(personTransformer.jpaToPersonResponse(persons.getContent()), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getAllPersonsWithDetailsPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<PersonJPA> persons = personRepo.findAll(p);
-        return new ResponseEntity(personWrapperTransformer.toResponseFromJPA(persons.getContent(), "workedOn"), HttpStatus.OK);
+        return new ResponseEntity(personWrapperTransformer.jpaToPersonResponse(persons.getContent(), "details"), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity getPersonWithProfessions(Long id) {
         Optional<PersonJPA> person = personRepo.findById(id);
         if (person.isPresent()) {
-            return new ResponseEntity(personWrapperTransformer.toResponseFromJPA(person.get(), ""), HttpStatus.OK);
+            return new ResponseEntity(personWrapperTransformer.jpaToPersonResponse(person.get(), "professions"), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No person found with id: " + id);
     }
@@ -76,7 +76,7 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
     public ResponseEntity getPersonWithDetails(Long id) {
         Optional<PersonJPA> person = personRepo.findById(id);
         if (person.isPresent()) {
-            return new ResponseEntity(personWrapperTransformer.toResponseFromJPA(person.get(), "workedOn"), HttpStatus.OK);
+            return new ResponseEntity(personWrapperTransformer.jpaToPersonResponse(person.get(), "details"), HttpStatus.OK);
         }
         throw new ResourceNotFoundException("No person found with id: " + id);
     }
@@ -91,7 +91,7 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
         if (person.get().getProfilePhoto() != null && !person.get().getProfilePhoto().isEmpty()) {
             fileRepo.deleteIfExistsPersonPhotoImage(person.get().getProfilePhoto());
         }
-        return new ResponseEntity(personWrapperTransformer.toResponseFromJPA(person.get(), "workedOn"), HttpStatus.OK);
+        return new ResponseEntity(personWrapperTransformer.jpaToPersonResponse(person.get(), "details"), HttpStatus.OK);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
             personRepo.saveAndFlush(person);
             manager.refresh(person);
         }
-        return new ResponseEntity<>(personWrapperTransformer.toResponseFromJPA(person, "workedOn"), HttpStatus.OK);
+        return new ResponseEntity<>(personWrapperTransformer.jpaToPersonResponse(person, "details"), HttpStatus.OK);
     }
 
     @Override
@@ -225,7 +225,7 @@ public class PersonServiceJPA implements IPersonService<PersonRequestDTO> {
                 fileRepo.deleteIfExistsPersonPhotoImage(profilePhotoDB);
             }
         }
-        return new ResponseEntity<>(personWrapperTransformer.toResponseFromJPA(person, "workedOn"), HttpStatus.OK);
+        return new ResponseEntity<>(personWrapperTransformer.jpaToPersonResponse(person, "details"), HttpStatus.OK);
 
     }
 

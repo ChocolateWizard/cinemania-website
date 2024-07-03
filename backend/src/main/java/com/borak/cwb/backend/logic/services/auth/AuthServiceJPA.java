@@ -97,7 +97,7 @@ public class AuthServiceJPA implements IAuthService<UserRegisterDTO, UserLoginDT
 
         Optional<UserJPA> userDB = userRepo.findById(userDetails.getId());
 
-        UserResponseDTO userInfoResponse = userTransformer.toUserResponseDTO(userDB.get());
+        UserResponseDTO userInfoResponse = userTransformer.jpaToUserResponse(userDB.get());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(userInfoResponse);
     }

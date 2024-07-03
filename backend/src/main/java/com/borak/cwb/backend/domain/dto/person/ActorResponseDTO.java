@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.cwb.backend.domain.dto.movie;
+package com.borak.cwb.backend.domain.dto.person;
 
 import com.borak.cwb.backend.domain.dto.DTO;
 import com.borak.cwb.backend.domain.enums.Gender;
@@ -15,10 +15,10 @@ import java.util.List;
 
 /**
  *
- * @author Mr. Poyo
+ * @author User
  */
 @JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender", "star", "starring", "roles"})
-public class MovieActorResponseDTO implements DTO {
+public class ActorResponseDTO implements DTO {
 
     @JsonView(JsonVisibilityViews.Lite.class)
     private Long id;
@@ -32,11 +32,11 @@ public class MovieActorResponseDTO implements DTO {
     private String lastName;
 
     @JsonView(JsonVisibilityViews.Lite.class)
-    @JsonProperty(value = "profile_photo_url")
-    private String profilePhotoUrl;
+    private Gender gender;
 
     @JsonView(JsonVisibilityViews.Lite.class)
-    private Gender gender;
+    @JsonProperty(value = "profile_photo_url")
+    private String profilePhotoUrl;
 
     @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "is_star")
@@ -47,20 +47,7 @@ public class MovieActorResponseDTO implements DTO {
     private Boolean starring;
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    private List<Role> roles = new ArrayList<>();
-
-    public MovieActorResponseDTO() {
-    }
-
-    public MovieActorResponseDTO(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender, Boolean star, Boolean starring) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.profilePhotoUrl = profilePhotoUrl;
-        this.gender = gender;
-        this.star = star;
-        this.starring = starring;
-    }
+    private List<ActorResponseDTO.Role> roles = new ArrayList<>();
 
     @JsonPropertyOrder({"id", "name"})
     @JsonView(JsonVisibilityViews.Heavy.class)
@@ -93,7 +80,19 @@ public class MovieActorResponseDTO implements DTO {
         public void setName(String name) {
             this.name = name;
         }
+    }
 
+    public ActorResponseDTO() {
+    }
+
+    public ActorResponseDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoUrl, Boolean star, Boolean starring) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profilePhotoUrl = profilePhotoUrl;
+        this.star = star;
+        this.starring = starring;
     }
 
     public Long getId() {
@@ -120,20 +119,20 @@ public class MovieActorResponseDTO implements DTO {
         this.lastName = lastName;
     }
 
-    public String getProfilePhotoUrl() {
-        return profilePhotoUrl;
-    }
-
-    public void setProfilePhotoUrl(String profilePhotoUrl) {
-        this.profilePhotoUrl = profilePhotoUrl;
-    }
-
     public Gender getGender() {
         return gender;
     }
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
+
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
     }
 
     public Boolean getStar() {
@@ -152,16 +151,12 @@ public class MovieActorResponseDTO implements DTO {
         this.starring = starring;
     }
 
-    public List<Role> getRoles() {
+    public List<ActorResponseDTO.Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
-        if (roles == null) {
-            this.roles = new ArrayList<>();
-        } else {
-            this.roles = roles;
-        }
+    public void setRoles(List<ActorResponseDTO.Role> roles) {
+        this.roles = roles;
     }
 
 }

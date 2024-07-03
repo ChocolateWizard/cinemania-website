@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.borak.cwb.backend.domain.dto.tv;
+package com.borak.cwb.backend.domain.dto.person;
 
 import com.borak.cwb.backend.domain.dto.DTO;
 import com.borak.cwb.backend.domain.enums.Gender;
@@ -11,10 +11,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  *
- * @author Mr. Poyo
+ * @author User
  */
-@JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender"})
-public class TVShowWriterResponseDTO implements DTO {
+@JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl","gender"})
+public class DirectorResponseDTO implements DTO {
 
     private Long id;
 
@@ -24,20 +24,20 @@ public class TVShowWriterResponseDTO implements DTO {
     @JsonProperty(value = "last_name")
     private String lastName;
 
+    private Gender gender;
+
     @JsonProperty(value = "profile_photo_url")
     private String profilePhotoUrl;
 
-    private Gender gender;
-
-    public TVShowWriterResponseDTO() {
+    public DirectorResponseDTO() {
     }
 
-    public TVShowWriterResponseDTO(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender) {
+    public DirectorResponseDTO(Long id, String firstName, String lastName, Gender gender, String profilePhotoUrl) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.profilePhotoUrl = profilePhotoUrl;
         this.gender = gender;
+        this.profilePhotoUrl = profilePhotoUrl;
     }
 
     public Long getId() {
@@ -64,14 +64,6 @@ public class TVShowWriterResponseDTO implements DTO {
         this.lastName = lastName;
     }
 
-    public String getProfilePhotoUrl() {
-        return profilePhotoUrl;
-    }
-
-    public void setProfilePhotoUrl(String profilePhotoUrl) {
-        this.profilePhotoUrl = profilePhotoUrl;
-    }
-
     public Gender getGender() {
         return gender;
     }
@@ -79,5 +71,15 @@ public class TVShowWriterResponseDTO implements DTO {
     public void setGender(Gender gender) {
         this.gender = gender;
     }
+
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
+
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
+    }
+    
+    
 
 }

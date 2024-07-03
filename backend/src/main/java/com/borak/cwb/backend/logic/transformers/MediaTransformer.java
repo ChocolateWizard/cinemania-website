@@ -30,78 +30,63 @@ public class MediaTransformer {
     @Autowired
     private ConfigProperties config;
 
-    public MediaResponseDTO toResponseFromJDBC(MediaJDBC mediaJDBC) throws IllegalArgumentException {
-        if (mediaJDBC == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
+    public MediaResponseDTO jdbcToMediaResponse(MediaJDBC media) {
         MediaResponseDTO response = new MediaResponseDTO();
-        response.setId(mediaJDBC.getId());
-        response.setTitle(mediaJDBC.getTitle());
-        if (mediaJDBC.getCoverImage() != null && !mediaJDBC.getCoverImage().isEmpty()) {
-            response.setCoverImageUrl(config.getMediaImagesBaseUrl() + mediaJDBC.getCoverImage());
+        response.setId(media.getId());
+        response.setTitle(media.getTitle());
+        if (media.getCoverImage() != null) {
+            response.setCoverImageUrl(config.getMediaImagesBaseUrl() + media.getCoverImage());
         }
-        response.setDescription(mediaJDBC.getDescription());
-        response.setReleaseDate(mediaJDBC.getReleaseDate());
-        response.setAudienceRating(mediaJDBC.getAudienceRating());
-        response.setCriticsRating(mediaJDBC.getCriticRating());
-        for (GenreJDBC genre : mediaJDBC.getGenres()) {
+        response.setDescription(media.getDescription());
+        response.setReleaseDate(media.getReleaseDate());
+        response.setAudienceRating(media.getAudienceRating());
+        response.setCriticsRating(media.getCriticRating());
+        for (GenreJDBC genre : media.getGenres()) {
             response.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
         }
-        if (mediaJDBC instanceof MovieJDBC) {
+        if (media instanceof MovieJDBC) {
             response.setMediaType(MediaType.MOVIE);
-        } else if (mediaJDBC instanceof TVShowJDBC) {
+        } else if (media instanceof TVShowJDBC) {
             response.setMediaType(MediaType.TV_SHOW);
-        } else {
-            throw new IllegalArgumentException("Unknown media type!");
         }
         return response;
     }
 
-    public List<MediaResponseDTO> toResponseFromJDBC(List<MediaJDBC> jdbcList) throws IllegalArgumentException {
-        if (jdbcList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
+    public MediaResponseDTO jpaToMediaResponse(MediaJPA media) {
+        MediaResponseDTO response = new MediaResponseDTO();
+        response.setId(media.getId());
+        response.setTitle(media.getTitle());
+        if (media.getCoverImage() != null) {
+            response.setCoverImageUrl(config.getMediaImagesBaseUrl() + media.getCoverImage());
         }
-        List<MediaResponseDTO> list = new ArrayList<>();
-        for (MediaJDBC jd : jdbcList) {
-            list.add(toResponseFromJDBC(jd));
+        response.setDescription(media.getDescription());
+        response.setReleaseDate(media.getReleaseDate());
+        response.setAudienceRating(media.getAudienceRating());
+        response.setCriticsRating(media.getCriticRating());
+        for (GenreJPA genre : media.getGenres()) {
+            response.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
+        }
+        if (media instanceof MovieJPA) {
+            response.setMediaType(MediaType.MOVIE);
+        } else if (media instanceof TVShowJPA) {
+            response.setMediaType(MediaType.TV_SHOW);
+        }
+        return response;
+    }
+//=================================================================================================================================
+
+    public List<MediaResponseDTO> jdbcToMediaResponse(List<MediaJDBC> medias) {
+        List<MediaResponseDTO> list = new ArrayList<>(medias.size());
+        for (MediaJDBC media : medias) {
+            list.add(jdbcToMediaResponse(media));
         }
         return list;
     }
 
-    public MediaResponseDTO toResponseFromJPA(MediaJPA mediaJPA) throws IllegalArgumentException {
-        if (mediaJPA == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        MediaResponseDTO response = new MediaResponseDTO();
-        response.setId(mediaJPA.getId());
-        response.setTitle(mediaJPA.getTitle());
-        if (mediaJPA.getCoverImage() != null && !mediaJPA.getCoverImage().isEmpty()) {
-            response.setCoverImageUrl(config.getMediaImagesBaseUrl() + mediaJPA.getCoverImage());
-        }
-        response.setDescription(mediaJPA.getDescription());
-        response.setReleaseDate(mediaJPA.getReleaseDate());
-        response.setAudienceRating(mediaJPA.getAudienceRating());
-        response.setCriticsRating(mediaJPA.getCriticRating());
-        for (GenreJPA genre : mediaJPA.getGenres()) {
-            response.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
-        }
-        if (mediaJPA instanceof MovieJPA) {
-            response.setMediaType(MediaType.MOVIE);
-        } else if (mediaJPA instanceof TVShowJPA) {
-            response.setMediaType(MediaType.TV_SHOW);
-        } else {
-            throw new IllegalArgumentException("Unknown media type!");
-        }
-        return response;
-    }
-
-    public List<MediaResponseDTO> toResponseFromJPA(List<MediaJPA> jpaList) throws IllegalArgumentException {
-        if (jpaList == null) {
-            throw new IllegalArgumentException("Null passed as method parameter");
-        }
-        List<MediaResponseDTO> list = new ArrayList<>();
-        for (MediaJPA jp : jpaList) {
-            list.add(toResponseFromJPA(jp));
+    public List<MediaResponseDTO> jpaToMediaResponse(List<MediaJPA> medias) {
+        List<MediaResponseDTO> list = new ArrayList<>(medias.size());
+        for (MediaJPA media : medias) {
+            list.add(jpaToMediaResponse(media));
         }
         return list;
     }

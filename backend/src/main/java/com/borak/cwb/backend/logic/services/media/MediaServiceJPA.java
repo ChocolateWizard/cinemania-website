@@ -34,7 +34,7 @@ public class MediaServiceJPA implements IMediaService {
     public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title) {
         Pageable p = PageRequest.of(page - 1, size);
         Page<MediaJPA> medias = mediaRepo.findByTitleContaining(title, p);
-        return new ResponseEntity(mediaTransformer.toResponseFromJPA(medias.getContent()), HttpStatus.OK);
+        return new ResponseEntity(mediaTransformer.jpaToMediaResponse(medias.getContent()), HttpStatus.OK);
     }
 
 }
