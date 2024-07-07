@@ -4,6 +4,9 @@
  */
 package com.borak.cwb.backend.logic.services.media;
 
+import com.borak.cwb.backend.domain.enums.MediaType;
+import com.borak.cwb.backend.domain.enums.SortOption;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -12,6 +15,8 @@ import org.springframework.http.ResponseEntity;
  */
 public interface IMediaService {
 
-    public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title);
+    public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title,
+            List<Long> genreIds,
+            SortOption sortByAudienceRating, SortOption sortByReleaseDate, Integer releaseYear, MediaType mediaType);
 
 }

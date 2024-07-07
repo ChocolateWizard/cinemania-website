@@ -6,11 +6,13 @@ package com.borak.cwb.backend.repository.jpa;
 
 import com.borak.cwb.backend.domain.jpa.ActorJPA;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author Mr. Poyo
  */
+@Repository
 public interface ActorRepositoryJPA extends JpaRepository<ActorJPA, Long>{
     
 }

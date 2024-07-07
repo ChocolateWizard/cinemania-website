@@ -27,6 +27,16 @@ public class Util {
         return false;
     }
 
+    public boolean duplicatesExist(List<Long> list) {
+        Set<Long> set = new HashSet<>();
+        for (Long aLong : list) {
+            if (!set.add(aLong)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<Long> sortAsc(List<Long> list) {
         List<Long> pom = new ArrayList<>(list);
         pom.sort((a, b) -> a.compareTo(b));

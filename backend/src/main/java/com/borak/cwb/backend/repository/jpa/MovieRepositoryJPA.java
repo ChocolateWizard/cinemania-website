@@ -8,14 +8,17 @@ import com.borak.cwb.backend.domain.jpa.MovieJPA;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author Mr. Poyo
  */
-public interface MovieRepositoryJPA extends JpaRepository<MovieJPA, Long>, PagingAndSortingRepository<MovieJPA, Long> {
+@Repository
+public interface MovieRepositoryJPA extends JpaRepository<MovieJPA, Long>, PagingAndSortingRepository<MovieJPA, Long>, JpaSpecificationExecutor<MovieJPA> {
 
     @Query("SELECT m FROM Movie m WHERE m.audienceRating >= :rating ORDER BY m.audienceRating DESC")
     Page<MovieJPA> findAllByAudienceRatingGreaterThanEqual(int rating, Pageable pageable);

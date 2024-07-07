@@ -4,38 +4,39 @@
  */
 package com.borak.cwb.backend.domain.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 
 /**
  *
- * @author Mr. Poyo
+ * @author User
  */
-public enum MediaType {
-    MOVIE("movie"), TV_SHOW("tv_show");
+public enum SortOption {
+
+    ASC("asc"), DESC("desc");
 
     private final String text;
     public static final String AVAILABLE_VALUES = Arrays.toString(values());// Cache the values array
 
-    private MediaType(String text) {
+    private SortOption(String text) {
         this.text = text;
     }
 
-    public static MediaType parseMediaType(String mediaType) throws IllegalArgumentException {
-        if (mediaType == null) {
+    public static SortOption parseSortOption(String sortOption) throws IllegalArgumentException {
+        if (sortOption == null) {
             return null;
         }
-        switch (mediaType.toLowerCase()) {
-            case "movie":
-                return MOVIE;
-            case "tv_show":
-                return TV_SHOW;
+        switch (sortOption.toLowerCase()) {
+            case "ascending":
+            case "asc":
+                return ASC;
+            case "descending":
+            case "desc":
+                return DESC;
             default:
-                throw new IllegalArgumentException("Unknown media type. Available types are: " + AVAILABLE_VALUES);
+                throw new IllegalArgumentException("Unknown sorting option. Available options are: " + AVAILABLE_VALUES);
         }
     }
 
-    @JsonValue
     @Override
     public String toString() {
         return text;

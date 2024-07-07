@@ -4,11 +4,15 @@
  */
 package com.borak.cwb.backend.integration.nonsecured;
 
+import com.borak.cwb.backend.helpers.Pair;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.borak.cwb.backend.helpers.TestJsonResponseReader;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +46,8 @@ public class MediaRoutesTest {
     private static final String ROUTE = "/api/medias";
 
     static {
-        testsPassed.put("getMediasByTitle_Test", false);
+        testsPassed.put("getMedia_InvalidInputData_Returns400", false);
+        testsPassed.put("getMedia_ValidInputData_Returns200", false);
     }
 
     public static boolean didAllTestsPass() {
@@ -62,82 +67,193 @@ public class MediaRoutesTest {
 
     @Test
     @Order(1)
-    @DisplayName("Tests GET /api/medias")
-    void getMediasByTitle_Test() {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(ROUTE + "/search", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(1));
+    @DisplayName("Tests GET /api/medias with invalid input")
+    void getMedia_InvalidInputData_Returns400() {
+        ResponseEntity<String> response;
+        String[] invalidUrls = getInvalidUrls();
+        for (int i = 0; i < invalidUrls.length; i++) {
+            response = restTemplate.getForEntity(ROUTE + invalidUrls[i], String.class);
+            assertThat(response.getStatusCode()).as("Assertion at i=%d for url=%s", i, invalidUrls[i]).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(1));
+        testsPassed.put("getMedia_InvalidInputData_Returns400", true);
+    }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(1));
+    @Test
+    @Order(2)
+    @DisplayName("Tests GET /api/medias with valid input")
+    void getMedia_ValidInputData_Returns200() {
+        ResponseEntity<String> response;
+        List<Pair<Integer, String>> inputs1 = getValidUrlsAndNonEmptyResponses();
+        String[] inputs2 = getValidUrlsForEmptyResponses();
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=a", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(2));
+        for (Pair<Integer, String> pom : inputs1) {
+            response = restTemplate.getForEntity(ROUTE + pom.getR(), String.class);
+            assertThat(response.getStatusCode()).as("Assertion at L=%d for url=%s", pom.getL(), pom.getR()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Assertion at L=%d for url=%s", pom.getL(), pom.getR()).isEqualTo(jsonReader.getMediaJson(pom.getL()));
+        }
+        for (int i = 0; i < inputs2.length; i++) {
+            response = restTemplate.getForEntity(ROUTE + inputs2[i], String.class);
+            assertThat(response.getStatusCode()).as("Assertion at i=%d for url=%s", i, inputs2[i]).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Assertion at i=%d for url=%s", i, inputs2[i]).isEqualTo("[]");
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=c", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(3));
+        testsPassed.put("getMedia_ValidInputData_Returns200", true);
+    }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=Sou", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(4));
+//=================================================================================================================================
+//PRIVATE METHODS
+    private String[] getInvalidUrls() {
+        return new String[]{
+            "/search?page=0&size=1",
+            "/search?page=-1&size=1",
+            "/search?page=-5&size=1",
+            "/search?page=-1101&size=1",
+            "/search?page=1&size=0",
+            "/search?page=1&size=-1",
+            "/search?page=1&size=-5",
+            "/search?page=1&size=-1101",
+            "/search?page=1&size=101",
+            "/search?page=1&size=10&title=",
+            "/search?page=1&size=10&title= ",
+            "/search?page=1&size=10&title=       ",
+            "/search?page=1&size=10&title=" + getRandomString(301),
+            "/search?page=1&size=10&title=text&genreIds=0",
+            "/search?page=1&size=10&title=text&genreIds=1,2,0",
+            "/search?page=1&size=10&title=text&genreIds=-1",
+            "/search?page=1&size=10&title=text&genreIds=1,2,-1",
+            "/search?page=1&size=10&title=text&genreIds=-5",
+            "/search?page=1&size=10&title=text&genreIds=1,2,-5",
+            "/search?page=1&size=10&title=text&genreIds=-1101",
+            "/search?page=1&size=10&title=text&genreIds=1,2,-1101",
+            "/search?page=1&size=10&title=text&genreIds=1,,2",
+            "/search?page=1&size=10&title=text&genreIds=1,,",
+            "/search?page=1&size=10&title=text&genreIds=,1,2",
+            "/search?page=1&size=10&title=text&genreIds=1,,2",
+            "/search?page=1&size=10&title=text&genreIds=,,,",
+            "/search?page=1&size=10&title=text&genreIds=1,    ,2",
+            "/search?page=1&size=10&title=text&genreIds=1,2,3,4,5,6",
+            "/search?page=1&size=10&title=text&genreIds=1,2,3,4,5,6,7,8,9,10",
+            "/search?page=1&size=10&title=text&genreIds=1,1,2",
+            "/search?page=1&size=10&title=text&genreIds=1,2,1",
+            "/search?page=1&size=10&title=text&genreIds=1,2,3,2,1",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=as",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=asca",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=ascendinga",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating= asc",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=asc ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating= asc ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desca",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating= descending",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=descending ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating= descending ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=as",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=asca",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=ascendinga",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate= asc",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=asc ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate= asc ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desca",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate= descending",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=descending ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate= descending ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=1964",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=1900",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=0",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=-1",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=-1965",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=-2024",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=a",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=aaaaaa",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=mov",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=moviee",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType= movie",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=movie  ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType= movie ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tv show",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType= tv_show",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tv_show ",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tvv_show",
+            "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tv _show"
+        };
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=st", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(5));
+    }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=South Park", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(6));
+    private List<Pair<Integer, String>> getValidUrlsAndNonEmptyResponses() {
+        return new ArrayList<>() {
+            {
+                add(new Pair(1, "/search"));
+                add(new Pair(1, "/search?page=1&size=10"));
+                add(new Pair(2, "/search?page=1&size=10&title=a"));
+                add(new Pair(3, "/search?page=1&size=10&title=c"));
+                add(new Pair(4, "/search?page=1&size=10&title=Sou"));
+                add(new Pair(5, "/search?page=1&size=10&title=st"));
+                add(new Pair(6, "/search?page=1&size=10&title=South Park"));
+                add(new Pair(7, "/search?page=1&size=10&title=ar"));
+                add(new Pair(8, "/search?sortByAudienceRating=desc"));
+                add(new Pair(9, "/search?sortByAudienceRating=ascending"));
+                add(new Pair(10, "/search?sortByReleaseDate=desc"));
+                add(new Pair(11, "/search?sortByReleaseDate=asc"));
+                add(new Pair(12, "/search?sortByAudienceRating=asc&sortByReleaseDate=desc"));
+                add(new Pair(13, "/search?sortByAudienceRating=desc&sortByReleaseDate=asc"));
+                add(new Pair(14, "/search?title=an&sortByAudienceRating=desc&sortByReleaseDate=asc"));
+                add(new Pair(15, "/search?genreIds=6,12&sortByAudienceRating=desc&sortByReleaseDate=asc"));
+                add(new Pair(16, "/search?genreIds=6,13&sortByAudienceRating=desc&sortByReleaseDate=asc"));
+                add(new Pair(17, "/search?genreIds=6,13,12&sortByAudienceRating=desc&sortByReleaseDate=asc"));
+                add(new Pair(18, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc"));
+                add(new Pair(19, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=movie"));
+                add(new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=tv_show"));
+                add(new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&releaseYear=2004&mediaType=tv_show"));
+            }
+        };
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=ar", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getMediaJson(7));
+    }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
+    private String[] getValidUrlsForEmptyResponses() {
+        return new String[]{
+            "/search?page=1&size=10&title=1",
+            "/search?page=1&size=10&title=   a  ",
+            "/search?page=1&size=10&title=Van Helsing",
+            "/search?page=1&size=10&title=The Raging Bull",
+            "/search?page=1&size=10&title=The Ra",
+            "/search?page=1&size=10&title=South&genreIds=1",
+            "/search?page=1&size=10&title=South&genreIds=1,2",
+            "/search?page=1&size=10&title=South&genreIds=3,5",
+            "/search?page=1&size=10&title=South&genreIds=3,4,5",
+            "/search?page=1&size=10&title=South&genreIds=3,40",
+            "/search?page=1&size=10&title=South&genreIds=3&releaseYear=2020",
+            "/search?page=1&size=10&title=South&genreIds=3&releaseYear=1998",
+            "/search?page=1&size=10&title=South&genreIds=3&releaseYear=1997&mediaType=movie",
+            "/search?page=1&size=10&genreIds=1,2,3,4",
+            "/search?page=1&size=10&genreIds=40",
+            "/search?page=1&size=10&genreIds=1&mediaType=movie",
+            "/search?page=1&size=10&genreIds=11&mediaType=tv_show",
+            "/search?page=1&size=10&releaseYear=2001&mediaType=tv_show",
+            "/search?page=1&size=10&releaseYear=2021&mediaType=movie",
+            "/search?page=1&size=10&releaseYear=1965",
+            "/search?page=1&size=10&releaseYear=2030",
+            "/search?page=1&size=10&releaseYear=2001&mediaType=movie&title=Mull",
+            "/search?page=1&size=10&genreIds=6&releaseYear=1965",
+            "/search?page=1&size=10&genreIds=6,12&releaseYear=2000",
+            "/search?page=1&size=10&genreIds=5,6,12",
+            "/search?page=1&size=10&genreIds=6,12,5",
+            "/search?page=1&size=10&genreIds=6,12&mediaType=tv_show",
+            "/search?page=1&size=10&genreIds=8&mediaType=tv_show",
+            "/search?page=1&size=10&genreIds=12,13&mediaType=movie&title=South"
+        };
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=10&title=   a  ", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
+    }
 
-        //----------------------------------------------------------------------------
-        //bad requests
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=0&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=-1&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=0", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/search?page=1&size=-1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        testsPassed.put("getMediasByTitle_Test", true);
+    private String getRandomString(int length) {
+        Random random = new Random();
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(alphabet.length());
+            char randomChar = alphabet.charAt(index);
+            sb.append(randomChar);
+        }
+        return sb.toString();
     }
 
 }

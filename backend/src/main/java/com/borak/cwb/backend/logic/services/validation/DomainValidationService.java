@@ -492,5 +492,19 @@ public class DomainValidationService {
         }
     }
 
+    public void validate(String title, List<Long> genreIds) throws ValidationException {
+        if (title != null) {
+            if (title.isBlank()) {
+                throw new ValidationException("Media title must not be empty!");
+            }
+            if (title.length() > 300) {
+                throw new ValidationException("Media title must have less than 300 characters!");
+            }
+        }
+        if (genreIds != null && util.duplicatesExist(genreIds)) {
+            throw new ValidationException("Genre ids must not contain duplicate values!");
+        }
+    }
+
 //---------------------------------------------------------------------------------------------------------
 }

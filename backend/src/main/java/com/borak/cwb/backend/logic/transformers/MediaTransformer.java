@@ -83,7 +83,7 @@ public class MediaTransformer {
         return list;
     }
 
-    public List<MediaResponseDTO> jpaToMediaResponse(List<MediaJPA> medias) {
+    public List<MediaResponseDTO> jpaToMediaResponse(List<? extends MediaJPA> medias) {
         List<MediaResponseDTO> list = new ArrayList<>(medias.size());
         for (MediaJPA media : medias) {
             list.add(jpaToMediaResponse(media));

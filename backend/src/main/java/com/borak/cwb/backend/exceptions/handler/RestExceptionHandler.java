@@ -10,6 +10,7 @@ import com.borak.cwb.backend.exceptions.EmailTakenException;
 import com.borak.cwb.backend.exceptions.InvalidInputException;
 import com.borak.cwb.backend.exceptions.ProfileNameTakenException;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
+import com.borak.cwb.backend.exceptions.UnexpectedException;
 import com.borak.cwb.backend.exceptions.UsernameTakenException;
 import com.borak.cwb.backend.exceptions.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  *
@@ -107,7 +109,18 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class, NullPointerException.class})
+    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail();
+        errorDetail.setTimestamp(new Date().getTime());
+        errorDetail.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetail.setTitle("Bad Request");
+        errorDetail.setDetails(new String[]{ex.getMessage()});
+        errorDetail.setDeveloperMessage(ex.getClass().getName());
+        return new ResponseEntity<>(errorDetail, null, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {IllegalArgumentException.class, NullPointerException.class, UnexpectedException.class})
     public ResponseEntity<?> handleIllegalArgumentException(RuntimeException ex, HttpServletRequest request) {
         log.error(ex.getMessage());
         ErrorDetail errorDetail = new ErrorDetail();

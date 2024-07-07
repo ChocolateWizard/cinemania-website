@@ -4,15 +4,14 @@
  */
 package com.borak.cwb.backend.logic.services.media;
 
+import com.borak.cwb.backend.domain.enums.MediaType;
+import com.borak.cwb.backend.domain.enums.SortOption;
 import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.logic.transformers.MediaTransformer;
 import com.borak.cwb.backend.repository.api.IMediaRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -29,10 +28,8 @@ public class MediaService implements IMediaService {
     private MediaTransformer mediaTransformer;
 
     @Override
-    public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title) {
-//        title = title.replace("%", "\\%").replace("_", "\\_");
-        List<MediaJDBC> medias = mediaRepo.findAllByTitleWithGenresPaginated(page, size, title);
-        return new ResponseEntity(mediaTransformer.jdbcToMediaResponse(medias), HttpStatus.OK);
+    public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title, List<Long> genreIds, SortOption sortByAudienceRating, SortOption sortByReleaseDate, Integer releaseYear, MediaType mediaType) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
