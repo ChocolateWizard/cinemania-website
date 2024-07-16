@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mr. Poyo
  */
 @Service
-@Transactional
+@Transactional()
 public class AuthServiceJPA implements IAuthService<UserRegisterDTO, UserLoginDTO> {
 
     @Autowired

@@ -9,31 +9,24 @@ import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.cwb.backend.domain.dto.person.PersonResponseDTO;
 import com.borak.cwb.backend.domain.enums.Gender;
-import com.borak.cwb.backend.domain.jdbc.ActorJDBC;
-import com.borak.cwb.backend.domain.jdbc.DirectorJDBC;
-import com.borak.cwb.backend.domain.jdbc.PersonJDBC;
-import com.borak.cwb.backend.domain.jdbc.PersonWrapperJDBC;
-import com.borak.cwb.backend.domain.jdbc.UserJDBC;
-import com.borak.cwb.backend.domain.jdbc.WriterJDBC;
+import com.borak.cwb.backend.domain.jpa.ActorJPA;
+import com.borak.cwb.backend.domain.jpa.DirectorJPA;
+import com.borak.cwb.backend.domain.jpa.PersonJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
+import com.borak.cwb.backend.domain.jpa.WriterJPA;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import com.borak.cwb.backend.helpers.TestUtil;
+import com.borak.cwb.backend.helpers.repositories.PersonTestRepository;
+import com.borak.cwb.backend.helpers.repositories.UserTestRepository;
 import com.borak.cwb.backend.logic.security.JwtUtils;
-import com.borak.cwb.backend.repository.jdbc.PersonWrapperRepositoryJDBC;
-import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
 import com.borak.cwb.backend.repository.file.FileRepository;
 import java.io.IOException;
 import java.net.HttpCookie;
-import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +40,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -69,44 +61,50 @@ import static org.assertj.core.api.Assertions.fail;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PersonSecuredRoutesTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private PersonWrapperRepositoryJDBC personRepo;
-    @Autowired
-    private UserRepositoryJDBC userRepo;
-    @Autowired
-    private FileRepository fileRepo;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private ConfigProperties config;
+    private final TestRestTemplate restTemplate;
+    private final PersonTestRepository personRepo;
+    private final UserTestRepository userRepo;
+    private final FileRepository fileRepo;
+    private final JwtUtils jwtUtils;
+    private final ConfigProperties config;
+    private final TestUtil testUtil;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    @Autowired
+    public PersonSecuredRoutesTest(TestRestTemplate restTemplate, PersonTestRepository personRepo, UserTestRepository userRepo, FileRepository fileRepo, JwtUtils jwtUtils, ConfigProperties config, TestUtil testUtil) {
+        this.restTemplate = restTemplate;
+        this.personRepo = personRepo;
+        this.userRepo = userRepo;
+        this.fileRepo = fileRepo;
+        this.jwtUtils = jwtUtils;
+        this.config = config;
+        this.testUtil = testUtil;
+    }
+
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/persons";
 
     static {
-        testsPassed.put("postPerson_UnauthenticatedUser_DoesNotCreatePersonReturns401", false);
-        testsPassed.put("postPerson_UnauthorizedUser_DoesNotCreatePersonReturns403", false);
-        testsPassed.put("postPerson_InvalidInputData_DoesNotCreatePersonReturns400", false);
-        testsPassed.put("postPerson_NonexistentDependencyData_DoesNotCreatePersonReturns404", false);
-        testsPassed.put("postPerson_ValidInput_CreatesPersonReturns200", false);
+        TESTS_PASSED.put("postPerson_UnauthenticatedUser_DoesNotCreatePersonReturns401", false);
+        TESTS_PASSED.put("postPerson_UnauthorizedUser_DoesNotCreatePersonReturns403", false);
+        TESTS_PASSED.put("postPerson_InvalidInputData_DoesNotCreatePersonReturns400", false);
+        TESTS_PASSED.put("postPerson_NonexistentDependencyData_DoesNotCreatePersonReturns404", false);
+        TESTS_PASSED.put("postPerson_ValidInput_CreatesPersonReturns200", false);
 
-        testsPassed.put("putPerson_UnauthenticatedUser_DoesNotUpdatePersonReturns401", false);
-        testsPassed.put("putPerson_UnauthorizedUser_DoesNotUpdatePersonReturns403", false);
-        testsPassed.put("putPerson_InvalidInputData_DoesNotUpdatePersonReturns400", false);
-        testsPassed.put("putPerson_NonexistentDependencyData_DoesNotUpdatePersonReturns404", false);
-        testsPassed.put("putPerson_ValidInput_UpdatesPersonReturns200", false);
+        TESTS_PASSED.put("putPerson_UnauthenticatedUser_DoesNotUpdatePersonReturns401", false);
+        TESTS_PASSED.put("putPerson_UnauthorizedUser_DoesNotUpdatePersonReturns403", false);
+        TESTS_PASSED.put("putPerson_InvalidInputData_DoesNotUpdatePersonReturns400", false);
+        TESTS_PASSED.put("putPerson_NonexistentDependencyData_DoesNotUpdatePersonReturns404", false);
+        TESTS_PASSED.put("putPerson_ValidInput_UpdatesPersonReturns200", false);
 
-        testsPassed.put("deletePerson_UnauthenticatedUser_DoesNotDeletePersonReturns401", false);
-        testsPassed.put("deletePerson_UnauthorizedUser_DoesNotDeletePersonReturns403", false);
-        testsPassed.put("deletePerson_InvalidInputData_DoesNotDeletePersonReturns400", false);
-        testsPassed.put("deletePerson_NonexistentDependencyData_DoesNotDeletePersonReturns404", false);
-        testsPassed.put("deletePerson_ValidInput_DeletesPersonReturns200", false);
+        TESTS_PASSED.put("deletePerson_UnauthenticatedUser_DoesNotDeletePersonReturns401", false);
+        TESTS_PASSED.put("deletePerson_UnauthorizedUser_DoesNotDeletePersonReturns403", false);
+        TESTS_PASSED.put("deletePerson_InvalidInputData_DoesNotDeletePersonReturns400", false);
+        TESTS_PASSED.put("deletePerson_NonexistentDependencyData_DoesNotDeletePersonReturns404", false);
+        TESTS_PASSED.put("deletePerson_ValidInput_DeletesPersonReturns200", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -128,12 +126,12 @@ public class PersonSecuredRoutesTest {
     void postPerson_UnauthenticatedUser_DoesNotCreatePersonReturns401() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         PersonRequestDTO personValid = getValidPerson(51l);
-        MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(20));
+        MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(20));
         int i = 0;
         try {
             for (String username : getNonExistentUsernames()) {
@@ -150,7 +148,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(personValid, imageValid, getRandomString(50));
+                request = constructRequest(personValid, imageValid, TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE, HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 personsAfter = getAllPersons();
@@ -159,7 +157,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -190,7 +188,7 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postPerson_UnauthenticatedUser_DoesNotCreatePersonReturns401", true);
+        TESTS_PASSED.put("postPerson_UnauthenticatedUser_DoesNotCreatePersonReturns401", true);
     }
 
     @Test
@@ -199,18 +197,18 @@ public class PersonSecuredRoutesTest {
     void postPerson_UnauthorizedUser_DoesNotCreatePersonReturns403() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         PersonRequestDTO personValid = getValidPerson(51l);
-        MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(20));
+        MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(20));
         int i = 0;
         try {
             for (String username : new String[]{"regular", "critic"}) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -230,7 +228,7 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postPerson_UnauthorizedUser_DoesNotCreatePersonReturns403", true);
+        TESTS_PASSED.put("postPerson_UnauthorizedUser_DoesNotCreatePersonReturns403", true);
     }
 
     @Test
@@ -239,12 +237,12 @@ public class PersonSecuredRoutesTest {
     void postPerson_InvalidInputData_DoesNotCreatePersonReturns400() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -254,7 +252,7 @@ public class PersonSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getBadRequestPersonsAndImages(51l, getRandomString(20))) {
+            for (Object[] input : getBadRequestPersonsAndImages(51l, TestUtil.getRandomString(20))) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
                 request = constructRequest((PersonRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -270,7 +268,7 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postPerson_InvalidInputData_DoesNotCreatePersonReturns400", true);
+        TESTS_PASSED.put("postPerson_InvalidInputData_DoesNotCreatePersonReturns400", true);
     }
 
     @Test
@@ -279,12 +277,12 @@ public class PersonSecuredRoutesTest {
     void postPerson_NonexistentDependencyData_DoesNotCreatePersonReturns404() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -294,7 +292,7 @@ public class PersonSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getNonExistentDependencyPersonsAndImages(51l, getRandomString(20))) {
+            for (Object[] input : getNonExistentDependencyPersonsAndImages(51l, TestUtil.getRandomString(20))) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
                 request = constructRequest((PersonRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -310,7 +308,7 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postPerson_NonexistentDependencyData_DoesNotCreatePersonReturns404", true);
+        TESTS_PASSED.put("postPerson_NonexistentDependencyData_DoesNotCreatePersonReturns404", true);
     }
 
     @Test
@@ -323,10 +321,10 @@ public class PersonSecuredRoutesTest {
         PersonRequestDTO personValid1 = getValidPerson(51l);
         PersonRequestDTO personValid2 = getValidPerson(null);
 
-        MockMultipartFile imageValid1 = getValidProfilePhoto(getRandomString(20));
-        MockMultipartFile imageValid2 = getValidProfilePhoto(getRandomString(20));
+        MockMultipartFile imageValid1 = getValidProfilePhoto(TestUtil.getRandomString(20));
+        MockMultipartFile imageValid2 = getValidProfilePhoto(TestUtil.getRandomString(20));
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -347,7 +345,7 @@ public class PersonSecuredRoutesTest {
         assertThat(personRepo.findById(personValid1.getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
 
-        Optional<PersonWrapperJDBC> actualDBPerson = personRepo.findByIdWithRelations(personValid1.getId());
+        Optional<PersonJPA> actualDBPerson = personRepo.findById(personValid1.getId());
         Resource actualDBImage = fileRepo.getPersonProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(actualDBPerson).isNotNull();
         assertThat(actualDBPerson.isPresent()).isTrue();
@@ -366,7 +364,7 @@ public class PersonSecuredRoutesTest {
         assertThat(personRepo.findById(response.getBody().getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
 
-        actualDBPerson = personRepo.findByIdWithRelations(response.getBody().getId());
+        actualDBPerson = personRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getPersonProfilePhoto(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBPerson).isNotNull();
         assertThat(actualDBPerson.isPresent()).isTrue();
@@ -376,7 +374,7 @@ public class PersonSecuredRoutesTest {
         assertPersonsEqual(actualDBPerson.get(), response.getBody());
         assertImagesEqual(actualDBImage, imageValid2);
 
-        testsPassed.put("postPerson_ValidInput_CreatesPersonReturns200", true);
+        TESTS_PASSED.put("postPerson_ValidInput_CreatesPersonReturns200", true);
     }
 
     //=========================================================================================================
@@ -385,15 +383,15 @@ public class PersonSecuredRoutesTest {
     @Order(6)
     @DisplayName("Tests whether PUT request to /api/persons with unauthenticated user did not update person and it returned 401")
     void putPerson_UnauthenticatedUser_DoesNotUpdatePersonReturns401() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         PersonRequestDTO personValid = getValidPerson(51l);
-        MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(40));
+        MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(40));
         int i = 0;
         try {
             for (String username : getNonExistentUsernames()) {
@@ -410,7 +408,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(personValid, imageValid, getRandomString(50));
+                request = constructRequest(personValid, imageValid, TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE + "/" + personValid.getId(), HttpMethod.PUT, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 personsAfter = getAllPersons();
@@ -419,7 +417,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -450,28 +448,28 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putPerson_UnauthenticatedUser_DoesNotUpdatePersonReturns401", true);
+        TESTS_PASSED.put("putPerson_UnauthenticatedUser_DoesNotUpdatePersonReturns401", true);
     }
 
     @Test
     @Order(7)
     @DisplayName("Tests whether PUT request to /api/persons with authenticated but unauthorized user did not update person and it returned 403")
     void putPerson_UnauthorizedUser_DoesNotUpdatePersonReturns403() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         PersonRequestDTO personValid = getValidPerson(51l);
-        MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(40));
+        MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(40));
         int i = 0;
         try {
             for (String username : new String[]{"regular", "critic"}) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -492,22 +490,22 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putPerson_UnauthorizedUser_DoesNotUpdatePersonReturns403", true);
+        TESTS_PASSED.put("putPerson_UnauthorizedUser_DoesNotUpdatePersonReturns403", true);
     }
 
     @Test
     @Order(8)
     @DisplayName("Tests whether PUT request to /api/persons with invalid input data did not update person and it returned 400")
     void putPerson_InvalidInputData_DoesNotUpdatePersonReturns400() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -517,7 +515,7 @@ public class PersonSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getBadRequestPersonsAndImages(51l, getRandomString(40))) {
+            for (Object[] input : getBadRequestPersonsAndImages(51l, TestUtil.getRandomString(40))) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
 
@@ -532,7 +530,7 @@ public class PersonSecuredRoutesTest {
             }
             i = 0;
             PersonRequestDTO personValid = getValidPerson(51l);
-            MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(40));
+            MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(40));
             for (long invalidId : new long[]{0l, -1l, -2l, -5l, -10l, -23l, Long.MIN_VALUE}) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
@@ -549,22 +547,22 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putPerson_InvalidInputData_DoesNotUpdatePersonReturns400", true);
+        TESTS_PASSED.put("putPerson_InvalidInputData_DoesNotUpdatePersonReturns400", true);
     }
 
     @Test
     @Order(9)
     @DisplayName("Tests whether PUT request to /api/persons with non-existent dependency objects did not update person and it returned 404")
     void putPerson_NonexistentDependencyData_DoesNotUpdatePersonReturns404() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -574,7 +572,7 @@ public class PersonSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getNonExistentDependencyPersonsAndImages(51l, getRandomString(40))) {
+            for (Object[] input : getNonExistentDependencyPersonsAndImages(51l, TestUtil.getRandomString(40))) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
                 request = constructRequest((PersonRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -588,7 +586,7 @@ public class PersonSecuredRoutesTest {
             }
             i = 0;
             PersonRequestDTO personValid = getValidPerson(51l);
-            MockMultipartFile imageValid = getValidProfilePhoto(getRandomString(40));
+            MockMultipartFile imageValid = getValidProfilePhoto(TestUtil.getRandomString(40));
             for (long invalidId : new long[]{101l, 102l, 150l, 200l, Long.MAX_VALUE}) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
@@ -605,14 +603,14 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putPerson_NonexistentDependencyData_DoesNotUpdatePersonReturns404", true);
+        TESTS_PASSED.put("putPerson_NonexistentDependencyData_DoesNotUpdatePersonReturns404", true);
     }
 
     @Test
     @Order(10)
     @DisplayName("Tests whether PUT request to /api/persons with valid input data did update person and it returned 200")
     void putPerson_ValidInput_UpdatesPersonReturns200() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<PersonResponseDTO> response;
 
@@ -624,10 +622,10 @@ public class PersonSecuredRoutesTest {
         changeAttributes(personValid2);
         changeAttributes(personValid3);
 
-        MockMultipartFile imageValid1 = getValidProfilePhoto(getRandomString(40));
-        MockMultipartFile imageValid2 = getValidProfilePhoto(getRandomString(50));
+        MockMultipartFile imageValid1 = getValidProfilePhoto(TestUtil.getRandomString(40));
+        MockMultipartFile imageValid2 = getValidProfilePhoto(TestUtil.getRandomString(50));
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -639,7 +637,7 @@ public class PersonSecuredRoutesTest {
         //first valid request where person has different valid attributes and ID and image are set
         assertThat(personRepo.findById(personValid1.getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        Optional<PersonWrapperJDBC> actualDBPerson = personRepo.findByIdWithRelations(personValid1.getId());
+        Optional<PersonJPA> actualDBPerson = personRepo.findById(personValid1.getId());
         Resource actualDBImage = fileRepo.getPersonProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(arePersonsEqual(actualDBPerson.get(), personValid1)).isFalse();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isFalse();
@@ -651,7 +649,7 @@ public class PersonSecuredRoutesTest {
 
         assertThat(personRepo.findById(personValid1.getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        actualDBPerson = personRepo.findByIdWithRelations(personValid1.getId());
+        actualDBPerson = personRepo.findById(personValid1.getId());
         actualDBImage = fileRepo.getPersonProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(arePersonsEqual(actualDBPerson.get(), personValid1)).isTrue();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isTrue();
@@ -666,7 +664,7 @@ public class PersonSecuredRoutesTest {
         //and that imageValid2 is different than the database imageValid1
         assertThat(personRepo.findById(personValid1.getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        actualDBPerson = personRepo.findByIdWithRelations(personValid1.getId());
+        actualDBPerson = personRepo.findById(personValid1.getId());
         actualDBImage = fileRepo.getPersonProfilePhoto(personValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         personValid2.setId(personValid1.getId());
         assertThat(arePersonsEqual(actualDBPerson.get(), personValid2)).isTrue();
@@ -682,7 +680,7 @@ public class PersonSecuredRoutesTest {
         assertThat(personRepo.findById(response.getBody().getId()).isPresent()).isTrue();
         assertThat(existsProfilePhoto(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
 
-        actualDBPerson = personRepo.findByIdWithRelations(response.getBody().getId());
+        actualDBPerson = personRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getPersonProfilePhoto(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBPerson).isNotNull();
         assertThat(actualDBPerson.isPresent()).isTrue();
@@ -697,9 +695,9 @@ public class PersonSecuredRoutesTest {
         //third valid request where person has different valid attributes, ID is 52 and image is null
         //check if image that was in database was deleted after successful PUT request
         assertThat(personRepo.findById(personValid3.getId()).isPresent()).isTrue();
-        actualDBPerson = personRepo.findByIdWithRelations(personValid3.getId());
+        actualDBPerson = personRepo.findById(personValid3.getId());
         assertThat(arePersonsEqual(actualDBPerson.get(), personValid3)).isFalse();
-        assertThat(existsProfilePhoto(actualDBPerson.get().getPerson().getProfilePhoto())).isTrue();
+        assertThat(existsProfilePhoto(actualDBPerson.get().getProfilePhoto())).isTrue();
 
         request = constructRequest(personValid3, null, cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + personValid3.getId(), HttpMethod.PUT, request, PersonResponseDTO.class);
@@ -707,14 +705,14 @@ public class PersonSecuredRoutesTest {
         assertThat(response.getBody()).isNotNull();
 
         assertThat(personRepo.findById(personValid3.getId()).isPresent()).isTrue();
-        assertThat(existsProfilePhoto(actualDBPerson.get().getPerson().getProfilePhoto())).isFalse();
-        actualDBPerson = personRepo.findByIdWithRelations(personValid3.getId());
+        assertThat(existsProfilePhoto(actualDBPerson.get().getProfilePhoto())).isFalse();
+        actualDBPerson = personRepo.findById(personValid3.getId());
         assertThat(arePersonsEqual(actualDBPerson.get(), personValid3)).isTrue();
 
         assertPersonsEqual(response.getBody(), personValid3, null);
         assertPersonsEqual(actualDBPerson.get(), response.getBody());
 
-        testsPassed.put("putPerson_ValidInput_UpdatesPersonReturns200", true);
+        TESTS_PASSED.put("putPerson_ValidInput_UpdatesPersonReturns200", true);
     }
 
     //=========================================================================================================
@@ -723,12 +721,12 @@ public class PersonSecuredRoutesTest {
     @Order(11)
     @DisplayName("Tests whether DELETE request to /api/persons with unauthenticated user did not delete person and it returned 401")
     void deletePerson_UnauthenticatedUser_DoesNotDeletePersonReturns401() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putPerson_ValidInput_UpdatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putPerson_ValidInput_UpdatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         int i = 0;
@@ -748,7 +746,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(getRandomString(50));
+                request = constructRequest(TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE + "/" + personValidId, HttpMethod.DELETE, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 personsAfter = getAllPersons();
@@ -757,7 +755,7 @@ public class PersonSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -788,19 +786,19 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deletePerson_UnauthenticatedUser_DoesNotDeletePersonReturns401", true);
+        TESTS_PASSED.put("deletePerson_UnauthenticatedUser_DoesNotDeletePersonReturns401", true);
     }
 
     @Test
     @Order(12)
     @DisplayName("Tests whether DELETE request to /api/persons with authenticated but unauthorized user did not delete person and it returned 403")
     void deletePerson_UnauthorizedUser_DoesNotDeletePersonReturns403() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putPerson_ValidInput_UpdatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putPerson_ValidInput_UpdatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         int i = 0;
@@ -809,7 +807,7 @@ public class PersonSecuredRoutesTest {
             for (String username : new String[]{"regular", "critic"}) {
                 personsBefore = getAllPersons();
                 imagesBefore = getAllProfilePhotos();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -828,23 +826,23 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deletePerson_UnauthorizedUser_DoesNotDeletePersonReturns403", true);
+        TESTS_PASSED.put("deletePerson_UnauthorizedUser_DoesNotDeletePersonReturns403", true);
     }
 
     @Test
     @Order(13)
     @DisplayName("Tests whether DELETE request to /api/persons with invalid input data did not delete person and it returned 400")
     void deletePerson_InvalidInputData_DoesNotDeletePersonReturns400() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putPerson_ValidInput_UpdatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putPerson_ValidInput_UpdatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -870,23 +868,23 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deletePerson_InvalidInputData_DoesNotDeletePersonReturns400", true);
+        TESTS_PASSED.put("deletePerson_InvalidInputData_DoesNotDeletePersonReturns400", true);
     }
 
     @Test
     @Order(14)
     @DisplayName("Tests whether DELETE request to /api/persons with non-existent dependency objects did not delete person and it returned 404")
     void deletePerson_NonexistentDependencyData_DoesNotDeletePersonReturns404() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putPerson_ValidInput_UpdatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putPerson_ValidInput_UpdatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<PersonWrapperJDBC> personsBefore;
-        List<PersonWrapperJDBC> personsAfter;
+        List<PersonJPA> personsBefore;
+        List<PersonJPA> personsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -912,22 +910,22 @@ public class PersonSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deletePerson_NonexistentDependencyData_DoesNotDeletePersonReturns404", true);
+        TESTS_PASSED.put("deletePerson_NonexistentDependencyData_DoesNotDeletePersonReturns404", true);
     }
 
     @Test
     @Order(15)
     @DisplayName("Tests whether DELETE request to /api/persons with valid input data did delete person and it returned 200")
     void deletePerson_ValidInput_DeletesPersonReturns200() {
-        Assumptions.assumeTrue(testsPassed.get("postPerson_ValidInput_CreatesPersonReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putPerson_ValidInput_UpdatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postPerson_ValidInput_CreatesPersonReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putPerson_ValidInput_UpdatesPersonReturns200"));
         HttpEntity request;
         ResponseEntity<PersonResponseDTO> response;
 
         long personValidId1 = 51l;
         long personValidId2 = 52l;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -938,8 +936,8 @@ public class PersonSecuredRoutesTest {
         //----------------------------------------------------------------------------
         //first valid request where personId is 51
         assertThat(personRepo.findById(personValidId1).isPresent()).isTrue();
-        Optional<PersonWrapperJDBC> personDB = personRepo.findByIdWithRelations(personValidId1);
-        assertThat(existsProfilePhoto(personDB.get().getPerson().getProfilePhoto())).isTrue();
+        Optional<PersonJPA> personDB = personRepo.findById(personValidId1);
+        assertThat(existsProfilePhoto(personDB.get().getProfilePhoto())).isTrue();
 
         request = constructRequest(cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + personValidId1, HttpMethod.DELETE, request, PersonResponseDTO.class);
@@ -947,14 +945,14 @@ public class PersonSecuredRoutesTest {
         assertThat(response.getBody()).isNotNull();
 
         assertThat(personRepo.findById(personValidId1).isPresent()).isFalse();
-        assertThat(existsProfilePhoto(personDB.get().getPerson().getProfilePhoto())).isFalse();
+        assertThat(existsProfilePhoto(personDB.get().getProfilePhoto())).isFalse();
         assertPersonsEqual(personDB.get(), response.getBody());
 
         //----------------------------------------------------------------------------
         //second valid request where personId is 52
         assertThat(personRepo.findById(personValidId2).isPresent()).isTrue();
-        personDB = personRepo.findByIdWithRelations(personValidId2);
-        assertThat(existsProfilePhoto(personDB.get().getPerson().getProfilePhoto())).isFalse();
+        personDB = personRepo.findById(personValidId2);
+        assertThat(existsProfilePhoto(personDB.get().getProfilePhoto())).isFalse();
 
         request = constructRequest(cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + personValidId2, HttpMethod.DELETE, request, PersonResponseDTO.class);
@@ -962,28 +960,16 @@ public class PersonSecuredRoutesTest {
         assertThat(response.getBody()).isNotNull();
 
         assertThat(personRepo.findById(personValidId2).isPresent()).isFalse();
-        assertThat(existsProfilePhoto(personDB.get().getPerson().getProfilePhoto())).isFalse();
+        assertThat(existsProfilePhoto(personDB.get().getProfilePhoto())).isFalse();
         assertPersonsEqual(personDB.get(), response.getBody());
 
-        testsPassed.put("deletePerson_ValidInput_DeletesPersonReturns200", true);
+        TESTS_PASSED.put("deletePerson_ValidInput_DeletesPersonReturns200", true);
     }
 
     //=========================================================================================================
     //PRIVATE METHODS
     private String[] getNonExistentUsernames() {
         return new String[]{"dummy user 1", "dummy user 2", "dummy user 4", "admina", "critic1", "dummy user 6"};
-    }
-
-    private String getRandomString(int length) {
-        Random random = new Random();
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
     }
 
     private PersonRequestDTO getValidPerson(Long personId) {
@@ -1053,7 +1039,7 @@ public class PersonSecuredRoutesTest {
     }
 
     private MockMultipartFile getValidProfilePhoto(String content) {
-        return new MockMultipartFile("profile_photo", "person_routes.png", "image/png", content.getBytes(StandardCharsets.UTF_8));
+        return new MockMultipartFile("profile_photo", "person_routes.png", "image/png", TestUtil.getBytes(content));
     }
 
     private List<Object[]> getBadRequestPersonsAndImages(Long validPersonId, String validImageContent) {
@@ -1066,7 +1052,7 @@ public class PersonSecuredRoutesTest {
         pFirstName2.setFirstName("");
         pFirstName3.setFirstName(" ");
         pFirstName4.setFirstName("         ");
-        pFirstName5.setFirstName(getRandomString(101));
+        pFirstName5.setFirstName(TestUtil.getRandomString(101));
 
         PersonRequestDTO pLastName1 = getValidPerson(validPersonId);
         PersonRequestDTO pLastName2 = getValidPerson(validPersonId);
@@ -1077,7 +1063,7 @@ public class PersonSecuredRoutesTest {
         pLastName2.setLastName("");
         pLastName3.setLastName(" ");
         pLastName4.setLastName("         ");
-        pLastName5.setLastName(getRandomString(101));
+        pLastName5.setLastName(TestUtil.getRandomString(101));
 
         PersonRequestDTO pGender1 = getValidPerson(validPersonId);
         pGender1.setGender(null);
@@ -1199,7 +1185,7 @@ public class PersonSecuredRoutesTest {
         ppNID1.setName("");
         ppNID2.setName(" ");
         ppNID3.setName("        ");
-        ppNID4.setName(getRandomString(20));
+        ppNID4.setName(TestUtil.getRandomString(20));
         ppNID5.setName("actor");
         ppNID5.setWorkedOn(new ArrayList<>() {
             {
@@ -1212,7 +1198,7 @@ public class PersonSecuredRoutesTest {
         ppNIW1.setName("");
         ppNIW2.setName(" ");
         ppNIW3.setName("        ");
-        ppNIW4.setName(getRandomString(20));
+        ppNIW4.setName(TestUtil.getRandomString(20));
         ppNIW5.setName("actor");
         ppNIW5.setWorkedOn(new ArrayList<>() {
             {
@@ -1225,7 +1211,7 @@ public class PersonSecuredRoutesTest {
         ppNIA1.setName("");
         ppNIA2.setName(" ");
         ppNIA3.setName("        ");
-        ppNIA4.setName(getRandomString(20));
+        ppNIA4.setName(TestUtil.getRandomString(20));
         ppNIA5.setName("director");
 
         ppNI1.setProfessions(new ArrayList<>() {
@@ -1948,7 +1934,7 @@ public class PersonSecuredRoutesTest {
                     {
                         add(new PersonRequestDTO.Actor.Acting(1l, true, new ArrayList<>() {
                             {
-                                add(getRandomString(301));
+                                add(TestUtil.getRandomString(301));
                             }
                         }));
                     }
@@ -2300,7 +2286,7 @@ public class PersonSecuredRoutesTest {
 
     //--------------------------------------------------------------------------------------------------------------------------------------------
     //assert methods
-    private void assertPersonsEqual(List<PersonWrapperJDBC> actual, List<PersonWrapperJDBC> expected) throws AssertionError {
+    private void assertPersonsEqual(List<PersonJPA> actual, List<PersonJPA> expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
         assertThat(actual.size()).isEqualTo(expected.size());
@@ -2309,16 +2295,16 @@ public class PersonSecuredRoutesTest {
         }
     }
 
-    private void checkValues(PersonWrapperJDBC actual, PersonWrapperJDBC expected) {
-        assertThat(actual).isNotNull();
-        checkPerson(actual.getPerson(), expected.getPerson());
-        checkDirector(actual.getDirector(), expected.getDirector());
-        checkWriter(actual.getWriter(), expected.getWriter());
-        checkActor(actual.getActor(), expected.getActor());
+    private void checkValues(PersonJPA actual, PersonJPA expected) {
+        checkPersonInfo(actual, expected);
+        checkDirector(actual.getDirectorInfo(), expected.getDirectorInfo());
+        checkWriter(actual.getWriterInfo(), expected.getWriterInfo());
+        checkActor(actual.getActorInfo(), expected.getActorInfo());
     }
 
-    private void checkPerson(PersonJDBC actual, PersonJDBC expected) {
+    private void checkPersonInfo(PersonJPA actual, PersonJPA expected) {
         assertThat(actual).isNotNull();
+        assertThat(expected).isNotNull();
         assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
         assertThat(actual.getFirstName()).isNotNull().isEqualTo(expected.getFirstName());
         assertThat(actual.getLastName()).isNotNull().isEqualTo(expected.getLastName());
@@ -2326,16 +2312,15 @@ public class PersonSecuredRoutesTest {
         assertThat(actual.getProfilePhoto()).isEqualTo(expected.getProfilePhoto());
     }
 
-    private void checkDirector(DirectorJDBC actual, DirectorJDBC expected) {
+    private void checkDirector(DirectorJPA actual, DirectorJPA expected) {
         if (actual == null) {
             assertThat(expected).isNull();
         } else {
             assertThat(expected).isNotNull();
-            assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
-            assertThat(actual.getFirstName()).isNull();
-            assertThat(actual.getLastName()).isNull();
-            assertThat(actual.getGender()).isNull();
-            assertThat(actual.getProfilePhoto()).isNull();
+            assertThat(actual.getPersonId()).isNotNull().isEqualTo(expected.getPersonId());
+            checkPersonInfo(actual.getPerson(), expected.getPerson());
+            assertThat(actual.getPersonId()).isEqualTo(actual.getPerson().getId());
+            assertThat(expected.getPersonId()).isEqualTo(expected.getPerson().getId());
 
             assertThat(actual.getMedias()).isNotNull();
             assertThat(actual.getMedias().size()).isEqualTo(expected.getMedias().size());
@@ -2343,33 +2328,26 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getMedias().get(i)).isNotNull();
                 assertThat(actual.getMedias().get(i).getId()).isNotNull().isEqualTo(expected.getMedias().get(i).getId());
 
-                assertThat(actual.getMedias().get(i).getTitle()).isNull();
-                assertThat(actual.getMedias().get(i).getDescription()).isNull();
-                assertThat(actual.getMedias().get(i).getReleaseDate()).isNull();
-                assertThat(actual.getMedias().get(i).getCoverImage()).isNull();
-                assertThat(actual.getMedias().get(i).getAudienceRating()).isNull();
-                assertThat(actual.getMedias().get(i).getCriticRating()).isNull();
-
-                assertThat(actual.getMedias().get(i).getGenres()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getDirectors()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getWriters()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getActings()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getCritiques()).isNotNull().isEmpty();
+                assertThat(actual.getMedias().get(i).getTitle()).isEqualTo(expected.getMedias().get(i).getTitle());
+                assertThat(actual.getMedias().get(i).getDescription()).isEqualTo(expected.getMedias().get(i).getDescription());
+                assertThat(actual.getMedias().get(i).getReleaseDate()).isEqualTo(expected.getMedias().get(i).getReleaseDate());
+                assertThat(actual.getMedias().get(i).getCoverImage()).isEqualTo(expected.getMedias().get(i).getCoverImage());
+                assertThat(actual.getMedias().get(i).getAudienceRating()).isEqualTo(expected.getMedias().get(i).getAudienceRating());
+                assertThat(actual.getMedias().get(i).getCriticRating()).isEqualTo(expected.getMedias().get(i).getCriticRating());
 
             }
         }
     }
 
-    private void checkWriter(WriterJDBC actual, WriterJDBC expected) {
+    private void checkWriter(WriterJPA actual, WriterJPA expected) {
         if (actual == null) {
             assertThat(expected).isNull();
         } else {
             assertThat(expected).isNotNull();
-            assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
-            assertThat(actual.getFirstName()).isNull();
-            assertThat(actual.getLastName()).isNull();
-            assertThat(actual.getGender()).isNull();
-            assertThat(actual.getProfilePhoto()).isNull();
+            assertThat(actual.getPersonId()).isNotNull().isEqualTo(expected.getPersonId());
+            checkPersonInfo(actual.getPerson(), expected.getPerson());       
+            assertThat(actual.getPersonId()).isEqualTo(actual.getPerson().getId());
+            assertThat(expected.getPersonId()).isEqualTo(expected.getPerson().getId());
 
             assertThat(actual.getMedias()).isNotNull();
             assertThat(actual.getMedias().size()).isEqualTo(expected.getMedias().size());
@@ -2377,35 +2355,26 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getMedias().get(i)).isNotNull();
                 assertThat(actual.getMedias().get(i).getId()).isNotNull().isEqualTo(expected.getMedias().get(i).getId());
 
-                assertThat(actual.getMedias().get(i).getTitle()).isNull();
-                assertThat(actual.getMedias().get(i).getDescription()).isNull();
-                assertThat(actual.getMedias().get(i).getReleaseDate()).isNull();
-                assertThat(actual.getMedias().get(i).getCoverImage()).isNull();
-                assertThat(actual.getMedias().get(i).getAudienceRating()).isNull();
-                assertThat(actual.getMedias().get(i).getCriticRating()).isNull();
-
-                assertThat(actual.getMedias().get(i).getGenres()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getDirectors()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getWriters()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getActings()).isNotNull().isEmpty();
-                assertThat(actual.getMedias().get(i).getCritiques()).isNotNull().isEmpty();
+                assertThat(actual.getMedias().get(i).getTitle()).isEqualTo(expected.getMedias().get(i).getTitle());
+                assertThat(actual.getMedias().get(i).getDescription()).isEqualTo(expected.getMedias().get(i).getDescription());
+                assertThat(actual.getMedias().get(i).getReleaseDate()).isEqualTo(expected.getMedias().get(i).getReleaseDate());
+                assertThat(actual.getMedias().get(i).getCoverImage()).isEqualTo(expected.getMedias().get(i).getCoverImage());
+                assertThat(actual.getMedias().get(i).getAudienceRating()).isEqualTo(expected.getMedias().get(i).getAudienceRating());
+                assertThat(actual.getMedias().get(i).getCriticRating()).isEqualTo(expected.getMedias().get(i).getCriticRating());
 
             }
 
         }
     }
 
-    private void checkActor(ActorJDBC actual, ActorJDBC expected) {
+    private void checkActor(ActorJPA actual, ActorJPA expected) {
         if (actual == null) {
             assertThat(expected).isNull();
         } else {
-            assertThat(expected).isNotNull();
-            assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
-            assertThat(actual.getFirstName()).isNull();
-            assertThat(actual.getLastName()).isNull();
-            assertThat(actual.getGender()).isNull();
-            assertThat(actual.getProfilePhoto()).isNull();
-            assertThat(actual.isStar()).isNotNull().isEqualTo(expected.isStar());
+            assertThat(expected).isNotNull();         
+            assertThat(actual.getPersonId()).isNotNull().isEqualTo(expected.getPersonId());
+            checkPersonInfo(actual.getPerson(), expected.getPerson());       
+            assertThat(actual.getStar()).isNotNull().isEqualTo(expected.getStar());
 
             assertThat(actual.getActings()).isNotNull();
             assertThat(actual.getActings().size()).isEqualTo(expected.getActings().size());
@@ -2415,29 +2384,23 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getActings().get(i).getMedia()).isNotNull();
                 assertThat(actual.getActings().get(i).getMedia().getId()).isNotNull().isEqualTo(expected.getActings().get(i).getMedia().getId());
 
-                assertThat(actual.getActings().get(i).getMedia().getTitle()).isNull();
-                assertThat(actual.getActings().get(i).getMedia().getDescription()).isNull();
-                assertThat(actual.getActings().get(i).getMedia().getReleaseDate()).isNull();
-                assertThat(actual.getActings().get(i).getMedia().getCoverImage()).isNull();
-                assertThat(actual.getActings().get(i).getMedia().getAudienceRating()).isNull();
-                assertThat(actual.getActings().get(i).getMedia().getCriticRating()).isNull();
-
-                assertThat(actual.getActings().get(i).getMedia().getGenres()).isNotNull().isEmpty();
-                assertThat(actual.getActings().get(i).getMedia().getDirectors()).isNotNull().isEmpty();
-                assertThat(actual.getActings().get(i).getMedia().getWriters()).isNotNull().isEmpty();
-                assertThat(actual.getActings().get(i).getMedia().getActings()).isNotNull().isEmpty();
-                assertThat(actual.getActings().get(i).getMedia().getCritiques()).isNotNull().isEmpty();
+                assertThat(actual.getActings().get(i).getMedia().getTitle()).isEqualTo(expected.getActings().get(i).getMedia().getTitle());
+                assertThat(actual.getActings().get(i).getMedia().getDescription()).isEqualTo(expected.getActings().get(i).getMedia().getDescription());
+                assertThat(actual.getActings().get(i).getMedia().getReleaseDate()).isEqualTo(expected.getActings().get(i).getMedia().getReleaseDate());
+                assertThat(actual.getActings().get(i).getMedia().getCoverImage()).isEqualTo(expected.getActings().get(i).getMedia().getCoverImage());
+                assertThat(actual.getActings().get(i).getMedia().getAudienceRating()).isEqualTo(expected.getActings().get(i).getMedia().getAudienceRating());
+                assertThat(actual.getActings().get(i).getMedia().getCriticRating()).isEqualTo(expected.getActings().get(i).getMedia().getCriticRating());
 
                 assertThat(actual.getActings().get(i).getActor()).isNotNull();
                 assertThat(actual.getActings().get(i).getActor() == actual).isTrue();
-                assertThat(actual.getActings().get(i).isStarring()).isNotNull().isEqualTo(expected.getActings().get(i).isStarring());
+                assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActings().get(i).getStarring());
 
                 assertThat(actual.getActings().get(i).getRoles()).isNotNull();
                 assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActings().get(i).getRoles().size());
                 for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                     assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
-                    assertThat(actual.getActings().get(i).getRoles().get(j).getActing() == actual.getActings().get(i)).isTrue();
-                    assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getId());
+                    assertThat(actual.getActings().get(i).getRoles().get(j).getId().getActing() == actual.getActings().get(i)).isTrue();
+                    assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getId().getId());
                     assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getName());
                 }
             }
@@ -2514,78 +2477,77 @@ public class PersonSecuredRoutesTest {
 
     }
 
-    private void assertPersonsEqual(PersonWrapperJDBC actual, PersonResponseDTO expected) throws AssertionError {
+    private void assertPersonsEqual(PersonJPA actual, PersonResponseDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
-        assertThat(actual.getPerson()).isNotNull();
-        assertThat(actual.getPerson().getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
-        assertThat(actual.getPerson().getFirstName()).isNotBlank().isEqualTo(expected.getFirstName());
-        assertThat(actual.getPerson().getLastName()).isNotBlank().isEqualTo(expected.getLastName());
-        assertThat(actual.getPerson().getGender()).isNotNull().isEqualTo(expected.getGender());
+        assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
+        assertThat(actual.getFirstName()).isNotBlank().isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isNotBlank().isEqualTo(expected.getLastName());
+        assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
         if (expected.getProfilePhotoUrl() == null) {
-            assertThat(actual.getPerson().getProfilePhoto()).isNull();
+            assertThat(actual.getProfilePhoto()).isNull();
         } else {
-            assertThat(config.getPersonImagesBaseUrl() + actual.getPerson().getProfilePhoto()).isEqualTo(expected.getProfilePhotoUrl());
+            assertThat(config.getPersonImagesBaseUrl() + actual.getProfilePhoto()).isEqualTo(expected.getProfilePhotoUrl());
         }
         int numberOfProfessions = 0;
-        if (actual.getDirector() != null) {
+        if (actual.getDirectorInfo() != null) {
             numberOfProfessions++;
         }
-        if (actual.getWriter() != null) {
+        if (actual.getWriterInfo() != null) {
             numberOfProfessions++;
         }
-        if (actual.getActor() != null) {
+        if (actual.getActorInfo() != null) {
             numberOfProfessions++;
         }
         assertThat(expected.getProfessions()).isNotNull();
         assertThat(numberOfProfessions).isEqualTo(expected.getProfessions().size());
         for (int i = 0; i < expected.getProfessions().size(); i++) {
             if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Director) {
-                assertThat(actual.getDirector()).isNotNull();
-                assertThat(actual.getDirector().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
-                assertThat(actual.getDirector().getMedias()).isNotNull();
+                assertThat(actual.getDirectorInfo()).isNotNull();
+                assertThat(actual.getDirectorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getDirectorInfo().getMedias()).isNotNull();
                 assertThat(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getDirector().getMedias().size()).isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getDirector().getMedias().size(); j++) {
-                    assertThat(actual.getDirector().getMedias().get(j)).isNotNull();
+                assertThat(actual.getDirectorInfo().getMedias().size()).isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getDirectorInfo().getMedias().size(); j++) {
+                    assertThat(actual.getDirectorInfo().getMedias().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getDirector().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getDirectorInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Writer) {
-                assertThat(actual.getWriter()).isNotNull();
-                assertThat(actual.getWriter().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
-                assertThat(actual.getWriter().getMedias()).isNotNull();
+                assertThat(actual.getWriterInfo()).isNotNull();
+                assertThat(actual.getWriterInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getWriterInfo().getMedias()).isNotNull();
                 assertThat(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getWriter().getMedias().size()).isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getWriter().getMedias().size(); j++) {
-                    assertThat(actual.getWriter().getMedias().get(j)).isNotNull();
+                assertThat(actual.getWriterInfo().getMedias().size()).isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getWriterInfo().getMedias().size(); j++) {
+                    assertThat(actual.getWriterInfo().getMedias().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getWriter().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getWriterInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Actor) {
-                assertThat(actual.getActor()).isNotNull();
-                assertThat(actual.getActor().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
+                assertThat(actual.getActorInfo()).isNotNull();
+                assertThat(actual.getActorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
                 assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar()).isNotNull();
-                assertThat(actual.getActor().isStar()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar());
-                assertThat(actual.getActor().getActings()).isNotNull();
+                assertThat(actual.getActorInfo().getStar()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar());
+                assertThat(actual.getActorInfo().getActings()).isNotNull();
                 assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getActor().getActings().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getActor().getActings().size(); j++) {
-                    assertThat(actual.getActor().getActings().get(j)).isNotNull();
+                assertThat(actual.getActorInfo().getActings().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getActorInfo().getActings().size(); j++) {
+                    assertThat(actual.getActorInfo().getActings().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getMedia()).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
-                    assertThat(actual.getActor().getActings().get(j).isStarring()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
-                    assertThat(actual.getActor().getActings().get(j).getRoles()).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getMedia()).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
+                    assertThat(actual.getActorInfo().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
+                    assertThat(actual.getActorInfo().getActings().get(j).getRoles()).isNotNull();
                     assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles()).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getRoles().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
-                    for (int k = 0; k < actual.getActor().getActings().get(j).getRoles().size(); k++) {
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k)).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getRoles().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
+                    for (int k = 0; k < actual.getActorInfo().getActings().get(j).getRoles().size(); k++) {
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k)).isNotNull();
                         assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k)).isNotNull();
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getId());
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getName());
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getId().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getId());
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getName());
                     }
                 }
             } else {
@@ -2596,22 +2558,21 @@ public class PersonSecuredRoutesTest {
 
     }
 
-    private void assertPersonsEqual(PersonWrapperJDBC actual, PersonRequestDTO expected) throws AssertionError {
+    private void assertPersonsEqual(PersonJPA actual, PersonRequestDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
-        assertThat(actual.getPerson()).isNotNull();
-        assertThat(actual.getPerson().getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
-        assertThat(actual.getPerson().getFirstName()).isNotBlank().isEqualTo(expected.getFirstName());
-        assertThat(actual.getPerson().getLastName()).isNotBlank().isEqualTo(expected.getLastName());
-        assertThat(actual.getPerson().getGender()).isNotNull().isEqualTo(expected.getGender());
+        assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
+        assertThat(actual.getFirstName()).isNotBlank().isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isNotBlank().isEqualTo(expected.getLastName());
+        assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
         int numberOfProfessions = 0;
-        if (actual.getDirector() != null) {
+        if (actual.getDirectorInfo() != null) {
             numberOfProfessions++;
         }
-        if (actual.getWriter() != null) {
+        if (actual.getWriterInfo() != null) {
             numberOfProfessions++;
         }
-        if (actual.getActor() != null) {
+        if (actual.getActorInfo() != null) {
             numberOfProfessions++;
         }
         assertThat(expected.getProfessions()).isNotNull();
@@ -2619,53 +2580,53 @@ public class PersonSecuredRoutesTest {
         for (int i = 0; i < expected.getProfessions().size(); i++) {
             if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Director) {
                 assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("director");
-                assertThat(actual.getDirector()).isNotNull();
-                assertThat(actual.getDirector().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
-                assertThat(actual.getDirector().getMedias()).isNotNull();
+                assertThat(actual.getDirectorInfo()).isNotNull();
+                assertThat(actual.getDirectorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getDirectorInfo().getMedias()).isNotNull();
                 assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getDirector().getMedias().size()).isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getDirector().getMedias().size(); j++) {
-                    assertThat(actual.getDirector().getMedias().get(j)).isNotNull();
+                assertThat(actual.getDirectorInfo().getMedias().size()).isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getDirectorInfo().getMedias().size(); j++) {
+                    assertThat(actual.getDirectorInfo().getMedias().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getDirector().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getDirectorInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Writer) {
                 assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("writer");
-                assertThat(actual.getWriter()).isNotNull();
-                assertThat(actual.getWriter().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
-                assertThat(actual.getWriter().getMedias()).isNotNull();
+                assertThat(actual.getWriterInfo()).isNotNull();
+                assertThat(actual.getWriterInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getWriterInfo().getMedias()).isNotNull();
                 assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getWriter().getMedias().size()).isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getWriter().getMedias().size(); j++) {
-                    assertThat(actual.getWriter().getMedias().get(j)).isNotNull();
+                assertThat(actual.getWriterInfo().getMedias().size()).isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getWriterInfo().getMedias().size(); j++) {
+                    assertThat(actual.getWriterInfo().getMedias().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getWriter().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getWriterInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Actor) {
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("actor");
-                assertThat(actual.getActor()).isNotNull();
-                assertThat(actual.getActor().getId()).isNotNull().isEqualTo(actual.getPerson().getId());
+                assertThat(actual.getActorInfo()).isNotNull();
+                assertThat(actual.getActorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar()).isNotNull();
-                assertThat(actual.getActor().isStar()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar());
-                assertThat(actual.getActor().getActings()).isNotNull();
+                assertThat(actual.getActorInfo().getStar()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar());
+                assertThat(actual.getActorInfo().getActings()).isNotNull();
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getActor().getActings().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getActor().getActings().size(); j++) {
-                    assertThat(actual.getActor().getActings().get(j)).isNotNull();
+                assertThat(actual.getActorInfo().getActings().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getActorInfo().getActings().size(); j++) {
+                    assertThat(actual.getActorInfo().getActings().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getMedia()).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
-                    assertThat(actual.getActor().getActings().get(j).isStarring()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
-                    assertThat(actual.getActor().getActings().get(j).getRoles()).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getMedia()).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
+                    assertThat(actual.getActorInfo().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
+                    assertThat(actual.getActorInfo().getActings().get(j).getRoles()).isNotNull();
                     assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles()).isNotNull();
-                    assertThat(actual.getActor().getActings().get(j).getRoles().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
-                    for (int k = 0; k < actual.getActor().getActings().get(j).getRoles().size(); k++) {
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k)).isNotNull();
+                    assertThat(actual.getActorInfo().getActings().get(j).getRoles().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
+                    for (int k = 0; k < actual.getActorInfo().getActings().get(j).getRoles().size(); k++) {
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k)).isNotNull();
                         assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k)).isNotNull();
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getId()).isNotNull().isEqualTo(k + 1);
-                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k));
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getId().getId()).isNotNull().isEqualTo(k + 1);
+                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k));
                     }
                 }
             } else {
@@ -2717,7 +2678,7 @@ public class PersonSecuredRoutesTest {
         }
     }
 
-    private boolean arePersonsEqual(PersonWrapperJDBC actual, PersonRequestDTO expected) {
+    private boolean arePersonsEqual(PersonJPA actual, PersonRequestDTO expected) {
         try {
             assertPersonsEqual(actual, expected);
             return true;
@@ -2743,27 +2704,11 @@ public class PersonSecuredRoutesTest {
     }
 
     private List<Resource> getAllProfilePhotos() {
-        try {
-            String folderPath = config.getPersonImagesFolderPath();
-            Path path = Path.of(folderPath);
-            try (Stream<Path> paths = Files.walk(path)) {
-                return paths.filter(Files::isRegularFile)
-                        .map(p -> {
-                            try {
-                                return new UrlResource(p.toUri());
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException("Issue in reading the file", e);
-                            }
-                        })
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Issue in reading files from the directory", e);
-        }
+        return testUtil.getAllPersonProfilePhotos();
     }
 
-    private List<PersonWrapperJDBC> getAllPersons() {
-        return personRepo.findAllWithRelationsPaginated(1, 100);
+    private List<PersonJPA> getAllPersons() {
+        return personRepo.findAll();
     }
 
     private void changeAttributes(PersonRequestDTO person) {

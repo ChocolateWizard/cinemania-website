@@ -35,14 +35,14 @@ public class ConfigPropertiesTest {
     @Value("${custom.property.jsonResponsesPropertiesFilePath}")
     private String jsonResponsesPropertiesFilePath;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
 
     static {
-        testsPassed.put("configPropertiesAndProperties_InitializedProperly", false);
+        TESTS_PASSED.put("configPropertiesAndProperties_InitializedProperly", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -76,7 +76,7 @@ public class ConfigPropertiesTest {
 
         assertThat(jsonResponsesPropertiesFilePath).isEqualTo(DataInitializer.jsonResponsesPropertiesFilePath);
 
-        testsPassed.put("configPropertiesAndProperties_InitializedProperly", true);
+        TESTS_PASSED.put("configPropertiesAndProperties_InitializedProperly", true);
     }
 
 }

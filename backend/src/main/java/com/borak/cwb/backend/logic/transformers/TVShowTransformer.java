@@ -40,9 +40,6 @@ public final class TVShowTransformer {
     @Autowired
     private ConfigProperties config;
 
-    @Autowired
-    private Util util;
-
     public TVShowResponseDTO toResponseFromJDBC(TVShowJDBC tvShow) {
         TVShowResponseDTO response = new TVShowResponseDTO();
         response.setId(tvShow.getId());
@@ -189,9 +186,9 @@ public final class TVShowTransformer {
     }
 
     public TVShowJDBC toTVShowJDBC(TVShowRequestDTO request) {
-        request.setGenres(util.sortAsc(request.getGenres()));
-        request.setDirectors(util.sortAsc(request.getDirectors()));
-        request.setWriters(util.sortAsc(request.getWriters()));
+        request.setGenres(Util.sortAsc(request.getGenres()));
+        request.setDirectors(Util.sortAsc(request.getDirectors()));
+        request.setWriters(Util.sortAsc(request.getWriters()));
         List<TVShowRequestDTO.Actor> pom = new ArrayList<>(request.getActors());
         pom.sort(Comparator.comparingLong(TVShowRequestDTO.Actor::getId));
         request.setActors(pom);
@@ -228,9 +225,9 @@ public final class TVShowTransformer {
     }
 
     public TVShowJPA toTVShowJPA(TVShowRequestDTO request) {
-        request.setGenres(util.sortAsc(request.getGenres()));
-        request.setDirectors(util.sortAsc(request.getDirectors()));
-        request.setWriters(util.sortAsc(request.getWriters()));
+        request.setGenres(Util.sortAsc(request.getGenres()));
+        request.setDirectors(Util.sortAsc(request.getDirectors()));
+        request.setWriters(Util.sortAsc(request.getWriters()));
         List<TVShowRequestDTO.Actor> pom = new ArrayList<>(request.getActors());
         pom.sort(Comparator.comparingLong(TVShowRequestDTO.Actor::getId));
         request.setActors(pom);

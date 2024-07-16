@@ -14,14 +14,14 @@ import org.springframework.test.context.ActiveProfiles;
 @Order(1)
 public class InitialTest {
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
 
     static {
-        testsPassed.put("contextLoads", false);
+        TESTS_PASSED.put("contextLoads", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -33,7 +33,8 @@ public class InitialTest {
     void contextLoads() {
         boolean didAllTestsFail = TestResultsHelper.didAllTestsFail();
         assertThat(didAllTestsFail).isTrue();
-        testsPassed.put("contextLoads", true);
+
+        TESTS_PASSED.put("contextLoads", true);
     }
 
 }

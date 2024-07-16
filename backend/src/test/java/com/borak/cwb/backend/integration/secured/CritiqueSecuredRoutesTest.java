@@ -7,15 +7,16 @@ package com.borak.cwb.backend.integration.secured;
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.cwb.backend.domain.enums.UserRole;
-import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
-import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
+import com.borak.cwb.backend.domain.jpa.MediaJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import com.borak.cwb.backend.helpers.TestUtil;
+import com.borak.cwb.backend.helpers.repositories.CritiqueTestRepository;
+import com.borak.cwb.backend.helpers.repositories.MovieTestRepository;
+import com.borak.cwb.backend.helpers.repositories.TVShowTestRepository;
+import com.borak.cwb.backend.helpers.repositories.UserTestRepository;
 import com.borak.cwb.backend.logic.security.JwtUtils;
-import com.borak.cwb.backend.repository.jdbc.CritiqueRepositoryJDBC;
-import com.borak.cwb.backend.repository.jdbc.MovieRepositoryJDBC;
-import com.borak.cwb.backend.repository.jdbc.TVShowRepositoryJDBC;
-import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
 import java.net.HttpCookie;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -53,47 +54,51 @@ import org.springframework.test.context.ActiveProfiles;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CritiqueSecuredRoutesTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private ConfigProperties config;
-    @Autowired
-    private CritiqueRepositoryJDBC critiqueRepo;
-    @Autowired
-    private MovieRepositoryJDBC movieRepo;
-    @Autowired
-    private TVShowRepositoryJDBC tvShowRepo;
-    @Autowired
-    private UserRepositoryJDBC userRepo;
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final TestRestTemplate restTemplate;
+    private final ConfigProperties config;
+    private final CritiqueTestRepository critiqueRepo;
+    private final MovieTestRepository movieRepo;
+    private final TVShowTestRepository tvShowRepo;
+    private final UserTestRepository userRepo;
+    private final JwtUtils jwtUtils;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    @Autowired
+    public CritiqueSecuredRoutesTest(TestRestTemplate restTemplate, ConfigProperties config, CritiqueTestRepository critiqueRepo, MovieTestRepository movieRepo, TVShowTestRepository tvShowRepo, UserTestRepository userRepo, JwtUtils jwtUtils) {
+        this.restTemplate = restTemplate;
+        this.config = config;
+        this.critiqueRepo = critiqueRepo;
+        this.movieRepo = movieRepo;
+        this.tvShowRepo = tvShowRepo;
+        this.userRepo = userRepo;
+        this.jwtUtils = jwtUtils;
+    }
+
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/critiques";
 
     static {
-        testsPassed.put("postCritique_UnauthenticatedUser_DoesNotCreateCritiqueReturns401", false);
-        testsPassed.put("postCritique_UnauthorizedUser_DoesNotCreateCritiqueReturns403", false);
-        testsPassed.put("postCritique_InvalidInputData_DoesNotCreateCritiqueReturns400", false);
-        testsPassed.put("postCritique_NonexistentDependencyData_DoesNotCreateCritiqueReturns404", false);
-        testsPassed.put("postCritique_DuplicateCritiqueData_DoesNotCreateCritiqueReturns409", false);
-        testsPassed.put("postCritique_ValidInput_CreatesCritiqueReturns200", false);
+        TESTS_PASSED.put("postCritique_UnauthenticatedUser_DoesNotCreateCritiqueReturns401", false);
+        TESTS_PASSED.put("postCritique_UnauthorizedUser_DoesNotCreateCritiqueReturns403", false);
+        TESTS_PASSED.put("postCritique_InvalidInputData_DoesNotCreateCritiqueReturns400", false);
+        TESTS_PASSED.put("postCritique_NonexistentDependencyData_DoesNotCreateCritiqueReturns404", false);
+        TESTS_PASSED.put("postCritique_DuplicateCritiqueData_DoesNotCreateCritiqueReturns409", false);
+        TESTS_PASSED.put("postCritique_ValidInput_CreatesCritiqueReturns200", false);
 
-        testsPassed.put("putCritique_UnauthenticatedUser_DoesNotUpdateCritiqueReturns401", false);
-        testsPassed.put("putCritique_UnauthorizedUser_DoesNotUpdateCritiqueReturns403", false);
-        testsPassed.put("putCritique_InvalidInputData_DoesNotUpdateCritiqueReturns400", false);
-        testsPassed.put("putCritique_NonexistentDependencyData_DoesNotUpdateCritiqueReturns404", false);
-        testsPassed.put("putCritique_ValidInput_UpdatesCritiqueReturns200", false);
+        TESTS_PASSED.put("putCritique_UnauthenticatedUser_DoesNotUpdateCritiqueReturns401", false);
+        TESTS_PASSED.put("putCritique_UnauthorizedUser_DoesNotUpdateCritiqueReturns403", false);
+        TESTS_PASSED.put("putCritique_InvalidInputData_DoesNotUpdateCritiqueReturns400", false);
+        TESTS_PASSED.put("putCritique_NonexistentDependencyData_DoesNotUpdateCritiqueReturns404", false);
+        TESTS_PASSED.put("putCritique_ValidInput_UpdatesCritiqueReturns200", false);
 
-        testsPassed.put("deleteCritique_UnauthenticatedUser_DoesNotDeleteCritiqueReturns401", false);
-        testsPassed.put("deleteCritique_UnauthorizedUser_DoesNotDeleteCritiqueReturns403", false);
-        testsPassed.put("deleteCritique_InvalidInputData_DoesNotDeleteCritiqueReturns400", false);
-        testsPassed.put("deleteCritique_NonexistentDependencyData_DoesNotDeleteCritiqueReturns404", false);
-        testsPassed.put("deleteCritique_ValidInput_DeletesCritiqueReturns200", false);
+        TESTS_PASSED.put("deleteCritique_UnauthenticatedUser_DoesNotDeleteCritiqueReturns401", false);
+        TESTS_PASSED.put("deleteCritique_UnauthorizedUser_DoesNotDeleteCritiqueReturns403", false);
+        TESTS_PASSED.put("deleteCritique_InvalidInputData_DoesNotDeleteCritiqueReturns400", false);
+        TESTS_PASSED.put("deleteCritique_NonexistentDependencyData_DoesNotDeleteCritiqueReturns404", false);
+        TESTS_PASSED.put("deleteCritique_ValidInput_DeletesCritiqueReturns200", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -113,8 +118,8 @@ public class CritiqueSecuredRoutesTest {
     @Order(1)
     @DisplayName("Tests whether POST request to /api/critiques with unauthenticated user did not create new critique and it returned 401")
     void postCritique_UnauthenticatedUser_DoesNotCreateCritiqueReturns401() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        Random random = new Random();
         int i = 0;
         List<SimpleEntry<CritiqueRequestDTO, String>> inputs = new ArrayList<>() {
             {
@@ -134,36 +139,36 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), null), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
-                List<CritiqueJDBC> critiques;
+                List<CritiqueJPA> critiques;
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
 
                 //critique present, with random string as cookie
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey().getMediaId(), HttpMethod.POST,
-                        constructRequest(input.getKey(), getRandomString(50, random)), String.class);
+                        constructRequest(input.getKey(), TestUtil.getRandomString(50)), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
 
                 //critique present, with jwt of non-existent user in cookies
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey().getMediaId(), HttpMethod.POST,
@@ -171,12 +176,12 @@ public class CritiqueSecuredRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
@@ -186,7 +191,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_UnauthenticatedUser_DoesNotCreateCritiqueReturns401", true);
+        TESTS_PASSED.put("postCritique_UnauthenticatedUser_DoesNotCreateCritiqueReturns401", true);
     }
 
     @Test
@@ -209,7 +214,7 @@ public class CritiqueSecuredRoutesTest {
         try {
             for (SimpleEntry<CritiqueRequestDTO, String> input : inputs) {
 
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 assertThat(user.get().getRole() != UserRole.CRITIC && user.get().getRole() != UserRole.ADMINISTRATOR).isTrue();
@@ -217,14 +222,14 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
-                List<CritiqueJDBC> critiques;
+                List<CritiqueJPA> critiques;
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
@@ -234,7 +239,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_UnauthorizedUser_DoesNotCreateCritiqueReturns403", true);
+        TESTS_PASSED.put("postCritique_UnauthorizedUser_DoesNotCreateCritiqueReturns403", true);
     }
 
     @Test
@@ -254,7 +259,7 @@ public class CritiqueSecuredRoutesTest {
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "", 50), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, " ", 50), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "      ", 50), "admin"));
-                add(new SimpleEntry<>(new CritiqueRequestDTO(1l, getRandomString(501, random), 50), "admin"));
+                add(new SimpleEntry<>(new CritiqueRequestDTO(1l, TestUtil.getRandomString(501), 50), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy description", -1), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy description", -2), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy description", Integer.MIN_VALUE), "admin"));
@@ -269,7 +274,7 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-                for (CritiqueJDBC critique : userRepo.findByIdWithRelations(
+                for (CritiqueJPA critique : userRepo.findById(
                         userRepo.findByUsername(input.getValue()).get().getId()
                 ).get().getCritiques()) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
@@ -282,7 +287,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_InvalidInputData_DoesNotCreateCritiqueReturns400", true);
+        TESTS_PASSED.put("postCritique_InvalidInputData_DoesNotCreateCritiqueReturns400", true);
     }
 
     @Test
@@ -304,9 +309,9 @@ public class CritiqueSecuredRoutesTest {
             for (SimpleEntry<CritiqueRequestDTO, String> input : inputs) {
 
                 //does such critique exist beforehand
-                Optional<UserJDBC> user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
-                Optional<CritiqueJDBC> actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                Optional<UserJPA> user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
+                Optional<CritiqueJPA> actualCritique = critiqueRepo.find(
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isFalse();
@@ -316,14 +321,14 @@ public class CritiqueSecuredRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
                 //does critique exist now
-                user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
+                user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
                 actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isFalse();
 
-                for (CritiqueJDBC critique : user.get().getCritiques()) {
+                for (CritiqueJPA critique : user.get().getCritiques()) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
@@ -334,7 +339,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_NonexistentDependencyData_DoesNotCreateCritiqueReturns404", true);
+        TESTS_PASSED.put("postCritique_NonexistentDependencyData_DoesNotCreateCritiqueReturns404", true);
     }
 
     @Test
@@ -360,7 +365,7 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
 
-                for (CritiqueJDBC critique : userRepo.findByIdWithRelations(
+                for (CritiqueJPA critique : userRepo.findById(
                         userRepo.findByUsername(input.getValue()).get().getId()
                 ).get().getCritiques()) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
@@ -373,7 +378,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_DuplicateCritiqueData_DoesNotCreateCritiqueReturns409", true);
+        TESTS_PASSED.put("postCritique_DuplicateCritiqueData_DoesNotCreateCritiqueReturns409", true);
     }
 
     @Test
@@ -392,10 +397,10 @@ public class CritiqueSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<CritiqueRequestDTO, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
+                Optional<UserJPA> user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
 
-                Optional<CritiqueJDBC> actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                Optional<CritiqueJPA> actualCritique = critiqueRepo.find(
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isFalse();
@@ -404,17 +409,17 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.RESET_CONTENT);
 
-                user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
+                user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
 
                 actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isTrue();
-                assertThat(actualCritique.get().getMedia()).isNotNull();
-                assertThat(actualCritique.get().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
-                assertThat(actualCritique.get().getCritic()).isNotNull();
-                assertThat(actualCritique.get().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
+                assertThat(actualCritique.get().getId().getMedia()).isNotNull();
+                assertThat(actualCritique.get().getId().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
+                assertThat(actualCritique.get().getId().getCritic()).isNotNull();
+                assertThat(actualCritique.get().getId().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
                 assertThat(actualCritique.get().getDescription()).isNotBlank().isEqualTo(input.getKey().getDescription());
                 assertThat(actualCritique.get().getRating()).isNotNull().isEqualTo(input.getKey().getRating());
 
@@ -424,7 +429,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postCritique_ValidInput_CreatesCritiqueReturns200", true);
+        TESTS_PASSED.put("postCritique_ValidInput_CreatesCritiqueReturns200", true);
     }
 
     //=========================================================================================================
@@ -454,36 +459,36 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), null), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
-                List<CritiqueJDBC> critiques;
+                List<CritiqueJPA> critiques;
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
 
                 //critique present, with random string as cookie
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey().getMediaId(), HttpMethod.PUT,
-                        constructRequest(input.getKey(), getRandomString(50, random)), String.class);
+                        constructRequest(input.getKey(), TestUtil.getRandomString(50)), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
 
                 //critique present, with jwt of non-existent user in cookies
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey().getMediaId(), HttpMethod.PUT,
@@ -491,12 +496,12 @@ public class CritiqueSecuredRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
@@ -506,7 +511,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putCritique_UnauthenticatedUser_DoesNotUpdateCritiqueReturns401", true);
+        TESTS_PASSED.put("putCritique_UnauthenticatedUser_DoesNotUpdateCritiqueReturns401", true);
     }
 
     @Test
@@ -530,21 +535,21 @@ public class CritiqueSecuredRoutesTest {
         try {
             for (SimpleEntry<CritiqueRequestDTO, String> input : inputs) {
 
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey().getMediaId(), HttpMethod.PUT,
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
-                List<CritiqueJDBC> critiques;
+                List<CritiqueJPA> critiques;
                 if (movieRepo.existsById(input.getKey().getMediaId())) {
-                    critiques = movieRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = movieRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 } else {
-                    critiques = tvShowRepo.findByIdWithRelations(input.getKey().getMediaId()).get().getCritiques();
+                    critiques = tvShowRepo.findById(input.getKey().getMediaId()).get().getCritiques();
                 }
 
-                for (CritiqueJDBC critique : critiques) {
+                for (CritiqueJPA critique : critiques) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
                     assertThat(critique.getRating()).isNotEqualTo(input.getKey().getRating());
                 }
@@ -554,7 +559,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putCritique_UnauthorizedUser_DoesNotUpdateCritiqueReturns403", true);
+        TESTS_PASSED.put("putCritique_UnauthorizedUser_DoesNotUpdateCritiqueReturns403", true);
     }
 
     @Test
@@ -574,7 +579,7 @@ public class CritiqueSecuredRoutesTest {
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "", 61), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, " ", 61), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "      ", 61), "admin"));
-                add(new SimpleEntry<>(new CritiqueRequestDTO(1l, getRandomString(501, random), 61), "admin"));
+                add(new SimpleEntry<>(new CritiqueRequestDTO(1l, TestUtil.getRandomString(501), 61), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy PUT description", -1), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy PUT description", -2), "admin"));
                 add(new SimpleEntry<>(new CritiqueRequestDTO(1l, "Dummy PUT description", Integer.MIN_VALUE), "admin"));
@@ -589,7 +594,7 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-                for (CritiqueJDBC critique : userRepo.findByIdWithRelations(
+                for (CritiqueJPA critique : userRepo.findById(
                         userRepo.findByUsername(input.getValue()).get().getId()
                 ).get().getCritiques()) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
@@ -602,7 +607,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putCritique_InvalidInputData_DoesNotUpdateCritiqueReturns400", true);
+        TESTS_PASSED.put("putCritique_InvalidInputData_DoesNotUpdateCritiqueReturns400", true);
     }
 
     @Test
@@ -629,7 +634,7 @@ public class CritiqueSecuredRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
                 //iterate over all critiques of current user
-                for (CritiqueJDBC critique : userRepo.findByIdWithRelations(
+                for (CritiqueJPA critique : userRepo.findById(
                         userRepo.findByUsername(input.getValue()).get().getId()
                 ).get().getCritiques()) {
                     assertThat(critique.getDescription()).isNotEqualTo(input.getKey().getDescription());
@@ -642,7 +647,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putCritique_NonexistentDependencyData_DoesNotUpdateCritiqueReturns404", true);
+        TESTS_PASSED.put("putCritique_NonexistentDependencyData_DoesNotUpdateCritiqueReturns404", true);
     }
 
     @Test
@@ -664,17 +669,17 @@ public class CritiqueSecuredRoutesTest {
         try {
             for (SimpleEntry<CritiqueRequestDTO, String> input : inputs) {
 
-                Optional<UserJDBC> user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
+                Optional<UserJPA> user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
 
-                Optional<CritiqueJDBC> actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                Optional<CritiqueJPA> actualCritique = critiqueRepo.find(
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isTrue();
-                assertThat(actualCritique.get().getMedia()).isNotNull();
-                assertThat(actualCritique.get().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
-                assertThat(actualCritique.get().getCritic()).isNotNull();
-                assertThat(actualCritique.get().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
+                assertThat(actualCritique.get().getId().getMedia()).isNotNull();
+                assertThat(actualCritique.get().getId().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
+                assertThat(actualCritique.get().getId().getCritic()).isNotNull();
+                assertThat(actualCritique.get().getId().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
                 assertThat(actualCritique.get().getDescription()).isNotBlank().isNotEqualTo(input.getKey().getDescription());
                 assertThat(actualCritique.get().getRating()).isNotNull().isNotEqualTo(input.getKey().getRating());
 
@@ -682,17 +687,17 @@ public class CritiqueSecuredRoutesTest {
                         constructRequest(input.getKey(), jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.RESET_CONTENT);
 
-                user = userRepo.findByIdWithRelations(userRepo.findByUsername(input.getValue()).get().getId());
+                user = userRepo.findById(userRepo.findByUsername(input.getValue()).get().getId());
 
                 actualCritique = critiqueRepo.find(
-                        new CritiqueJDBC(user.get(), new MediaJDBC(input.getKey().getMediaId()), null, null)
+                        new CritiqueJPA(new CritiqueJPA.ID(user.get(), new MediaJPA(input.getKey().getMediaId())), null, null)
                 );
                 assertThat(actualCritique).isNotNull();
                 assertThat(actualCritique.isPresent()).isTrue();
-                assertThat(actualCritique.get().getMedia()).isNotNull();
-                assertThat(actualCritique.get().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
-                assertThat(actualCritique.get().getCritic()).isNotNull();
-                assertThat(actualCritique.get().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
+                assertThat(actualCritique.get().getId().getMedia()).isNotNull();
+                assertThat(actualCritique.get().getId().getMedia().getId()).isNotNull().isEqualTo(input.getKey().getMediaId());
+                assertThat(actualCritique.get().getId().getCritic()).isNotNull();
+                assertThat(actualCritique.get().getId().getCritic().getId()).isNotNull().isEqualTo(user.get().getId());
                 assertThat(actualCritique.get().getDescription()).isNotBlank().isEqualTo(input.getKey().getDescription());
                 assertThat(actualCritique.get().getRating()).isNotNull().isEqualTo(input.getKey().getRating());
 
@@ -702,7 +707,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putCritique_ValidInput_UpdatesCritiqueReturns200", true);
+        TESTS_PASSED.put("putCritique_ValidInput_UpdatesCritiqueReturns200", true);
     }
 
     //=========================================================================================================
@@ -727,34 +732,34 @@ public class CritiqueSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<CritiqueJDBC> critsBeforeRequest = getCritsByMediaId(input.getKey());
+                List<CritiqueJPA> critsBeforeRequest = getCritsByMediaId(input.getKey());
 
                 //with no cookie
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, null), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-                List<CritiqueJDBC> critsAfterRequest = getCritsByMediaId(input.getKey());
+                List<CritiqueJPA> critsAfterRequest = getCritsByMediaId(input.getKey());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
 
                 //critique present, with random string as cookie
-                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, getRandomString(50, random)), String.class);
+                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, TestUtil.getRandomString(50)), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 critsAfterRequest = getCritsByMediaId(input.getKey());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
 
                 //critique present, with jwt of non-existent user in cookies
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
@@ -762,8 +767,8 @@ public class CritiqueSecuredRoutesTest {
                 critsAfterRequest = getCritsByMediaId(input.getKey());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
@@ -773,7 +778,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteCritique_UnauthenticatedUser_DoesNotDeleteCritiqueReturns401", true);
+        TESTS_PASSED.put("deleteCritique_UnauthenticatedUser_DoesNotDeleteCritiqueReturns401", true);
     }
 
     @Test
@@ -795,19 +800,19 @@ public class CritiqueSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 assertThat(user.get().getRole() != UserRole.CRITIC && user.get().getRole() != UserRole.ADMINISTRATOR).isTrue();
 
-                List<CritiqueJDBC> critsBeforeRequest = getCritsByMediaId(input.getKey());
+                List<CritiqueJPA> critsBeforeRequest = getCritsByMediaId(input.getKey());
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-                List<CritiqueJDBC> critsAfterRequest = getCritsByMediaId(input.getKey());
+                List<CritiqueJPA> critsAfterRequest = getCritsByMediaId(input.getKey());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
@@ -817,7 +822,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteCritique_UnauthorizedUser_DoesNotDeleteCritiqueReturns403", true);
+        TESTS_PASSED.put("deleteCritique_UnauthorizedUser_DoesNotDeleteCritiqueReturns403", true);
     }
 
     @Test
@@ -838,17 +843,17 @@ public class CritiqueSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
-                List<CritiqueJDBC> critsBeforeRequest = getCritsByUserUsername(input.getValue());
+                List<CritiqueJPA> critsBeforeRequest = getCritsByUserUsername(input.getValue());
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-                List<CritiqueJDBC> critsAfterRequest = getCritsByUserUsername(input.getValue());
+                List<CritiqueJPA> critsAfterRequest = getCritsByUserUsername(input.getValue());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
@@ -858,7 +863,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteCritique_InvalidInputData_DoesNotDeleteCritiqueReturns400", true);
+        TESTS_PASSED.put("deleteCritique_InvalidInputData_DoesNotDeleteCritiqueReturns400", true);
     }
 
     @Test
@@ -881,18 +886,18 @@ public class CritiqueSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
 
-                List<CritiqueJDBC> critsBeforeRequest = getCritsByUserUsername(input.getValue());
+                List<CritiqueJPA> critsBeforeRequest = getCritsByUserUsername(input.getValue());
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null, jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-                List<CritiqueJDBC> critsAfterRequest = getCritsByUserUsername(input.getValue());
+                List<CritiqueJPA> critsAfterRequest = getCritsByUserUsername(input.getValue());
                 assertThat(critsBeforeRequest.size()).isEqualTo(critsAfterRequest.size());
                 for (int j = 0; j < critsAfterRequest.size(); j++) {
-                    assertThat(critsAfterRequest.get(j).getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getMedia().getId());
-                    assertThat(critsAfterRequest.get(j).getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getCritic().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getMedia().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getMedia().getId());
+                    assertThat(critsAfterRequest.get(j).getId().getCritic().getId()).isEqualTo(critsBeforeRequest.get(j).getId().getCritic().getId());
                     assertThat(critsAfterRequest.get(j).getDescription()).isEqualTo(critsBeforeRequest.get(j).getDescription());
                     assertThat(critsAfterRequest.get(j).getRating()).isEqualTo(critsBeforeRequest.get(j).getRating());
                 }
@@ -902,7 +907,7 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteCritique_NonexistentDependencyData_DoesNotDeleteCritiqueReturns404", true);
+        TESTS_PASSED.put("deleteCritique_NonexistentDependencyData_DoesNotDeleteCritiqueReturns404", true);
     }
 
     @Test
@@ -937,10 +942,11 @@ public class CritiqueSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteCritique_ValidInput_DeletesCritiqueReturns200", true);
+        TESTS_PASSED.put("deleteCritique_ValidInput_DeletesCritiqueReturns200", true);
     }
-    //=========================================================================================================
-    //PRIVATE METHODS
+//=================================================================================================================================
+//PRIVATE METHODS
+//=================================================================================================================================
 
     private HttpEntity<CritiqueRequestDTO> constructRequest(CritiqueRequestDTO critique, String jwt) {
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -959,32 +965,21 @@ public class CritiqueSecuredRoutesTest {
 
     }
 
-    private String getRandomString(int length, Random random) {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
-    }
-
-    private List<CritiqueJDBC> getCritsByMediaId(Long mediaId) {
+    private List<CritiqueJPA> getCritsByMediaId(Long mediaId) {
         if (movieRepo.existsById(mediaId)) {
-            return movieRepo.findByIdWithRelations(mediaId).get().getCritiques();
+            return movieRepo.findById(mediaId).get().getCritiques();
         }
-        return tvShowRepo.findByIdWithRelations(mediaId).get().getCritiques();
+        return tvShowRepo.findById(mediaId).get().getCritiques();
     }
 
-    private List<CritiqueJDBC> getCritsByUserUsername(String username) {
-        return userRepo.findByIdWithRelations(
+    private List<CritiqueJPA> getCritsByUserUsername(String username) {
+        return userRepo.findById(
                 userRepo.findByUsername(username).get().getId()
         ).get().getCritiques();
     }
 
     private boolean doesCritiqueExist(Long mediaId, String username) {
-        return critiqueRepo.exists(new CritiqueJDBC(userRepo.findByUsername(username).get(), new MediaJDBC(mediaId), null, null));
+        return critiqueRepo.exists(new CritiqueJPA(new CritiqueJPA.ID(userRepo.findByUsername(username).get(), new MediaJPA(mediaId)), null, null));
     }
 
 }

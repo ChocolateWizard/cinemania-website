@@ -4,6 +4,7 @@
  */
 package com.borak.cwb.backend.integration.nonsecured;
 
+import com.borak.cwb.backend.helpers.Pair;
 import com.borak.cwb.backend.helpers.TestJsonResponseReader;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
 import java.util.HashMap;
@@ -38,18 +39,18 @@ public class PersonRoutesTest {
     @Autowired
     private TestJsonResponseReader jsonReader;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/persons";
 
     static {
-        testsPassed.put("getAllPersonsPaginated_Test", false);
-        testsPassed.put("getAllPersonsWithDetailsPaginated_Test", false);
-        testsPassed.put("getPersonWithProfessions_Test", false);
-        testsPassed.put("getPersonWithDetails_Test", false);
+        TESTS_PASSED.put("getAllPersonsPaginated_Test", false);
+        TESTS_PASSED.put("getAllPersonsWithDetailsPaginated_Test", false);
+        TESTS_PASSED.put("getPersonWithProfessions_Test", false);
+        TESTS_PASSED.put("getPersonWithDetails_Test", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -67,276 +68,223 @@ public class PersonRoutesTest {
     @Order(1)
     @DisplayName("Tests GET /api/persons")
     void getAllPersonsPaginated_Test() {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(ROUTE, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(1));
+        ResponseEntity<String> response;
+        int i = 0;
+        for (String req : getPersonsRequestInvalidResponse400()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+        i = 0;
+        for (String req : getPersonsRequestValidResponseEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, req).isEqualTo("[]");
+        }
+        i = 0;
+        for (Pair<Integer, String> reqres : getPersonsRequestValidResponseNonEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getPersonJson(reqres.getL()));
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=1&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(1));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=2&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(2));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=3&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(3));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=5&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(4));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=6&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=2&size=100", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=1&size=5", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(5));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=2&size=5", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(6));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=1&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(7));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=10&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(8));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=20&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(9));
-
-        //----------------------------------------------------------------------------
-        //bad requests
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=0&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=-1&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=1&size=0", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "?page=1&size=-1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        testsPassed.put("getAllPersonsPaginated_Test", true);
+        TESTS_PASSED.put("getAllPersonsPaginated_Test", true);
     }
 
     @Test
     @Order(2)
     @DisplayName("Tests GET /api/persons/details")
     void getAllPersonsWithDetailsPaginated_Test() {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(ROUTE + "/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(10));
+        ResponseEntity<String> response;
+        int i = 0;
+        for (String req : getPersonsDetailsRequestInvalidResponse400()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+        i = 0;
+        for (String req : getPersonsDetailsRequestValidResponseEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, req).isEqualTo("[]");
+        }
+        i = 0;
+        for (Pair<Integer, String> reqres : getPersonsDetailsRequestValidResponseNonEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getPersonJson(reqres.getL()));
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=1&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(10));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=2&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(11));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=3&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(12));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=5&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(13));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=6&size=10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=2&size=100", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("[]");
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=1&size=5", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(14));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=2&size=5", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(15));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=1&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(16));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=10&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(17));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=20&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(18));
-
-        //----------------------------------------------------------------------------
-        //bad requests
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=0&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=-1&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=1&size=0", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/details?page=1&size=-1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        testsPassed.put("getAllPersonsWithDetailsPaginated_Test", true);
+        TESTS_PASSED.put("getAllPersonsWithDetailsPaginated_Test", true);
     }
 
     @Test
     @Order(3)
     @DisplayName("Tests GET /api/persons/{id}")
     void getPersonWithProfessions_Test() {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(ROUTE + "/1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(19));
+        ResponseEntity<String> response;
+        int i = 0;
+        for (String req : getPersonRequestInvalidResponse400()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+        i = 0;
+        for (String req : getPersonRequestValidResponse404()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.NOT_FOUND);
+        }
+        i = 0;
+        for (Pair<Integer, String> reqres : getPersonRequestValidResponseNonEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getPersonJson(reqres.getL()));
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/2", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(20));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/10", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(21));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/20", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(22));
-
-        //not found
-        response
-                = restTemplate.getForEntity(ROUTE + "/51", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/52", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/70", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/100", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        //bad request
-        response
-                = restTemplate.getForEntity(ROUTE + "/0", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/-1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        testsPassed.put("getPersonWithProfessions_Test", true);
+        TESTS_PASSED.put("getPersonWithProfessions_Test", true);
     }
 
     @Test
     @Order(4)
     @DisplayName("Tests GET /api/persons/{id}/details")
     void getPersonWithDetails_Test() {
-        ResponseEntity<String> response
-                = restTemplate.getForEntity(ROUTE + "/1/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(23));
+        ResponseEntity<String> response;
+        int i = 0;
+        for (String req : getPersonDetailsRequestInvalidResponse400()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+        i = 0;
+        for (String req : getPersonDetailsRequestValidResponse404()) {
+            response = restTemplate.getForEntity(ROUTE + req, String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.NOT_FOUND);           
+        }
+        i = 0;
+        for (Pair<Integer, String> reqres : getPersonDetailsRequestValidResponseNonEmpty200()) {
+            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getPersonJson(reqres.getL()));
+        }
 
-        response
-                = restTemplate.getForEntity(ROUTE + "/2/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(24));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/10/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(25));
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/20/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(jsonReader.getPersonJson(26));
-
-        //not found
-        response
-                = restTemplate.getForEntity(ROUTE + "/51/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/52/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/70/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/100/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        //bad request
-        response
-                = restTemplate.getForEntity(ROUTE + "/0/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        response
-                = restTemplate.getForEntity(ROUTE + "/-1/details", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-
-        testsPassed.put("getPersonWithDetails_Test", true);
+        TESTS_PASSED.put("getPersonWithDetails_Test", true);
     }
 
+//=================================================================================================================================
+//PRIVATE METHODS
+//=================================================================================================================================
+//persons
+    private String[] getPersonsRequestInvalidResponse400() {
+        return new String[]{
+            "?page=0&size=1",
+            "?page=-1&size=1",
+            "?page=1&size=0",
+            "?page=1&size=-1"
+        };
+    }
+
+    private String[] getPersonsRequestValidResponseEmpty200() {
+        return new String[]{
+            "?page=6&size=10",
+            "?page=2&size=100"
+        };
+    }
+
+    private Pair<Integer, String>[] getPersonsRequestValidResponseNonEmpty200() {
+        return new Pair[]{
+            new Pair(1, ""),
+            new Pair(1, "?page=1&size=10"),
+            new Pair(2, "?page=2&size=10"),
+            new Pair(3, "?page=3&size=10"),
+            new Pair(4, "?page=5&size=10"),
+            new Pair(5, "?page=1&size=5"),
+            new Pair(6, "?page=2&size=5"),
+            new Pair(7, "?page=1&size=1"),
+            new Pair(8, "?page=10&size=1"),
+            new Pair(9, "?page=20&size=1")
+        };
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//persons/details
+    private String[] getPersonsDetailsRequestInvalidResponse400() {
+        return new String[]{
+            "/details?page=0&size=1",
+            "/details?page=-1&size=1",
+            "/details?page=1&size=0",
+            "/details?page=1&size=-1"
+        };
+    }
+
+    private String[] getPersonsDetailsRequestValidResponseEmpty200() {
+        return new String[]{
+            "/details?page=6&size=10",
+            "/details?page=2&size=100"
+        };
+    }
+
+    private Pair<Integer, String>[] getPersonsDetailsRequestValidResponseNonEmpty200() {
+        return new Pair[]{
+            new Pair(10, "/details"),
+            new Pair(10, "/details?page=1&size=10"),
+            new Pair(11, "/details?page=2&size=10"),
+            new Pair(12, "/details?page=3&size=10"),
+            new Pair(13, "/details?page=5&size=10"),
+            new Pair(14, "/details?page=1&size=5"),
+            new Pair(15, "/details?page=2&size=5"),
+            new Pair(16, "/details?page=1&size=1"),
+            new Pair(17, "/details?page=10&size=1"),
+            new Pair(18, "/details?page=20&size=1")
+        };
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//persons/{id}
+    private String[] getPersonRequestInvalidResponse400() {
+        return new String[]{
+            "/0",
+            "/-1"
+        };
+    }
+
+    private String[] getPersonRequestValidResponse404() {
+        return new String[]{
+            "/51",
+            "/52",
+            "/70",
+            "/100"
+        };
+    }
+
+    private Pair<Integer, String>[] getPersonRequestValidResponseNonEmpty200() {
+        return new Pair[]{
+            new Pair(19, "/1"),
+            new Pair(20, "/2"),
+            new Pair(21, "/10"),
+            new Pair(22, "/20")
+        };
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//persons/{id}/details
+    private String[] getPersonDetailsRequestInvalidResponse400() {
+        return new String[]{
+            "/0/details",
+            "/-1/details"
+        };
+    }
+
+    private String[] getPersonDetailsRequestValidResponse404() {
+        return new String[]{
+            "/51/details",
+            "/52/details",
+            "/70/details",
+            "/100/details"
+        };
+    }
+
+    private Pair<Integer, String>[] getPersonDetailsRequestValidResponseNonEmpty200() {
+        return new Pair[]{
+            new Pair(23, "/1/details"),
+            new Pair(24, "/2/details"),
+            new Pair(25, "/10/details"),
+            new Pair(26, "/20/details")
+        };
+    }
 }

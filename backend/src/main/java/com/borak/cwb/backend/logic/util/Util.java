@@ -8,16 +8,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Mr. Poyo
  */
-@Component
-public class Util {
+public final class Util {
 
-    public boolean duplicatesExistIgnoreNullAndNonNatural(List<Long> list) {
+    private Util() {
+    }
+
+    public static boolean duplicatesExistIgnoreNullAndNonNatural(List<Long> list) {
         Set<Long> set = new HashSet<>();
         for (Long aLong : list) {
             if (aLong != null && aLong > 0 && !set.add(aLong)) {
@@ -27,7 +28,7 @@ public class Util {
         return false;
     }
 
-    public boolean duplicatesExist(List<Long> list) {
+    public static boolean duplicatesExist(List<Long> list) {
         Set<Long> set = new HashSet<>();
         for (Long aLong : list) {
             if (!set.add(aLong)) {
@@ -37,7 +38,7 @@ public class Util {
         return false;
     }
 
-    public List<Long> sortAsc(List<Long> list) {
+    public static List<Long> sortAsc(List<Long> list) {
         List<Long> pom = new ArrayList<>(list);
         pom.sort((a, b) -> a.compareTo(b));
         return pom;

@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class AuthService implements IAuthService<UserRegisterDTO, UserLoginDTO> {
+public class AuthServiceJDBC implements IAuthService<UserRegisterDTO, UserLoginDTO> {
 
     @Autowired
     private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;

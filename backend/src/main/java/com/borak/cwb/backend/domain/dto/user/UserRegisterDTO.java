@@ -59,7 +59,7 @@ public class UserRegisterDTO implements DTO {
     private String password;
 
     @NotNull
-    private UserRole role = UserRole.REGULAR;
+    private UserRole role;
 
     @NotNull(message = "Country id must not be null!")
     @Min(value = 1, message = "Country id must be greater than or equal to 1!")
@@ -69,7 +69,7 @@ public class UserRegisterDTO implements DTO {
     public UserRegisterDTO() {
     }
 
-    public UserRegisterDTO(String firstName, String lastName, Gender gender, String profileName, MyImage profileImage, String username, String email, String password, Long countryId) {
+    public UserRegisterDTO(String firstName, String lastName, Gender gender, String profileName, MyImage profileImage, String username, String email, String password, UserRole role, Long countryId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -78,6 +78,7 @@ public class UserRegisterDTO implements DTO {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = role;
         this.countryId = countryId;
     }
 

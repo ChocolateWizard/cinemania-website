@@ -8,29 +8,23 @@ import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowResponseDTO;
-import com.borak.cwb.backend.domain.enums.UserRole;
-import com.borak.cwb.backend.domain.jdbc.TVShowJDBC;
-import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.TVShowJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import com.borak.cwb.backend.helpers.TestUtil;
+import com.borak.cwb.backend.helpers.repositories.TVShowTestRepository;
+import com.borak.cwb.backend.helpers.repositories.UserTestRepository;
 import com.borak.cwb.backend.logic.security.JwtUtils;
-import com.borak.cwb.backend.repository.jdbc.TVShowRepositoryJDBC;
-import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
 import com.borak.cwb.backend.repository.file.FileRepository;
 import java.io.IOException;
 import java.net.HttpCookie;
-import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -53,7 +46,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 /**
@@ -66,44 +58,50 @@ import static org.assertj.core.api.Assertions.fail;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TVShowSecuredRoutesTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private TVShowRepositoryJDBC tvShowRepo;
-    @Autowired
-    private UserRepositoryJDBC userRepo;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private FileRepository fileRepo;
-    @Autowired
-    private ConfigProperties config;
+    private final TestRestTemplate restTemplate;
+    private final TVShowTestRepository tvShowRepo;
+    private final UserTestRepository userRepo;
+    private final JwtUtils jwtUtils;
+    private final FileRepository fileRepo;
+    private final ConfigProperties config;
+    private final TestUtil testUtil;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    @Autowired
+    public TVShowSecuredRoutesTest(TestRestTemplate restTemplate, TVShowTestRepository tvShowRepo, UserTestRepository userRepo, JwtUtils jwtUtils, FileRepository fileRepo, ConfigProperties config, TestUtil testUtil) {
+        this.restTemplate = restTemplate;
+        this.tvShowRepo = tvShowRepo;
+        this.userRepo = userRepo;
+        this.jwtUtils = jwtUtils;
+        this.fileRepo = fileRepo;
+        this.config = config;
+        this.testUtil = testUtil;
+    }
+
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();  
     private static final String ROUTE = "/api/tv";
 
     static {
-        testsPassed.put("postTVShow_UnauthenticatedUser_DoesNotCreateTVShowReturns401", false);
-        testsPassed.put("postTVShow_UnauthorizedUser_DoesNotCreateTVShowReturns403", false);
-        testsPassed.put("postTVShow_InvalidInputData_DoesNotCreateTVShowReturns400", false);
-        testsPassed.put("postTVShow_NonexistentDependencyData_DoesNotCreateTVShowReturns404", false);
-        testsPassed.put("postTVShow_ValidInput_CreatesTVShowReturns200", false);
+        TESTS_PASSED.put("postTVShow_UnauthenticatedUser_DoesNotCreateTVShowReturns401", false);
+        TESTS_PASSED.put("postTVShow_UnauthorizedUser_DoesNotCreateTVShowReturns403", false);
+        TESTS_PASSED.put("postTVShow_InvalidInputData_DoesNotCreateTVShowReturns400", false);
+        TESTS_PASSED.put("postTVShow_NonexistentDependencyData_DoesNotCreateTVShowReturns404", false);
+        TESTS_PASSED.put("postTVShow_ValidInput_CreatesTVShowReturns200", false);
 
-        testsPassed.put("putTVShow_UnauthenticatedUser_DoesNotUpdateTVShowReturns401", false);
-        testsPassed.put("putTVShow_UnauthorizedUser_DoesNotUpdateTVShowReturns403", false);
-        testsPassed.put("putTVShow_InvalidInputData_DoesNotUpdateTVShowReturns400", false);
-        testsPassed.put("putTVShow_NonexistentDependencyData_DoesNotUpdateTVShowReturns404", false);
-        testsPassed.put("putTVShow_ValidInput_UpdatesTVShowReturns200", false);
+        TESTS_PASSED.put("putTVShow_UnauthenticatedUser_DoesNotUpdateTVShowReturns401", false);
+        TESTS_PASSED.put("putTVShow_UnauthorizedUser_DoesNotUpdateTVShowReturns403", false);
+        TESTS_PASSED.put("putTVShow_InvalidInputData_DoesNotUpdateTVShowReturns400", false);
+        TESTS_PASSED.put("putTVShow_NonexistentDependencyData_DoesNotUpdateTVShowReturns404", false);
+        TESTS_PASSED.put("putTVShow_ValidInput_UpdatesTVShowReturns200", false);
 
-        testsPassed.put("deleteTVShow_UnauthenticatedUser_DoesNotDeleteTVShowReturns401", false);
-        testsPassed.put("deleteTVShow_UnauthorizedUser_DoesNotDeleteTVShowReturns403", false);
-        testsPassed.put("deleteTVShow_InvalidInputData_DoesNotDeleteTVShowReturns400", false);
-        testsPassed.put("deleteTVShow_NonexistentDependencyData_DoesNotDeleteTVShowReturns404", false);
-        testsPassed.put("deleteTVShow_ValidInput_DeletesTVShowReturns200", false);
+        TESTS_PASSED.put("deleteTVShow_UnauthenticatedUser_DoesNotDeleteTVShowReturns401", false);
+        TESTS_PASSED.put("deleteTVShow_UnauthorizedUser_DoesNotDeleteTVShowReturns403", false);
+        TESTS_PASSED.put("deleteTVShow_InvalidInputData_DoesNotDeleteTVShowReturns400", false);
+        TESTS_PASSED.put("deleteTVShow_NonexistentDependencyData_DoesNotDeleteTVShowReturns404", false);
+        TESTS_PASSED.put("deleteTVShow_ValidInput_DeletesTVShowReturns200", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -125,12 +123,12 @@ public class TVShowSecuredRoutesTest {
     void postTVShow_UnauthenticatedUser_DoesNotCreateTVShowReturns401() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-        MockMultipartFile imageValid = getValidCoverImage(getRandomString(20));
+        MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(20));
         int i = 0;
         try {
             for (String username : getNonExistentUsernames()) {
@@ -147,7 +145,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(tvShowValid, imageValid, getRandomString(50));
+                request = constructRequest(tvShowValid, imageValid, TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE, HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 tvShowsAfter = getAllTVShows();
@@ -156,7 +154,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -187,7 +185,7 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postTVShow_UnauthenticatedUser_DoesNotCreateTVShowReturns401", true);
+        TESTS_PASSED.put("postTVShow_UnauthenticatedUser_DoesNotCreateTVShowReturns401", true);
     }
 
     @Test
@@ -196,18 +194,18 @@ public class TVShowSecuredRoutesTest {
     void postTVShow_UnauthorizedUser_DoesNotCreateTVShowReturns403() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-        MockMultipartFile imageValid = getValidCoverImage(getRandomString(20));
+        MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(20));
         int i = 0;
         try {
             for (String username : new String[]{"regular", "critic"}) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -227,7 +225,7 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postTVShow_UnauthorizedUser_DoesNotCreateTVShowReturns403", true);
+        TESTS_PASSED.put("postTVShow_UnauthorizedUser_DoesNotCreateTVShowReturns403", true);
     }
 
     @Test
@@ -236,12 +234,12 @@ public class TVShowSecuredRoutesTest {
     void postTVShow_InvalidInputData_DoesNotCreateTVShowReturns400() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -251,7 +249,7 @@ public class TVShowSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getBadRequestTVShowsAndImages(9l, getRandomString(20))) {
+            for (Object[] input : getBadRequestTVShowsAndImages(9l, TestUtil.getRandomString(20))) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
                 request = constructRequest((TVShowRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -267,7 +265,7 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postTVShow_InvalidInputData_DoesNotCreateTVShowReturns400", true);
+        TESTS_PASSED.put("postTVShow_InvalidInputData_DoesNotCreateTVShowReturns400", true);
     }
 
     @Test
@@ -276,12 +274,12 @@ public class TVShowSecuredRoutesTest {
     void postTVShow_NonexistentDependencyData_DoesNotCreateTVShowReturns404() {
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -291,7 +289,7 @@ public class TVShowSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getNonExistentDependencyTVShowsAndImages(9l, getRandomString(20))) {
+            for (Object[] input : getNonExistentDependencyTVShowsAndImages(9l, TestUtil.getRandomString(20))) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
                 request = constructRequest((TVShowRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -307,7 +305,7 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postTVShow_NonexistentDependencyData_DoesNotCreateTVShowReturns404", true);
+        TESTS_PASSED.put("postTVShow_NonexistentDependencyData_DoesNotCreateTVShowReturns404", true);
     }
 
     @Test
@@ -320,10 +318,10 @@ public class TVShowSecuredRoutesTest {
         TVShowRequestDTO tvShowValid1 = getValidTVShow(9l);
         TVShowRequestDTO tvShowValid2 = getValidTVShow(null);
 
-        MockMultipartFile imageValid1 = getValidCoverImage(getRandomString(20));
-        MockMultipartFile imageValid2 = getValidCoverImage(getRandomString(20));
+        MockMultipartFile imageValid1 = getValidCoverImage(TestUtil.getRandomString(20));
+        MockMultipartFile imageValid2 = getValidCoverImage(TestUtil.getRandomString(20));
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -344,7 +342,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(tvShowRepo.existsById(tvShowValid1.getId())).isTrue();
         assertThat(existsCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
 
-        Optional<TVShowJDBC> actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid1.getId());
+        Optional<TVShowJPA> actualDBTVShow = tvShowRepo.findById(tvShowValid1.getId());
         Resource actualDBImage = fileRepo.getMediaCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(actualDBTVShow).isNotNull();
         assertThat(actualDBTVShow.isPresent()).isTrue();
@@ -363,7 +361,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(tvShowRepo.existsById(response.getBody().getId())).isTrue();
         assertThat(existsCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
 
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(response.getBody().getId());
+        actualDBTVShow = tvShowRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getMediaCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBTVShow).isNotNull();
         assertThat(actualDBTVShow.isPresent()).isTrue();
@@ -373,7 +371,7 @@ public class TVShowSecuredRoutesTest {
         assertTVShowsEqual(actualDBTVShow.get(), response.getBody());
         assertImagesEqual(actualDBImage, imageValid2);
 
-        testsPassed.put("postTVShow_ValidInput_CreatesTVShowReturns200", true);
+        TESTS_PASSED.put("postTVShow_ValidInput_CreatesTVShowReturns200", true);
     }
 
     //=========================================================================================================
@@ -382,15 +380,15 @@ public class TVShowSecuredRoutesTest {
     @Order(6)
     @DisplayName("Tests whether PUT request to /api/tv with unauthenticated user did not update tv show and it returned 401")
     void putTVShow_UnauthenticatedUser_DoesNotUpdateTVShowReturns401() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-        MockMultipartFile imageValid = getValidCoverImage(getRandomString(40));
+        MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(40));
         int i = 0;
         try {
             for (String username : getNonExistentUsernames()) {
@@ -407,7 +405,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(tvShowValid, imageValid, getRandomString(50));
+                request = constructRequest(tvShowValid, imageValid,TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE + "/" + tvShowValid.getId(), HttpMethod.PUT, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 tvShowsAfter = getAllTVShows();
@@ -416,7 +414,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -447,28 +445,28 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putTVShow_UnauthenticatedUser_DoesNotUpdateTVShowReturns401", true);
+        TESTS_PASSED.put("putTVShow_UnauthenticatedUser_DoesNotUpdateTVShowReturns401", true);
     }
 
     @Test
     @Order(7)
     @DisplayName("Tests whether PUT request to /api/tv with authenticated but unauthorized user did not update tv show and it returned 403")
     void putTVShow_UnauthorizedUser_DoesNotUpdateTVShowReturns403() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-        MockMultipartFile imageValid = getValidCoverImage(getRandomString(40));
+        MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(40));
         int i = 0;
         try {
             for (String username : new String[]{"regular", "critic"}) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -489,22 +487,22 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putTVShow_UnauthorizedUser_DoesNotUpdateTVShowReturns403", true);
+        TESTS_PASSED.put("putTVShow_UnauthorizedUser_DoesNotUpdateTVShowReturns403", true);
     }
 
     @Test
     @Order(8)
     @DisplayName("Tests whether PUT request to /api/tv with invalid input data did not update tv show and it returned 400")
     void putTVShow_InvalidInputData_DoesNotUpdateTVShowReturns400() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -514,7 +512,7 @@ public class TVShowSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getBadRequestTVShowsAndImages(9l, getRandomString(40))) {
+            for (Object[] input : getBadRequestTVShowsAndImages(9l, TestUtil.getRandomString(40))) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
                 request = constructRequest((TVShowRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -528,7 +526,7 @@ public class TVShowSecuredRoutesTest {
             }
             i = 0;
             TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-            MockMultipartFile imageValid = getValidCoverImage(getRandomString(40));
+            MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(40));
             for (long invalidId : new long[]{0l, -1l, -2l, -5l, -10l, -23l, Long.MIN_VALUE}) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
@@ -545,22 +543,22 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putTVShow_InvalidInputData_DoesNotUpdateTVShowReturns400", true);
+        TESTS_PASSED.put("putTVShow_InvalidInputData_DoesNotUpdateTVShowReturns400", true);
     }
 
     @Test
     @Order(9)
     @DisplayName("Tests whether PUT request to /api/tv with non-existent dependency objects did not update tv show and it returned 404")
     void putTVShow_NonexistentDependencyData_DoesNotUpdateTVShowReturns404() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -570,7 +568,7 @@ public class TVShowSecuredRoutesTest {
 
         int i = 0;
         try {
-            for (Object[] input : getNonExistentDependencyTVShowsAndImages(9l, getRandomString(40))) {
+            for (Object[] input : getNonExistentDependencyTVShowsAndImages(9l, TestUtil.getRandomString(40))) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
                 request = constructRequest((TVShowRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
@@ -584,7 +582,7 @@ public class TVShowSecuredRoutesTest {
             }
             i = 0;
             TVShowRequestDTO tvShowValid = getValidTVShow(9l);
-            MockMultipartFile imageValid = getValidCoverImage(getRandomString(40));
+            MockMultipartFile imageValid = getValidCoverImage(TestUtil.getRandomString(40));
             for (long invalidId : new long[]{4l, 1l, 2l, 50l, 51l, 101l, Long.MAX_VALUE}) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
@@ -601,14 +599,14 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("putTVShow_NonexistentDependencyData_DoesNotUpdateTVShowReturns404", true);
+        TESTS_PASSED.put("putTVShow_NonexistentDependencyData_DoesNotUpdateTVShowReturns404", true);
     }
 
     @Test
     @Order(10)
     @DisplayName("Tests whether PUT request to /api/tv with valid input data did update tv show and it returned 200")
     void putTVShow_ValidInput_UpdatesTVShowReturns200() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<TVShowResponseDTO> response;
@@ -621,10 +619,10 @@ public class TVShowSecuredRoutesTest {
         changeAttributes(tvShowValid2);
         changeAttributes(tvShowValid3);
 
-        MockMultipartFile imageValid1 = getValidCoverImage(getRandomString(40));
-        MockMultipartFile imageValid2 = getValidCoverImage(getRandomString(50));
+        MockMultipartFile imageValid1 = getValidCoverImage(TestUtil.getRandomString(40));
+        MockMultipartFile imageValid2 = getValidCoverImage(TestUtil.getRandomString(50));
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -636,7 +634,7 @@ public class TVShowSecuredRoutesTest {
         //first valid request where tv show has different valid attributes and ID and image are set
         assertThat(tvShowRepo.existsById(tvShowValid1.getId())).isTrue();
         assertThat(existsCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        Optional<TVShowJDBC> actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid1.getId());
+        Optional<TVShowJPA> actualDBTVShow = tvShowRepo.findById(tvShowValid1.getId());
         Resource actualDBImage = fileRepo.getMediaCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(areTVShowsEqual(actualDBTVShow.get(), tvShowValid1)).isFalse();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isFalse();
@@ -648,7 +646,7 @@ public class TVShowSecuredRoutesTest {
 
         assertThat(tvShowRepo.existsById(tvShowValid1.getId())).isTrue();
         assertThat(existsCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid1.getId());
+        actualDBTVShow = tvShowRepo.findById(tvShowValid1.getId());
         actualDBImage = fileRepo.getMediaCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(areTVShowsEqual(actualDBTVShow.get(), tvShowValid1)).isTrue();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isTrue();
@@ -663,7 +661,7 @@ public class TVShowSecuredRoutesTest {
         //and that imageValid2 is different than the database imageValid1
         assertThat(tvShowRepo.existsById(tvShowValid1.getId())).isTrue();
         assertThat(existsCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid1.getId());
+        actualDBTVShow = tvShowRepo.findById(tvShowValid1.getId());
         actualDBImage = fileRepo.getMediaCoverImage(tvShowValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         tvShowValid2.setId(tvShowValid1.getId());
         assertThat(areTVShowsEqual(actualDBTVShow.get(), tvShowValid2)).isTrue();
@@ -679,7 +677,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(tvShowRepo.existsById(response.getBody().getId())).isTrue();
         assertThat(existsCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
 
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(response.getBody().getId());
+        actualDBTVShow = tvShowRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getMediaCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBTVShow).isNotNull();
         assertThat(actualDBTVShow.isPresent()).isTrue();
@@ -694,7 +692,7 @@ public class TVShowSecuredRoutesTest {
         //third valid request where tv show has different valid attributes, ID is 10 and image is null
         //check if image that was in database was deleted after successful PUT request
         assertThat(tvShowRepo.existsById(tvShowValid3.getId())).isTrue();
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid3.getId());
+        actualDBTVShow = tvShowRepo.findById(tvShowValid3.getId());
         assertThat(areTVShowsEqual(actualDBTVShow.get(), tvShowValid3)).isFalse();
         assertThat(existsCoverImage(actualDBTVShow.get().getCoverImage())).isTrue();
 
@@ -705,13 +703,13 @@ public class TVShowSecuredRoutesTest {
 
         assertThat(tvShowRepo.existsById(tvShowValid3.getId())).isTrue();
         assertThat(existsCoverImage(actualDBTVShow.get().getCoverImage())).isFalse();
-        actualDBTVShow = tvShowRepo.findByIdWithRelations(tvShowValid3.getId());
+        actualDBTVShow = tvShowRepo.findById(tvShowValid3.getId());
         assertThat(areTVShowsEqual(actualDBTVShow.get(), tvShowValid3)).isTrue();
 
         assertTVShowsEqual(response.getBody(), tvShowValid3, null);
         assertTVShowsEqual(actualDBTVShow.get(), response.getBody());
 
-        testsPassed.put("putTVShow_ValidInput_UpdatesTVShowReturns200", true);
+        TESTS_PASSED.put("putTVShow_ValidInput_UpdatesTVShowReturns200", true);
     }
 
     //=========================================================================================================
@@ -720,13 +718,13 @@ public class TVShowSecuredRoutesTest {
     @Order(11)
     @DisplayName("Tests whether DELETE request to /api/tv with unauthenticated user did not delete tv show and it returned 401")
     void deleteTVShow_UnauthenticatedUser_DoesNotDeleteTVShowReturns401() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         int i = 0;
@@ -746,7 +744,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(getRandomString(50));
+                request = constructRequest(TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE + "/" + tvShowValidId, HttpMethod.DELETE, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 tvShowsAfter = getAllTVShows();
@@ -755,7 +753,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //jwt of non-existent user as cookie
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 String jwt = jwtUtils.generateTokenFromUsername(username);
@@ -786,20 +784,20 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteTVShow_UnauthenticatedUser_DoesNotDeleteTVShowReturns401", true);
+        TESTS_PASSED.put("deleteTVShow_UnauthenticatedUser_DoesNotDeleteTVShowReturns401", true);
     }
 
     @Test
     @Order(12)
     @DisplayName("Tests whether DELETE request to /api/tv with authenticated but unauthorized user did not delete tv show and it returned 403")
     void deleteTVShow_UnauthorizedUser_DoesNotDeleteTVShowReturns403() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
         int i = 0;
@@ -808,7 +806,7 @@ public class TVShowSecuredRoutesTest {
             for (String username : new String[]{"regular", "critic"}) {
                 tvShowsBefore = getAllTVShows();
                 imagesBefore = getAllCoverImages();
-                Optional<UserJDBC> user = userRepo.findByUsername(username);
+                Optional<UserJPA> user = userRepo.findByUsername(username);
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(username));
@@ -827,24 +825,24 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteTVShow_UnauthorizedUser_DoesNotDeleteTVShowReturns403", true);
+        TESTS_PASSED.put("deleteTVShow_UnauthorizedUser_DoesNotDeleteTVShowReturns403", true);
     }
 
     @Test
     @Order(13)
     @DisplayName("Tests whether DELETE request to /api/tv with invalid input data did not delete tv show and it returned 400")
     void deleteTVShow_InvalidInputData_DoesNotDeleteTVShowReturns400() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -870,24 +868,24 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteTVShow_InvalidInputData_DoesNotDeleteTVShowReturns400", true);
+        TESTS_PASSED.put("deleteTVShow_InvalidInputData_DoesNotDeleteTVShowReturns400", true);
     }
 
     @Test
     @Order(14)
     @DisplayName("Tests whether DELETE request to /api/tv with non-existent dependency objects did not delete tv show and it returned 404")
     void deleteTVShow_NonexistentDependencyData_DoesNotDeleteTVShowReturns404() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<String> response;
-        List<TVShowJDBC> tvShowsBefore;
-        List<TVShowJDBC> tvShowsAfter;
+        List<TVShowJPA> tvShowsBefore;
+        List<TVShowJPA> tvShowsAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -913,15 +911,15 @@ public class TVShowSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteTVShow_NonexistentDependencyData_DoesNotDeleteTVShowReturns404", true);
+        TESTS_PASSED.put("deleteTVShow_NonexistentDependencyData_DoesNotDeleteTVShowReturns404", true);
     }
 
     @Test
     @Order(15)
     @DisplayName("Tests whether DELETE request to /api/tv with valid input data did delete tv show and it returned 200")
     void deleteTVShow_ValidInput_DeletesTVShowReturns200() {
-        Assumptions.assumeTrue(testsPassed.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
-        Assumptions.assumeTrue(testsPassed.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("postTVShow_ValidInput_CreatesTVShowReturns200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("putTVShow_ValidInput_UpdatesTVShowReturns200"));
 
         HttpEntity request;
         ResponseEntity<TVShowResponseDTO> response;
@@ -929,7 +927,7 @@ public class TVShowSecuredRoutesTest {
         long tvShowValidId1 = 9l;
         long tvShowValidId2 = 10l;
 
-        Optional<UserJDBC> user = userRepo.findByUsername("admin");
+        Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
         HttpCookie cookie = new HttpCookie(config.getJwtCookieName(), jwtUtils.generateTokenFromUsername(user.get().getUsername()));
@@ -940,7 +938,7 @@ public class TVShowSecuredRoutesTest {
         //----------------------------------------------------------------------------
         //first valid request where movieId is 7
         assertThat(tvShowRepo.existsById(tvShowValidId1)).isTrue();
-        Optional<TVShowJDBC> tvShowDB = tvShowRepo.findByIdWithRelations(tvShowValidId1);
+        Optional<TVShowJPA> tvShowDB = tvShowRepo.findById(tvShowValidId1);
         assertThat(existsCoverImage(tvShowDB.get().getCoverImage())).isTrue();
 
         request = constructRequest(cookie.toString());
@@ -955,7 +953,7 @@ public class TVShowSecuredRoutesTest {
         //----------------------------------------------------------------------------
         //second valid request where movieId is 8
         assertThat(tvShowRepo.existsById(tvShowValidId2)).isTrue();
-        tvShowDB = tvShowRepo.findByIdWithRelations(tvShowValidId2);
+        tvShowDB = tvShowRepo.findById(tvShowValidId2);
         assertThat(existsCoverImage(tvShowDB.get().getCoverImage())).isFalse();
 
         request = constructRequest(cookie.toString());
@@ -967,25 +965,13 @@ public class TVShowSecuredRoutesTest {
         assertThat(existsCoverImage(tvShowDB.get().getCoverImage())).isFalse();
         assertTVShowsEqual(tvShowDB.get(), response.getBody());
 
-        testsPassed.put("deleteTVShow_ValidInput_DeletesTVShowReturns200", true);
+        TESTS_PASSED.put("deleteTVShow_ValidInput_DeletesTVShowReturns200", true);
     }
 
-    //=========================================================================================================
-    //PRIVATE METHODS
+//=================================================================================================================================
+//PRIVATE METHODS
     private String[] getNonExistentUsernames() {
         return new String[]{"dummy user 1", "dummy user 2", "dummy user 4", "admina", "critic1", "dummy user 6"};
-    }
-
-    private String getRandomString(int length) {
-        Random random = new Random();
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
     }
 
     private TVShowRequestDTO getValidTVShow(Long tvShowId) {
@@ -1069,7 +1055,7 @@ public class TVShowSecuredRoutesTest {
     }
 
     private MockMultipartFile getValidCoverImage(String content) {
-        return new MockMultipartFile("cover_image", "tv_show_routes.png", "image/png", content.getBytes(StandardCharsets.UTF_8));
+        return new MockMultipartFile("cover_image", "tv_show_routes.png", "image/png", TestUtil.getBytes(content));
     }
 
     private List<Object[]> getBadRequestTVShowsAndImages(Long validTVShowId, String validImageContent) {
@@ -1082,7 +1068,7 @@ public class TVShowSecuredRoutesTest {
         tvTitle2.setTitle("");
         tvTitle3.setTitle(" ");
         tvTitle4.setTitle("         ");
-        tvTitle5.setTitle(getRandomString(301));
+        tvTitle5.setTitle(TestUtil.getRandomString(301));
 
         TVShowRequestDTO tvDescription1 = getValidTVShow(validTVShowId);
         TVShowRequestDTO tvDescription2 = getValidTVShow(validTVShowId);
@@ -1093,7 +1079,7 @@ public class TVShowSecuredRoutesTest {
         tvDescription2.setDescription("");
         tvDescription3.setDescription(" ");
         tvDescription4.setDescription("         ");
-        tvDescription5.setDescription(getRandomString(1001));
+        tvDescription5.setDescription(TestUtil.getRandomString(1001));
 
         TVShowRequestDTO tvReleaseDate1 = getValidTVShow(validTVShowId);
         tvReleaseDate1.setReleaseDate(null);
@@ -1408,7 +1394,7 @@ public class TVShowSecuredRoutesTest {
             {
                 add(new TVShowRequestDTO.Actor(2l, true, new ArrayList<>() {
                     {
-                        add(getRandomString(301));
+                        add(TestUtil.getRandomString(301));
                     }
                 }));
             }
@@ -1696,11 +1682,11 @@ public class TVShowSecuredRoutesTest {
 
     //--------------------------------------------------------------------------------------------------------------------------------------------
     //assert methods
-    private void assertTVShowsEqual(List<TVShowJDBC> actual, List<TVShowJDBC> expected) throws AssertionError {
+    private void assertTVShowsEqual(List<TVShowJPA> actual, List<TVShowJPA> expected) throws AssertionError {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(expected).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
-
+        
         for (int i = 0; i < actual.size(); i++) {
             assertThat(actual.get(i)).isNotNull();
             assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
@@ -1711,94 +1697,98 @@ public class TVShowSecuredRoutesTest {
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
             assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
-
+            
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
-
+            
             for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
                 assertThat(actual.get(i).getGenres().get(j)).isNotNull();
                 assertThat(actual.get(i).getGenres().get(j).getId()).isEqualTo(expected.get(i).getGenres().get(j).getId());
                 assertThat(actual.get(i).getGenres().get(j).getName()).isEqualTo(expected.get(i).getGenres().get(j).getName());
             }
-
+            
             assertThat(actual.get(i).getDirectors()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getDirectors().size() == expected.get(i).getDirectors().size()).isTrue();
             for (int j = 0; j < actual.get(i).getDirectors().size(); j++) {
                 assertThat(actual.get(i).getDirectors().get(j)).isNotNull();
-                assertThat(actual.get(i).getDirectors().get(j).getId()).isEqualTo(expected.get(i).getDirectors().get(j).getId());
-                assertThat(actual.get(i).getDirectors().get(j).getFirstName()).isEqualTo(expected.get(i).getDirectors().get(j).getFirstName());
-                assertThat(actual.get(i).getDirectors().get(j).getLastName()).isEqualTo(expected.get(i).getDirectors().get(j).getLastName());
-                assertThat(actual.get(i).getDirectors().get(j).getGender()).isEqualTo(expected.get(i).getDirectors().get(j).getGender());
-                assertThat(actual.get(i).getDirectors().get(j).getProfilePhoto()).isEqualTo(expected.get(i).getDirectors().get(j).getProfilePhoto());
+                assertThat(actual.get(i).getDirectors().get(j).getPersonId()).isEqualTo(expected.get(i).getDirectors().get(j).getPersonId());
+                assertThat(actual.get(i).getDirectors().get(j).getPerson().getFirstName()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getFirstName());
+                assertThat(actual.get(i).getDirectors().get(j).getPerson().getLastName()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getLastName());
+                assertThat(actual.get(i).getDirectors().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getGender());
+                assertThat(actual.get(i).getDirectors().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getProfilePhoto());
             }
-
+            
             assertThat(actual.get(i).getWriters()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getWriters().size() == expected.get(i).getWriters().size()).isTrue();
             for (int j = 0; j < actual.get(i).getWriters().size(); j++) {
                 assertThat(actual.get(i).getWriters().get(j)).isNotNull();
-                assertThat(actual.get(i).getWriters().get(j).getId()).isEqualTo(expected.get(i).getWriters().get(j).getId());
-                assertThat(actual.get(i).getWriters().get(j).getFirstName()).isEqualTo(expected.get(i).getWriters().get(j).getFirstName());
-                assertThat(actual.get(i).getWriters().get(j).getLastName()).isEqualTo(expected.get(i).getWriters().get(j).getLastName());
-                assertThat(actual.get(i).getWriters().get(j).getGender()).isEqualTo(expected.get(i).getWriters().get(j).getGender());
-                assertThat(actual.get(i).getWriters().get(j).getProfilePhoto()).isEqualTo(expected.get(i).getWriters().get(j).getProfilePhoto());
+                assertThat(actual.get(i).getWriters().get(j).getPersonId()).isEqualTo(expected.get(i).getWriters().get(j).getPersonId());
+                assertThat(actual.get(i).getWriters().get(j).getPerson().getFirstName()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getFirstName());
+                assertThat(actual.get(i).getWriters().get(j).getPerson().getLastName()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getLastName());
+                assertThat(actual.get(i).getWriters().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getGender());
+                assertThat(actual.get(i).getWriters().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getProfilePhoto());
             }
-
+            
             assertThat(actual.get(i).getActings()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getActings().size() == expected.get(i).getActings().size()).isTrue();
             for (int j = 0; j < actual.get(i).getActings().size(); j++) {
                 assertThat(actual.get(i).getActings().get(j)).isNotNull();
-                assertThat(actual.get(i).getActings().get(j).isStarring()).isEqualTo(expected.get(i).getActings().get(j).isStarring());
-
+                assertThat(actual.get(i).getActings().get(j).getStarring()).isEqualTo(expected.get(i).getActings().get(j).getStarring());
+                
                 assertThat(actual.get(i).getActings().get(j).getActor()).isNotNull();
-                assertThat(actual.get(i).getActings().get(j).getActor().getId()).isEqualTo(expected.get(i).getActings().get(j).getActor().getId());
-                assertThat(actual.get(i).getActings().get(j).getActor().getFirstName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getFirstName());
-                assertThat(actual.get(i).getActings().get(j).getActor().getLastName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getLastName());
-                assertThat(actual.get(i).getActings().get(j).getActor().getGender()).isEqualTo(expected.get(i).getActings().get(j).getActor().getGender());
-                assertThat(actual.get(i).getActings().get(j).getActor().getProfilePhoto()).isEqualTo(expected.get(i).getActings().get(j).getActor().getProfilePhoto());
-                assertThat(actual.get(i).getActings().get(j).getActor().isStar()).isEqualTo(expected.get(i).getActings().get(j).getActor().isStar());
-
+                assertThat(actual.get(i).getActings().get(j).getActor().getPersonId()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPersonId());
+                assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getFirstName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getFirstName());
+                assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getLastName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getLastName());
+                assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getGender()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getGender());
+                assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto());
+                assertThat(actual.get(i).getActings().get(j).getActor().getStar()).isEqualTo(expected.get(i).getActings().get(j).getActor().getStar());
+                
                 assertThat(actual.get(i).getActings().get(j).getMedia()).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getMedia() == actual.get(i)).isTrue();
-
+                
                 assertThat(actual.get(i).getActings().get(j).getRoles()).isNotNull().isNotEmpty();
                 assertThat(actual.get(i).getActings().get(j).getRoles().size() == expected.get(i).getActings().get(j).getRoles().size()).isTrue();
                 for (int k = 0; k < actual.get(i).getActings().get(j).getRoles().size(); k++) {
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k)).isNotNull();
-                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getActing()).isNotNull();
-                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getActing() == actual.get(i).getActings().get(j)).isTrue();
-
-                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId());
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId()).isNotNull();
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing()).isNotNull();
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing() == actual.get(i).getActings().get(j)).isTrue();
+                    
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getId()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId().getId());
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getName()).isEqualTo(actual.get(i).getActings().get(j).getRoles().get(k).getName());
                 }
             }
-
+            
             assertThat(actual.get(i).getCritiques()).isNotNull();
             assertThat(actual.get(i).getCritiques().size() == expected.get(i).getCritiques().size()).isTrue();
             for (int j = 0; j < actual.get(i).getCritiques().size(); j++) {
                 assertThat(actual.get(i).getCritiques().get(j)).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileName());
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getCritic().getProfileImage());
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getRole()).isEqualTo(UserRole.CRITIC);
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getFirstName()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getLastName()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getGender()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCountry()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUsername()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getPassword()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getEmail()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCreatedAt()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getUpdatedAt()).isNull();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getMedias()).isNotNull().isEmpty();
-                assertThat(actual.get(i).getCritiques().get(j).getCritic().getCritiques()).isNotNull().isEmpty();
-
-                assertThat(actual.get(i).getCritiques().get(j).getMedia()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getMedia() == actual.get(i)).isTrue();
-
+                assertThat(actual.get(i).getCritiques().get(j).getId()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic()).isNotNull();
+                
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getFirstName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getFirstName());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getLastName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getLastName());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getGender()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getGender());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getRole()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getRole());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileName());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileImage());                
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUsername()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUsername());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getPassword()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getPassword());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getEmail()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getEmail());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt());
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt());
+                
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
+                assertThat(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId());                
+                
+                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia() == actual.get(i)).isTrue();
+                
                 assertThat(actual.get(i).getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getDescription());
                 assertThat(actual.get(i).getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getRating());
             }
-
+            
         }
     }
 
@@ -1852,7 +1842,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual.getCritiques()).isNotNull().isEmpty();
     }
 
-    private void assertTVShowsEqual(TVShowJDBC actual, TVShowResponseDTO expected) throws AssertionError {
+    private void assertTVShowsEqual(TVShowJPA actual, TVShowResponseDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
         assertThat(actual.getTitle()).isEqualTo(expected.getTitle());
@@ -1866,7 +1856,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getNumberOfSeasons()).isEqualTo(expected.getNumberOfSeasons());
         assertThat(actual.getCriticRating()).isNull();
-
+        
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
@@ -1874,59 +1864,63 @@ public class TVShowSecuredRoutesTest {
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i).getId());
             assertThat(actual.getGenres().get(i).getName()).isNotNull().isEqualTo(expected.getGenres().get(i).getName());
         }
-
+        
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
             assertThat(actual.getDirectors().get(i)).isNotNull();
-            assertThat(actual.getDirectors().get(i).getId()).isNotNull().isEqualTo(expected.getDirectors().get(i).getId());
-            assertThat(actual.getDirectors().get(i).getFirstName()).isEqualTo(expected.getDirectors().get(i).getFirstName());
-            assertThat(actual.getDirectors().get(i).getLastName()).isEqualTo(expected.getDirectors().get(i).getLastName());
-            assertThat(actual.getDirectors().get(i).getGender()).isEqualTo(expected.getDirectors().get(i).getGender());
-            if (actual.getDirectors().get(i).getProfilePhoto() == null) {
-                assertThat(actual.getDirectors().get(i).getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
+            assertThat(actual.getDirectors().get(i).getPerson()).isNotNull();
+            assertThat(actual.getDirectors().get(i).getPersonId()).isNotNull().isEqualTo(expected.getDirectors().get(i).getId());
+            assertThat(actual.getDirectors().get(i).getPerson().getFirstName()).isEqualTo(expected.getDirectors().get(i).getFirstName());
+            assertThat(actual.getDirectors().get(i).getPerson().getLastName()).isEqualTo(expected.getDirectors().get(i).getLastName());
+            assertThat(actual.getDirectors().get(i).getPerson().getGender()).isEqualTo(expected.getDirectors().get(i).getGender());
+            if (actual.getDirectors().get(i).getPerson().getProfilePhoto() == null) {
+                assertThat(actual.getDirectors().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
             } else {
-                assertThat(config.getPersonImagesBaseUrl() + actual.getDirectors().get(i).getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
+                assertThat(config.getPersonImagesBaseUrl() + actual.getDirectors().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
             }
         }
-
+        
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
             assertThat(actual.getWriters().get(i)).isNotNull();
-            assertThat(actual.getWriters().get(i).getId()).isNotNull().isEqualTo(expected.getWriters().get(i).getId());
-            assertThat(actual.getWriters().get(i).getFirstName()).isEqualTo(expected.getWriters().get(i).getFirstName());
-            assertThat(actual.getWriters().get(i).getLastName()).isEqualTo(expected.getWriters().get(i).getLastName());
-            assertThat(actual.getWriters().get(i).getGender()).isEqualTo(expected.getWriters().get(i).getGender());
-            if (actual.getWriters().get(i).getProfilePhoto() == null) {
-                assertThat(actual.getWriters().get(i).getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
+            assertThat(actual.getWriters().get(i).getPerson()).isNotNull();
+            assertThat(actual.getWriters().get(i).getPersonId()).isNotNull().isEqualTo(expected.getWriters().get(i).getId());
+            assertThat(actual.getWriters().get(i).getPerson().getFirstName()).isEqualTo(expected.getWriters().get(i).getFirstName());
+            assertThat(actual.getWriters().get(i).getPerson().getLastName()).isEqualTo(expected.getWriters().get(i).getLastName());
+            assertThat(actual.getWriters().get(i).getPerson().getGender()).isEqualTo(expected.getWriters().get(i).getGender());
+            if (actual.getWriters().get(i).getPerson().getProfilePhoto() == null) {
+                assertThat(actual.getWriters().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
             } else {
-                assertThat(config.getPersonImagesBaseUrl() + actual.getWriters().get(i).getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
+                assertThat(config.getPersonImagesBaseUrl() + actual.getWriters().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
             }
-
+            
         }
-
+        
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
             assertThat(actual.getActings().get(i)).isNotNull();
             assertThat(actual.getActings().get(i).getActor()).isNotNull();
-            assertThat(actual.getActings().get(i).getActor().getId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
-            assertThat(actual.getActings().get(i).getActor().getFirstName()).isEqualTo(expected.getActors().get(i).getFirstName());
-            assertThat(actual.getActings().get(i).getActor().getLastName()).isEqualTo(expected.getActors().get(i).getLastName());
-            assertThat(actual.getActings().get(i).getActor().getGender()).isEqualTo(expected.getActors().get(i).getGender());
-            if (actual.getActings().get(i).getActor().getProfilePhoto() == null) {
-                assertThat(actual.getActings().get(i).getActor().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
+            assertThat(actual.getActings().get(i).getActor().getPerson()).isNotNull();
+            assertThat(actual.getActings().get(i).getActor().getPersonId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
+            assertThat(actual.getActings().get(i).getActor().getPerson().getFirstName()).isEqualTo(expected.getActors().get(i).getFirstName());
+            assertThat(actual.getActings().get(i).getActor().getPerson().getLastName()).isEqualTo(expected.getActors().get(i).getLastName());
+            assertThat(actual.getActings().get(i).getActor().getPerson().getGender()).isEqualTo(expected.getActors().get(i).getGender());
+            assertThat(actual.getActings().get(i).getActor().getStar()).isEqualTo(expected.getActors().get(i).getStar());
+            if (actual.getActings().get(i).getActor().getPerson().getProfilePhoto() == null) {
+                assertThat(actual.getActings().get(i).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
             } else {
-                assertThat(config.getPersonImagesBaseUrl() + actual.getActings().get(i).getActor().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
+                assertThat(config.getPersonImagesBaseUrl() + actual.getActings().get(i).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
             }
-
-            assertThat(actual.getActings().get(i).isStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
+            
+            assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j).getName());
             }
         }
@@ -1934,7 +1928,7 @@ public class TVShowSecuredRoutesTest {
 
     }
 
-    private void assertTVShowsEqual(TVShowJDBC actual, TVShowRequestDTO expected) throws AssertionError {
+    private void assertTVShowsEqual(TVShowJPA actual, TVShowRequestDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
         assertThat(actual.getId()).isNotNull().isEqualTo(expected.getId());
@@ -1943,41 +1937,42 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual.getReleaseDate()).isNotNull().isEqualTo(expected.getReleaseDate());
         assertThat(actual.getAudienceRating()).isNotNull().isEqualTo(expected.getAudienceRating());
         assertThat(actual.getNumberOfSeasons()).isNotNull().isEqualTo(expected.getNumberOfSeasons());
-
+        
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
             assertThat(actual.getGenres().get(i)).isNotNull();
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i));
         }
-
+        
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
             assertThat(actual.getDirectors().get(i)).isNotNull();
-            assertThat(actual.getDirectors().get(i).getId()).isNotNull().isEqualTo(expected.getDirectors().get(i));
+            assertThat(actual.getDirectors().get(i).getPersonId()).isNotNull().isEqualTo(expected.getDirectors().get(i));
         }
-
+        
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
             assertThat(actual.getWriters().get(i)).isNotNull();
-            assertThat(actual.getWriters().get(i).getId()).isNotNull().isEqualTo(expected.getWriters().get(i));
+            assertThat(actual.getWriters().get(i).getPersonId()).isNotNull().isEqualTo(expected.getWriters().get(i));
         }
-
+        
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
             assertThat(actual.getActings().get(i)).isNotNull();
             assertThat(actual.getActings().get(i).getActor()).isNotNull();
-            assertThat(actual.getActings().get(i).getActor().getId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
-
-            assertThat(actual.getActings().get(i).isStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
+            assertThat(actual.getActings().get(i).getActor().getPersonId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
+            
+            assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull().isEqualTo(j + 1);
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull();
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(j + 1);
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j));
             }
         }
@@ -2025,7 +2020,7 @@ public class TVShowSecuredRoutesTest {
         }
     }
 
-    private boolean areTVShowsEqual(TVShowJDBC actual, TVShowRequestDTO expected) {
+    private boolean areTVShowsEqual(TVShowJPA actual, TVShowRequestDTO expected) {
         try {
             assertTVShowsEqual(actual, expected);
             return true;
@@ -2051,27 +2046,11 @@ public class TVShowSecuredRoutesTest {
     }
 
     private List<Resource> getAllCoverImages() {
-        try {
-            String folderPath = config.getMediaImagesFolderPath();
-            Path path = Path.of(folderPath);
-            try (Stream<Path> paths = Files.walk(path)) {
-                return paths.filter(Files::isRegularFile)
-                        .map(p -> {
-                            try {
-                                return new UrlResource(p.toUri());
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException("Issue in reading the file", e);
-                            }
-                        })
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Issue in reading files from the directory", e);
-        }
+       return testUtil.getAllMediaCoverImages();
     }
 
-    private List<TVShowJDBC> getAllTVShows() {
-        return tvShowRepo.findAllWithRelations();
+    private List<TVShowJPA> getAllTVShows() {
+        return tvShowRepo.findAll();
     }
 
     private void changeAttributes(TVShowRequestDTO tvShow) {

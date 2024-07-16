@@ -45,6 +45,14 @@ public class SecurityUser implements UserDetails {
 
     private Country country;
 
+    public SecurityUser() {
+    }
+
+    public SecurityUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.toString()));

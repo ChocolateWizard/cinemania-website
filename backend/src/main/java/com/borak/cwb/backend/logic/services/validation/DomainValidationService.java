@@ -16,7 +16,6 @@ import com.borak.cwb.backend.logic.util.Util;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -29,9 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 public class DomainValidationService {
-
-    @Autowired
-    private Util util;
 
     public void validate(MovieRequestDTO movie, MultipartFile coverImage, RequestMethod requestType) throws ValidationException {
         if (movie == null) {
@@ -84,7 +80,7 @@ public class DomainValidationService {
         if (movie.getGenres() == null || movie.getGenres().isEmpty()) {
             messages.add("Genres field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(movie.getGenres())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(movie.getGenres())) {
                 messages.add("Genres field must not contain duplicate id values!");
             }
             int i = 1;
@@ -100,7 +96,7 @@ public class DomainValidationService {
         if (movie.getDirectors() == null || movie.getDirectors().isEmpty()) {
             messages.add("Directors field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(movie.getDirectors())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(movie.getDirectors())) {
                 messages.add("Directors field must not contain duplicate id values!");
             }
             int i = 1;
@@ -116,7 +112,7 @@ public class DomainValidationService {
         if (movie.getWriters() == null || movie.getWriters().isEmpty()) {
             messages.add("Writers field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(movie.getWriters())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(movie.getWriters())) {
                 messages.add("Writers field must not contain duplicate id values!");
             }
             int i = 1;
@@ -132,7 +128,7 @@ public class DomainValidationService {
         if (movie.getActors() == null || movie.getActors().isEmpty()) {
             messages.add("Actors field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(movie.getActors().stream().map((actor) -> {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(movie.getActors().stream().map((actor) -> {
                 return (actor == null) ? null : actor.getId();
             }).collect(Collectors.toList()))) {
                 messages.add("Actors field must not contain duplicate id values!");
@@ -224,7 +220,7 @@ public class DomainValidationService {
         if (tvShow.getGenres() == null || tvShow.getGenres().isEmpty()) {
             messages.add("Genres field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getGenres())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getGenres())) {
                 messages.add("Genres field must not contain duplicate id values!");
             }
             int i = 1;
@@ -240,7 +236,7 @@ public class DomainValidationService {
         if (tvShow.getDirectors() == null || tvShow.getDirectors().isEmpty()) {
             messages.add("Directors field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getDirectors())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getDirectors())) {
                 messages.add("Directors field must not contain duplicate id values!");
             }
             int i = 1;
@@ -256,7 +252,7 @@ public class DomainValidationService {
         if (tvShow.getWriters() == null || tvShow.getWriters().isEmpty()) {
             messages.add("Writers field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getWriters())) {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getWriters())) {
                 messages.add("Writers field must not contain duplicate id values!");
             }
             int i = 1;
@@ -272,7 +268,7 @@ public class DomainValidationService {
         if (tvShow.getActors() == null || tvShow.getActors().isEmpty()) {
             messages.add("Actors field must not be null or empty!");
         } else {
-            if (util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getActors().stream().map((actor) -> {
+            if (Util.duplicatesExistIgnoreNullAndNonNatural(tvShow.getActors().stream().map((actor) -> {
                 return (actor == null) ? null : actor.getId();
             }).collect(Collectors.toList()))) {
                 messages.add("Actors field must not contain duplicate id values!");
@@ -361,7 +357,7 @@ public class DomainValidationService {
                 } else if (person.getProfessions().get(i) instanceof PersonRequestDTO.Director director) {
                     numberOfDirectors++;
                     if (!director.getWorkedOn().isEmpty()) {
-                        if (util.duplicatesExistIgnoreNullAndNonNatural(director.getWorkedOn())) {
+                        if (Util.duplicatesExistIgnoreNullAndNonNatural(director.getWorkedOn())) {
                             messages.add("Persons director profession worked on medias field must not contain duplicate media id values!");
                         }
                         int mI = 1;
@@ -377,7 +373,7 @@ public class DomainValidationService {
                 } else if (person.getProfessions().get(i) instanceof PersonRequestDTO.Writer writer) {
                     numberOfWriters++;
                     if (!writer.getWorkedOn().isEmpty()) {
-                        if (util.duplicatesExistIgnoreNullAndNonNatural(writer.getWorkedOn())) {
+                        if (Util.duplicatesExistIgnoreNullAndNonNatural(writer.getWorkedOn())) {
                             messages.add("Persons writer profession worked on medias field must not contain duplicate media id values!");
                         }
                         int mI = 1;
@@ -396,7 +392,7 @@ public class DomainValidationService {
                         messages.add("Persons actor profession star status must not be null!");
                     }
                     if (!actor.getWorkedOn().isEmpty()) {
-                        if (util.duplicatesExistIgnoreNullAndNonNatural(actor.getWorkedOn().stream().map((acting) -> {
+                        if (Util.duplicatesExistIgnoreNullAndNonNatural(actor.getWorkedOn().stream().map((acting) -> {
                             return (acting == null) ? null : acting.getMediaId();
                         }).collect(Collectors.toList()))) {
                             messages.add("Persons actor profession worked on medias field must not contain duplicate media id values!");
@@ -501,7 +497,7 @@ public class DomainValidationService {
                 throw new ValidationException("Media title must have less than 300 characters!");
             }
         }
-        if (genreIds != null && util.duplicatesExist(genreIds)) {
+        if (genreIds != null && Util.duplicatesExist(genreIds)) {
             throw new ValidationException("Genre ids must not contain duplicate values!");
         }
     }

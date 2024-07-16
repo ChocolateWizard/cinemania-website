@@ -41,9 +41,6 @@ public final class MovieTransformer {
     @Autowired
     private ConfigProperties config;
 
-    @Autowired
-    private Util util;
-
     public MovieResponseDTO jdbcToMovieResponse(MovieJDBC movie) {
         MovieResponseDTO response = new MovieResponseDTO();
         response.setId(movie.getId());
@@ -192,9 +189,9 @@ public final class MovieTransformer {
     }
 
     public MovieJDBC toMovieJDBC(MovieRequestDTO request) {
-        request.setGenres(util.sortAsc(request.getGenres()));
-        request.setDirectors(util.sortAsc(request.getDirectors()));
-        request.setWriters(util.sortAsc(request.getWriters()));
+        request.setGenres(Util.sortAsc(request.getGenres()));
+        request.setDirectors(Util.sortAsc(request.getDirectors()));
+        request.setWriters(Util.sortAsc(request.getWriters()));
         List<MovieRequestDTO.Actor> pom = new ArrayList<>(request.getActors());
         pom.sort(Comparator.comparingLong(MovieRequestDTO.Actor::getId));
         request.setActors(pom);
@@ -231,9 +228,9 @@ public final class MovieTransformer {
     }
 
     public MovieJPA toMovieJPA(MovieRequestDTO request) {
-        request.setGenres(util.sortAsc(request.getGenres()));
-        request.setDirectors(util.sortAsc(request.getDirectors()));
-        request.setWriters(util.sortAsc(request.getWriters()));
+        request.setGenres(Util.sortAsc(request.getGenres()));
+        request.setDirectors(Util.sortAsc(request.getDirectors()));
+        request.setWriters(Util.sortAsc(request.getWriters()));
         List<MovieRequestDTO.Actor> pom = new ArrayList<>(request.getActors());
         pom.sort(Comparator.comparingLong(MovieRequestDTO.Actor::getId));
         request.setActors(pom);

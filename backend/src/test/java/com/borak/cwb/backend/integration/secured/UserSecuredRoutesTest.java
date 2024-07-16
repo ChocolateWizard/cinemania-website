@@ -5,11 +5,11 @@
 package com.borak.cwb.backend.integration.secured;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
-import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import com.borak.cwb.backend.helpers.TestUtil;
+import com.borak.cwb.backend.helpers.repositories.UserTestRepository;
 import com.borak.cwb.backend.logic.security.JwtUtils;
-import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
 import java.net.HttpCookie;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,33 +46,37 @@ import org.springframework.test.context.ActiveProfiles;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserSecuredRoutesTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private UserRepositoryJDBC userRepo;
-    @Autowired
-    private ConfigProperties config;
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final TestRestTemplate restTemplate;
+    private final UserTestRepository userRepo;
+    private final ConfigProperties config;
+    private final JwtUtils jwtUtils;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    @Autowired
+    public UserSecuredRoutesTest(TestRestTemplate restTemplate, UserTestRepository userRepo, ConfigProperties config, JwtUtils jwtUtils) {
+        this.restTemplate = restTemplate;
+        this.userRepo = userRepo;
+        this.config = config;
+        this.jwtUtils = jwtUtils;
+    }
+
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/users/library";
 
     static {
-        testsPassed.put("postMediaToLibrary_UnauthenticatedUser_DoesNotCreateMediaInLibraryReturns401", false);
-        testsPassed.put("postMediaToLibrary_InvalidInputData_DoesNotCreateMediaInLibraryReturns400", false);
-        testsPassed.put("postMediaToLibrary_NonexistentDependencyData_DoesNotCreateMediaInLibraryReturns404", false);
-        testsPassed.put("postMediaToLibrary_DuplicateMediaData_DoesNotCreateMediaInLibraryReturns409", false);
-        testsPassed.put("postMediaToLibrary_ValidInput_CreatesMediaInLibraryReturns204", false);
+        TESTS_PASSED.put("postMediaToLibrary_UnauthenticatedUser_DoesNotCreateMediaInLibraryReturns401", false);
+        TESTS_PASSED.put("postMediaToLibrary_InvalidInputData_DoesNotCreateMediaInLibraryReturns400", false);
+        TESTS_PASSED.put("postMediaToLibrary_NonexistentDependencyData_DoesNotCreateMediaInLibraryReturns404", false);
+        TESTS_PASSED.put("postMediaToLibrary_DuplicateMediaData_DoesNotCreateMediaInLibraryReturns409", false);
+        TESTS_PASSED.put("postMediaToLibrary_ValidInput_CreatesMediaInLibraryReturns204", false);
 
-        testsPassed.put("deleteMediaFromLibrary_UnauthenticatedUser_DoesNotDeleteMediaFromLibraryReturns401", false);
-        testsPassed.put("deleteMediaFromLibrary_InvalidInputData_DoesNotDeleteMediaFromLibraryReturns400", false);
-        testsPassed.put("deleteMediaFromLibrary_NonexistentDependencyData_DoesNotDeleteMediaFromLibraryReturns404", false);
-        testsPassed.put("deleteMediaFromLibrary_ValidInput_DeletesMediaFromLibraryReturns204", false);
+        TESTS_PASSED.put("deleteMediaFromLibrary_UnauthenticatedUser_DoesNotDeleteMediaFromLibraryReturns401", false);
+        TESTS_PASSED.put("deleteMediaFromLibrary_InvalidInputData_DoesNotDeleteMediaFromLibraryReturns400", false);
+        TESTS_PASSED.put("deleteMediaFromLibrary_NonexistentDependencyData_DoesNotDeleteMediaFromLibraryReturns404", false);
+        TESTS_PASSED.put("deleteMediaFromLibrary_ValidInput_DeletesMediaFromLibraryReturns204", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -94,7 +97,6 @@ public class UserSecuredRoutesTest {
     @DisplayName("Tests whether POST request to /api/users/library with unauthenticated user did not create new media in library and it returned 401")
     void postMediaToLibrary_UnauthenticatedUser_DoesNotCreateMediaInLibraryReturns401() {
         ResponseEntity<String> response;
-        Random random = new Random();
         int i = 0;
         List<SimpleEntry<Long, String>> inputs = new ArrayList<>() {
             {
@@ -108,21 +110,21 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
                 // no cookie
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(null), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
 
                 //random string as cookie
-                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(getRandomString(50, random)), String.class);
+                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(TestUtil.getRandomString(50)), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
 
                 //jwt of non-existent user in cookies
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
@@ -135,7 +137,7 @@ public class UserSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("postMediaToLibrary_UnauthenticatedUser_DoesNotCreateMediaInLibraryReturns401", true);
+        TESTS_PASSED.put("postMediaToLibrary_UnauthenticatedUser_DoesNotCreateMediaInLibraryReturns401", true);
     }
 
     @Test
@@ -154,20 +156,20 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("postMediaToLibrary_InvalidInputData_DoesNotCreateMediaInLibraryReturns400", true);
+        TESTS_PASSED.put("postMediaToLibrary_InvalidInputData_DoesNotCreateMediaInLibraryReturns400", true);
     }
 
     @Test
@@ -187,20 +189,20 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("postMediaToLibrary_NonexistentDependencyData_DoesNotCreateMediaInLibraryReturns404", true);
+        TESTS_PASSED.put("postMediaToLibrary_NonexistentDependencyData_DoesNotCreateMediaInLibraryReturns404", true);
     }
 
     @Test
@@ -222,20 +224,20 @@ public class UserSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.POST, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("postMediaToLibrary_DuplicateMediaData_DoesNotCreateMediaInLibraryReturns409", true);
+        TESTS_PASSED.put("postMediaToLibrary_DuplicateMediaData_DoesNotCreateMediaInLibraryReturns409", true);
     }
 
     @Test
@@ -255,7 +257,7 @@ public class UserSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 boolean isInLibrary = userRepo.existsMediaInLibrary(user.get().getId(), input.getKey());
@@ -269,7 +271,7 @@ public class UserSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("postMediaToLibrary_ValidInput_CreatesMediaInLibraryReturns204", true);
+        TESTS_PASSED.put("postMediaToLibrary_ValidInput_CreatesMediaInLibraryReturns204", true);
     }
 
     //=========================================================================================================
@@ -279,7 +281,6 @@ public class UserSecuredRoutesTest {
     @DisplayName("Tests whether DELETE request to /api/users/library with unauthenticated user did not delete media from library and it returned 401")
     void deleteMediaFromLibrary_UnauthenticatedUser_DoesNotDeleteMediaFromLibraryReturns401() {
         ResponseEntity<String> response;
-        Random random = new Random();
         int i = 0;
         List<SimpleEntry<Long, String>> inputs = new ArrayList<>() {
             {
@@ -293,21 +294,21 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
                 // no cookie
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(null), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
 
                 //random string as cookie
-                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(getRandomString(50, random)), String.class);
+                response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(TestUtil.getRandomString(50)), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
 
                 //jwt of non-existent user in cookies
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isFalse();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
@@ -320,7 +321,7 @@ public class UserSecuredRoutesTest {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("deleteMediaFromLibrary_UnauthenticatedUser_DoesNotDeleteMediaFromLibraryReturns401", true);
+        TESTS_PASSED.put("deleteMediaFromLibrary_UnauthenticatedUser_DoesNotDeleteMediaFromLibraryReturns401", true);
     }
 
     @Test
@@ -339,20 +340,20 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("deleteMediaFromLibrary_InvalidInputData_DoesNotDeleteMediaFromLibraryReturns400", true);
+        TESTS_PASSED.put("deleteMediaFromLibrary_InvalidInputData_DoesNotDeleteMediaFromLibraryReturns400", true);
     }
 
     @Test
@@ -377,20 +378,20 @@ public class UserSecuredRoutesTest {
         };
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                List<UserJDBC> usersBefore = getAllUsersWithLibrary();
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                List<UserJPA> usersBefore = getAllUsersWithLibrary();
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 response = restTemplate.exchange(ROUTE + "/" + input.getKey(), HttpMethod.DELETE, constructRequest(jwtUtils.generateTokenFromUsername(input.getValue())), String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-                List<UserJDBC> usersAfter = getAllUsersWithLibrary();
+                List<UserJPA> usersAfter = getAllUsersWithLibrary();
                 checkUsersMediaId(usersBefore, usersAfter);
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("deleteMediaFromLibrary_NonexistentDependencyData_DoesNotDeleteMediaFromLibraryReturns404", true);
+        TESTS_PASSED.put("deleteMediaFromLibrary_NonexistentDependencyData_DoesNotDeleteMediaFromLibraryReturns404", true);
     }
 
     @Test
@@ -410,7 +411,7 @@ public class UserSecuredRoutesTest {
 
         try {
             for (SimpleEntry<Long, String> input : inputs) {
-                Optional<UserJDBC> user = userRepo.findByUsername(input.getValue());
+                Optional<UserJPA> user = userRepo.findByUsername(input.getValue());
                 assertThat(user).isNotNull();
                 assertThat(user.isPresent()).isTrue();
                 boolean isInLibrary = userRepo.existsMediaInLibrary(user.get().getId(), input.getKey());
@@ -424,10 +425,10 @@ public class UserSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        testsPassed.put("deleteMediaFromLibrary_ValidInput_DeletesMediaFromLibraryReturns204", true);
+        TESTS_PASSED.put("deleteMediaFromLibrary_ValidInput_DeletesMediaFromLibraryReturns204", true);
     }
-    //=========================================================================================================
-    //PRIVATE METHODS
+//=================================================================================================================================
+//PRIVATE METHODS
 
     private HttpEntity constructRequest(String jwt) {
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -441,17 +442,12 @@ public class UserSecuredRoutesTest {
         return new HttpEntity<>(requestHeaders);
     }
 
-    private List<UserJDBC> getAllUsersWithLibrary() {
-        List<UserJDBC> users = userRepo.findAll();
-        for (UserJDBC user : users) {
-            List<MediaJDBC> medias = userRepo.findAllLibraryMediaByUserId(user.getId());
-            user.setMedias(medias);
-        }
-        return users;
+    private List<UserJPA> getAllUsersWithLibrary() {
+        return userRepo.findAll();
     }
 
     //checks if all user ids and media ids are the same in value and number
-    private void checkUsersMediaId(List<UserJDBC> beforeUsers, List<UserJDBC> afterUsers) {
+    private void checkUsersMediaId(List<UserJPA> beforeUsers, List<UserJPA> afterUsers) {
         assertThat(afterUsers.size()).isEqualTo(beforeUsers.size());
         for (int i = 0; i < afterUsers.size(); i++) {
             assertThat(afterUsers.get(i).getId()).isEqualTo(beforeUsers.get(i).getId());
@@ -460,17 +456,6 @@ public class UserSecuredRoutesTest {
                 assertThat(afterUsers.get(i).getMedias().get(j).getId()).isEqualTo(beforeUsers.get(i).getMedias().get(j).getId());
             }
         }
-    }
-
-    private String getRandomString(int length, Random random) {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
     }
 
 }

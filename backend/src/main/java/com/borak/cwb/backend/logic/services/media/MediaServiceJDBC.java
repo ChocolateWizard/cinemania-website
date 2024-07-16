@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
  */
 //@Service
 //@Transactional
-public class MediaService implements IMediaService {
+public class MediaServiceJDBC implements IMediaService {
 
     @Autowired
     private IMediaRepository<MediaJDBC, Long> mediaRepo;

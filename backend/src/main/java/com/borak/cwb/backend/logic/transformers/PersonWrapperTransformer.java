@@ -39,8 +39,6 @@ public class PersonWrapperTransformer {
 
     @Autowired
     private ConfigProperties config;
-    @Autowired
-    private Util util;
 
     public PersonResponseDTO jdbcToPersonResponse(PersonWrapperJDBC person) {
         PersonResponseDTO response = new PersonResponseDTO();
@@ -154,13 +152,13 @@ public class PersonWrapperTransformer {
             for (PersonRequestDTO.Profession profession : request.getProfessions()) {
                 switch (profession) {
                     case PersonRequestDTO.Director director -> {
-                        List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
+                        List<Long> sortedIds = Util.sortAsc(director.getWorkedOn());
                         List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
                         d = new DirectorJDBC(request.getId());
                         d.setMedias(medias);
                     }
                     case PersonRequestDTO.Writer writer -> {
-                        List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
+                        List<Long> sortedIds = Util.sortAsc(writer.getWorkedOn());
                         List<MediaJDBC> medias = sortedIds.stream().map(id -> new MediaJDBC(id)).collect(Collectors.toList());
                         w = new WriterJDBC(request.getId());
                         w.setMedias(medias);
@@ -211,13 +209,13 @@ public class PersonWrapperTransformer {
             for (PersonRequestDTO.Profession profession : request.getProfessions()) {
                 switch (profession) {
                     case PersonRequestDTO.Director director -> {
-                        List<Long> sortedIds = util.sortAsc(director.getWorkedOn());
+                        List<Long> sortedIds = Util.sortAsc(director.getWorkedOn());
                         List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
                         d = new DirectorJPA(request.getId(), person);
                         d.setMedias(medias);
                     }
                     case PersonRequestDTO.Writer writer -> {
-                        List<Long> sortedIds = util.sortAsc(writer.getWorkedOn());
+                        List<Long> sortedIds = Util.sortAsc(writer.getWorkedOn());
                         List<MediaJPA> medias = sortedIds.stream().map(id -> new MediaJPA(id)).collect(Collectors.toList());
                         w = new WriterJPA(request.getId(), person);
                         w.setMedias(medias);

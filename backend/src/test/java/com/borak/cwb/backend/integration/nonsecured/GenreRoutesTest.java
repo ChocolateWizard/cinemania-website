@@ -67,6 +67,7 @@ public class GenreRoutesTest {
         ResponseEntity<String> response = restTemplate.getForEntity(ROUTE, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(jsonReader.getGenreJson(1));
+
         TESTS_PASSED.put("getAll_Test", true);
     }
 

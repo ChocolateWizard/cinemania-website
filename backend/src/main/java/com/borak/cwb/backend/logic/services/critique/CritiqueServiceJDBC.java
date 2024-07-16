@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class CritiqueService implements ICritiqueService<CritiqueRequestDTO, Long> {
+public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO, Long> {
 
     @Autowired
     private ICritiqueRepository<CritiqueJDBC, Long> critiqueRepo;

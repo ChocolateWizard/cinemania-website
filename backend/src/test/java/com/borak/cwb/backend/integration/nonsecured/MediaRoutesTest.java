@@ -8,11 +8,9 @@ import com.borak.cwb.backend.helpers.Pair;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.borak.cwb.backend.helpers.TestJsonResponseReader;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
-import java.util.ArrayList;
+import com.borak.cwb.backend.helpers.TestUtil;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,16 +40,16 @@ public class MediaRoutesTest {
     @Autowired
     private TestJsonResponseReader jsonReader;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/medias";
 
     static {
-        testsPassed.put("getMedia_InvalidInputData_Returns400", false);
-        testsPassed.put("getMedia_ValidInputData_Returns200", false);
+        TESTS_PASSED.put("getMedia_InvalidInputData_Returns400", false);
+        TESTS_PASSED.put("getMedia_ValidInputData_Returns200", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -76,7 +74,7 @@ public class MediaRoutesTest {
             assertThat(response.getStatusCode()).as("Assertion at i=%d for url=%s", i, invalidUrls[i]).isEqualTo(HttpStatus.BAD_REQUEST);
         }
 
-        testsPassed.put("getMedia_InvalidInputData_Returns400", true);
+        TESTS_PASSED.put("getMedia_InvalidInputData_Returns400", true);
     }
 
     @Test
@@ -84,7 +82,7 @@ public class MediaRoutesTest {
     @DisplayName("Tests GET /api/medias with valid input")
     void getMedia_ValidInputData_Returns200() {
         ResponseEntity<String> response;
-        List<Pair<Integer, String>> inputs1 = getValidUrlsAndNonEmptyResponses();
+        Pair<Integer, String>[] inputs1 = getValidUrlsAndNonEmptyResponses();
         String[] inputs2 = getValidUrlsForEmptyResponses();
 
         for (Pair<Integer, String> pom : inputs1) {
@@ -98,7 +96,7 @@ public class MediaRoutesTest {
             assertThat(response.getBody()).as("Assertion at i=%d for url=%s", i, inputs2[i]).isEqualTo("[]");
         }
 
-        testsPassed.put("getMedia_ValidInputData_Returns200", true);
+        TESTS_PASSED.put("getMedia_ValidInputData_Returns200", true);
     }
 
 //=================================================================================================================================
@@ -117,7 +115,7 @@ public class MediaRoutesTest {
             "/search?page=1&size=10&title=",
             "/search?page=1&size=10&title= ",
             "/search?page=1&size=10&title=       ",
-            "/search?page=1&size=10&title=" + getRandomString(301),
+            "/search?page=1&size=10&title=" + TestUtil.getRandomString(301),
             "/search?page=1&size=10&title=text&genreIds=0",
             "/search?page=1&size=10&title=text&genreIds=1,2,0",
             "/search?page=1&size=10&title=text&genreIds=-1",
@@ -176,37 +174,33 @@ public class MediaRoutesTest {
             "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tvv_show",
             "/search?page=1&size=10&title=text&genreIds=1,2&sortByAudienceRating=desc&sortByReleaseDate=desc&releaseYear=2020&mediaType=tv _show"
         };
-
     }
 
-    private List<Pair<Integer, String>> getValidUrlsAndNonEmptyResponses() {
-        return new ArrayList<>() {
-            {
-                add(new Pair(1, "/search"));
-                add(new Pair(1, "/search?page=1&size=10"));
-                add(new Pair(2, "/search?page=1&size=10&title=a"));
-                add(new Pair(3, "/search?page=1&size=10&title=c"));
-                add(new Pair(4, "/search?page=1&size=10&title=Sou"));
-                add(new Pair(5, "/search?page=1&size=10&title=st"));
-                add(new Pair(6, "/search?page=1&size=10&title=South Park"));
-                add(new Pair(7, "/search?page=1&size=10&title=ar"));
-                add(new Pair(8, "/search?sortByAudienceRating=desc"));
-                add(new Pair(9, "/search?sortByAudienceRating=ascending"));
-                add(new Pair(10, "/search?sortByReleaseDate=desc"));
-                add(new Pair(11, "/search?sortByReleaseDate=asc"));
-                add(new Pair(12, "/search?sortByAudienceRating=asc&sortByReleaseDate=desc"));
-                add(new Pair(13, "/search?sortByAudienceRating=desc&sortByReleaseDate=asc"));
-                add(new Pair(14, "/search?title=an&sortByAudienceRating=desc&sortByReleaseDate=asc"));
-                add(new Pair(15, "/search?genreIds=6,12&sortByAudienceRating=desc&sortByReleaseDate=asc"));
-                add(new Pair(16, "/search?genreIds=6,13&sortByAudienceRating=desc&sortByReleaseDate=asc"));
-                add(new Pair(17, "/search?genreIds=6,13,12&sortByAudienceRating=desc&sortByReleaseDate=asc"));
-                add(new Pair(18, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc"));
-                add(new Pair(19, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=movie"));
-                add(new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=tv_show"));
-                add(new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&releaseYear=2004&mediaType=tv_show"));
-            }
+    private Pair<Integer, String>[] getValidUrlsAndNonEmptyResponses() {
+        return new Pair[]{
+            new Pair(1, "/search"),
+            new Pair(1, "/search?page=1&size=10"),
+            new Pair(2, "/search?page=1&size=10&title=a"),
+            new Pair(3, "/search?page=1&size=10&title=c"),
+            new Pair(4, "/search?page=1&size=10&title=Sou"),
+            new Pair(5, "/search?page=1&size=10&title=st"),
+            new Pair(6, "/search?page=1&size=10&title=South Park"),
+            new Pair(7, "/search?page=1&size=10&title=ar"),
+            new Pair(8, "/search?sortByAudienceRating=desc"),
+            new Pair(9, "/search?sortByAudienceRating=ascending"),
+            new Pair(10, "/search?sortByReleaseDate=desc"),
+            new Pair(11, "/search?sortByReleaseDate=asc"),
+            new Pair(12, "/search?sortByAudienceRating=asc&sortByReleaseDate=desc"),
+            new Pair(13, "/search?sortByAudienceRating=desc&sortByReleaseDate=asc"),
+            new Pair(14, "/search?title=an&sortByAudienceRating=desc&sortByReleaseDate=asc"),
+            new Pair(15, "/search?genreIds=6,12&sortByAudienceRating=desc&sortByReleaseDate=asc"),
+            new Pair(16, "/search?genreIds=6,13&sortByAudienceRating=desc&sortByReleaseDate=asc"),
+            new Pair(17, "/search?genreIds=6,13,12&sortByAudienceRating=desc&sortByReleaseDate=asc"),
+            new Pair(18, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc"),
+            new Pair(19, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=movie"),
+            new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&mediaType=tv_show"),
+            new Pair(20, "/search?genreIds=13,6&sortByAudienceRating=asc&sortByReleaseDate=asc&releaseYear=2004&mediaType=tv_show")
         };
-
     }
 
     private String[] getValidUrlsForEmptyResponses() {
@@ -241,19 +235,6 @@ public class MediaRoutesTest {
             "/search?page=1&size=10&genreIds=8&mediaType=tv_show",
             "/search?page=1&size=10&genreIds=12,13&mediaType=movie&title=South"
         };
-
-    }
-
-    private String getRandomString(int length) {
-        Random random = new Random();
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
     }
 
 }

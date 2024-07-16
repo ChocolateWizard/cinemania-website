@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class CountryService implements ICountryService {
+public class CountryServiceJDBC implements ICountryService {
 
     @Autowired
     private CountryTransformer countryTransformer;

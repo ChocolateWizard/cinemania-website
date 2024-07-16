@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class PersonService implements IPersonService<PersonRequestDTO> {
+public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
 
     @Autowired
     private IPersonRepository<PersonJDBC, Long> personRepo;

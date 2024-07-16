@@ -45,17 +45,17 @@ public class ImageRoutesTest {
     private FileRepository fileRepo;
 
     private final DataInitializer init = new DataInitializer();
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/images";
 
     static {
-        testsPassed.put("getMediaImage_Test", false);
-        testsPassed.put("getPersonImage_Test", false);
-        testsPassed.put("getUserImage_Test", false);
+        TESTS_PASSED.put("getMediaImage_Test", false);
+        TESTS_PASSED.put("getPersonImage_Test", false);
+        TESTS_PASSED.put("getUserImage_Test", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -91,7 +91,7 @@ public class ImageRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             }
         }
-        testsPassed.put("getMediaImage_Test", true);
+        TESTS_PASSED.put("getMediaImage_Test", true);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ImageRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             }
         }
-        testsPassed.put("getPersonImage_Test", true);
+        TESTS_PASSED.put("getPersonImage_Test", true);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class ImageRoutesTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             }
         }
-        testsPassed.put("getUserImage_Test", true);
+        TESTS_PASSED.put("getUserImage_Test", true);
     }
 
 }

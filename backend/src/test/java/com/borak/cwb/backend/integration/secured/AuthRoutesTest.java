@@ -5,31 +5,26 @@
 package com.borak.cwb.backend.integration.secured;
 
 import com.borak.cwb.backend.config.ConfigProperties;
-import com.borak.cwb.backend.domain.MyImage;
 import com.borak.cwb.backend.domain.dto.user.UserLoginDTO;
 import com.borak.cwb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.cwb.backend.domain.enums.Gender;
 import com.borak.cwb.backend.domain.enums.UserRole;
-import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.domain.SecurityUser;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
+import com.borak.cwb.backend.helpers.Pair;
 import com.borak.cwb.backend.helpers.TestJsonResponseReader;
 import com.borak.cwb.backend.helpers.TestResultsHelper;
+import com.borak.cwb.backend.helpers.TestUtil;
+import com.borak.cwb.backend.helpers.repositories.UserTestRepository;
 import com.borak.cwb.backend.logic.security.JwtUtils;
-import com.borak.cwb.backend.repository.jdbc.UserRepositoryJDBC;
 import com.borak.cwb.backend.repository.file.FileRepository;
-import java.io.IOException;
 import java.net.HttpCookie;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +47,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.core.io.ByteArrayResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -66,44 +60,50 @@ import static org.assertj.core.api.Assertions.fail;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthRoutesTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private UserRepositoryJDBC userRepo;
-    @Autowired
-    private FileRepository fileRepo;
-    @Autowired
-    private PasswordEncoder pswEncoder;
-    @Autowired
-    private ConfigProperties config;
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private TestJsonResponseReader jsonReader;
+    private final TestRestTemplate restTemplate;
+    private final UserTestRepository userRepo;
+    private final FileRepository fileRepo;
+    private final PasswordEncoder pswEncoder;
+    private final ConfigProperties config;
+    private final JwtUtils jwtUtils;
+    private final TestJsonResponseReader jsonReader;
+    private final TestUtil testUtil;
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/auth";
 
+    @Autowired
+    public AuthRoutesTest(TestRestTemplate restTemplate, UserTestRepository userRepo, FileRepository fileRepo, PasswordEncoder pswEncoder, ConfigProperties config, JwtUtils jwtUtils, TestJsonResponseReader jsonReader, TestUtil testUtil) {
+        this.restTemplate = restTemplate;
+        this.userRepo = userRepo;
+        this.fileRepo = fileRepo;
+        this.pswEncoder = pswEncoder;
+        this.config = config;
+        this.jwtUtils = jwtUtils;
+        this.jsonReader = jsonReader;
+        this.testUtil = testUtil;
+    }
+
     static {
-        testsPassed.put("register_InvalidInput_NotCreatedUserReturns400", false);
-        testsPassed.put("register_DuplicateInput_NotCreatedUserReturns400", false);
-        testsPassed.put("register_NonExistentDependencyObjects_NotCreatedUserReturns404", false);
-        testsPassed.put("register_ValidInput_CreatedUserReturns200", false);
+        TESTS_PASSED.put("register_InvalidInput_NotCreatedUserReturns400", false);
+        TESTS_PASSED.put("register_DuplicateInput_NotCreatedUserReturns400", false);
+        TESTS_PASSED.put("register_NonExistentDependencyObjects_NotCreatedUserReturns404", false);
+        TESTS_PASSED.put("register_ValidInput_CreatedUserReturns200", false);
 
-        testsPassed.put("login_InvalidInput_NotLoggedInReturns400", false);
-        testsPassed.put("login_NonExistentUser_NotLoggedInReturns401", false);
-        testsPassed.put("login_ValidInput_ReturnsUserJWTAnd200", false);
-        testsPassed.put("login_SuccessiveValidInput_ReturnsCorrectJWTAndUser", false);
-        testsPassed.put("login_NonExistentUserInputValidJWT_Returns401AndNoJWT", false);
+        TESTS_PASSED.put("login_InvalidInput_NotLoggedInReturns400", false);
+        TESTS_PASSED.put("login_NonExistentUser_NotLoggedInReturns401", false);
+        TESTS_PASSED.put("login_ValidInput_ReturnsUserJWTAnd200", false);
+        TESTS_PASSED.put("login_SuccessiveValidInput_ReturnsCorrectJWTAndUser", false);
+        TESTS_PASSED.put("login_NonExistentUserInputValidJWT_Returns401AndNoJWT", false);
 
-        testsPassed.put("logout_NoJWT_Returns401", false);
-        testsPassed.put("logout_InvalidJWT_Returns401", false);
-        testsPassed.put("logout_NonExistentUserJWT_Returns401", false);
-        testsPassed.put("logout_ValidJWT_ReturnsNoJWTAnd200", false);
+        TESTS_PASSED.put("logout_NoJWT_Returns401", false);
+        TESTS_PASSED.put("logout_InvalidJWT_Returns401", false);
+        TESTS_PASSED.put("logout_NonExistentUserJWT_Returns401", false);
+        TESTS_PASSED.put("logout_ValidJWT_ReturnsNoJWTAnd200", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -116,1083 +116,533 @@ public class AuthRoutesTest {
     void beforeEach() {
         Assumptions.assumeTrue(TestResultsHelper.didAllPreControllerTestsPass());
     }
+//---------------------------------------------------------------------------------------------------------------------------------
+//register
 
     @Test
     @Order(1)
     @DisplayName("Tests whether POST request to /api/auth/register with structurally invalid data did not create new user and it returned 400")
     void register_InvalidInput_NotCreatedUserReturns400() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        boolean doesUserExist;
-        Optional<UserJDBC> userDB;
-        Resource userProfileImage;
-        Random random = new Random();
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
+
+        //get a valid JWT cookie 
+        final Optional<UserJPA> user = userRepo.findByUsername("admin");
+        final HttpCookie cookie = testUtil.constructJWTCookie(user.get().getUsername());
+
         int i = 0;
-        //bad requests
-        List<SimpleEntry<UserRegisterDTO, MockMultipartFile>> badUserInputs = new ArrayList<>() {
-            {
-                //--------------------------------------------------------------------------------------
-                //invalid first name
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                null, "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                " ", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "        ", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                getRandomString(101, random), "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-------------------------------------------------------------------------------------------
-                //invalid last name
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", null, Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", " ", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "         ", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", getRandomString(101, random), Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid gender
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", null,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid profile name
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                null, null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                " ", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "           ", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                getRandomString(101, random), null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko  makro", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                " marko ", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "......marko....", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko&^$makro", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko.exe", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko!", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko_markovic?", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "/marko/", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "mar\tko", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "mar\nko", null, "badInput", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid username
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, null, "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, " ", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "        ", "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, getRandomString(301, random), "badInput@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid email
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", null, "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", " ", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "          ", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", getRandomString(301, random), "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", getRandomString(291, random) + "@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badIn..put@@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail@.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInputgmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid password
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", null, 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", " ", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "        ", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", getRandomString(301, random), 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //-----------------------------------------------------------------------------------------------
-                //invalid country id
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", null),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", 0l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", -1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", -10l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "badInput", null, "badInput", "badInput@gmail.com", "123456", -100l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-            }
-        };
-        UserRegisterDTO invalidUserRoleUser1 = new UserRegisterDTO(
-                "Marko", "Markovic", Gender.MALE, "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l);
-        UserRegisterDTO invalidUserRoleUser2 = new UserRegisterDTO(
-                "Marko", "Markovic", Gender.MALE, "badInput", null, "badInput", "badInput@gmail.com", "123456", 1l);
-        invalidUserRoleUser1.setRole(null);
-        invalidUserRoleUser2.setRole(UserRole.ADMINISTRATOR);
-        badUserInputs.add(new SimpleEntry<>(invalidUserRoleUser1,
-                new MockMultipartFile("profile_image", "test.jpg", "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-        badUserInputs.add(new SimpleEntry<>(invalidUserRoleUser2,
-                new MockMultipartFile("profile_image", "test.jpg", "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
         try {
-            for (SimpleEntry<UserRegisterDTO, MockMultipartFile> input : badUserInputs) {
-                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, constructRequest(input.getKey(), input.getValue()), String.class);
-
+            for (Pair<UserRegisterDTO, MockMultipartFile> pair : getInvalidRegisterFormsForResponse400()) {
+                //1. request without a cookie
+                request = constructRequest(pair.getL(), pair.getR(), null);
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-                if (input.getKey().getUsername() != null) {
-                    doesUserExist = userRepo.existsUsername(input.getKey().getUsername());
-                    userDB = userRepo.findByUsername(input.getKey().getUsername());
-                    assertThat(doesUserExist).isFalse();
-                    assertThat(userDB).isNotNull();
-                    assertThat(userDB.isPresent()).isFalse();
-                } else {
-                    doesUserExist = userRepo.existsEmail(input.getKey().getEmail());
-                    assertThat(doesUserExist).isFalse();
-                }
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
 
-                if (input.getValue() != null && input.getKey().getProfileName() != null) {
-                    String[] nameAndExtension = MyImage.extractNameAndExtension(input.getValue().getOriginalFilename());
-                    String filename = input.getKey().getProfileName() + "." + nameAndExtension[1];
-                    if (isValidFilename(filename)) {
-                        userProfileImage = fileRepo.getUserProfileImage(filename);
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
-                        assertThat(userProfileImage.exists()).isFalse();
-                        assertThat(userProfileImage.isReadable()).isFalse();
-                    }
-                }
+                //2. request with a valid cookie
+                request = constructRequest(pair.getL(), pair.getR(), cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
+
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
-        testsPassed.put("register_InvalidInput_NotCreatedUserReturns400", true);
+
+        TESTS_PASSED.put("register_InvalidInput_NotCreatedUserReturns400", true);
     }
 
     @Test
     @Order(2)
     @DisplayName("Tests whether POST request to /api/auth/register with data of already existing user did not create new user and it returned 400")
     void register_DuplicateInput_NotCreatedUserReturns400() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        boolean doesUserExist;
-        Optional<UserJDBC> userDB;
-        Resource userProfileImage;
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
+
+        final Optional<UserJPA> user = userRepo.findByUsername("admin");
+        final HttpCookie cookie = testUtil.constructJWTCookie(user.get().getUsername());
+
         int i = 0;
-
-        List<SimpleEntry<UserRegisterDTO, MockMultipartFile>> duplicateUserInputs = new ArrayList<>() {
-            {
-                //username exists
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko_markov10", null, "admin", "marko10@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.png",
-                                "image/png", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //email exists
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko_markov10", null, "marko10", "admin@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                //profile name exists
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "Admin", null, "marko10", "marko10@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-            }
-        };
         try {
-            for (SimpleEntry<UserRegisterDTO, MockMultipartFile> input : duplicateUserInputs) {
-                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, constructRequest(input.getKey(), input.getValue()), String.class);
+            for (Pair<UserRegisterDTO, MockMultipartFile> pair : getDuplicateDataRegisterFormsForResponse400()) {
+                //1. request without a cookie
+                request = constructRequest(pair.getL(), pair.getR(), null);
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
 
-                doesUserExist = userRepo.existsUsername(input.getKey().getUsername());
-                userDB = userRepo.findByUsername(input.getKey().getUsername());
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
-                if (input.getKey().getUsername().equals("admin")) {
-                    assertThat(doesUserExist).isTrue();
-                    assertThat(userDB).isNotNull();
-                    assertThat(userDB.isPresent()).isTrue();
+                //2. request with a cookie
+                request = constructRequest(pair.getL(), pair.getR(), cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
 
-                    assertThat(userDB.get().getFirstName()).isNotEqualTo(input.getKey().getFirstName());
-                    assertThat(userDB.get().getLastName()).isNotEqualTo(input.getKey().getLastName());
-                    assertThat(userDB.get().getGender()).isNotEqualTo(input.getKey().getGender());
-                    assertThat(userDB.get().getProfileName()).isNotEqualTo(input.getKey().getProfileName());
-                    assertThat(userDB.get().getEmail()).isNotEqualTo(input.getKey().getEmail());
-                    assertThat(userDB.get().getPassword()).isNotEqualTo(input.getKey().getPassword());
-                    assertThat(userDB.get().getRole()).isNotEqualTo(input.getKey().getRole());
-                    assertThat(userDB.get().getCountry().getId()).isNotEqualTo(input.getKey().getCountryId());
-
-                } else {
-                    assertThat(doesUserExist).isFalse();
-                    assertThat(userDB).isNotNull();
-                    assertThat(userDB.isPresent()).isFalse();
-                }
-
-                String[] nameAndExtension = MyImage.extractNameAndExtension(input.getValue().getOriginalFilename());
-                userProfileImage = fileRepo.getUserProfileImage(input.getKey().getProfileName() + "." + nameAndExtension[1]);
-
-                assertThat(userProfileImage.exists()).isFalse();
-                assertThat(userProfileImage.isReadable()).isFalse();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("register_DuplicateInput_NotCreatedUserReturns400", true);
+        TESTS_PASSED.put("register_DuplicateInput_NotCreatedUserReturns400", true);
     }
 
     @Test
     @Order(3)
     @DisplayName("Tests whether POST request to /api/auth/register with user data that has non-existent dependency objects did not create new user and it returned 404")
     void register_NonExistentDependencyObjects_NotCreatedUserReturns404() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        boolean doesUserExist;
-        Optional<UserJDBC> userDB;
-        Resource userProfileImage;
-        UserRegisterDTO nonExistentCountryIdInput = new UserRegisterDTO(
-                "Marko", "Markovic", Gender.MALE,
-                "marko_markov11", null, "marko11", "marko11@gmail.com", "123456", 400l);
-        MockMultipartFile mockImage = new MockMultipartFile("profile_image", "test.jpg", "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8));
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
 
-        response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, constructRequest(nonExistentCountryIdInput, mockImage), String.class);
+        final Optional<UserJPA> user = userRepo.findByUsername("admin");
+        final HttpCookie cookie = testUtil.constructJWTCookie(user.get().getUsername());
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        doesUserExist = userRepo.existsUsername(nonExistentCountryIdInput.getUsername());
-        userDB = userRepo.findByUsername(nonExistentCountryIdInput.getUsername());
-        assertThat(doesUserExist).isFalse();
-        assertThat(userDB).isNotNull();
-        assertThat(userDB.isPresent()).isFalse();
-        String[] nameAndExtension = MyImage.extractNameAndExtension(mockImage.getOriginalFilename());
-        userProfileImage = fileRepo.getUserProfileImage(nonExistentCountryIdInput.getProfileName() + "." + nameAndExtension[1]);
-        assertThat(userProfileImage.exists()).isFalse();
-        assertThat(userProfileImage.isReadable()).isFalse();
+        int i = 0;
+        try {
+            for (Pair<UserRegisterDTO, MockMultipartFile> pair : getNonExistentRelationshipDataRegisterFormsForResponse404()) {
+                //1. request without a cookie
+                request = constructRequest(pair.getL(), pair.getR(), null);
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
 
-        testsPassed.put("register_NonExistentDependencyObjects_NotCreatedUserReturns404", true);
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
+
+                //2. request with a cookie
+                request = constructRequest(pair.getL(), pair.getR(), cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
+
+                i++;
+            }
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
+        }
+
+        TESTS_PASSED.put("register_NonExistentDependencyObjects_NotCreatedUserReturns404", true);
     }
 
     @Test
     @Order(4)
     @DisplayName("Tests whether POST request to /api/auth/register with valid user data did create new user and it returned 200")
     void register_ValidInput_CreatedUserReturns200() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        boolean doesUserExist;
-        Optional<UserJDBC> userDB;
-        Resource userProfileImage;
-        UserRole[] roles = {UserRole.REGULAR, UserRole.CRITIC};
-        Random random = new Random();
+        List<UserJPA> usersBefore;
+        List<UserJPA> usersAfter;
+        List<Resource> imagesBefore;
+        List<Resource> imagesAfter;
+        Optional<UserJPA> userDB;
+        Resource imageDB;
+
         int i = 0;
-
-        List<SimpleEntry<UserRegisterDTO, MockMultipartFile>> validInputs = new ArrayList<>() {
-            {
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko_markov", null, "marko", "marko@gmail.com", "123456", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "test image content".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko", "Markovic", Gender.MALE,
-                                "marko_markov2", null, "marko2", "marko2@gmail.com", "123456", 190l),
-                        null));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Teodora", "Teodorovic", Gender.FEMALE,
-                                "tea123", null, "tea123", "tea123@gmail.com", "ttodora", 190l),
-                        new MockMultipartFile("profile_image", "test.png",
-                                "image/png", "test image random content bytes".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "aaaaa", "aaaaa", Gender.OTHER,
-                                "aaaaa", null, "aaaaa", "aaaaa@gmail.com", "aaa11aaaaa", 1l),
-                        new MockMultipartFile("profile_image", "test.png",
-                                "image/png", "afnpaisjngfvapiugn1431234ijansdfv".getBytes(StandardCharsets.UTF_8))));
-
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Marko3", "Markovic3", Gender.OTHER,
-                                "marko2_markiz3", null, "marko3", "marko3@gmail.com", "mmarko123", 1l),
-                        new MockMultipartFile("profile_image", "test.jpg",
-                                "image/jpeg", "testimageBYteasfaosdfnarandomcontent".getBytes(StandardCharsets.UTF_8))));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Teodora", "Teodorovic", Gender.FEMALE,
-                                "teadora123", null, "tea321", "tea321@gmail.com", "ttodora", 190l),
-                        null));
-                add(new SimpleEntry<>(
-                        new UserRegisterDTO(
-                                "Teodora", "Teodorovic", Gender.FEMALE,
-                                "teadora1234", null, "tea3214", "tea321@yahoo.com", "ttodora", 185l),
-                        null));
-            }
-        };
-
         try {
-            for (SimpleEntry<UserRegisterDTO, MockMultipartFile> validInput : validInputs) {
-                //set randomly either REGULAR or CRITIC
-                validInput.getKey().setRole(roles[random.nextInt(roles.length)]);
-                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, constructRequest(validInput.getKey(), validInput.getValue()), String.class);
+            for (Pair<UserRegisterDTO, MockMultipartFile> pair : getValidRegisterFormsForResponse200()) {
+                usersBefore = getAllUsers();
+                imagesBefore = getAllProfileImages();
+
+                request = constructRequest(pair.getL(), pair.getR(), null);
+                response = restTemplate.exchange(ROUTE + "/register", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-                doesUserExist = userRepo.existsUsername(validInput.getKey().getUsername());
-                userDB = userRepo.findByUsername(validInput.getKey().getUsername());
-
-                assertThat(doesUserExist).isTrue();
+                usersAfter = getAllUsers();
+                userDB = userRepo.findByUsername(pair.getL().getUsername());
                 assertThat(userDB).isNotNull();
                 assertThat(userDB.isPresent()).isTrue();
+                assertThat(usersAfter.size()).isEqualTo(usersBefore.size() + 1);
+                assertThat(usersAfter.contains(userDB.get())).isTrue();
 
-                assertThat(userDB.get()).isNotNull();
-                assertThat(userDB.get().getFirstName()).isNotEmpty().isEqualTo(validInput.getKey().getFirstName());
-                assertThat(userDB.get().getLastName()).isNotEmpty().isEqualTo(validInput.getKey().getLastName());
-                assertThat(userDB.get().getGender()).isNotNull().isEqualTo(validInput.getKey().getGender());
-                assertThat(userDB.get().getRole()).isNotNull().isEqualTo(validInput.getKey().getRole());
-                assertThat(userDB.get().getCountry()).isNotNull();
-                assertThat(userDB.get().getCountry().getId()).isNotNull().isEqualTo(validInput.getKey().getCountryId());
-                assertThat(userDB.get().getEmail()).isNotEmpty().isEqualTo(validInput.getKey().getEmail());
-                assertThat(userDB.get().getProfileName()).isNotEmpty().isEqualTo(validInput.getKey().getProfileName());
-                assertThat(userDB.get().getUsername()).isNotEmpty().isEqualTo(validInput.getKey().getUsername());
-                assertThat(userDB.get().getPassword()).isNotEmpty();
-                assertThat(pswEncoder.matches(validInput.getKey().getPassword(), userDB.get().getPassword())).isTrue();
+                assertUsersEqual(userDB.get(), pair.getL());
+                usersAfter.remove(userDB.get());
+                assertUsersEqual(usersAfter, usersBefore);
 
-                if (validInput.getValue() != null) {
-                    String[] nameAndExtension = MyImage.extractNameAndExtension(validInput.getValue().getOriginalFilename());
-                    userProfileImage = fileRepo.getUserProfileImage(validInput.getKey().getProfileName() + "." + nameAndExtension[1]);
-
-                    assertThat(userProfileImage.exists()).isTrue();
-                    assertThat(userProfileImage.isReadable()).isTrue();
-                    try {
-                        assertThat(userProfileImage.getContentAsByteArray()).isEqualTo(validInput.getValue().getBytes());
-                    } catch (IOException ex) {
-                        fail("getContentAsByteArray() and getBytes() were not supposed to fail");
-                    }
+                if (pair.getR() != null) {
+                    imageDB = fileRepo.getUserProfileImage(userDB.get().getProfileImage());
+                    assertThat(imageDB).isNotNull();
+                    assertThat(imageDB.exists()).isTrue();
+                    assertThat(imageDB.isReadable()).isTrue();
+                    assertThat(imageDB.getContentAsByteArray()).isEqualTo(pair.getR().getBytes());
                 } else {
-                    for (String extension : MyImage.VALID_EXTENSIONS) {
-                        userProfileImage = fileRepo.getUserProfileImage(validInput.getKey().getProfileName() + "." + extension);
-                        assertThat(userProfileImage.exists()).isFalse();
-                        assertThat(userProfileImage.isReadable()).isFalse();
-                    }
+                    imagesAfter = getAllProfileImages();
+                    assertImagesEqual(imagesAfter, imagesBefore);
                 }
+
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("register_ValidInput_CreatedUserReturns200", true);
+        TESTS_PASSED.put("register_ValidInput_CreatedUserReturns200", true);
     }
+//---------------------------------------------------------------------------------------------------------------------------------
+//login
 
     @Test
     @Order(5)
-    @DisplayName("Tests whether POST request to POST /api/auth/login with structurally invalid data did not login user and it returned 400")
+    @DisplayName("Tests whether POST request to POST /api/auth/login with structurally invalid data did not login user and it returned 400 with no Cookie")
     void login_InvalidInput_NotLoggedInReturns400() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        Random random = new Random();
-        int i = 0;
-        List<UserLoginDTO> invalidInput = new ArrayList<>() {
-            {
-                add(new UserLoginDTO(null, "admin"));
-                add(new UserLoginDTO("", "admin"));
-                add(new UserLoginDTO(" ", "admin"));
-                add(new UserLoginDTO("       ", "admin"));
-                add(new UserLoginDTO(getRandomString(301, random), "admin"));
-                add(new UserLoginDTO("admin", null));
-                add(new UserLoginDTO("admin", ""));
-                add(new UserLoginDTO("admin", " "));
-                add(new UserLoginDTO("admin", "      "));
-                add(new UserLoginDTO("admin", getRandomString(301, random)));
-            }
-        };
-        try {
-            for (UserLoginDTO input : invalidInput) {
-                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(input, null), String.class);
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
 
-                // Check cookies
-                MultiValueMap<String, String> responseHeaders = response.getHeaders();
-                List<String> setCookieHeader = responseHeaders.get(HttpHeaders.SET_COOKIE);
-                assertThat(setCookieHeader).isNull();
+        final Optional<UserJPA> user = userRepo.findByUsername("admin");
+        final HttpCookie cookie = testUtil.constructJWTCookie(user.get().getUsername());
+
+        int i = 0;
+        try {
+            for (UserLoginDTO lForm : getStructurallyInvalidLoginFormsForResponse400()) {
+                //1. request without a cookie
+                request = constructRequest(lForm, null);
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                // Check received cookies
+                assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNull();
+
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
+
+                //2. request with a cookie
+                request = constructRequest(lForm, cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+                // Check received cookies
+                assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNull();
+
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("login_InvalidInput_NotLoggedInReturns400", true);
+        TESTS_PASSED.put("login_InvalidInput_NotLoggedInReturns400", true);
     }
 
     @Test
     @Order(6)
-    @DisplayName("Tests whether POST request to POST /api/auth/login with non-existent user did not login user and it returned 401")
+    @DisplayName("Tests whether POST request to POST /api/auth/login with non-existent user did not login user and it returned 401 with no Cookie")
     void login_NonExistentUser_NotLoggedInReturns401() {
+        HttpEntity request;
         ResponseEntity<String> response;
-        int i = 0;
-        List<UserLoginDTO> nonExistentUserInput = new ArrayList<>() {
-            {
-                add(new UserLoginDTO("admina", "admina"));
-                add(new UserLoginDTO("admin", "admina"));
-                add(new UserLoginDTO("admina", "admin"));
-                add(new UserLoginDTO("admin", "admina"));
-                add(new UserLoginDTO("aaaaa", "aaaaa"));
-            }
-        };
-        try {
-            for (UserLoginDTO input : nonExistentUserInput) {
-                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(input, null), String.class);
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
 
-                // Check cookies
-                MultiValueMap<String, String> responseHeaders = response.getHeaders();
-                List<String> setCookieHeader = responseHeaders.get(HttpHeaders.SET_COOKIE);
-                assertThat(setCookieHeader).isNull();
+        final Optional<UserJPA> user = userRepo.findByUsername("admin");
+        final HttpCookie cookie = testUtil.constructJWTCookie(user.get().getUsername());
+
+        int i = 0;
+        try {
+            for (UserLoginDTO input : getNonExistentUserLoginForms()) {
+                //1. request without a cookie
+                request = constructRequest(input, null);
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                // Check received cookies
+                assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNull();
+
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
+
+                //2. request with a cookie
+                request = constructRequest(input, cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                // Check received cookies
+                assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNull();
+
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("login_NonExistentUser_NotLoggedInReturns401", true);
+        TESTS_PASSED.put("login_NonExistentUser_NotLoggedInReturns401", true);
     }
 
     @Test
     @Order(7)
     @DisplayName("Tests whether POST request to /api/auth/login with valid user data did login user by returning user data, JWT and 200")
     void login_ValidInput_ReturnsUserJWTAnd200() {
+        HttpEntity request;
         ResponseEntity<String> response;
+        final List<UserJPA> usersBefore = getAllUsers();
+        List<UserJPA> usersAfter;
+        final List<Resource> imagesBefore = getAllProfileImages();
+        List<Resource> imagesAfter;
+
         int i = 0;
-        //existing user input and expected json response
-        List<SimpleEntry<UserLoginDTO, String>> existingUserInput = new ArrayList<>() {
-            {
-                add(new SimpleEntry<>(new UserLoginDTO("admin", "admin"), jsonReader.getUserJson(1)));
-                add(new SimpleEntry<>(new UserLoginDTO("regular", "regular"), jsonReader.getUserJson(2)));
-                add(new SimpleEntry<>(new UserLoginDTO("critic", "critic"), jsonReader.getUserJson(3)));
-            }
-        };
         try {
-            for (SimpleEntry<UserLoginDTO, String> input : existingUserInput) {
-                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(input.getKey(), null), String.class);
-
+            for (Pair<UserLoginDTO, String> pair : getValidUserLoginFormsAndResponses()) {
+                request = constructRequest(pair.getL(), null);
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
+                //check user data
+                assertThat(response.getBody()).isEqualTo(pair.getR());
                 // Check cookies
-                List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                List<String> cookieStrings = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                assertThat(cookieStrings).isNotNull();
+                assertThat(cookieStrings.size()).isEqualTo(1);
+                List<HttpCookie> cookies = HttpCookie.parse(cookieStrings.get(0));
                 assertThat(cookies).isNotNull();
                 assertThat(cookies.size()).isEqualTo(1);
-                for (String cookieString : cookies) {
-                    HttpCookie cookie = HttpCookie.parse(cookieString).get(0);
-                    assertThat(cookie).isNotNull();
-                    assertThat(cookie.getName()).isEqualTo(config.getJwtCookieName());
-                    assertThat(cookie.getPath()).isEqualTo("/api");
-                    assertThat(cookie.isHttpOnly()).isTrue();
-                    assertThat(cookie.getMaxAge()).isEqualTo(24 * 60 * 60);
-                    assertThat(jwtUtils.getUserNameFromJwtToken(cookie.getValue())).isEqualTo(input.getKey().getUsername());
-                }
+                HttpCookie cookie = cookies.get(0);
 
-                //check user data
-                assertThat(response.getBody()).isEqualTo(input.getValue());
+                assertThat(cookie).isNotNull();
+                assertThat(cookie.getName()).isEqualTo(config.getJwtCookieName());
+                assertThat(cookie.getPath()).isEqualTo("/api");
+                assertThat(cookie.isHttpOnly()).isTrue();
+                assertThat(cookie.getMaxAge()).isEqualTo(24 * 60 * 60);
+                assertThat(jwtUtils.getUserNameFromJwtToken(cookie.getValue())).isEqualTo(pair.getL().getUsername());
+
+                usersAfter = getAllUsers();
+                imagesAfter = getAllProfileImages();
+                assertUsersEqual(usersAfter, usersBefore);
+                assertImagesEqual(imagesAfter, imagesBefore);
 
                 i++;
             }
-        } catch (AssertionError | IllegalArgumentException e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("login_ValidInput_ReturnsUserJWTAnd200", true);
+        TESTS_PASSED.put("login_ValidInput_ReturnsUserJWTAnd200", true);
     }
 
     @Test
     @Order(8)
-    @DisplayName("Tests whether POST request to /api/auth/login with valid user data returns correct cookie and user data after POST of another valid user with different JWT")
+    @DisplayName("Tests whether POST request to /api/auth/login with valid user and a valid JWT of a different valid user, returns 200 and response of the initial user with his JWT")
     void login_SuccessiveValidInput_ReturnsCorrectJWTAndUser() {
-        Assumptions.assumeTrue(testsPassed.get("login_ValidInput_ReturnsUserJWTAnd200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("login_ValidInput_ReturnsUserJWTAnd200"));
 
+        HttpEntity request;
         ResponseEntity<String> response;
-        UserLoginDTO adminUser = new UserLoginDTO("admin", "admin");
-        UserLoginDTO regularUser = new UserLoginDTO("regular", "regular");
-        UserLoginDTO criticUser = new UserLoginDTO("critic", "critic");
+        final Pair<UserLoginDTO, String>[] pairs1 = getValidUserLoginFormsAndResponses();
+        final Pair<UserLoginDTO, String>[] pairs2 = getValidUserLoginFormsAndResponses();
+        int i = 0;
+        int j = 0;
+        try {
+            for (Pair<UserLoginDTO, String> pair1 : pairs1) {
+                request = constructRequest(pair1.getL(), null);
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                String cookieString1 = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
+                assertThat(cookieString1).isNotNull();
 
-        //JWT of admin user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(adminUser, null), String.class);
-        String adminCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(adminCookie).isNotNull();
+                for (Pair<UserLoginDTO, String> pair2 : pairs2) {
+                    if (!pair1.getL().getUsername().equals(pair2.getL().getUsername())) {
+                        request = constructRequest(pair2.getL(), cookieString1);
+                        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                        String cookieString2 = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
+                        assertThat(cookieString2).isNotNull();
+                        assertThat(cookieString2).isNotEqualTo(cookieString1);
+                        HttpCookie cookie2 = HttpCookie.parse(cookieString2).get(0);
+                        assertThat(cookie2).isNotNull();
+                        assertThat(jwtUtils.getUserNameFromJwtToken(cookie2.getValue())).isEqualTo(pair2.getL().getUsername());
+                        assertThat(response.getBody()).isEqualTo(pair2.getR());
+                    }
+                    j++;
+                }
+                i++;
+            }
+        } catch (Throwable t) {
+            fail("Assertion failed at index (i,j)=(" + i + "," + j + ")", t);
+        }
 
-        //JWT of regular user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(regularUser, null), String.class);
-        String regularCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(regularCookie).isNotNull();
-
-        //JWT of critic user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(criticUser, null), String.class);
-        String criticCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(criticCookie).isNotNull();
-
-        //make a login request for regular user with admin JWT
-        HttpEntity request = constructRequest(regularUser, adminCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        String actualResponseCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(actualResponseCookie).isNotNull();
-        assertThat(actualResponseCookie).isNotEqualTo(adminCookie);
-        assertThat(actualResponseCookie).isNotEqualTo(criticCookie);
-        HttpCookie responseCookie = HttpCookie.parse(actualResponseCookie).get(0);
-        assertThat(responseCookie).isNotNull();
-        assertThat(jwtUtils.getUserNameFromJwtToken(responseCookie.getValue())).isEqualTo("regular");
-        assertThat(response.getBody()).isEqualTo(jsonReader.getUserJson(2));
-
-        //make a login request for admin user with regular JWT
-        request = constructRequest(adminUser, regularCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        actualResponseCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(actualResponseCookie).isNotNull();
-        assertThat(actualResponseCookie).isNotEqualTo(regularCookie);
-        assertThat(actualResponseCookie).isNotEqualTo(criticCookie);
-        responseCookie = HttpCookie.parse(actualResponseCookie).get(0);
-        assertThat(responseCookie).isNotNull();
-        assertThat(jwtUtils.getUserNameFromJwtToken(responseCookie.getValue())).isEqualTo("admin");
-        assertThat(response.getBody()).isEqualTo(jsonReader.getUserJson(1));
-
-        //make a login request for admin user with critic JWT
-        request = constructRequest(adminUser, criticCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        actualResponseCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(actualResponseCookie).isNotNull();
-        assertThat(actualResponseCookie).isNotEqualTo(criticCookie);
-        assertThat(actualResponseCookie).isNotEqualTo(regularCookie);
-        responseCookie = HttpCookie.parse(actualResponseCookie).get(0);
-        assertThat(responseCookie).isNotNull();
-        assertThat(jwtUtils.getUserNameFromJwtToken(responseCookie.getValue())).isEqualTo("admin");
-        assertThat(response.getBody()).isEqualTo(jsonReader.getUserJson(1));
-
-        //make a login request for critic user with regular JWT
-        request = constructRequest(criticUser, regularCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        actualResponseCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(actualResponseCookie).isNotNull();
-        assertThat(actualResponseCookie).isNotEqualTo(regularCookie);
-        assertThat(actualResponseCookie).isNotEqualTo(adminCookie);
-        responseCookie = HttpCookie.parse(actualResponseCookie).get(0);
-        assertThat(responseCookie).isNotNull();
-        assertThat(jwtUtils.getUserNameFromJwtToken(responseCookie.getValue())).isEqualTo("critic");
-        assertThat(response.getBody()).isEqualTo(jsonReader.getUserJson(3));
-
-        testsPassed.put("login_SuccessiveValidInput_ReturnsCorrectJWTAndUser", true);
+        TESTS_PASSED.put("login_SuccessiveValidInput_ReturnsCorrectJWTAndUser", true);
     }
 
     @Test
     @Order(9)
-    @DisplayName("Tests whether POST request to /api/auth/login with non-existent user data and valid JWT returns 401 and no JWT")
+    @DisplayName("Tests whether POST request to /api/auth/login with non-existent user and valid JWT returns 401 and no JWT")
     void login_NonExistentUserInputValidJWT_Returns401AndNoJWT() {
-        Assumptions.assumeTrue(testsPassed.get("login_ValidInput_ReturnsUserJWTAnd200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("login_ValidInput_ReturnsUserJWTAnd200"));
 
+        HttpEntity request;
         ResponseEntity<String> response;
-        UserLoginDTO adminUser = new UserLoginDTO("admin", "admin");
-        UserLoginDTO regularUser = new UserLoginDTO("regular", "regular");
-        UserLoginDTO criticUser = new UserLoginDTO("critic", "critic");
+        final Pair<UserLoginDTO, String>[] pairs1 = getValidUserLoginFormsAndResponses();
+        final UserLoginDTO[] users2 = getNonExistentUserLoginForms();
+        int i = 0;
+        int j = 0;
+        try {
+            for (Pair<UserLoginDTO, String> pair1 : pairs1) {
+                request = constructRequest(pair1.getL(), null);
+                response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                String cookieString1 = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
+                assertThat(cookieString1).isNotNull();
 
-        //JWT of admin user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(adminUser, null), String.class);
-        String adminCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(adminCookie).isNotNull();
+                for (UserLoginDTO user : users2) {
+                    request = constructRequest(user, cookieString1);
+                    response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+                    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                    List<String> actualResponseCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                    assertThat(actualResponseCookies).isNull();
+                    j++;
+                }
+                i++;
+            }
+        } catch (Throwable t) {
+            fail("Assertion failed at index (i,j)=(" + i + "," + j + ")", t);
+        }
 
-        //JWT of regular user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(regularUser, null), String.class);
-        String regularCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(regularCookie).isNotNull();
-
-        //JWT of critic user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(criticUser, null), String.class);
-        String criticCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(criticCookie).isNotNull();
-
-        //non-existent user with valid JWT
-        HttpEntity request = constructRequest(new UserLoginDTO("dummyUser101", "dummyPassword101"), adminCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        List<String> actualResponseCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        assertThat(actualResponseCookies).isNull();
-
-        request = constructRequest(new UserLoginDTO("dummyUser102", "dummyPassword102"), regularCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        actualResponseCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        assertThat(actualResponseCookies).isNull();
-
-        request = constructRequest(new UserLoginDTO("dummyUser102", "dummyPassword102"), criticCookie);
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        actualResponseCookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
-        assertThat(actualResponseCookies).isNull();
-
-        testsPassed.put("login_NonExistentUserInputValidJWT_Returns401AndNoJWT", true);
+        TESTS_PASSED.put("login_NonExistentUserInputValidJWT_Returns401AndNoJWT", true);
     }
+//---------------------------------------------------------------------------------------------------------------------------------
+//logout
 
     @Test
     @Order(10)
-    @DisplayName("Tests whether POST request to /api/auth/logout without a JWT returned 401")
+    @DisplayName("Tests whether POST request to /api/auth/logout without a JWT returned 401 and no cookie")
     void logout_NoJWT_Returns401() {
-        for (int i = 0; i < 100; i++) {
-            ResponseEntity<String> response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, constructRequest(null), String.class);
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        HttpEntity request;
+        ResponseEntity<String> response;
+        List<String> cookies;
+        int i = 0;
+        try {
+            for (i = 0; i < 100; i++) {
+                request = constructRequest(null);
+                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, request, String.class);
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                assertThat(cookies).isNull();
+            }
+        } catch (Throwable t) {
+            fail("Assertion failed at index " + i, t);
         }
 
-        testsPassed.put("logout_NoJWT_Returns401", true);
+        TESTS_PASSED.put("logout_NoJWT_Returns401", true);
     }
 
     @Test
     @Order(11)
-    @DisplayName("Tests whether POST request to /api/auth/logout with an invalid JWT returned 401")
+    @DisplayName("Tests whether POST request to /api/auth/logout with an invalid JWT returned 401 and no cookie")
     void logout_InvalidJWT_Returns401() {
-        Assumptions.assumeTrue(testsPassed.get("login_ValidInput_ReturnsUserJWTAnd200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("login_ValidInput_ReturnsUserJWTAnd200"));
 
-        Random random = new Random();
+        HttpEntity request;
         ResponseEntity<String> response;
-        UserLoginDTO adminUser = new UserLoginDTO("admin", "admin");
-        UserLoginDTO regularUser = new UserLoginDTO("regular", "regular");
-        UserLoginDTO criticUser = new UserLoginDTO("critic", "critic");
+        List<String> cookies;
         int i = 0;
-
-        //JWT of admin user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(adminUser, null), String.class);
-        HttpCookie adminCookie = HttpCookie.parse(response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0);
-        assertThat(adminCookie).isNotNull();
-
-        //JWT of regular user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(regularUser, null), String.class);
-        HttpCookie regularCookie = HttpCookie.parse(response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0);
-        assertThat(regularCookie).isNotNull();
-
-        //JWT of critic user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(criticUser, null), String.class);
-        HttpCookie criticCookie = HttpCookie.parse(response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0);
-        assertThat(criticCookie).isNotNull();
-
-        adminCookie.setValue("a" + adminCookie.getValue().substring(1));
-        regularCookie.setValue("dummyfirstvalue.dummytsecond.thirdoptionwhatever");
-        criticCookie.setValue(getRandomString(100, random));
-
-        HttpCookie emptyValueCookie = (HttpCookie) adminCookie.clone();
-        emptyValueCookie.setValue("");
-
-        //invalid JWT value Strings
-        List<String> invalidJWTs = new ArrayList<>() {
-            {
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ");
-                add(".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQSflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQSflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-                add("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ==.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-            }
-        };
-
-        //invalid cookies
-        List<HttpCookie> invalidCookies = new ArrayList<>() {
-            {
-                add(adminCookie);
-                add(regularCookie);
-                add(criticCookie);
-                add(emptyValueCookie);
-            }
-        };
-        for (String invalidJWT : invalidJWTs) {
-            HttpCookie invalidCookie = (HttpCookie) criticCookie.clone();
-            invalidCookie.setValue(invalidJWT);
-            invalidCookies.add(invalidCookie);
-        }
-        invalidCookies.add(new HttpCookie("token", getRandomString(100, random)));
-        invalidCookies.add(new HttpCookie(getRandomString(10, random), getRandomString(100, random)));
-
-        //check
         try {
-            for (HttpCookie invalidCookie : invalidCookies) {
-                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, constructRequest(invalidCookie.toString()), String.class);
+            for (HttpCookie cookie : getInvalidCookies()) {
+                request = constructRequest(cookie.toString());
+                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                assertThat(cookies).isNull();
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
-        }
-
-        //invalid cookie strings
-        List<String> invalidCookieNames = new ArrayList<>() {
-            {
-                add("");
-                add("username=");
-                add("user@name=value");
-                add("user name=value");
-                add("usernamevalue");
-                add("username==value");
-                add("username=\\u0000value");
-                add("username=valué");
-                add("cwt=; Path=/api; Max-Age=86400; HttpOnly");
-                add("cwt=invalidToken; Path=/api; Max-Age=86400; HttpOnly");
-                add("cwt=yourJwtToken; Path=/api; Max-Age=0; HttpOnly");
-                add("cwt=yourJwtToken; Path=/api; Max-Age=3153600000; HttpOnly");
-                add("cwt=yourJwtToken; Path=/wrongPath; Max-Age=86400; HttpOnly");
-                add("cwt=yourJwtToken; Path=/api; Max-Age=86400");
-                add("cwt=yourJwtToken; Path=/api; Max-Age=86400; HttpOnly; Secure; SameSite=Lax");
-                add("wrongName=yourJwtToken; Path=/api; Max-Age=86400; HttpOnly");
-                add("cwt=yourJwtToken$%^&*(); Path=/api; Max-Age=86400; HttpOnly");
-                add("cwt=your Jwt Token; Path=/api; Max-Age=86400; HttpOnly");
-                add("LWSSO_COOKIE_KEY=123-LWSSO_COOKIE_KEY-VALUE-456; Path=/; Domain=localhost; Max-Age=PT168H; Expires=Tue, 14 Jun 2022 22:35:02 GMT; Secure; HttpOnly");
-            }
-        };
-        try {
-            for (String cookie : invalidCookieNames) {
-                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, constructRequest(cookie), String.class);
+            i = 0;
+            for (String cookie : getInvalidCookieStrings()) {
+                request = constructRequest(cookie);
+                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                assertThat(cookies).isNull();
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("logout_InvalidJWT_Returns401", true);
+        TESTS_PASSED.put("logout_InvalidJWT_Returns401", true);
     }
 
     @Test
     @Order(12)
-    @DisplayName("Tests whether POST request to /api/auth/logout with a JWT of an non-existent user returned 401")
+    @DisplayName("Tests whether POST request to /api/auth/logout with a JWT of an non-existent user returned 401 and no cookie")
     void logout_NonExistentUserJWT_Returns401() {
-        Assumptions.assumeTrue(testsPassed.get("login_ValidInput_ReturnsUserJWTAnd200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("login_ValidInput_ReturnsUserJWTAnd200"));
 
-        Random random = new Random();
+        HttpEntity request;
         ResponseEntity<String> response;
+        List<String> cookies;
         int i = 0;
-
-        SecurityUser user1 = new SecurityUser();
-        user1.setFirstName("DummyName");
-        user1.setLastName("DummyName");
-        user1.setGender(Gender.OTHER);
-        user1.setProfileName("DummyProfileName");
-        user1.setEmail("DummyEmail@gmail.com");
-        user1.setUsername("DummyUsername");
-        user1.setPassword("DummyPassword");
-        user1.setRole(UserRole.ADMINISTRATOR);
-        user1.setCountry(new SecurityUser.Country(190l, "Some random country", "Some random country", "RM"));
-        user1.setId(100l);
-        user1.setCreatedAt(LocalDateTime.now());
-        user1.setUpdatedAt(LocalDateTime.now());
-
-        SecurityUser user2 = new SecurityUser();
-        user2.setFirstName("DummyName2");
-        user2.setLastName("DummyName2");
-        user2.setGender(Gender.MALE);
-        user2.setProfileName("DummyProfileName2");
-        user2.setEmail("DummyEmail2@gmail.com");
-        user2.setUsername("DummyUsername2");
-        user2.setPassword("DummyPassword2");
-        user2.setRole(UserRole.REGULAR);
-        user2.setCountry(new SecurityUser.Country(190l, "Some random country2", "Some random country2", "RF"));
-        user2.setId(101l);
-        user2.setCreatedAt(LocalDateTime.now());
-        user2.setUpdatedAt(LocalDateTime.now());
-
-        SecurityUser user3 = new SecurityUser();
-        user3.setFirstName(getRandomString(10, random));
-        user3.setLastName(getRandomString(10, random));
-        user3.setGender(Gender.FEMALE);
-        user3.setProfileName(getRandomString(15, random));
-        user3.setEmail(getRandomString(10, random) + "@gmail.com");
-        user3.setUsername(getRandomString(20, random));
-        user3.setPassword(getRandomString(12, random));
-        user3.setRole(UserRole.CRITIC);
-        user3.setCountry(new SecurityUser.Country(190l, getRandomString(30, random), getRandomString(33, random), getRandomString(2, random)));
-        user3.setId(102l);
-        user3.setCreatedAt(LocalDateTime.now());
-        user3.setUpdatedAt(LocalDateTime.now());
-
-        List<SecurityUser> users = new ArrayList<>() {
-            {
-                add(user1);
-                add(user2);
-                add(user3);
-            }
-        };
         try {
-            for (SecurityUser user : users) {
-                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, constructRequest(jwtUtils.generateJwtCookie(user).toString()), String.class);
+            for (String cookie : getNonExistentUserValidJWTs()) {
+                request = constructRequest(cookie);
+                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+                cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+                assertThat(cookies).isNull();
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("logout_NonExistentUserJWT_Returns401", true);
+        TESTS_PASSED.put("logout_NonExistentUserJWT_Returns401", true);
     }
 
     @Test
     @Order(13)
-    @DisplayName("Tests whether POST request to /api/auth/logout with a JWT of an existing user returned no JWT and 200")
+    @DisplayName("Tests whether POST request to /api/auth/logout with a JWT of an existing user returned 200 and an empty JWT cookie")
     void logout_ValidJWT_ReturnsNoJWTAnd200() {
-        Assumptions.assumeTrue(testsPassed.get("login_ValidInput_ReturnsUserJWTAnd200"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("login_ValidInput_ReturnsUserJWTAnd200"));
 
+        HttpEntity request;
         ResponseEntity<String> response;
-        UserLoginDTO adminUser = new UserLoginDTO("admin", "admin");
-        UserLoginDTO regularUser = new UserLoginDTO("regular", "regular");
-        UserLoginDTO criticUser = new UserLoginDTO("critic", "critic");
         int i = 0;
-
-        //JWT of admin user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(adminUser, null), String.class);
-        String adminCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(adminCookie).isNotNull();
-
-        //JWT of regular user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(regularUser, null), String.class);
-        String regularCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(regularCookie).isNotNull();
-
-        //JWT of critic user
-        response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, constructRequest(criticUser, null), String.class);
-        String criticCookie = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-        assertThat(criticCookie).isNotNull();
-
-        List<String> cookies = new ArrayList<>() {
-            {
-                add(adminCookie);
-                add(regularCookie);
-                add(criticCookie);
-            }
-        };
-
         try {
-            for (String cookie : cookies) {
-                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, constructRequest(cookie), String.class);
+            for (String cookie : getValidCookies()) {
+                request = constructRequest(cookie);
+                response = restTemplate.exchange(ROUTE + "/logout", HttpMethod.POST, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 // Check cookies
@@ -1209,56 +659,54 @@ public class AuthRoutesTest {
                 assertThat(response.getBody()).isEqualTo("{\"message\":\"You've been logged out!\"}");
                 i++;
             }
-        } catch (AssertionError e) {
-            throw new AssertionError("Assertion failed at index " + i, e);
+        } catch (Throwable e) {
+            fail("Assertion failed at index " + i, e);
         }
 
-        testsPassed.put("logout_ValidJWT_ReturnsNoJWTAnd200", true);
+        TESTS_PASSED.put("logout_ValidJWT_ReturnsNoJWTAnd200", true);
     }
 
-//=========================================================================================================
+//=================================================================================================================================
 //PRIVATE METHODS
-    private HttpEntity<MultiValueMap<String, Object>> constructRequest(UserRegisterDTO registerForm, MockMultipartFile profileImage) {
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        HttpHeaders userHeaders = new HttpHeaders();
-        userHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<UserRegisterDTO> userEntity = new HttpEntity<>(registerForm, userHeaders);
-
+//=================================================================================================================================
+    private HttpEntity<MultiValueMap<String, Object>> constructRequest(UserRegisterDTO registerForm, MockMultipartFile profileImage, String cookie) throws AssertionError {
+        HttpHeaders requestHeader = new HttpHeaders();
+        HttpHeaders userHeader = new HttpHeaders();
+        HttpHeaders imageHeader = new HttpHeaders();
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("user", userEntity);
+        HttpEntity<UserRegisterDTO> userBody;
+        HttpEntity<Resource> imageBody;
+
+        if (cookie != null) {
+            requestHeader.set(HttpHeaders.COOKIE, cookie);
+        }
+        requestHeader.setContentType(MediaType.MULTIPART_FORM_DATA);
+        userHeader.setContentType(MediaType.APPLICATION_JSON);
+        userBody = new HttpEntity<>(registerForm, userHeader);
+        body.add("user", userBody);
 
         if (profileImage != null) {
             try {
-                Resource image = new ByteArrayResource(profileImage.getBytes()) {
-                    @Override
-                    public String getFilename() {
-                        return profileImage.getOriginalFilename();
-                    }
-                };
-                HttpHeaders imageHeaders = new HttpHeaders();
-                imageHeaders.setContentType(MediaType.valueOf(profileImage.getContentType()));
-                HttpEntity<Resource> imageEntity = new HttpEntity<>(image, imageHeaders);
-                body.add("profile_image", imageEntity);
-            } catch (IOException ex) {
-                fail("getBytes() should not have thrown an exception");
+                imageHeader.setContentType(MediaType.valueOf(profileImage.getContentType()));
+                imageBody = new HttpEntity<>(profileImage.getResource(), imageHeader);
+                body.add("profile_image", imageBody);
+            } catch (Exception ex) {
+                fail("Failed to set profile_image part of multipart form data of HttpEntity request", ex);
             }
         }
 
-        return new HttpEntity<>(body, requestHeaders);
+        return new HttpEntity<>(body, requestHeader);
+
     }
 
     private HttpEntity<UserLoginDTO> constructRequest(UserLoginDTO loginForm, String cookie) {
         HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         if (cookie != null) {
             requestHeaders.set(HttpHeaders.COOKIE, cookie);
         }
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<UserLoginDTO> request = new HttpEntity<>(loginForm, requestHeaders);
-
-        return request;
+        return new HttpEntity<>(loginForm, requestHeaders);
     }
 
     private HttpEntity constructRequest(String cookie) {
@@ -1270,25 +718,438 @@ public class AuthRoutesTest {
         return new HttpEntity<>(null);
     }
 
-    private String getRandomString(int length, Random random) {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            int index = random.nextInt(alphabet.length());
-            char randomChar = alphabet.charAt(index);
-            sb.append(randomChar);
-        }
-        return sb.toString();
+    private List<UserJPA> getAllUsers() {
+        return userRepo.findAll();
     }
 
-    private boolean isValidFilename(String filename) {
+    private List<Resource> getAllProfileImages() throws RuntimeException {
+        return testUtil.getAllUserProfileImages();
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//assert methods
+    private void assertUsersEqual(List<UserJPA> actual, List<UserJPA> expected) throws AssertionError {
+        assertThat(actual).isNotNull();
+        assertThat(expected).isNotNull();
+        assertThat(actual.size()).isEqualTo(expected.size());
+        int i = 0;
         try {
-            Paths.get(filename);
-        } catch (InvalidPathException | NullPointerException ex) {
-            return false;
+            for (i = 0; i < actual.size(); i++) {
+                assertUsersEqual(actual.get(i), expected.get(i));
+                i++;
+            }
+        } catch (AssertionError e) {
+            fail("Error at i=" + i + " for:\nActual=" + actual.get(i) + "\nExpected=" + expected.get(i), e);
         }
-        return true;
     }
 
-//=========================================================================================================
+    private void assertUsersEqual(UserJPA actual, UserJPA expected) throws AssertionError {
+        assertThat(actual).isNotNull();
+        assertThat(expected).isNotNull();
+        assertThat(actual.getId()).isEqualTo(expected.getId());
+        assertThat(actual.getFirstName()).isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isEqualTo(expected.getLastName());
+        assertThat(actual.getGender()).isEqualTo(expected.getGender());
+        assertThat(actual.getRole()).isEqualTo(expected.getRole());
+        assertThat(actual.getProfileName()).isEqualTo(expected.getProfileName());
+        assertThat(actual.getProfileImage()).isEqualTo(expected.getProfileImage());
+        assertThat(actual.getEmail()).isEqualTo(expected.getEmail());
+        assertThat(actual.getUsername()).isEqualTo(expected.getUsername());
+        assertThat(actual.getPassword()).isEqualTo(expected.getPassword());
+        assertThat(actual.getCreatedAt()).isEqualTo(expected.getCreatedAt());
+        assertThat(actual.getUpdatedAt()).isEqualTo(expected.getUpdatedAt());
+
+        assertThat(actual.getCountry()).isNotNull();
+        assertThat(expected.getCountry()).isNotNull();
+        assertThat(actual.getCountry().getId()).isEqualTo(expected.getCountry().getId());
+        assertThat(actual.getCountry().getName()).isEqualTo(expected.getCountry().getName());
+        assertThat(actual.getCountry().getOfficialStateName()).isEqualTo(expected.getCountry().getOfficialStateName());
+        assertThat(actual.getCountry().getCode()).isEqualTo(expected.getCountry().getCode());
+
+        assertThat(actual.getMedias()).isNotNull();
+        assertThat(expected.getMedias()).isNotNull();
+        assertThat(actual.getMedias().size()).isEqualTo(expected.getMedias().size());
+        for (int i = 0; i < actual.getMedias().size(); i++) {
+            assertThat(actual.getMedias().get(i)).isNotNull();
+            assertThat(expected.getMedias().get(i)).isNotNull();
+            assertThat(actual.getMedias().get(i).getId()).isEqualTo(expected.getMedias().get(i).getId());
+        }
+
+        assertThat(actual.getCritiques()).isNotNull();
+        assertThat(expected.getCritiques()).isNotNull();
+        assertThat(actual.getCritiques().size()).isEqualTo(expected.getCritiques().size());
+        for (int i = 0; i < actual.getCritiques().size(); i++) {
+            assertThat(actual.getCritiques().get(i)).isNotNull();
+            assertThat(expected.getCritiques().get(i)).isNotNull();
+            assertThat(actual.getCritiques().get(i).getId()).isNotNull();
+            assertThat(expected.getCritiques().get(i).getId()).isNotNull();
+
+            assertThat(actual.getCritiques().get(i).getId().getCritic()).isNotNull();
+            assertThat(expected.getCritiques().get(i).getId().getCritic()).isNotNull();
+            assertThat(actual.getCritiques().get(i).getId().getMedia()).isNotNull();
+            assertThat(expected.getCritiques().get(i).getId().getMedia()).isNotNull();
+
+            assertThat(actual.getCritiques().get(i).getId().getCritic().getId()).isEqualTo(expected.getCritiques().get(i).getId().getCritic().getId());
+            assertThat(actual.getCritiques().get(i).getId().getCritic().getId()).isEqualTo(actual.getId());
+            assertThat(actual.getCritiques().get(i).getId().getMedia().getId()).isEqualTo(expected.getCritiques().get(i).getId().getMedia().getId());
+            assertThat(actual.getCritiques().get(i).getDescription()).isEqualTo(expected.getCritiques().get(i).getDescription());
+            assertThat(actual.getCritiques().get(i).getRating()).isEqualTo(expected.getCritiques().get(i).getRating());
+        }
+    }
+
+    private void assertUsersEqual(UserJPA actual, UserRegisterDTO expected) throws AssertionError {
+        assertThat(actual).isNotNull();
+        assertThat(expected).isNotNull();
+        assertThat(actual.getFirstName()).isEqualTo(expected.getFirstName());
+        assertThat(actual.getLastName()).isEqualTo(expected.getLastName());
+        assertThat(actual.getGender()).isEqualTo(expected.getGender());
+        assertThat(actual.getRole()).isEqualTo(expected.getRole());
+        assertThat(actual.getProfileName()).isEqualTo(expected.getProfileName());
+        assertThat(actual.getEmail()).isEqualTo(expected.getEmail());
+        assertThat(actual.getUsername()).isEqualTo(expected.getUsername());
+        assertThat(pswEncoder.matches(expected.getPassword(), actual.getPassword())).isTrue();
+
+        assertThat(actual.getCountry()).isNotNull();
+        assertThat(expected.getCountryId()).isNotNull();
+        assertThat(actual.getCountry().getId()).isEqualTo(expected.getCountryId());
+
+        assertThat(actual.getMedias()).isNotNull().isEmpty();
+        assertThat(actual.getCritiques()).isNotNull().isEmpty();
+    }
+
+    private void assertImagesEqual(List<Resource> actual, List<Resource> expected) throws AssertionError {
+        TestUtil.assertResourcesEqual(actual, expected);
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//register
+    private UserRegisterDTO getRandomValidUserRegisterDTO() {
+        Gender[] genders = Gender.values();
+        UserRole[] roles = {UserRole.REGULAR, UserRole.CRITIC};
+        String emailDomain = TestUtil.getRandomValidEmailDomain();
+
+        UserRegisterDTO register = new UserRegisterDTO();
+        register.setFirstName(TestUtil.getRandomString(TestUtil.getRandomInt(1, 100)));
+        register.setLastName(TestUtil.getRandomString(TestUtil.getRandomInt(1, 100)));
+        register.setProfileName(TestUtil.getRandomString(TestUtil.getRandomInt(1, 100)));
+        register.setEmail(TestUtil.getRandomString(TestUtil.getRandomInt(1, 64)) + "@" + emailDomain);
+        register.setUsername(TestUtil.getRandomString(TestUtil.getRandomInt(1, 300)));
+        register.setPassword(TestUtil.getRandomString(TestUtil.getRandomInt(1, 300)));
+        register.setGender(TestUtil.getRandomEnum(genders));
+        register.setRole(TestUtil.getRandomEnum(roles));
+        register.setCountryId((long) TestUtil.getRandomInt(1, 249));
+        return register;
+    }
+
+    private List<Pair<UserRegisterDTO, MockMultipartFile>> getInvalidRegisterFormsForResponse400() {
+        final String validEmailDomain = TestUtil.getRandomValidEmailDomain();
+        final String[] invalidFirstNames = {null, "", " ", "        ", TestUtil.getRandomString(101)};
+        final String[] invalidLastNames = {null, "", " ", "        ", TestUtil.getRandomString(101)};
+        final Gender[] invalidGenders = {null};
+        final UserRole[] invalidUserRoles = {null, UserRole.ADMINISTRATOR};
+        final String[] invalidProfileNames = {null, "", " ", "           ", TestUtil.getRandomString(101), "marko  makro", " marko ",
+            "......marko....", "marko&^$makro", "marko.exe", "marko!", "marko_markovic?", "/marko/", "mar\tko", "mar\nko"};
+        final MockMultipartFile[] invalidProfileImages = TestUtil.getInvalidImages();
+        final String[] invalidEmails = {null, "", " ", "           ",
+            TestUtil.getRandomString(301), TestUtil.getRandomString((300 - (validEmailDomain.length() + 1)) + 1) + "@" + validEmailDomain,
+            "badIn..put@@" + TestUtil.getRandomValidEmailDomain(), "badInput@gmail@.com", "badInput" + TestUtil.getRandomValidEmailDomain()
+        };
+        final String[] invalidUsernames = {null, "", " ", "           ", TestUtil.getRandomString(301)};
+        final String[] invalidPasswords = {null, "", " ", "        ", TestUtil.getRandomString(301)};
+        final Long[] invalidCountryIds = {null, 0l, -1l, -10l, -100l};
+
+        final List<Pair<UserRegisterDTO, MockMultipartFile>> pairs = new LinkedList<>();
+        UserRegisterDTO user;
+        MockMultipartFile image;
+        for (String pom : invalidFirstNames) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setFirstName(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (String pom : invalidLastNames) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setLastName(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (Gender pom : invalidGenders) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setGender(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (UserRole pom : invalidUserRoles) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setRole(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (String pom : invalidProfileNames) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setProfileName(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (MockMultipartFile pom : invalidProfileImages) {
+            user = getRandomValidUserRegisterDTO();
+            pairs.add(new Pair(user, pom));
+        }
+        for (String pom : invalidEmails) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setEmail(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (String pom : invalidUsernames) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setUsername(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (String pom : invalidPasswords) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setPassword(pom);
+            pairs.add(new Pair(user, image));
+        }
+        for (Long pom : invalidCountryIds) {
+            user = getRandomValidUserRegisterDTO();
+            image = TestUtil.getRandomValidImage();
+            user.setCountryId(pom);
+            pairs.add(new Pair(user, image));
+        }
+        return pairs;
+    }
+
+    private List<Pair<UserRegisterDTO, MockMultipartFile>> getDuplicateDataRegisterFormsForResponse400() {
+        final List<UserJPA> users = getAllUsers();
+        final List<Pair<UserRegisterDTO, MockMultipartFile>> pairs = new ArrayList<>(users.size() * 3);
+        UserRegisterDTO rf;
+        for (UserJPA user : users) {
+            rf = getRandomValidUserRegisterDTO();
+            rf.setProfileName(user.getProfileName());
+            pairs.add(new Pair(rf, TestUtil.getRandomValidImage()));
+
+            rf = getRandomValidUserRegisterDTO();
+            rf.setEmail(user.getEmail());
+            pairs.add(new Pair(rf, TestUtil.getRandomValidImage()));
+
+            rf = getRandomValidUserRegisterDTO();
+            rf.setUsername(user.getUsername());
+            pairs.add(new Pair(rf, TestUtil.getRandomValidImage()));
+        }
+        return pairs;
+    }
+
+    private List<Pair<UserRegisterDTO, MockMultipartFile>> getNonExistentRelationshipDataRegisterFormsForResponse404() {
+        Long[] nonExistentCountryIds = new Long[]{400l, 401l, 402l, 499l, 1000l, 301l, 300l};
+        List<Pair<UserRegisterDTO, MockMultipartFile>> pairs = new LinkedList<>();
+        UserRegisterDTO registerForm;
+        for (Long countryId : nonExistentCountryIds) {
+            registerForm = getRandomValidUserRegisterDTO();
+            registerForm.setCountryId(countryId);
+            pairs.add(new Pair(registerForm, TestUtil.getRandomValidImage()));
+        }
+        return pairs;
+    }
+
+    private Pair<UserRegisterDTO, MockMultipartFile>[] getValidRegisterFormsForResponse200() {
+        UserRole[] roles = {UserRole.REGULAR, UserRole.CRITIC};
+        return new Pair[]{
+            new Pair<>(
+            new UserRegisterDTO("Marko", "Markovic", Gender.MALE, "marko_markov", null, "marko", "marko@gmail.com", "123456", TestUtil.getRandomEnum(roles), 1l),
+            new MockMultipartFile("profile_image", "test.jpg", "image/jpeg", TestUtil.getBytes(TestUtil.getRandomString(TestUtil.getRandomInt(10, 100))))),
+            new Pair<>(
+            new UserRegisterDTO("Marko", "Markovic", Gender.MALE, "marko_markov2", null, "marko2", "marko2@gmail.com", "123456", TestUtil.getRandomEnum(roles), 190l),
+            null),
+            new Pair<>(
+            new UserRegisterDTO("Teodora", "Teodorovic", Gender.FEMALE, "tea123", null, "tea123", "tea123@gmail.com", "ttodora", TestUtil.getRandomEnum(roles), 190l),
+            new MockMultipartFile("profile_image", "test.png", "image/png", TestUtil.getBytes(TestUtil.getRandomString(TestUtil.getRandomInt(10, 100))))),
+            new Pair<>(
+            new UserRegisterDTO("aaaaa", "aaaaa", Gender.OTHER, "aaaaa", null, "aaaaa", "aaaaa@gmail.com", "aaa11aaaaa", TestUtil.getRandomEnum(roles), 1l),
+            new MockMultipartFile("profile_image", "test.png", "image/png", TestUtil.getBytes(TestUtil.getRandomString(TestUtil.getRandomInt(10, 100))))),
+            new Pair<>(
+            new UserRegisterDTO("Marko3", "Markovic3", Gender.OTHER, "marko2_markiz3", null, "marko3", "marko3@gmail.com", "mmarko123", TestUtil.getRandomEnum(roles), 1l),
+            new MockMultipartFile("profile_image", "test.jpg", "image/jpeg", TestUtil.getBytes(TestUtil.getRandomString(TestUtil.getRandomInt(10, 100))))),
+            new Pair<>(
+            new UserRegisterDTO("Teodora", "Teodorovic", Gender.FEMALE, "teadora123", null, "tea321", "tea321@gmail.com", "ttodora", TestUtil.getRandomEnum(roles), 190l),
+            null),
+            new Pair<>(
+            new UserRegisterDTO("Teodora", "Teodorovic", Gender.FEMALE, "teadora1234", null, "tea3214", "tea321@yahoo.com", "ttodora", TestUtil.getRandomEnum(roles), 185l),
+            null)
+
+        };
+    }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+//login
+    private UserLoginDTO getRandomStructurallyValidUserLoginDTO() {
+        UserLoginDTO login = new UserLoginDTO();
+        login.setUsername(TestUtil.getRandomString(TestUtil.getRandomInt(1, 300)));
+        login.setPassword(TestUtil.getRandomString(TestUtil.getRandomInt(1, 300)));
+        return login;
+    }
+
+    private List<UserLoginDTO> getStructurallyInvalidLoginFormsForResponse400() {
+        final String[] invalidUsernames = {null, "", " ", "           ", TestUtil.getRandomString(301)};
+        final String[] invalidPasswords = {null, "", " ", "        ", TestUtil.getRandomString(301)};
+
+        List<UserLoginDTO> forms = new LinkedList<>();
+        UserLoginDTO user;
+
+        for (String pom : invalidUsernames) {
+            user = getRandomStructurallyValidUserLoginDTO();
+            user.setUsername(pom);
+            forms.add(user);
+        }
+        for (String pom : invalidPasswords) {
+            user = getRandomStructurallyValidUserLoginDTO();
+            user.setPassword(pom);
+            forms.add(user);
+        }
+
+        return forms;
+    }
+
+    private UserLoginDTO[] getNonExistentUserLoginForms() {
+        return new UserLoginDTO[]{
+            new UserLoginDTO("admina", "admina"),
+            new UserLoginDTO("admin", "admina"),
+            new UserLoginDTO("admina", "admin"),
+            new UserLoginDTO("admin", "admina"),
+            new UserLoginDTO("aaaaa", "aaaaa"),
+            new UserLoginDTO("dummyUser101", "dummyPassword101"),
+            new UserLoginDTO("dummyUser102", "dummyUser102"),
+            new UserLoginDTO("DummyUsername", "DummyPassword"),
+            new UserLoginDTO("DummyUsername2", "DummyPassword2"),
+            new UserLoginDTO(TestUtil.getRandomString(20), TestUtil.getRandomString(12))
+        };
+    }
+
+    private Pair<UserLoginDTO, String>[] getValidUserLoginFormsAndResponses() {
+        return new Pair[]{
+            new Pair<>(new UserLoginDTO("admin", "admin"), jsonReader.getUserJson(1)),
+            new Pair<>(new UserLoginDTO("regular", "regular"), jsonReader.getUserJson(2)),
+            new Pair<>(new UserLoginDTO("critic", "critic"), jsonReader.getUserJson(3))
+        };
+
+    }
+//---------------------------------------------------------------------------------------------------------------------------------
+//logout
+
+    private String[] getNonExistentUserValidJWTs() {
+        final String[] usernames = {
+            "admina",
+            "aaaaaa",
+            "dummyUser101",
+            "admina",
+            "dummyUser102",
+            "DummyUsername",
+            "DummyUsername2",
+            TestUtil.getRandomString(20)
+        };
+        final SecurityUser user = new SecurityUser();
+        final String[] result = new String[usernames.length];
+        for (int i = 0; i < usernames.length; i++) {
+            user.setUsername(usernames[i]);
+            result[i] = jwtUtils.generateJwtCookie(user).toString();
+        }
+        return result;
+    }
+
+    private List<HttpCookie> getInvalidCookies() {
+        HttpEntity request;
+        ResponseEntity<String> response;
+        final Pair<UserLoginDTO, String>[] pairs = getValidUserLoginFormsAndResponses();
+        final List<HttpCookie> validCookies = new ArrayList<>(pairs.length);
+        final List<HttpCookie> invalidCookies = new LinkedList<>();
+
+        for (Pair<UserLoginDTO, String> pair : pairs) {
+            request = constructRequest(pair.getL(), null);
+            response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+            validCookies.add(HttpCookie.parse(response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0));
+        }
+        final String[] invalidJWTs = {
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQSflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQSflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ==.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+        };
+        HttpCookie invalidCookie;
+        for (HttpCookie cookie : validCookies) {
+            invalidCookie = (HttpCookie) cookie.clone();
+            invalidCookie.setValue("a" + invalidCookie.getValue().substring(1));
+            invalidCookies.add(invalidCookie);
+
+            invalidCookie = (HttpCookie) cookie.clone();
+            invalidCookie.setValue("dummyfirstvalue.dummytsecond.thirdoptionwhatever");
+            invalidCookies.add(invalidCookie);
+
+            invalidCookie = (HttpCookie) cookie.clone();
+            invalidCookie.setValue(TestUtil.getRandomString(100));
+            invalidCookies.add(invalidCookie);
+
+            invalidCookie = (HttpCookie) cookie.clone();
+            invalidCookie.setValue("");
+            invalidCookies.add(invalidCookie);
+
+            for (String invalidJWT : invalidJWTs) {
+                invalidCookie = (HttpCookie) cookie.clone();
+                invalidCookie.setValue(invalidJWT);
+                invalidCookies.add(invalidCookie);
+            }
+        }
+        invalidCookies.add(new HttpCookie("token", TestUtil.getRandomString(100)));
+        invalidCookies.add(new HttpCookie(TestUtil.getRandomString(10), TestUtil.getRandomString(100)));
+        return invalidCookies;
+    }
+
+    private String[] getInvalidCookieStrings() {
+        return new String[]{
+            "",
+            "username=",
+            "user@name=value",
+            "user name=value",
+            "usernamevalue",
+            "username==value",
+            "username=\\u0000value",
+            "username=valué",
+            "cwt=; Path=/api; Max-Age=86400; HttpOnly",
+            "cwt=invalidToken; Path=/api; Max-Age=86400; HttpOnly",
+            "cwt=yourJwtToken; Path=/api; Max-Age=0; HttpOnly",
+            "cwt=yourJwtToken; Path=/api; Max-Age=3153600000; HttpOnly",
+            "cwt=yourJwtToken; Path=/wrongPath; Max-Age=86400; HttpOnly",
+            "cwt=yourJwtToken; Path=/api; Max-Age=86400",
+            "cwt=yourJwtToken; Path=/api; Max-Age=86400; HttpOnly; Secure; SameSite=Lax",
+            "wrongName=yourJwtToken; Path=/api; Max-Age=86400; HttpOnly",
+            "cwt=yourJwtToken$%^&*(); Path=/api; Max-Age=86400; HttpOnly",
+            "cwt=your Jwt Token; Path=/api; Max-Age=86400; HttpOnly",
+            "LWSSO_COOKIE_KEY=123-LWSSO_COOKIE_KEY-VALUE-456; Path=/; Domain=localhost; Max-Age=PT168H; Expires=Tue, 14 Jun 2022 22:35:02 GMT; Secure; HttpOnly"
+
+        };
+    }
+
+    private String[] getValidCookies() {
+        HttpEntity request;
+        ResponseEntity<String> response;
+        final Pair<UserLoginDTO, String>[] pairs = getValidUserLoginFormsAndResponses();
+        final String[] result = new String[pairs.length];
+        int i = 0;
+        for (Pair<UserLoginDTO, String> pair : pairs) {
+            request = constructRequest(pair.getL(), null);
+            response = restTemplate.exchange(ROUTE + "/login", HttpMethod.POST, request, String.class);
+            result[i] = response.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
+            i++;
+        }
+        return result;
+    }
+
 }
