@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mr. Poyo
  */
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class MediaTestRepository {
 
     private final MediaRepositoryJPA repo;

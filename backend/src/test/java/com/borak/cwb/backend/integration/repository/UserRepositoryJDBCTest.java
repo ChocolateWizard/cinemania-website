@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -42,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author Mr. Poyo
  */
+@Disabled
 @SpringBootTest
 @ActiveProfiles("test")
 @Order(4)

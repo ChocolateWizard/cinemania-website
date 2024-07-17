@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Mr. Poyo
  */
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserTestRepository {
 
     private final UserRepositoryJPA repo;

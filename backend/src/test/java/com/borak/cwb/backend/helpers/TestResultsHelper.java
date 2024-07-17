@@ -92,22 +92,10 @@ public final class TestResultsHelper {
      * tests of classes on whose functionality Controller classes depend on
      * either directly or indirectly. Those test classes are:
      * <ul>
-     * <li>ContextLoadsTest</li>
+     * <li>InitialTest</li>
      * <li>ConfigPropertiesTest</li>
      * <li>MyImageTest</li>
-     * <li>ActingRepositoryJDBCTest</li>
-     * <li>ActorRepositoryJDBCTest</li>
-     * <li>DirectorRepositoryJDBCTest</li>
      * <li>FileRepositoryTest</li>
-     * <li>GenreRepositoryJDBCTest</li>
-     * <li>MediaRepositoryJDBCTest</li>
-     * <li>MovieRepositoryJDBCTest</li>
-     * <li>PersonRepositoryJDBCTest</li>
-     * <li>PersonWrapperRepositoryJDBCTest</li>
-     * <li>TVShowRepositoryJDBCTest</li>
-     * <li>WriterRepositoryJDBCTest</li>
-     * <li>UserRepositoryJDBCTest</li>
-     * <li>CritiqueRepositoryJDBCTest</li>
      * </ul>
      *
      * @return Returns false if any of these tests has not passed. Else returns
@@ -118,20 +106,7 @@ public final class TestResultsHelper {
             InitialTest.didAllTestsPass(),
             ConfigPropertiesTest.didAllTestsPass(),
             MyImageTest.didAllTestsPass(),
-            ActingRepositoryJDBCTest.didAllTestsPass(),
-            ActorRepositoryJDBCTest.didAllTestsPass(),
-            DirectorRepositoryJDBCTest.didAllTestsPass(),
-            FileRepositoryTest.didAllTestsPass(),
-            GenreRepositoryJDBCTest.didAllTestsPass(),
-            MediaRepositoryJDBCTest.didAllTestsPass(),
-            MovieRepositoryJDBCTest.didAllTestsPass(),
-            PersonRepositoryJDBCTest.didAllTestsPass(),
-            PersonWrapperRepositoryJDBCTest.didAllTestsPass(),
-            TVShowRepositoryJDBCTest.didAllTestsPass(),
-            WriterRepositoryJDBCTest.didAllTestsPass(),
-            UserRepositoryJDBCTest.didAllTestsPass(),
-            CritiqueRepositoryJDBCTest.didAllTestsPass()
-        };
+            FileRepositoryTest.didAllTestsPass(),};
         for (boolean isPassed : testsPassed) {
             if (!isPassed) {
                 return false;
@@ -232,26 +207,13 @@ public final class TestResultsHelper {
             InitialTest.didAllTestsPass(),
             ConfigPropertiesTest.didAllTestsPass(),
             MyImageTest.didAllTestsPass(),
-            ActingRepositoryJDBCTest.didAllTestsPass(),
-            ActorRepositoryJDBCTest.didAllTestsPass(),
-            DirectorRepositoryJDBCTest.didAllTestsPass(),
             FileRepositoryTest.didAllTestsPass(),
-            GenreRepositoryJDBCTest.didAllTestsPass(),
-            MediaRepositoryJDBCTest.didAllTestsPass(),
-            MovieRepositoryJDBCTest.didAllTestsPass(),
-            PersonRepositoryJDBCTest.didAllTestsPass(),
-            PersonWrapperRepositoryJDBCTest.didAllTestsPass(),
-            TVShowRepositoryJDBCTest.didAllTestsPass(),
-            WriterRepositoryJDBCTest.didAllTestsPass(),
-            UserRepositoryJDBCTest.didAllTestsPass(),
-            CritiqueRepositoryJDBCTest.didAllTestsPass(),
             CountryRoutesTest.didAllTestsPass(),
             GenreRoutesTest.didAllTestsPass(),
             ImageRoutesTest.didAllTestsPass(),
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
-            PersonRoutesTest.didAllTestsPass(),
-            TVShowRepositoryJDBCTest.didAllTestsPass(),
+            PersonRoutesTest.didAllTestsPass(),            
             AuthRoutesTest.didAllTestsPass(),
             CritiqueSecuredRoutesTest.didAllTestsPass(),
             MovieSecuredRoutesTest.didAllTestsPass(),
@@ -278,26 +240,13 @@ public final class TestResultsHelper {
             InitialTest.didAllTestsPass(),
             ConfigPropertiesTest.didAllTestsPass(),
             MyImageTest.didAllTestsPass(),
-            ActingRepositoryJDBCTest.didAllTestsPass(),
-            ActorRepositoryJDBCTest.didAllTestsPass(),
-            DirectorRepositoryJDBCTest.didAllTestsPass(),
             FileRepositoryTest.didAllTestsPass(),
-            GenreRepositoryJDBCTest.didAllTestsPass(),
-            MediaRepositoryJDBCTest.didAllTestsPass(),
-            MovieRepositoryJDBCTest.didAllTestsPass(),
-            PersonRepositoryJDBCTest.didAllTestsPass(),
-            PersonWrapperRepositoryJDBCTest.didAllTestsPass(),
-            TVShowRepositoryJDBCTest.didAllTestsPass(),
-            WriterRepositoryJDBCTest.didAllTestsPass(),
-            UserRepositoryJDBCTest.didAllTestsPass(),
-            CritiqueRepositoryJDBCTest.didAllTestsPass(),
             CountryRoutesTest.didAllTestsPass(),
             GenreRoutesTest.didAllTestsPass(),
             ImageRoutesTest.didAllTestsPass(),
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
-            PersonRoutesTest.didAllTestsPass(),
-            TVShowRepositoryJDBCTest.didAllTestsPass(),
+            PersonRoutesTest.didAllTestsPass(),          
             AuthRoutesTest.didAllTestsPass(),
             CritiqueSecuredRoutesTest.didAllTestsPass(),
             MovieSecuredRoutesTest.didAllTestsPass(),

@@ -49,21 +49,21 @@ public class FileRepositoryTest {
 
     private final DataInitializer init = new DataInitializer();
 
-    private static final Map<String, Boolean> testsPassed = new HashMap<>();
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
 
     static {
-        testsPassed.put("saveMediaCoverImage_Test", false);
-        testsPassed.put("savePersonProfilePhoto_Test", false);
-        testsPassed.put("saveUserProfileImage_Test", false);
-        testsPassed.put("deleteIfExistsMediaCoverImage_Test", false);
-        testsPassed.put("deleteIfExistsPersonPhotoImage_Test", false);
-        testsPassed.put("getMediaCoverImage_Test", false);
-        testsPassed.put("getPersonProfilePhoto_Test", false);
-        testsPassed.put("getUserProfileImage_Test", false);
+        TESTS_PASSED.put("saveMediaCoverImage_Test", false);
+        TESTS_PASSED.put("savePersonProfilePhoto_Test", false);
+        TESTS_PASSED.put("saveUserProfileImage_Test", false);
+        TESTS_PASSED.put("deleteIfExistsMediaCoverImage_Test", false);
+        TESTS_PASSED.put("deleteIfExistsPersonPhotoImage_Test", false);
+        TESTS_PASSED.put("getMediaCoverImage_Test", false);
+        TESTS_PASSED.put("getPersonProfilePhoto_Test", false);
+        TESTS_PASSED.put("getUserProfileImage_Test", false);
     }
 
     public static boolean didAllTestsPass() {
-        for (boolean b : testsPassed.values()) {
+        for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
                 return false;
             }
@@ -194,7 +194,7 @@ public class FileRepositoryTest {
             fail("Files.readAllBytes() was not supposed to throw exception");
         }
 
-        testsPassed.put("saveMediaCoverImage_Test", true);
+        TESTS_PASSED.put("saveMediaCoverImage_Test", true);
     }
 
     @Test
@@ -313,7 +313,7 @@ public class FileRepositoryTest {
             fail("Files.readAllBytes() was not supposed to throw exception");
         }
 
-        testsPassed.put("savePersonProfilePhoto_Test", true);
+        TESTS_PASSED.put("savePersonProfilePhoto_Test", true);
     }
 
     @Test
@@ -434,13 +434,13 @@ public class FileRepositoryTest {
                 }
             }
         }
-        testsPassed.put("saveUserProfileImage_Test", true);
+        TESTS_PASSED.put("saveUserProfileImage_Test", true);
     }
 
     @Test
     @Order(4)
     void deleteIfExistsMediaCoverImage_Test() {
-        Assumptions.assumeTrue(testsPassed.get("saveMediaCoverImage_Test"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("saveMediaCoverImage_Test"));
 
         String[] invalidInput = new String[]{null, "", " ", "        "};
         for (int iter = 0; iter < invalidInput.length; iter++) {
@@ -498,13 +498,13 @@ public class FileRepositoryTest {
         file = new File(DataInitializer.mediaImagesFolderPath + image.getFullName());
         assertThat(file.exists()).isFalse();
 
-        testsPassed.put("deleteIfExistsMediaCoverImage_Test", true);
+        TESTS_PASSED.put("deleteIfExistsMediaCoverImage_Test", true);
     }
 
     @Test
     @Order(5)
     void deleteIfExistsPersonPhotoImage_Test() {
-        Assumptions.assumeTrue(testsPassed.get("savePersonProfilePhoto_Test"));
+        Assumptions.assumeTrue(TESTS_PASSED.get("savePersonProfilePhoto_Test"));
 
         String[] invalidInput = new String[]{null, "", " ", "        "};
         for (int iter = 0; iter < invalidInput.length; iter++) {
@@ -562,7 +562,7 @@ public class FileRepositoryTest {
             }
         }
 
-        testsPassed.put("deleteIfExistsPersonPhotoImage_Test", true);
+        TESTS_PASSED.put("deleteIfExistsPersonPhotoImage_Test", true);
     }
 
     @Test
@@ -585,7 +585,7 @@ public class FileRepositoryTest {
                 }
             }
         }
-        testsPassed.put("getMediaCoverImage_Test", true);
+        TESTS_PASSED.put("getMediaCoverImage_Test", true);
     }
 
     @Test
@@ -608,7 +608,7 @@ public class FileRepositoryTest {
                 }
             }
         }
-        testsPassed.put("getPersonProfilePhoto_Test", true);
+        TESTS_PASSED.put("getPersonProfilePhoto_Test", true);
     }
 
     @Test
@@ -631,7 +631,7 @@ public class FileRepositoryTest {
                 }
             }
         }
-        testsPassed.put("getUserProfileImage_Test", true);
+        TESTS_PASSED.put("getUserProfileImage_Test", true);
     }
 
 }
