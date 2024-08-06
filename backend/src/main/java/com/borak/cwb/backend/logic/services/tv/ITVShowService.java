@@ -10,33 +10,30 @@ import org.springframework.http.ResponseEntity;
 /**
  *
  * @author Mr. Poyo
+ * @param <D> tv show request object
  */
 public interface ITVShowService<D extends DTO> {
 
-    public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size);
+    //GET
+    ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size);
 
-    public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size);
+    ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size);
 
-    public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size);
+    ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size);
 
-    public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size);
+    ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size);
 
-    public ResponseEntity getTVShowWithGenres(Long id);
+    ResponseEntity getTVShowWithGenres(long id);
 
-    public ResponseEntity getTVShowWithDetails(Long id);
+    ResponseEntity getTVShowWithDetails(long id);
 
-    public ResponseEntity getTVShowDirectors(Long id);
+    //POST
+    ResponseEntity postTVShow(D tvShow);
 
-    public ResponseEntity getTVShowWriters(Long id);
+    //PUT
+    ResponseEntity putTVShow(D tvShow);
 
-    public ResponseEntity getTVShowActors(Long id);
-
-    public ResponseEntity getTVShowActorsWithRoles(Long id);
-
-    public ResponseEntity deleteTVShowById(long id);
-
-    public ResponseEntity postTVShow(D tvShow);
-
-    public ResponseEntity putTVShow(D tvShow);
+    //DELETE
+    ResponseEntity deleteTVShowById(long id);
 
 }

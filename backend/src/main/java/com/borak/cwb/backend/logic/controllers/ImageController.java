@@ -20,9 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "images")
 public class ImageController {
 
-    @Autowired
-    private IImageService imageService;
+    private final IImageService imageService;
 
+    @Autowired
+    public ImageController(IImageService imageService) {
+        this.imageService = imageService;
+    }
+
+//=================================================================================================================================
+//GET
     @GetMapping("/media/{filename:.+}")
     public ResponseEntity getMediaImage(@PathVariable String filename) {
         return imageService.getMediaImage(filename);

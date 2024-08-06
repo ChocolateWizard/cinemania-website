@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -20,17 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class GenreServiceJPA implements IGenreService{
+public class GenreServiceJPA implements IGenreService {
+
+    private final GenreRepositoryJPA genreRepo;
+    private final GenreTransformer genreTransformer;
 
     @Autowired
-    private GenreRepositoryJPA genreRepo;
-    @Autowired
-    private GenreTransformer genreTransformer;
-    
+    public GenreServiceJPA(GenreRepositoryJPA genreRepo, GenreTransformer genreTransformer) {
+        this.genreRepo = genreRepo;
+        this.genreTransformer = genreTransformer;
+    }
+
+//=================================================================================================================================  
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public ResponseEntity getAll() {
-        List<GenreJPA> genres=genreRepo.findAll();
+        List<GenreJPA> genres = genreRepo.findAll();
         return new ResponseEntity(genreTransformer.jpaToGenreResponse(genres), HttpStatus.OK);
     }
-    
+
 }

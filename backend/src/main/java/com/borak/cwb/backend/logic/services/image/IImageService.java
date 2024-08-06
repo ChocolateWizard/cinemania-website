@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
  */
 public interface IImageService {
 
-    public ResponseEntity getMediaImage(String filename);
+    ResponseEntity getMediaImage(String filename);
 
-    public ResponseEntity getPersonImage(String filename);
+    ResponseEntity getPersonImage(String filename);
 
-    public ResponseEntity getUserImage(String filename);
+    ResponseEntity getUserImage(String filename);
 
 }

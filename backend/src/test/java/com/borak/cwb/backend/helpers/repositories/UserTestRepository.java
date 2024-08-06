@@ -4,6 +4,7 @@
  */
 package com.borak.cwb.backend.helpers.repositories;
 
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.repository.jpa.UserRepositoryJPA;
@@ -27,6 +28,7 @@ public class UserTestRepository {
     public UserTestRepository(UserRepositoryJPA userRepo) {
         this.repo = userRepo;
     }
+//=================================================================================================================================
 
     public List<UserJPA> findAll() {
         List<UserJPA> users = repo.findAll();
@@ -35,6 +37,9 @@ public class UserTestRepository {
             u.getCountry();
             u.getMedias().size();
             u.getCritiques().size();
+            u.getComments().size();
+            u.getCommentsLikeDislikes().size();
+            u.getCritiqueLikeDislikes().size();
         }
         return users;
     }
@@ -56,6 +61,9 @@ public class UserTestRepository {
             user.get().getCountry();
             user.get().getMedias().size();
             user.get().getCritiques().size();
+            user.get().getComments().size();
+            user.get().getCommentsLikeDislikes().size();
+            user.get().getCritiqueLikeDislikes().size();
         }
         return user;
     }
@@ -67,6 +75,9 @@ public class UserTestRepository {
             user.get().getCountry();
             user.get().getMedias().size();
             user.get().getCritiques().size();
+            user.get().getComments().size();
+            user.get().getCommentsLikeDislikes().size();
+            user.get().getCritiqueLikeDislikes().size();
         }
         return user;
     }
@@ -80,7 +91,5 @@ public class UserTestRepository {
         }
         return false;
     }
-    
-    
 
 }

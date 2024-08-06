@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -22,12 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CountryServiceJPA implements ICountryService {
 
-    @Autowired
-    private CountryTransformer countryTransformer;
+    private final CountryTransformer countryTransformer;
+    private final CountryRepositoryJPA countryRepo;
 
     @Autowired
-    private CountryRepositoryJPA countryRepo;
+    public CountryServiceJPA(CountryTransformer countryTransformer, CountryRepositoryJPA countryRepo) {
+        this.countryTransformer = countryTransformer;
+        this.countryRepo = countryRepo;
+    }
 
+//=================================================================================================================================    
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public ResponseEntity getAll() {
         List<CountryJPA> countries = countryRepo.findAll();

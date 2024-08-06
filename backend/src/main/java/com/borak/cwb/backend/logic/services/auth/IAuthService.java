@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 /**
  *
  * @author Mr. Poyo
+ * @param <RF> register form object
+ * @param <LF> login form object
  */
 public interface IAuthService<RF, LF> {
 

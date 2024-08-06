@@ -16,12 +16,15 @@ DROP TRIGGER IF EXISTS `aftcritins`;
 DROP TRIGGER IF EXISTS `aftcritupd`;
 DROP TRIGGER IF EXISTS `aftcritdel`;
 
+DROP TABLE IF EXISTS `critique_like_dislike`;
+DROP TABLE IF EXISTS `comment_like_dislike`;
 DROP TABLE IF EXISTS `user_media`;
 DROP TABLE IF EXISTS `media_genres`;
 DROP TABLE IF EXISTS `media_directors`;
 DROP TABLE IF EXISTS `media_writers`;
 DROP TABLE IF EXISTS `acting_role`;
 DROP TABLE IF EXISTS `acting`;
+DROP TABLE IF EXISTS `comment`;
 DROP TABLE IF EXISTS `critique`;
 DROP TABLE IF EXISTS `director`;
 DROP TABLE IF EXISTS `writer`;
@@ -60,9 +63,9 @@ CREATE TABLE `user` (
   `username` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
+  `updated_at` datetime,
   `country_id` bigint unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_username_unique` (`username`),
@@ -92,7 +95,9 @@ CREATE TABLE `media` (
   `cover_image` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `audience_rating` int NOT NULL,
-  `critic_rating` int DEFAULT NULL,
+  `critics_rating` int DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime,
   PRIMARY KEY (`id`),
   CONSTRAINT `RATING_DOMAIN` CHECK (((`audience_rating` >= 0) and (`audience_rating` <= 100)))
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -123,6 +128,8 @@ CREATE TABLE `person` (
   `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `gender` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `profile_photo` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime,
   PRIMARY KEY (`id`),
   CONSTRAINT `CONST_PERSON_GENDER` CHECK ((`gender` in (_utf8mb4'M',_utf8mb4'F',_utf8mb4'O')))
 ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -214,41 +221,82 @@ CREATE TABLE `acting` (
 
 CREATE TABLE `acting_role` (
   `acting_id` bigint unsigned NOT NULL,
-  `id` bigint unsigned NOT NULL,
+  `order_number` bigint unsigned NOT NULL,
   `name` varchar(300) NOT NULL,
-  PRIMARY KEY (`acting_id`,`id`),
+  PRIMARY KEY (`acting_id`,`order_number`),
   CONSTRAINT `acting_role_ibfk_1` FOREIGN KEY (`acting_id`) REFERENCES `acting` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `critique` */
 
 CREATE TABLE `critique` (
-  `user_critic_id` bigint unsigned NOT NULL,
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
   `media_id` bigint unsigned NOT NULL,
   `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `rating` int NOT NULL,
-  PRIMARY KEY (`user_critic_id`,`media_id`),
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `critique_user_media_unique` (`user_id`,`media_id`),
   KEY `media_id` (`media_id`),
-  CONSTRAINT `critique_ibfk_1` FOREIGN KEY (`user_critic_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `critique_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `critique_ibfk_2` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `CRITIQUE_RATING_DOMAIN` CHECK (((`rating` >= 0) and (`rating` <= 100)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+/*Table structure for table `critique_like_dislike` */
+
+CREATE TABLE `critique_like_dislike` (
+  `user_id` bigint unsigned NOT NULL,
+  `critique_id` bigint unsigned NOT NULL,
+  `is_like` tinyint(1) NOT NULL,
+  PRIMARY KEY (`user_id`,`critique_id`),
+  KEY `critique_id` (`critique_id`),
+  CONSTRAINT `critique_like_dislike_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `critique_like_dislike_ibfk_2` FOREIGN KEY (`critique_id`) REFERENCES `critique` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+/*Table structure for table `comment` */
+
+CREATE TABLE `comment` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `critique_id` bigint unsigned NOT NULL,
+  `content` varchar(300) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `COMMENT_USER_CRITIQUE_UNIQUE` (`user_id`,`critique_id`),
+  KEY `critique_id` (`critique_id`),
+  CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `comment_ibfk_2` FOREIGN KEY (`critique_id`) REFERENCES `critique` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+/*Table structure for table `comment_like_dislike` */
+
+CREATE TABLE `comment_like_dislike` (
+  `user_id` bigint unsigned NOT NULL,
+  `comment_id` bigint unsigned NOT NULL,
+  `is_like` tinyint(1) NOT NULL,
+  PRIMARY KEY (`user_id`,`comment_id`),
+  KEY `comment_id` (`comment_id`),
+  CONSTRAINT `comment_like_dislike_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `comment_like_dislike_ibfk_2` FOREIGN KEY (`comment_id`) REFERENCES `comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*========================================================================================================================================*/
 
 /* Triggers structure for table `critique` */
 
 CREATE TRIGGER `aftcritins` AFTER INSERT ON `critique` FOR EACH ROW 
-UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
+UPDATE media SET critics_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
 WHERE id=NEW.media_id;
 
 CREATE  TRIGGER `aftcritupd` AFTER UPDATE ON `critique` FOR EACH ROW 
-UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
+UPDATE media SET critics_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
 WHERE id=NEW.media_id;
 
 CREATE  TRIGGER `aftcritdel` AFTER DELETE ON `critique` FOR EACH ROW 
-UPDATE media SET critic_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
+UPDATE media SET critics_rating=(SELECT ROUND(AVG(rating)) FROM critique WHERE media.id = critique.media_id)
 WHERE id=OLD.media_id;
 
 

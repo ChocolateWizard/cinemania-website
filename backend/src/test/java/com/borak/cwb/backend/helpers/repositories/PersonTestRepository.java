@@ -32,14 +32,14 @@ public class PersonTestRepository {
         List<PersonJPA> persons = personRepo.findAll();
         //initialize lazy attributes
         for (PersonJPA person : persons) {
-            if (person.getDirectorInfo() != null) {
-                person.getDirectorInfo().getMedias().size();
+            if (person.getDirector() != null) {
+                person.getDirector().getMedias().size();
             }
-            if (person.getWriterInfo() != null) {
-                person.getWriterInfo().getMedias().size();
+            if (person.getWriter() != null) {
+                person.getWriter().getMedias().size();
             }
-            if (person.getActorInfo() != null) {
-                for (ActingJPA acting : person.getActorInfo().getActings()) {
+            if (person.getActor() != null) {
+                for (ActingJPA acting : person.getActor().getActings()) {
                     acting.getRoles().size();
                 }
             }
@@ -50,14 +50,14 @@ public class PersonTestRepository {
     public Optional<PersonJPA> findById(Long id) {
         Optional<PersonJPA> person = personRepo.findById(id);
         if (person.isPresent()) {
-            if (person.get().getDirectorInfo() != null) {
-                person.get().getDirectorInfo().getMedias().size();
+            if (person.get().getDirector() != null) {
+                person.get().getDirector().getMedias().size();
             }
-            if (person.get().getWriterInfo() != null) {
-                person.get().getWriterInfo().getMedias().size();
+            if (person.get().getWriter() != null) {
+                person.get().getWriter().getMedias().size();
             }
-            if (person.get().getActorInfo() != null) {
-                for (ActingJPA acting : person.get().getActorInfo().getActings()) {
+            if (person.get().getActor() != null) {
+                for (ActingJPA acting : person.get().getActor().getActings()) {
                     acting.getRoles().size();
                 }
             }

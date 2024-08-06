@@ -5,7 +5,6 @@
 package com.borak.cwb.backend.domain.dto.movie;
 
 import com.borak.cwb.backend.domain.dto.DTO;
-import com.borak.cwb.backend.domain.enums.Gender;
 import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,16 +37,16 @@ public class MovieResponseDTO implements DTO {
     private String title;
 
     @JsonView(JsonVisibilityViews.Lite.class)
+    @JsonProperty(value = "release_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d/MM/yyyy")
+    private LocalDate releaseDate;
+
+    @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "cover_image_url")
     private String coverImageUrl;
 
     @JsonView(JsonVisibilityViews.Medium.class)
     private String description;
-
-    @JsonView(JsonVisibilityViews.Lite.class)
-    @JsonProperty(value = "release_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d/MM/yyyy")
-    private LocalDate releaseDate;
 
     @JsonView(JsonVisibilityViews.Medium.class)
     private Integer length;
@@ -61,426 +60,32 @@ public class MovieResponseDTO implements DTO {
     private Integer criticsRating;
 
     @JsonView(JsonVisibilityViews.Lite.class)
-    private List<Genre> genres = new ArrayList<>();
+    private List<MovieGenreResponseDTO> genres = new ArrayList<>();
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    private List<Critique> critiques = new ArrayList<>();
+    private List<MovieDirectorResponseDTO> directors = new ArrayList<>();
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    private List<Director> directors = new ArrayList<>();
+    private List<MovieWriterResponseDTO> writers = new ArrayList<>();
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    private List<Writer> writers = new ArrayList<>();
+    private List<MovieActorResponseDTO> actors = new ArrayList<>();
 
     @JsonView(JsonVisibilityViews.Heavy.class)
-    private List<Actor> actors = new ArrayList<>();
+    private List<MovieCritiqueResponseDTO> critiques = new ArrayList<>();
 
     public MovieResponseDTO() {
     }
 
-    public MovieResponseDTO(Long id, String title, String coverImageUrl, String description, LocalDate releaseDate, Integer length, Integer audienceRating, Integer criticsRating) {
+    public MovieResponseDTO(Long id, String title, LocalDate releaseDate, String coverImageUrl, String description, Integer length, Integer audienceRating, Integer criticsRating) {
         this.id = id;
         this.title = title;
+        this.releaseDate = releaseDate;
         this.coverImageUrl = coverImageUrl;
         this.description = description;
-        this.releaseDate = releaseDate;
         this.length = length;
         this.audienceRating = audienceRating;
         this.criticsRating = criticsRating;
-    }
-
-    @JsonView(JsonVisibilityViews.Lite.class)
-    @JsonPropertyOrder({"id", "name"})
-    public static class Genre {
-
-        private Long id;
-        private String name;
-
-        public Genre() {
-        }
-
-        public Genre(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-    }
-
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    @JsonPropertyOrder({"critic", "rating", "description"})
-    public static class Critique {
-
-        private Critic critic;
-        private Integer rating;
-        private String description;
-
-        public Critique() {
-        }
-
-        public Critique(Critic critic, Integer rating, String description) {
-            this.critic = critic;
-            this.rating = rating;
-            this.description = description;
-        }
-
-        @JsonView(JsonVisibilityViews.Heavy.class)
-        @JsonPropertyOrder({"profileName", "profileImageUrl"})
-        public static class Critic {
-
-            @JsonProperty(value = "profile_name")
-            private String profileName;
-
-            @JsonProperty(value = "profile_image_url")
-            private String profileImageUrl;
-
-            public Critic() {
-            }
-
-            public Critic(String profileName, String profileImageUrl) {
-                this.profileName = profileName;
-                this.profileImageUrl = profileImageUrl;
-            }
-
-            public String getProfileName() {
-                return profileName;
-            }
-
-            public void setProfileName(String profileName) {
-                this.profileName = profileName;
-            }
-
-            public String getProfileImageUrl() {
-                return profileImageUrl;
-            }
-
-            public void setProfileImageUrl(String profileImageUrl) {
-                this.profileImageUrl = profileImageUrl;
-            }
-
-        }
-
-        public Critic getCritic() {
-            return critic;
-        }
-
-        public void setCritic(Critic critic) {
-            this.critic = critic;
-        }
-
-        public Integer getRating() {
-            return rating;
-        }
-
-        public void setRating(Integer rating) {
-            this.rating = rating;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-    }
-
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    @JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender"})
-    public static class Director {
-
-        private Long id;
-
-        @JsonProperty(value = "first_name")
-        private String firstName;
-
-        @JsonProperty(value = "last_name")
-        private String lastName;
-
-        @JsonProperty(value = "profile_photo_url")
-        private String profilePhotoUrl;
-
-        private Gender gender;
-
-        public Director() {
-        }
-
-        public Director(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.profilePhotoUrl = profilePhotoUrl;
-            this.gender = gender;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public String getProfilePhotoUrl() {
-            return profilePhotoUrl;
-        }
-
-        public void setProfilePhotoUrl(String profilePhotoUrl) {
-            this.profilePhotoUrl = profilePhotoUrl;
-        }
-
-        public Gender getGender() {
-            return gender;
-        }
-
-        public void setGender(Gender gender) {
-            this.gender = gender;
-        }
-
-    }
-
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    @JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender"})
-    public static class Writer {
-
-        private Long id;
-
-        @JsonProperty(value = "first_name")
-        private String firstName;
-
-        @JsonProperty(value = "last_name")
-        private String lastName;
-
-        @JsonProperty(value = "profile_photo_url")
-        private String profilePhotoUrl;
-
-        private Gender gender;
-
-        public Writer() {
-        }
-
-        public Writer(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.profilePhotoUrl = profilePhotoUrl;
-            this.gender = gender;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public String getProfilePhotoUrl() {
-            return profilePhotoUrl;
-        }
-
-        public void setProfilePhotoUrl(String profilePhotoUrl) {
-            this.profilePhotoUrl = profilePhotoUrl;
-        }
-
-        public Gender getGender() {
-            return gender;
-        }
-
-        public void setGender(Gender gender) {
-            this.gender = gender;
-        }
-
-    }
-
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    @JsonPropertyOrder({"id", "firstName", "lastName", "profilePhotoUrl", "gender", "star", "starring", "roles"})
-    public static class Actor {
-
-        private Long id;
-
-        @JsonProperty(value = "first_name")
-        private String firstName;
-
-        @JsonProperty(value = "last_name")
-        private String lastName;
-
-        @JsonProperty(value = "profile_photo_url")
-        private String profilePhotoUrl;
-
-        private Gender gender;
-
-        @JsonProperty(value = "is_star")
-        private Boolean star;
-
-        @JsonProperty(value = "is_starring")
-        private Boolean starring;
-
-        private List<Role> roles = new ArrayList<>();
-
-        public Actor() {
-        }
-
-        public Actor(Long id, String firstName, String lastName, String profilePhotoUrl, Gender gender, Boolean star, Boolean starring) {
-            this.id = id;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.profilePhotoUrl = profilePhotoUrl;
-            this.gender = gender;
-            this.star = star;
-            this.starring = starring;
-        }
-
-        @JsonView(JsonVisibilityViews.Heavy.class)
-        @JsonPropertyOrder({"id", "name"})
-        public static class Role {
-
-            private Long id;
-
-            private String name;
-
-            public Role() {
-            }
-
-            public Role(Long id, String name) {
-                this.id = id;
-                this.name = name;
-            }
-
-            public Long getId() {
-                return id;
-            }
-
-            public void setId(Long id) {
-                this.id = id;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public void setFirstName(String firstName) {
-            this.firstName = firstName;
-        }
-
-        public String getLastName() {
-            return lastName;
-        }
-
-        public void setLastName(String lastName) {
-            this.lastName = lastName;
-        }
-
-        public String getProfilePhotoUrl() {
-            return profilePhotoUrl;
-        }
-
-        public void setProfilePhotoUrl(String profilePhotoUrl) {
-            this.profilePhotoUrl = profilePhotoUrl;
-        }
-
-        public Gender getGender() {
-            return gender;
-        }
-
-        public void setGender(Gender gender) {
-            this.gender = gender;
-        }
-
-        public Boolean getStar() {
-            return star;
-        }
-
-        public void setStar(Boolean star) {
-            this.star = star;
-        }
-
-        public Boolean getStarring() {
-            return starring;
-        }
-
-        public void setStarring(Boolean starring) {
-            this.starring = starring;
-        }
-
-        public List<Role> getRoles() {
-            return roles;
-        }
-
-        public void setRoles(List<Role> roles) {
-            if (roles == null) {
-                this.roles = new ArrayList<>();
-            } else {
-                this.roles = roles;
-            }
-        }
-
     }
 
     public Long getId() {
@@ -499,6 +104,14 @@ public class MovieResponseDTO implements DTO {
         this.title = title;
     }
 
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     public String getCoverImageUrl() {
         return coverImageUrl;
     }
@@ -513,14 +126,6 @@ public class MovieResponseDTO implements DTO {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
     }
 
     public Integer getLength() {
@@ -547,64 +152,44 @@ public class MovieResponseDTO implements DTO {
         this.criticsRating = criticsRating;
     }
 
-    public List<Genre> getGenres() {
+    public List<MovieGenreResponseDTO> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
-        if (genres == null) {
-            this.genres = new ArrayList<>();
-        } else {
-            this.genres = genres;
-        }
+    public void setGenres(List<MovieGenreResponseDTO> genres) {
+        this.genres = genres;
     }
 
-    public List<Critique> getCritiques() {
-        return critiques;
-    }
-
-    public void setCritiques(List<Critique> critiques) {
-        if (critiques == null) {
-            this.critiques = new ArrayList<>();
-        } else {
-            this.critiques = critiques;
-        }
-    }
-
-    public List<Director> getDirectors() {
+    public List<MovieDirectorResponseDTO> getDirectors() {
         return directors;
     }
 
-    public void setDirectors(List<Director> directors) {
-        if (directors == null) {
-            this.directors = new ArrayList<>();
-        } else {
-            this.directors = directors;
-        }
+    public void setDirectors(List<MovieDirectorResponseDTO> directors) {
+        this.directors = directors;
     }
 
-    public List<Writer> getWriters() {
+    public List<MovieWriterResponseDTO> getWriters() {
         return writers;
     }
 
-    public void setWriters(List<Writer> writers) {
-        if (writers == null) {
-            this.writers = new ArrayList<>();
-        } else {
-            this.writers = writers;
-        }
+    public void setWriters(List<MovieWriterResponseDTO> writers) {
+        this.writers = writers;
     }
 
-    public List<Actor> getActors() {
+    public List<MovieActorResponseDTO> getActors() {
         return actors;
     }
 
-    public void setActors(List<Actor> actors) {
-        if (actors == null) {
-            this.actors = new ArrayList<>();
-        } else {
-            this.actors = actors;
-        }
+    public void setActors(List<MovieActorResponseDTO> actors) {
+        this.actors = actors;
+    }
+
+    public List<MovieCritiqueResponseDTO> getCritiques() {
+        return critiques;
+    }
+
+    public void setCritiques(List<MovieCritiqueResponseDTO> critiques) {
+        this.critiques = critiques;
     }
 
 }

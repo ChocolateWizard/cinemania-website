@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class UserServiceJPA implements IUserService<Long> {
+public class UserServiceJPA implements IUserService {
 
     @Autowired
     private UserRepositoryJPA userRepo;
@@ -33,7 +33,7 @@ public class UserServiceJPA implements IUserService<Long> {
     private MediaRepositoryJPA mediaRepo;
 
     @Override
-    public ResponseEntity postMediaIntoLibrary(Long mediaId) {
+    public ResponseEntity postMediaIntoLibrary(long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }
@@ -49,7 +49,7 @@ public class UserServiceJPA implements IUserService<Long> {
     }
 
     @Override
-    public ResponseEntity deleteMediaFromLibrary(Long mediaId) {
+    public ResponseEntity deleteMediaFromLibrary(long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
         }

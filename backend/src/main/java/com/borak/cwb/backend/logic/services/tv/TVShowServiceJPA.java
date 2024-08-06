@@ -7,16 +7,9 @@ package com.borak.cwb.backend.logic.services.tv;
 import com.borak.cwb.backend.domain.dto.tv.TVShowRequestDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowResponseDTO;
 import com.borak.cwb.backend.domain.jpa.ActingJPA;
-import com.borak.cwb.backend.domain.jpa.ActorJPA;
-import com.borak.cwb.backend.domain.jpa.DirectorJPA;
 import com.borak.cwb.backend.domain.jpa.TVShowJPA;
-import com.borak.cwb.backend.domain.jpa.WriterJPA;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
-import com.borak.cwb.backend.logic.transformers.ActingTransformer;
-import com.borak.cwb.backend.logic.transformers.ActorTransformer;
-import com.borak.cwb.backend.logic.transformers.DirectorTransformer;
 import com.borak.cwb.backend.logic.transformers.TVShowTransformer;
-import com.borak.cwb.backend.logic.transformers.WriterTransformer;
 import com.borak.cwb.backend.repository.jpa.ActorRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.DirectorRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.GenreRepositoryJPA;
@@ -25,17 +18,19 @@ import com.borak.cwb.backend.repository.jpa.WriterRepositoryJPA;
 import com.borak.cwb.backend.repository.file.FileRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -65,120 +60,69 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
 
     @Autowired
     private TVShowTransformer tvShowTransformer;
-    @Autowired
-    private DirectorTransformer directorTransformer;
-    @Autowired
-    private WriterTransformer writerTransformer;
-    @Autowired
-    private ActorTransformer actorTransformer;
-    @Autowired
-    private ActingTransformer actingTransformer;
 
-//----------------------------------------------------------------------------------------------------
+//=================================================================================================================================
+//GET
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<TVShowJPA> t = tvShowRepo.findAll(p);
-        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
+        List<TVShowJPA> t = tvShowRepo.findAllByOrderByIdAsc(p);
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponseWithGenres(t);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<TVShowJPA> t = tvShowRepo.findAllByAudienceRatingGreaterThanEqual(POPULARITY_TRESHOLD, p);
-        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
+        List<TVShowJPA> t = tvShowRepo.findAllByAudienceRatingGreaterThanEqual(POPULARITY_TRESHOLD, p);
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponseWithGenres(t);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
         Pageable p = PageRequest.of(page - 1, size);
-        Page<TVShowJPA> t = tvShowRepo.findAllByReleaseDateYearGreaterThanEqual(year, p);
-        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "genres");
+        List<TVShowJPA> t = tvShowRepo.findAllByReleaseDateYearGreaterThanEqual(year, p);
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponseWithGenres(t);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<TVShowJPA> t = tvShowRepo.findAll(p);
-        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponse(t.getContent(), "details");
+        List<TVShowJPA> t = tvShowRepo.findAllByOrderByIdAsc(p);
+        List<TVShowResponseDTO> response = tvShowTransformer.jpaToTVShowResponseWithDetails(t);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity getTVShowWithGenres(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(), "genres"), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getTVShowWithDetails(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow.get(), "details"), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getTVShowDirectors(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            List<DirectorJPA> directors = tvShow.get().getDirectors();
-            return new ResponseEntity<>(directorTransformer.jpaToDirectorResponse(directors), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getTVShowWriters(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            List<WriterJPA> writers = tvShow.get().getWriters();
-            return new ResponseEntity<>(writerTransformer.jpaToWriterResponse(writers), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getTVShowActors(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            List<ActorJPA> actors = tvShow.get().getActings().stream().map(e -> e.getActor()).toList();
-            return new ResponseEntity<>(actorTransformer.jpaToActorResponse(actors), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getTVShowActorsWithRoles(Long id) {
-        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
-        if (tvShow.isPresent()) {
-            List<ActingJPA> actings = tvShow.get().getActings();
-            return new ResponseEntity<>(actingTransformer.jpaToActorResponse(actings), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No tv show found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity deleteTVShowById(long id) {
+    public ResponseEntity getTVShowWithGenres(long id) {
         Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
         if (tvShow.isEmpty()) {
             throw new ResourceNotFoundException("No tv show found with id: " + id);
         }
-        tvShowRepo.deleteById(id);
-        if (tvShow.get().getCoverImage() != null && !tvShow.get().getCoverImage().isEmpty()) {
-            fileRepo.deleteIfExistsMediaCoverImage(tvShow.get().getCoverImage());
-        }
-        return new ResponseEntity(tvShowTransformer.toResponseFromJPA(tvShow.get(), "details"), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.jpaToTVShowResponseWithGenres(tvShow.get()), HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity getTVShowWithDetails(long id) {
+        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
+        if (tvShow.isEmpty()) {
+            throw new ResourceNotFoundException("No tv show found with id: " + id);
+        }
+        return new ResponseEntity<>(tvShowTransformer.jpaToTVShowResponseWithDetails(tvShow.get()), HttpStatus.OK);
+    }
+//=================================================================================================================================
+//POST
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     @Override
     public ResponseEntity postTVShow(TVShowRequestDTO tvShowClient) {
         for (Long genre : tvShowClient.getGenres()) {
@@ -202,6 +146,7 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
             }
         }
         TVShowJPA tvShowToSave = tvShowTransformer.toTVShowJPA(tvShowClient);
+        tvShowToSave.setCreatedAt(LocalDateTime.now());
         tvShowToSave.setCoverImage(null);
         TVShowJPA tvShow;
         if (tvShowClient.getCoverImage() != null) {
@@ -215,9 +160,12 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
             tvShow = tvShowRepo.saveAndFlush(tvShowToSave);
             manager.refresh(tvShow);
         }
-        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow, "details"), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.jpaToTVShowResponseWithDetails(tvShow), HttpStatus.OK);
     }
+//=================================================================================================================================
+//PUT
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED)
     @Override
     public ResponseEntity putTVShow(TVShowRequestDTO request) {
         Optional<TVShowJPA> tvShowDB = tvShowRepo.findById(request.getId());
@@ -251,6 +199,8 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
             //client provided a cover image in PUT request so he wished to replace the current one if it's present
             request.getCoverImage().setName("" + request.getId());
             TVShowJPA tvShowToSave = tvShowTransformer.toTVShowJPA(request);
+            tvShowToSave.setCreatedAt(tvShowDB.get().getCreatedAt());
+            tvShowToSave.setUpdatedAt(LocalDateTime.now());
             for (ActingJPA acting : tvShowToSave.getActings()) {
                 for (ActingJPA actingDB : tvShowDB.get().getActings()) {
                     if (Objects.equals(actingDB.getActor().getPersonId(), acting.getActor().getPersonId())) {
@@ -268,6 +218,8 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
             //MyImage == null
             //client provided no cover image in PUT request so he wished to delete the exisitng one if present         
             TVShowJPA tvShowToSave = tvShowTransformer.toTVShowJPA(request);
+            tvShowToSave.setCreatedAt(tvShowDB.get().getCreatedAt());
+            tvShowToSave.setUpdatedAt(LocalDateTime.now());
             for (ActingJPA acting : tvShowToSave.getActings()) {
                 for (ActingJPA actingDB : tvShowDB.get().getActings()) {
                     if (Objects.equals(actingDB.getActor().getPersonId(), acting.getActor().getPersonId())) {
@@ -281,7 +233,23 @@ public class TVShowServiceJPA implements ITVShowService<TVShowRequestDTO> {
                 fileRepo.deleteIfExistsMediaCoverImage(coverImageDB);
             }
         }
-        return new ResponseEntity<>(tvShowTransformer.toResponseFromJPA(tvShow, "details"), HttpStatus.OK);
+        return new ResponseEntity<>(tvShowTransformer.jpaToTVShowResponseWithDetails(tvShow), HttpStatus.OK);
+    }
+//=================================================================================================================================
+//DELETE
+
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
+    @Override
+    public ResponseEntity deleteTVShowById(long id) {
+        Optional<TVShowJPA> tvShow = tvShowRepo.findById(id);
+        if (tvShow.isEmpty()) {
+            throw new ResourceNotFoundException("No tv show found with id: " + id);
+        }
+        tvShowRepo.deleteById(id);
+        if (tvShow.get().getCoverImage() != null) {
+            fileRepo.deleteIfExistsMediaCoverImage(tvShow.get().getCoverImage());
+        }
+        return new ResponseEntity(tvShowTransformer.jpaToTVShowResponseWithDetails(tvShow.get()), HttpStatus.OK);
     }
 
 }

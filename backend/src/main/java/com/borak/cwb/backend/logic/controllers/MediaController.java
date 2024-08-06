@@ -32,12 +32,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class MediaController {
 
-    @Autowired
-    private IMediaService mediaService;
-    @Autowired
-    private DomainValidationService domainValidator;
+    private final IMediaService mediaService;
+    private final DomainValidationService domainValidator;
 
-    //=========================GET MAPPINGS==================================  
+    @Autowired
+    public MediaController(IMediaService mediaService, DomainValidationService domainValidator) {
+        this.mediaService = mediaService;
+        this.domainValidator = domainValidator;
+    }
+
+//=================================================================================================================================
+//GET
     @GetMapping(path = "/search")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getMediasByTitle(

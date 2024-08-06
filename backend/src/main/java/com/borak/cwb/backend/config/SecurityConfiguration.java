@@ -101,17 +101,18 @@ public class SecurityConfiguration {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth
-                        -> auth.requestMatchers(HttpMethod.GET,
-                        "/api/medias/**",
-                        "/api/movies/**",
-                        "/api/tv/**",
-                        "/api/genres/**",
-                        "/api/persons/**",
-                        "/api/countries/**",
-                        "/images/**"
-                ).permitAll()
+                        -> auth.
+                        requestMatchers(HttpMethod.GET,
+                                "/api/medias/**",
+                                "/api/movies/**",
+                                "/api/tv/**",
+                                "/api/genres/**",
+                                "/api/persons/**",
+                                "/api/countries/**",
+                                "/images/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST,
-                                "api/critiques/*"
+                                "api/critiques"
                         ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
                         .requestMatchers(HttpMethod.PUT,
                                 "api/critiques/*"
@@ -119,6 +120,27 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE,
                                 "api/critiques/*"
                         ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.POST,
+                                "api/critiques/*/likes",
+                                "api/critiques/*/dislikes",
+                                "api/critiques/*/comments",
+                                "api/critiques/*/comments/*/likes",
+                                "api/critiques/*/comments/*/dislikes"
+                        ).hasAnyAuthority(UserRole.REGULAR.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.PUT,
+                                "api/critiques/*/likes",
+                                "api/critiques/*/dislikes",
+                                "api/critiques/*/comments",
+                                "api/critiques/*/comments/*/likes",
+                                "api/critiques/*/comments/*/dislikes"
+                        ).hasAnyAuthority(UserRole.REGULAR.toString(), UserRole.ADMINISTRATOR.toString())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "api/critiques/*/likes",
+                                "api/critiques/*/dislikes",
+                                "api/critiques/*/comments",
+                                "api/critiques/*/comments/*/likes",
+                                "api/critiques/*/comments/*/dislikes"
+                        ).hasAnyAuthority(UserRole.REGULAR.toString(), UserRole.ADMINISTRATOR.toString())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/movies",
                                 "/api/tv",

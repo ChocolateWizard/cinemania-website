@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
  * @author Mr. Poyo
  */
 @Repository
-public interface MediaRepositoryJPA extends JpaRepository<MediaJPA, Long>, PagingAndSortingRepository<MediaJPA, Long>, JpaSpecificationExecutor<MediaJPA> {
+public interface MediaRepositoryJPA extends JpaRepository<MediaJPA, Long>, ListPagingAndSortingRepository<MediaJPA, Long>, JpaSpecificationExecutor<MediaJPA> {
 
     Page<MediaJPA> findByTitleContaining(String title, Pageable pageable);
 

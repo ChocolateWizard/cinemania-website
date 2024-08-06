@@ -4,13 +4,19 @@
  */
 package com.borak.cwb.backend.logic.transformers;
 
+import com.borak.cwb.backend.config.ConfigProperties;
+import com.borak.cwb.backend.domain.SecurityUser;
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
+import com.borak.cwb.backend.domain.dto.critique.CritiqueResponseDTO;
+import com.borak.cwb.backend.domain.dto.critique.CritiqueUserResponseDTO;
 import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
 import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.domain.jdbc.UserJDBC;
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.UserJPA;
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,6 +25,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CritiqueTransformer {
+
+    @Autowired
+    private ConfigProperties config;
 
     public CritiqueJDBC toCritiqueJDBC(CritiqueRequestDTO request, Long userId) {
         CritiqueJDBC critique = new CritiqueJDBC();
@@ -33,16 +42,14 @@ public class CritiqueTransformer {
         return critique;
     }
 
-    public CritiqueJPA toCritiqueJPA(CritiqueRequestDTO request, Long userId) {
-        CritiqueJPA critique = new CritiqueJPA();
-        UserJPA user = new UserJPA();
-        MediaJPA media = new MediaJPA();
-        critique.setDescription(request.getDescription());
-        critique.setRating(request.getRating());
-        user.setId(userId);
-        media.setId(request.getMediaId());
-        critique.setId(new CritiqueJPA.ID(user, media));
-        return critique;
+    public CritiqueJPA toCritiqueJPA(CritiqueRequestDTO request, UserJPA user) {
+        return new CritiqueJPA(
+                request.getId(),
+                user,
+                new MediaJPA(request.getMediaId()),
+                request.getDescription(),
+                request.getRating(),
+                LocalDateTime.now());
     }
 
     public CritiqueJDBC toCritiqueJDBC(Long mediaId, Long userId) {
@@ -57,13 +64,23 @@ public class CritiqueTransformer {
     }
 
     public CritiqueJPA toCritiqueJPA(Long mediaId, Long userId) {
-        CritiqueJPA critique = new CritiqueJPA();
-        UserJPA user = new UserJPA();
-        MediaJPA media = new MediaJPA();
-        user.setId(userId);
-        media.setId(mediaId);
-        critique.setId(new CritiqueJPA.ID(user, media));
-        return critique;
+        return new CritiqueJPA(new UserJPA(userId), new MediaJPA(mediaId));
+    }
+
+    public CritiqueResponseDTO toCritiqueResponse(CritiqueJPA critique) {
+        CritiqueResponseDTO response = new CritiqueResponseDTO();
+        CritiqueUserResponseDTO critic = new CritiqueUserResponseDTO();
+        response.setId(critique.getId());
+        response.setMediaId(critique.getMedia().getId());
+        response.setDescription(critique.getDescription());
+        response.setRating(critique.getRating());
+        response.setCreatedAt(critique.getCreatedAt());
+        critic.setProfileName(critique.getUser().getProfileName());
+        if (critique.getUser().getProfileImage() != null) {
+            critic.setProfileImageUrl(config.getUserImagesBaseUrl() + critique.getUser().getProfileImage());
+        }
+        response.setCritic(critic);
+        return response;
     }
 
 }

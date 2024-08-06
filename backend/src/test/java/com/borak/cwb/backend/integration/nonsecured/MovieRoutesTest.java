@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -49,10 +50,6 @@ public class MovieRoutesTest {
         TESTS_PASSED.put("getAllMoviesWithDetailsPaginated_Test", false);
         TESTS_PASSED.put("getMovieWithGenres_Test", false);
         TESTS_PASSED.put("getMovieWithDetails_Test", false);
-        TESTS_PASSED.put("getMovieDirectors_Test", false);
-        TESTS_PASSED.put("getMovieWriters_Test", false);
-        TESTS_PASSED.put("getMovieActors_Test", false);
-        TESTS_PASSED.put("getMovieActorsWithRoles_Test", false);
     }
 
     public static boolean didAllTestsPass() {
@@ -212,106 +209,6 @@ public class MovieRoutesTest {
         TESTS_PASSED.put("getMovieWithDetails_Test", true);
     }
 
-    @Test
-    @Order(7)
-    @DisplayName("Tests GET /api/movies/{id}/directors")
-    void getMovieDirectors_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getMovieDirectorsRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getMovieDirectorsRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getMovieDirectorsRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getMovieJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getMovieDirectors_Test", true);
-    }
-
-    @Test
-    @Order(8)
-    @DisplayName("Tests GET /api/movies/{id}/writers")
-    void getMovieWriters_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getMovieWritersRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getMovieWritersRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getMovieWritersRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getMovieJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getMovieWriters_Test", true);
-    }
-
-    @Test
-    @Order(9)
-    @DisplayName("Tests GET /api/movies/{id}/actors")
-    void getMovieActors_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getMovieActorsRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getMovieActorsRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getMovieActorsRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getMovieJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getMovieActors_Test", true);
-    }
-
-    @Test
-    @Order(10)
-    @DisplayName("Tests GET /api/movies/{id}/actors/roles")
-    void getMovieActorsWithRoles_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getMovieActorsRolesRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getMovieActorsRolesRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getMovieActorsRolesRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getMovieJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getMovieActorsWithRoles_Test", true);
-    }
-
 //=================================================================================================================================
 //PRIVATE METHODS
 //=================================================================================================================================
@@ -321,7 +218,10 @@ public class MovieRoutesTest {
             "?page=0&size=1",
             "?page=-1&size=1",
             "?page=1&size=0",
-            "?page=1&size=-1"
+            "?page=1&size=-1",
+            "?page=1&size=101",
+            "?page=1&size=102",
+            "?page=1&size=201"
         };
     }
 
@@ -351,7 +251,10 @@ public class MovieRoutesTest {
             "/popular?page=0&size=1",
             "/popular?page=-1&size=1",
             "/popular?page=1&size=0",
-            "/popular?page=1&size=-1"
+            "/popular?page=1&size=-1",
+            "/popular?page=1&size=101",
+            "/popular?page=1&size=102",
+            "/popular?page=1&size=201"
         };
     }
 
@@ -376,7 +279,10 @@ public class MovieRoutesTest {
             "/current?page=0&size=1",
             "/current?page=-1&size=1",
             "/current?page=1&size=0",
-            "/current?page=1&size=-1"
+            "/current?page=1&size=-1",
+            "/current?page=1&size=101",
+            "/current?page=1&size=102",
+            "/current?page=1&size=201"
         };
     }
 
@@ -401,7 +307,10 @@ public class MovieRoutesTest {
             "/details?page=0&size=1",
             "/details?page=-1&size=1",
             "/details?page=1&size=0",
-            "/details?page=1&size=-1"
+            "/details?page=1&size=-1",
+            "/details?page=1&size=101",
+            "/details?page=1&size=102",
+            "/details?page=1&size=201"
         };
     }
 
@@ -477,107 +386,4 @@ public class MovieRoutesTest {
     }
 
 //---------------------------------------------------------------------------------------------------------------------------------
-//movies/{id}/directors
-    private String[] getMovieDirectorsRequestInvalidResponse400() {
-        return new String[]{
-            "/0/directors",
-            "/-1/directors"
-        };
-    }
-
-    private String[] getMovieDirectorsRequestValidResponse404() {
-        return new String[]{
-            "/3/directors",
-            "/5/directors",
-            "/6/directors",
-            "/20/directors"
-        };
-    }
-
-    private Pair<Integer, String>[] getMovieDirectorsRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(19, "/1/directors"),
-            new Pair(20, "/2/directors"),
-            new Pair(21, "/4/directors")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//movies/{id}/writers
-    private String[] getMovieWritersRequestInvalidResponse400() {
-        return new String[]{
-            "/0/writers",
-            "/-1/writers"
-        };
-    }
-
-    private String[] getMovieWritersRequestValidResponse404() {
-        return new String[]{
-            "/3/writers",
-            "/5/writers",
-            "/6/writers",
-            "/20/writers"
-        };
-    }
-
-    private Pair<Integer, String>[] getMovieWritersRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(22, "/1/writers"),
-            new Pair(23, "/2/writers"),
-            new Pair(24, "/4/writers")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//movies/{id}/actors
-    private String[] getMovieActorsRequestInvalidResponse400() {
-        return new String[]{
-            "/0/actors",
-            "/-1/actors"
-        };
-    }
-
-    private String[] getMovieActorsRequestValidResponse404() {
-        return new String[]{
-            "/3/actors",
-            "/5/actors",
-            "/6/actors",
-            "/20/actors"
-        };
-    }
-
-    private Pair<Integer, String>[] getMovieActorsRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(25, "/1/actors"),
-            new Pair(26, "/2/actors"),
-            new Pair(27, "/4/actors")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//movies/{id}/actors/roles
-    private String[] getMovieActorsRolesRequestInvalidResponse400() {
-        return new String[]{
-            "/0/actors/roles",
-            "/-1/actors/roles"
-        };
-    }
-
-    private String[] getMovieActorsRolesRequestValidResponse404() {
-        return new String[]{
-            "/3/actors/roles",
-            "/5/actors/roles",
-            "/6/actors/roles",
-            "/20/actors/roles"
-        };
-    }
-
-    private Pair<Integer, String>[] getMovieActorsRolesRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(28, "/1/actors/roles"),
-            new Pair(29, "/2/actors/roles"),
-            new Pair(30, "/4/actors/roles")
-        };
-    }
-
 }

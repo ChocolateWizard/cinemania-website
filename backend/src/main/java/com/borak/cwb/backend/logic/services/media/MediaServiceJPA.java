@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -37,16 +38,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MediaServiceJPA implements IMediaService {
 
-    @Autowired
-    private MediaRepositoryJPA mediaRepo;
-    @Autowired
-    private MovieRepositoryJPA movieRepo;
-    @Autowired
-    private TVShowRepositoryJPA tvShowRepo;
+    private final MediaRepositoryJPA mediaRepo;
+    private final MovieRepositoryJPA movieRepo;
+    private final TVShowRepositoryJPA tvShowRepo;
+
+    private final MediaTransformer mediaTransformer;
 
     @Autowired
-    private MediaTransformer mediaTransformer;
+    public MediaServiceJPA(MediaRepositoryJPA mediaRepo, MovieRepositoryJPA movieRepo, TVShowRepositoryJPA tvShowRepo, MediaTransformer mediaTransformer) {
+        this.mediaRepo = mediaRepo;
+        this.movieRepo = movieRepo;
+        this.tvShowRepo = tvShowRepo;
+        this.mediaTransformer = mediaTransformer;
+    }
 
+//=================================================================================================================================    
+    
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title, List<Long> genreIds, SortOption sortByAudienceRating, SortOption sortByReleaseDate, Integer releaseYear, MediaType mediaType) {
         Sort sort = Sort.unsorted();

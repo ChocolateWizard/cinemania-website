@@ -10,33 +10,30 @@ import org.springframework.http.ResponseEntity;
 /**
  *
  * @author Mr. Poyo
+ * @param <D> movie request object
  */
 public interface IMovieService<D extends DTO> {
 
-    public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size);
+    //GET
+    ResponseEntity getAllMoviesWithGenresPaginated(int page, int size);
 
-    public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size);
+    ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size);
 
-    public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size);
+    ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size);
 
-    public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size);
+    ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size);
 
-    public ResponseEntity getMovieWithGenres(Long id);
+    ResponseEntity getMovieWithGenres(long id);
 
-    public ResponseEntity getMovieWithDetails(Long id);
+    ResponseEntity getMovieWithDetails(long id);
 
-    public ResponseEntity getMovieDirectors(Long id);
+    //POST
+    ResponseEntity postMovie(D movie);
 
-    public ResponseEntity getMovieWriters(Long id);
+    //PUT
+    ResponseEntity putMovie(D movie);
 
-    public ResponseEntity getMovieActors(Long id);
-
-    public ResponseEntity getMovieActorsWithRoles(Long id);
-
-    public ResponseEntity deleteMovieById(long id);
-
-    public ResponseEntity postMovie(D movie);
-
-    public ResponseEntity putMovie(D movie);
+    //DELETE
+    ResponseEntity deleteMovieById(long id);
 
 }

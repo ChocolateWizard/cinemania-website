@@ -44,71 +44,93 @@ public class UserJPA implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "First name must not be empty")
+    @Size(max = 100, message = "First name must be less than or equal to 100 characters")
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Last name must not be empty")
+    @Size(max = 100, message = "Last name must be less than or equal to 100 characters")
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "Gender must not be null")
     @Column(name = "gender", nullable = false)
     private Gender gender;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Profile name must not be empty")
+    @Size(max = 100, message = "Profile name must be less than or equal to 100 characters")
     @Column(name = "profile_name", nullable = false, unique = true, length = 100)
     private String profileName;
 
-    @Size(max = 110)
+    @Size(max = 110, message = "Profile image must be less than or equal to 110 characters")
     @Column(name = "profile_image", length = 110)
     private String profileImage;
 
-    @NotBlank
-    @Size(max = 300)
+    @NotBlank(message = "Username must not be empty")
+    @Size(max = 300, message = "Username must be less than or equal to 300 characters")
     @Column(name = "username", nullable = false, unique = true, length = 300)
     private String username;
 
-    @NotBlank
-    @Size(max = 300)
-    @Email
+    @NotBlank(message = "Email must not be empty")
+    @Size(max = 300, message = "Email must be less than or equal to 300 characters")
+    @Email(message = "Email must be of valid email structure")
     @Column(name = "email", nullable = false, unique = true, length = 300)
     private String email;
 
-    @NotBlank
-    @Size(max = 300)
+    @NotBlank(message = "Password must not be empty")
+    @Size(max = 300, message = "Password must be less than or equal to 300 characters")
     @Column(name = "password", nullable = false, length = 300)
     private String password;
 
-    @NotNull
-    @Column(name = "role", nullable = false, length = 100)
+    @NotNull(message = "Role must not be null")
+    @Column(name = "role", nullable = false, length = 30)
     private UserRole role;
 
-    @NotNull
+    @NotNull(message = "Created at must not be null")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @NotNull
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "country_id", nullable = false, referencedColumnName = "id")
     private CountryJPA country;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH})
     @JoinTable(name = "user_media",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "media_id", referencedColumnName = "id", nullable = false))
     private List<MediaJPA> medias = new ArrayList<>();
 
-    @OneToMany(targetEntity = CritiqueJPA.class, mappedBy = "id.critic", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @OneToMany(targetEntity = CritiqueJPA.class, mappedBy = "user", fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
     private List<CritiqueJPA> critiques = new ArrayList<>();
 
+    @OneToMany(targetEntity = CommentJPA.class, mappedBy = "user", fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<CommentJPA> comments = new ArrayList<>();
+
+    @OneToMany(targetEntity = CritiqueLikeDislikeJPA.class, mappedBy = "id.user",
+            fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<CritiqueLikeDislikeJPA> critiqueLikeDislikes = new ArrayList<>();
+
+    @OneToMany(targetEntity = CommentLikeDislikeJPA.class, mappedBy = "id.user",
+            fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<CommentLikeDislikeJPA> commentsLikeDislikes = new ArrayList<>();
+
     public UserJPA() {
+    }
+
+    public UserJPA(Long id) {
+        this.id = id;
+    }
+
+    public UserJPA(Long id, String profileName, String profileImage) {
+        this.id = id;
+        this.profileName = profileName;
+        this.profileImage = profileImage;
     }
 
     public UserJPA(String firstName, String lastName, Gender gender, String profileName, String profileImage, String username, String email, String password, UserRole role, LocalDateTime createdAt, LocalDateTime updatedAt, CountryJPA country) {
@@ -260,6 +282,30 @@ public class UserJPA implements Serializable {
 
     public void setCritiques(List<CritiqueJPA> critiques) {
         this.critiques = critiques;
+    }
+
+    public List<CommentJPA> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentJPA> comments) {
+        this.comments = comments;
+    }
+
+    public List<CritiqueLikeDislikeJPA> getCritiqueLikeDislikes() {
+        return critiqueLikeDislikes;
+    }
+
+    public void setCritiqueLikeDislikes(List<CritiqueLikeDislikeJPA> critiqueLikeDislikes) {
+        this.critiqueLikeDislikes = critiqueLikeDislikes;
+    }
+
+    public List<CommentLikeDislikeJPA> getCommentsLikeDislikes() {
+        return commentsLikeDislikes;
+    }
+
+    public void setCommentsLikeDislikes(List<CommentLikeDislikeJPA> commentsLikeDislikes) {
+        this.commentsLikeDislikes = commentsLikeDislikes;
     }
 
     @Override

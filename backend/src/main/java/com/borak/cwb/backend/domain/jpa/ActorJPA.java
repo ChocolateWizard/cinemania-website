@@ -30,8 +30,7 @@ import java.util.Objects;
 public class ActorJPA implements Serializable {
 
     @Id
-    @Basic(optional = false)
-    @NotNull
+    @NotNull(message = "Person id must not be null")
     @Column(name = "person_id")
     private Long personId;
 
@@ -39,7 +38,7 @@ public class ActorJPA implements Serializable {
     @MapsId
     private PersonJPA person;
 
-    @NotNull
+    @NotNull(message = "Star status must not be null")
     @Column(name = "is_star", nullable = false)
     private Boolean star;
 

@@ -5,6 +5,8 @@
 package com.borak.cwb.backend.helpers.repositories;
 
 import com.borak.cwb.backend.domain.jpa.ActingJPA;
+import com.borak.cwb.backend.domain.jpa.CommentJPA;
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.MovieJPA;
 import com.borak.cwb.backend.repository.jpa.MovieRepositoryJPA;
 import java.util.List;
@@ -39,7 +41,12 @@ public class MovieTestRepository {
             movie.get().getGenres().size();
             movie.get().getDirectors().size();
             movie.get().getWriters().size();
-            movie.get().getCritiques().size();
+            for (CritiqueJPA critique : movie.get().getCritiques()) {
+                critique.getLikeDislikes().size();
+                for (CommentJPA comment : critique.getComments()) {
+                    comment.getLikeDislikes().size();
+                }
+            }
             movie.get().getActings().size();
             for (ActingJPA acting : movie.get().getActings()) {
                 acting.getRoles().size();
@@ -55,7 +62,13 @@ public class MovieTestRepository {
             movie.getGenres().size();
             movie.getDirectors().size();
             movie.getWriters().size();
-            movie.getCritiques().size();
+            for (CritiqueJPA critique : movie.getCritiques()) {
+                critique.getLikeDislikes().size();
+                for (CommentJPA comment : critique.getComments()) {
+                    comment.getLikeDislikes().size();
+                }
+            }
+
             movie.getActings().size();
             for (ActingJPA acting : movie.getActings()) {
                 acting.getRoles().size();

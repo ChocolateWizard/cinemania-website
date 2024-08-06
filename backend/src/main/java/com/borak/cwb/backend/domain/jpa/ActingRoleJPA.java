@@ -12,7 +12,6 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -35,8 +34,8 @@ public class ActingRoleJPA implements Serializable {
     @EmbeddedId
     private ActingRoleJPA.ID id;
 
-    @NotBlank
-    @Size(max = 300)
+    @NotBlank(message = "Name must not be empty")
+    @Size(max = 300, message = "Name must be less than or equal to 300 characters")
     @Column(name = "name", nullable = false, length = 300)
     private String name;
 
@@ -47,17 +46,17 @@ public class ActingRoleJPA implements Serializable {
         @JoinColumn(name = "acting_id", referencedColumnName = "id", nullable = false)
         private ActingJPA acting;
 
-        @NotNull
-        @Min(value = 1)
-        @Column(name = "id", nullable = false)
-        private Long id;
+        @NotNull(message = "Order number must not be null")
+        @Min(value = 1, message = "Order number must be greater than or equal to 1")
+        @Column(name = "order_number", nullable = false)
+        private Long orderNumber;
 
         public ID() {
         }
 
-        public ID(ActingJPA acting, Long id) {
+        public ID(ActingJPA acting, Long orderNumber) {
             this.acting = acting;
-            this.id = id;
+            this.orderNumber = orderNumber;
         }
 
         public ActingJPA getActing() {
@@ -68,19 +67,19 @@ public class ActingRoleJPA implements Serializable {
             this.acting = acting;
         }
 
-        public Long getId() {
-            return id;
+        public Long getOrderNumber() {
+            return orderNumber;
         }
 
-        public void setId(Long id) {
-            this.id = id;
+        public void setOrderNumber(Long orderNumber) {
+            this.orderNumber = orderNumber;
         }
 
         @Override
         public int hashCode() {
             int hash = 7;
             hash = 17 * hash + Objects.hashCode(this.acting);
-            hash = 17 * hash + Objects.hashCode(this.id);
+            hash = 17 * hash + Objects.hashCode(this.orderNumber);
             return hash;
         }
 
@@ -99,7 +98,7 @@ public class ActingRoleJPA implements Serializable {
             if (!Objects.equals(this.acting, other.acting)) {
                 return false;
             }
-            return Objects.equals(this.id, other.id);
+            return Objects.equals(this.orderNumber, other.orderNumber);
         }
 
     }

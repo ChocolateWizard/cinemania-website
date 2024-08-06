@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
+public class MovieServiceJDBC {
 
     private static final int POPULARITY_TRESHOLD = 80;
 
@@ -71,32 +71,32 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
     private ActingTransformer actingTransformer;
 //----------------------------------------------------------------------------------------------------
 
-    @Override
+    
     public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size) {
         List<MovieResponseDTO> movies = movieTransformer.jdbcToMovieResponse(movieRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @Override
+   
     public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size) {
         List<MovieResponseDTO> movies = movieTransformer.jdbcToMovieResponse(movieRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @Override
+    
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
         List<MovieResponseDTO> movies = movieTransformer.jdbcToMovieResponse(movieRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @Override
+    
     public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size) {
         List<MovieResponseDTO> movies = movieTransformer.jdbcToMovieResponse(movieRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @Override
+   
     public ResponseEntity getMovieWithGenres(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdWithGenres(id);
         if (movie.isPresent()) {
@@ -105,7 +105,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+    
     public ResponseEntity getMovieWithDetails(Long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdWithRelations(id);
         if (movie.isPresent()) {
@@ -114,7 +114,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+    
     public ResponseEntity getMovieDirectors(Long id) {
         if (movieRepo.existsById(id)) {
             List<DirectorJDBC> directors = directorRepo.findAllByMediaId(id);
@@ -123,7 +123,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+    
     public ResponseEntity getMovieWriters(Long id) {
         if (movieRepo.existsById(id)) {
             List<WriterJDBC> writers = writerRepo.findAllByMediaId(id);
@@ -132,7 +132,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+    
     public ResponseEntity getMovieActors(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActorJDBC> actors = actorRepo.findAllByMediaId(id);
@@ -141,7 +141,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+   
     public ResponseEntity getMovieActorsWithRoles(Long id) {
         if (movieRepo.existsById(id)) {
             List<ActingJDBC> actings = actingRepo.findAllByMediaId(id);
@@ -150,7 +150,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
+    
     public ResponseEntity deleteMovieById(long id) {
         Optional<MovieJDBC> movie = movieRepo.findByIdWithRelations(id);
         if (movie.isEmpty()) {
@@ -164,7 +164,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
 
     }
 
-    @Override
+   
     public ResponseEntity postMovie(MovieRequestDTO movieClient) {
         for (Long genre : movieClient.getGenres()) {
             if (!genreRepo.existsById(genre)) {
@@ -201,7 +201,7 @@ public class MovieServiceJDBC implements IMovieService<MovieRequestDTO> {
         return new ResponseEntity<>(movieTransformer.jdbcToMovieResponse(movie.get()), HttpStatus.OK);
     }
 
-    @Override
+
     public ResponseEntity putMovie(MovieRequestDTO request) {
         if (!movieRepo.existsById(request.getId())) {
             throw new ResourceNotFoundException("Movie with id: " + request.getId() + " does not exist in database!");

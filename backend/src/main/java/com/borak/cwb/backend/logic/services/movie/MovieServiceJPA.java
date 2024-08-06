@@ -7,16 +7,9 @@ package com.borak.cwb.backend.logic.services.movie;
 import com.borak.cwb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.cwb.backend.domain.dto.movie.MovieResponseDTO;
 import com.borak.cwb.backend.domain.jpa.ActingJPA;
-import com.borak.cwb.backend.domain.jpa.ActorJPA;
-import com.borak.cwb.backend.domain.jpa.DirectorJPA;
 import com.borak.cwb.backend.domain.jpa.MovieJPA;
-import com.borak.cwb.backend.domain.jpa.WriterJPA;
 import com.borak.cwb.backend.exceptions.ResourceNotFoundException;
-import com.borak.cwb.backend.logic.transformers.ActingTransformer;
-import com.borak.cwb.backend.logic.transformers.ActorTransformer;
-import com.borak.cwb.backend.logic.transformers.DirectorTransformer;
 import com.borak.cwb.backend.logic.transformers.MovieTransformer;
-import com.borak.cwb.backend.logic.transformers.WriterTransformer;
 import com.borak.cwb.backend.repository.jpa.ActorRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.DirectorRepositoryJPA;
 import com.borak.cwb.backend.repository.jpa.GenreRepositoryJPA;
@@ -25,17 +18,19 @@ import com.borak.cwb.backend.repository.jpa.WriterRepositoryJPA;
 import com.borak.cwb.backend.repository.file.FileRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -65,120 +60,69 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
 
     @Autowired
     private MovieTransformer movieTransformer;
-    @Autowired
-    private DirectorTransformer directorTransformer;
-    @Autowired
-    private WriterTransformer writerTransformer;
-    @Autowired
-    private ActorTransformer actorTransformer;
-    @Autowired
-    private ActingTransformer actingTransformer;
-//----------------------------------------------------------------------------------------------------
 
+//=================================================================================================================================
+//GET
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllMoviesWithGenresPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<MovieJPA> m = movieRepo.findAll(p);
-        List<MovieResponseDTO> response = movieTransformer.jpaToMovieResponse(m.getContent(), "genres");
+        List<MovieJPA> m = movieRepo.findAllByOrderByIdAsc(p);
+        List<MovieResponseDTO> response = movieTransformer.jpaToMovieResponseWithGenres(m);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllMoviesWithGenresPopularPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<MovieJPA> m = movieRepo.findAllByAudienceRatingGreaterThanEqual(POPULARITY_TRESHOLD, p);
-        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponse(m.getContent(), "genres");
+        List<MovieJPA> m = movieRepo.findAllByAudienceRatingGreaterThanEqual(POPULARITY_TRESHOLD, p);
+        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponseWithGenres(m);
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllMoviesWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
         Pageable p = PageRequest.of(page - 1, size);
-        Page<MovieJPA> m = movieRepo.findAllByReleaseDateYearGreaterThanEqual(year, p);
-        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponse(m.getContent(), "genres");
+        List<MovieJPA> m = movieRepo.findAllByReleaseDateYearGreaterThanEqual(year, p);
+        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponseWithGenres(m);
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity getAllMoviesWithDetailsPaginated(int page, int size) {
         Pageable p = PageRequest.of(page - 1, size);
-        Page<MovieJPA> m = movieRepo.findAll(p);
-        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponse(m.getContent(), "details");
+        List<MovieJPA> m = movieRepo.findAllByOrderByIdAsc(p);
+        List<MovieResponseDTO> movies = movieTransformer.jpaToMovieResponseWithDetails(m);
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity getMovieWithGenres(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            return new ResponseEntity<>(movieTransformer.jpaToMovieResponse(movie.get(), "genres"), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getMovieWithDetails(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            return new ResponseEntity<>(movieTransformer.jpaToMovieResponse(movie.get(), "details"), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getMovieDirectors(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            List<DirectorJPA> directors = movie.get().getDirectors();
-            return new ResponseEntity<>(directorTransformer.jpaToDirectorResponse(directors), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getMovieWriters(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            List<WriterJPA> writers = movie.get().getWriters();
-            return new ResponseEntity<>(writerTransformer.jpaToWriterResponse(writers), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getMovieActors(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            List<ActorJPA> actors = movie.get().getActings().stream().map(e -> e.getActor()).toList();
-            return new ResponseEntity<>(actorTransformer.jpaToActorResponse(actors), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity getMovieActorsWithRoles(Long id) {
-        Optional<MovieJPA> movie = movieRepo.findById(id);
-        if (movie.isPresent()) {
-            List<ActingJPA> actings = movie.get().getActings();
-            return new ResponseEntity<>(actingTransformer.jpaToActorResponse(actings), HttpStatus.OK);
-        }
-        throw new ResourceNotFoundException("No movie found with id: " + id);
-    }
-
-    @Override
-    public ResponseEntity deleteMovieById(long id) {
+    public ResponseEntity getMovieWithGenres(long id) {
         Optional<MovieJPA> movie = movieRepo.findById(id);
         if (movie.isEmpty()) {
             throw new ResourceNotFoundException("No movie found with id: " + id);
         }
-        movieRepo.deleteById(id);
-        if (movie.get().getCoverImage() != null && !movie.get().getCoverImage().isEmpty()) {
-            fileRepo.deleteIfExistsMediaCoverImage(movie.get().getCoverImage());
-        }
-        return new ResponseEntity(movieTransformer.jpaToMovieResponse(movie.get(), "details"), HttpStatus.OK);
+        return new ResponseEntity<>(movieTransformer.jpaToMovieResponseWithGenres(movie.get()), HttpStatus.OK);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public ResponseEntity getMovieWithDetails(long id) {
+        Optional<MovieJPA> movie = movieRepo.findById(id);
+        if (movie.isEmpty()) {
+            throw new ResourceNotFoundException("No movie found with id: " + id);
+        }
+        return new ResponseEntity<>(movieTransformer.jpaToMovieResponseWithDetails(movie.get()), HttpStatus.OK);
+    }
+//=================================================================================================================================
+//POST
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     @Override
     public ResponseEntity postMovie(MovieRequestDTO movieClient) {
         for (Long genre : movieClient.getGenres()) {
@@ -202,6 +146,7 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
             }
         }
         MovieJPA movieToSave = movieTransformer.toMovieJPA(movieClient);
+        movieToSave.setCreatedAt(LocalDateTime.now());
         movieToSave.setCoverImage(null);
         MovieJPA movie;
         if (movieClient.getCoverImage() != null) {
@@ -215,9 +160,12 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
             movie = movieRepo.saveAndFlush(movieToSave);
             manager.refresh(movie);
         }
-        return new ResponseEntity<>(movieTransformer.jpaToMovieResponse(movie, "details"), HttpStatus.OK);
+        return new ResponseEntity<>(movieTransformer.jpaToMovieResponseWithDetails(movie), HttpStatus.OK);
     }
+//=================================================================================================================================
+//PUT
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ, propagation = Propagation.REQUIRED)
     @Override
     public ResponseEntity putMovie(MovieRequestDTO request) {
         Optional<MovieJPA> movieDB = movieRepo.findById(request.getId());
@@ -244,13 +192,15 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
                 throw new ResourceNotFoundException("Actor with id: " + actor.getId() + " does not exist in database!");
             }
         }
-        MovieJPA movie;
+        MovieJPA movieToReturn;
         String coverImageDB = movieDB.get().getCoverImage();
         if (request.getCoverImage() != null) {
             //MyImage != null
             //client provided a cover image in PUT request so he wished to replace the current one if it's present
             request.getCoverImage().setName("" + request.getId());
             MovieJPA movieToSave = movieTransformer.toMovieJPA(request);
+            movieToSave.setCreatedAt(movieDB.get().getCreatedAt());
+            movieToSave.setUpdatedAt(LocalDateTime.now());
             for (ActingJPA acting : movieToSave.getActings()) {
                 for (ActingJPA actingDB : movieDB.get().getActings()) {
                     if (Objects.equals(actingDB.getActor().getPersonId(), acting.getActor().getPersonId())) {
@@ -258,8 +208,8 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
                     }
                 }
             }
-            movie = movieRepo.saveAndFlush(movieToSave);
-            manager.refresh(movie);
+            movieToReturn = movieRepo.saveAndFlush(movieToSave);
+            manager.refresh(movieToReturn);
             if (coverImageDB != null) {
                 fileRepo.deleteIfExistsMediaCoverImage(coverImageDB);
             }
@@ -268,6 +218,8 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
             //MyImage == null
             //client provided no cover image in PUT request so he wished to delete the exisitng one if present         
             MovieJPA movieToSave = movieTransformer.toMovieJPA(request);
+            movieToSave.setCreatedAt(movieDB.get().getCreatedAt());
+            movieToSave.setUpdatedAt(LocalDateTime.now());
             for (ActingJPA acting : movieToSave.getActings()) {
                 for (ActingJPA actingDB : movieDB.get().getActings()) {
                     if (Objects.equals(actingDB.getActor().getPersonId(), acting.getActor().getPersonId())) {
@@ -275,13 +227,29 @@ public class MovieServiceJPA implements IMovieService<MovieRequestDTO> {
                     }
                 }
             }
-            movie = movieRepo.saveAndFlush(movieToSave);
-            manager.refresh(movie);
+            movieToReturn = movieRepo.saveAndFlush(movieToSave);
+            manager.refresh(movieToReturn);
             if (coverImageDB != null) {
                 fileRepo.deleteIfExistsMediaCoverImage(coverImageDB);
             }
         }
-        return new ResponseEntity<>(movieTransformer.jpaToMovieResponse(movie, "details"), HttpStatus.OK);
+        return new ResponseEntity<>(movieTransformer.jpaToMovieResponseWithDetails(movieToReturn), HttpStatus.OK);
+    }
+
+//=================================================================================================================================
+//DELETE
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
+    @Override
+    public ResponseEntity deleteMovieById(long id) {
+        Optional<MovieJPA> movie = movieRepo.findById(id);
+        if (movie.isEmpty()) {
+            throw new ResourceNotFoundException("No movie found with id: " + id);
+        }
+        movieRepo.deleteById(id);
+        if (movie.get().getCoverImage() != null) {
+            fileRepo.deleteIfExistsMediaCoverImage(movie.get().getCoverImage());
+        }
+        return new ResponseEntity(movieTransformer.jpaToMovieResponseWithDetails(movie.get()), HttpStatus.OK);
     }
 
 }

@@ -10,10 +10,10 @@ import org.springframework.http.ResponseEntity;
  *
  * @author Mr. Poyo
  */
-public interface IUserService<ID> {
+public interface IUserService {
 
-    ResponseEntity postMediaIntoLibrary(ID mediaId);
+    ResponseEntity postMediaIntoLibrary(long mediaId);
 
-    ResponseEntity deleteMediaFromLibrary(ID mediaId);
+    ResponseEntity deleteMediaFromLibrary(long mediaId);
 
 }

@@ -6,6 +6,7 @@ package com.borak.cwb.backend.logic.services.validation;
 
 import com.borak.cwb.backend.domain.dto.movie.MovieRequestDTO;
 import com.borak.cwb.backend.domain.MyImage;
+import com.borak.cwb.backend.domain.dto.critique.CritiqueCommentRequestDTO;
 import com.borak.cwb.backend.domain.dto.critique.CritiqueRequestDTO;
 import com.borak.cwb.backend.domain.dto.person.PersonRequestDTO;
 import com.borak.cwb.backend.domain.dto.tv.TVShowRequestDTO;
@@ -468,11 +469,29 @@ public class DomainValidationService {
 
     }
 
-    public void validate(CritiqueRequestDTO critique) throws ValidationException {
+    public void validate(CritiqueRequestDTO critique, RequestMethod requestType) throws ValidationException {
         if (critique == null) {
             throw new ValidationException("Invalid critique info!");
         }
         List<String> messages = new LinkedList<>();
+        switch (requestType) {
+            case PUT:
+                if (critique.getId() == null) {
+                    messages.add("Critique id must not be null!");
+                } else if (critique.getId() < 1) {
+                    messages.add("Critique id must be greater than or equal to 1!");
+                }
+                break;
+            case POST:
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported requestType!");
+        }
+        if (critique.getMediaId() == null) {
+            messages.add("Critique media id must not be null!");
+        } else if (critique.getMediaId() < 1) {
+            messages.add("Critique media id must be greater than or equal to 1!");
+        }
         if (critique.getRating() == null) {
             messages.add("Critique rating must not be null!");
         } else if (critique.getRating() < 0 || critique.getRating() > 100) {
@@ -500,6 +519,23 @@ public class DomainValidationService {
         if (genreIds != null && Util.duplicatesExist(genreIds)) {
             throw new ValidationException("Genre ids must not contain duplicate values!");
         }
+    }
+
+    public void validate(CritiqueCommentRequestDTO commentRequest) {
+        if (commentRequest == null) {
+            throw new ValidationException("Invalid comment info");
+        }
+        if (commentRequest.getCritiqueId() == null) {
+            throw new ValidationException("Critique id must not be null");
+        } else if (commentRequest.getCritiqueId() < 1) {
+            throw new ValidationException("Critique id must be greater than or equal to 1");
+        }
+        if (commentRequest.getContent() == null || commentRequest.getContent().isBlank()) {
+            throw new ValidationException("Critique comment content must not be null or empty");
+        } else if (commentRequest.getContent().length() > 300) {
+            throw new ValidationException("Critique comment content must have less than 300 characters");
+        }
+
     }
 
 //---------------------------------------------------------------------------------------------------------

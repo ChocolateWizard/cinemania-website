@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
+public class TVShowServiceJDBC {
 
     private static final int POPULARITY_TRESHOLD = 80;
 
@@ -71,32 +71,27 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
     private ActingTransformer actingTransformer;
 
 //----------------------------------------------------------------------------------------------------
-    @Override
     public ResponseEntity getAllTVShowsWithGenresPaginated(int page, int size) {
         List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllWithGenresPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity getAllTVShowsWithGenresPopularPaginated(int page, int size) {
         List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllByAudienceRatingWithGenresPaginated(page, size, POPULARITY_TRESHOLD));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity getAllTVShowsWithGenresCurrentPaginated(int page, int size) {
         int year = Year.now().getValue() - 1;
         List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllByReleaseYearWithGenresPaginated(page, size, year));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity getAllTVShowsWithDetailsPaginated(int page, int size) {
         List<TVShowResponseDTO> tvShows = tvShowTransformer.jdbcToTVShowResponse(tvShowRepo.findAllWithRelationsPaginated(page, size));
         return new ResponseEntity<>(tvShows, HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity getTVShowWithGenres(Long id) {
         Optional<TVShowJDBC> tvShow = tvShowRepo.findByIdWithGenres(id);
         if (tvShow.isPresent()) {
@@ -105,7 +100,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getTVShowWithDetails(Long id) {
         Optional<TVShowJDBC> tvShow = tvShowRepo.findByIdWithRelations(id);
         if (tvShow.isPresent()) {
@@ -114,7 +108,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getTVShowDirectors(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<DirectorJDBC> directors = directorRepo.findAllByMediaId(id);
@@ -123,7 +116,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getTVShowWriters(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<WriterJDBC> writers = writerRepo.findAllByMediaId(id);
@@ -132,7 +124,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getTVShowActors(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<ActorJDBC> actors = actorRepo.findAllByMediaId(id);
@@ -141,7 +132,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No tv show found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getTVShowActorsWithRoles(Long id) {
         if (tvShowRepo.existsById(id)) {
             List<ActingJDBC> actings = actingRepo.findAllByMediaId(id);
@@ -150,7 +140,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         throw new ResourceNotFoundException("No movie found with id: " + id);
     }
 
-    @Override
     public ResponseEntity deleteTVShowById(long id) {
         Optional<TVShowJDBC> tvShow = tvShowRepo.findByIdWithRelations(id);
         if (tvShow.isEmpty()) {
@@ -163,7 +152,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         return new ResponseEntity(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity postTVShow(TVShowRequestDTO tvShowClient) {
         for (Long genre : tvShowClient.getGenres()) {
             if (!genreRepo.existsById(genre)) {
@@ -200,7 +188,6 @@ public class TVShowServiceJDBC implements ITVShowService<TVShowRequestDTO> {
         return new ResponseEntity<>(tvShowTransformer.toResponseFromJDBC(tvShow.get()), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity putTVShow(TVShowRequestDTO request) {
         if (!tvShowRepo.existsById(request.getId())) {
             throw new ResourceNotFoundException("TV show with id: " + request.getId() + " does not exist in database!");

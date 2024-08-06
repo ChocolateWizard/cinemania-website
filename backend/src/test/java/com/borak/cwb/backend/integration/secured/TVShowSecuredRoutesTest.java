@@ -47,6 +47,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -77,7 +78,7 @@ public class TVShowSecuredRoutesTest {
         this.testUtil = testUtil;
     }
 
-    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();  
+    private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/tv";
 
     static {
@@ -405,7 +406,7 @@ public class TVShowSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
 
                 //random string as cookie
-                request = constructRequest(tvShowValid, imageValid,TestUtil.getRandomString(50));
+                request = constructRequest(tvShowValid, imageValid, TestUtil.getRandomString(50));
                 response = restTemplate.exchange(ROUTE + "/" + tvShowValid.getId(), HttpMethod.PUT, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
                 tvShowsAfter = getAllTVShows();
@@ -1686,7 +1687,7 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(expected).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
-        
+
         for (int i = 0; i < actual.size(); i++) {
             assertThat(actual.get(i)).isNotNull();
             assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
@@ -1696,17 +1697,19 @@ public class TVShowSecuredRoutesTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getNumberOfSeasons()).isEqualTo(expected.get(i).getNumberOfSeasons());
-            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
-            
+            assertThat(actual.get(i).getCriticsRating()).isEqualTo(expected.get(i).getCriticsRating());
+            assertThat(actual.get(i).getCreatedAt()).isEqualTo(expected.get(i).getCreatedAt());
+            assertThat(actual.get(i).getUpdatedAt()).isEqualTo(expected.get(i).getUpdatedAt());
+
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
-            
+
             for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
                 assertThat(actual.get(i).getGenres().get(j)).isNotNull();
                 assertThat(actual.get(i).getGenres().get(j).getId()).isEqualTo(expected.get(i).getGenres().get(j).getId());
                 assertThat(actual.get(i).getGenres().get(j).getName()).isEqualTo(expected.get(i).getGenres().get(j).getName());
             }
-            
+
             assertThat(actual.get(i).getDirectors()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getDirectors().size() == expected.get(i).getDirectors().size()).isTrue();
             for (int j = 0; j < actual.get(i).getDirectors().size(); j++) {
@@ -1717,7 +1720,7 @@ public class TVShowSecuredRoutesTest {
                 assertThat(actual.get(i).getDirectors().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getGender());
                 assertThat(actual.get(i).getDirectors().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getProfilePhoto());
             }
-            
+
             assertThat(actual.get(i).getWriters()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getWriters().size() == expected.get(i).getWriters().size()).isTrue();
             for (int j = 0; j < actual.get(i).getWriters().size(); j++) {
@@ -1728,13 +1731,13 @@ public class TVShowSecuredRoutesTest {
                 assertThat(actual.get(i).getWriters().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getGender());
                 assertThat(actual.get(i).getWriters().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getProfilePhoto());
             }
-            
+
             assertThat(actual.get(i).getActings()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getActings().size() == expected.get(i).getActings().size()).isTrue();
             for (int j = 0; j < actual.get(i).getActings().size(); j++) {
                 assertThat(actual.get(i).getActings().get(j)).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getStarring()).isEqualTo(expected.get(i).getActings().get(j).getStarring());
-                
+
                 assertThat(actual.get(i).getActings().get(j).getActor()).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getActor().getPersonId()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPersonId());
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getFirstName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getFirstName());
@@ -1742,10 +1745,10 @@ public class TVShowSecuredRoutesTest {
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getGender()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getGender());
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto());
                 assertThat(actual.get(i).getActings().get(j).getActor().getStar()).isEqualTo(expected.get(i).getActings().get(j).getActor().getStar());
-                
+
                 assertThat(actual.get(i).getActings().get(j).getMedia()).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getMedia() == actual.get(i)).isTrue();
-                
+
                 assertThat(actual.get(i).getActings().get(j).getRoles()).isNotNull().isNotEmpty();
                 assertThat(actual.get(i).getActings().get(j).getRoles().size() == expected.get(i).getActings().get(j).getRoles().size()).isTrue();
                 for (int k = 0; k < actual.get(i).getActings().get(j).getRoles().size(); k++) {
@@ -1753,42 +1756,68 @@ public class TVShowSecuredRoutesTest {
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId()).isNotNull();
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing()).isNotNull();
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing() == actual.get(i).getActings().get(j)).isTrue();
-                    
-                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getId()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId().getId());
+
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getOrderNumber()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId().getOrderNumber());
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getName()).isEqualTo(actual.get(i).getActings().get(j).getRoles().get(k).getName());
                 }
             }
-            
+
             assertThat(actual.get(i).getCritiques()).isNotNull();
             assertThat(actual.get(i).getCritiques().size() == expected.get(i).getCritiques().size()).isTrue();
             for (int j = 0; j < actual.get(i).getCritiques().size(); j++) {
                 assertThat(actual.get(i).getCritiques().get(j)).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic()).isNotNull();
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getFirstName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getFirstName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getLastName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getLastName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getGender()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getGender());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getRole()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getRole());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileImage());                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUsername()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUsername());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getPassword()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getPassword());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getEmail()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getEmail());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt());
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
-                assertThat(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId());                
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia() == actual.get(i)).isTrue();
-                
+                assertThat(actual.get(i).getCritiques().get(j).getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getId());
+                assertThat(actual.get(i).getCritiques().get(j).getUser()).isNotNull();
+
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getFirstName()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getFirstName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getLastName()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getLastName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getGender()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getGender());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getRole()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getRole());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getUser().getProfileName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getProfileImage());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getUsername()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getUsername());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getPassword()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getPassword());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getEmail()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getEmail());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCreatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getCreatedAt());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getUpdatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getUpdatedAt());
+
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCountry()).isNotNull();
+                assertThat(expected.get(i).getCritiques().get(j).getUser().getCountry()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCountry().getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getUser().getCountry().getId());
+
+                assertThat(actual.get(i).getCritiques().get(j).getMedia()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getMedia() == actual.get(i)).isTrue();
+
                 assertThat(actual.get(i).getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getDescription());
                 assertThat(actual.get(i).getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getRating());
+                assertThat(actual.get(i).getCritiques().get(j).getCreatedAt()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getCreatedAt());
+
+                assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().size()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().size());
+                for (int k = 0; k < actual.get(i).getCritiques().get(j).getLikeDislikes().size(); k++) {
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getUser().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getUser().getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getCritique().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getCritique().getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getIsLike()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getIsLike());
+                }
+
+                assertThat(actual.get(i).getCritiques().get(j).getComments()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getComments().size()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().size());
+                for (int k = 0; k < actual.get(i).getCritiques().get(j).getComments().size(); k++) {
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getContent()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getContent());
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getCreatedAt()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getCreatedAt());
+
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k)).isNotNull();
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size());
+                    for (int u = 0; u < actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size(); u++) {
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getUser().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getUser().getId());
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getComment().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getComment().getId());
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getIsLike()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getIsLike());
+                    }
+                }
+
             }
-            
+
         }
     }
 
@@ -1855,8 +1884,8 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getNumberOfSeasons()).isEqualTo(expected.getNumberOfSeasons());
-        assertThat(actual.getCriticRating()).isNull();
-        
+        assertThat(actual.getCriticsRating()).isNull();
+
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
@@ -1864,7 +1893,7 @@ public class TVShowSecuredRoutesTest {
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i).getId());
             assertThat(actual.getGenres().get(i).getName()).isNotNull().isEqualTo(expected.getGenres().get(i).getName());
         }
-        
+
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
@@ -1880,7 +1909,7 @@ public class TVShowSecuredRoutesTest {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getDirectors().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
             }
         }
-        
+
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
@@ -1895,9 +1924,9 @@ public class TVShowSecuredRoutesTest {
             } else {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getWriters().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
             }
-            
+
         }
-        
+
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
@@ -1914,13 +1943,13 @@ public class TVShowSecuredRoutesTest {
             } else {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getActings().get(i).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
             }
-            
+
             assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getOrderNumber()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j).getName());
             }
         }
@@ -1937,42 +1966,42 @@ public class TVShowSecuredRoutesTest {
         assertThat(actual.getReleaseDate()).isNotNull().isEqualTo(expected.getReleaseDate());
         assertThat(actual.getAudienceRating()).isNotNull().isEqualTo(expected.getAudienceRating());
         assertThat(actual.getNumberOfSeasons()).isNotNull().isEqualTo(expected.getNumberOfSeasons());
-        
+
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
             assertThat(actual.getGenres().get(i)).isNotNull();
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i));
         }
-        
+
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
             assertThat(actual.getDirectors().get(i)).isNotNull();
             assertThat(actual.getDirectors().get(i).getPersonId()).isNotNull().isEqualTo(expected.getDirectors().get(i));
         }
-        
+
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
             assertThat(actual.getWriters().get(i)).isNotNull();
             assertThat(actual.getWriters().get(i).getPersonId()).isNotNull().isEqualTo(expected.getWriters().get(i));
         }
-        
+
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
             assertThat(actual.getActings().get(i)).isNotNull();
             assertThat(actual.getActings().get(i).getActor()).isNotNull();
             assertThat(actual.getActings().get(i).getActor().getPersonId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
-            
+
             assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
                 assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(j + 1);
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getOrderNumber()).isNotNull().isEqualTo(j + 1);
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j));
             }
         }
@@ -2046,7 +2075,7 @@ public class TVShowSecuredRoutesTest {
     }
 
     private List<Resource> getAllCoverImages() {
-       return testUtil.getAllMediaCoverImages();
+        return testUtil.getAllMediaCoverImages();
     }
 
     private List<TVShowJPA> getAllTVShows() {

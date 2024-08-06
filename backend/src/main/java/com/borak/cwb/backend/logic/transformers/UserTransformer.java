@@ -6,9 +6,16 @@ package com.borak.cwb.backend.logic.transformers;
 
 import com.borak.cwb.backend.config.ConfigProperties;
 import com.borak.cwb.backend.domain.dto.media.MediaResponseDTO;
+import com.borak.cwb.backend.domain.dto.user.UserCommentLikeDislikesDTO;
+import com.borak.cwb.backend.domain.dto.user.UserCountryResponseDTO;
+import com.borak.cwb.backend.domain.dto.user.UserCritiqueLikeDislikesDTO;
+import com.borak.cwb.backend.domain.dto.user.UserLibraryMediaGenreResponseDTO;
+import com.borak.cwb.backend.domain.dto.user.UserLibraryMediaResponseDTO;
+import com.borak.cwb.backend.domain.dto.user.UserLibraryResponseDTO;
 import com.borak.cwb.backend.domain.dto.user.UserRegisterDTO;
 import com.borak.cwb.backend.domain.dto.user.UserResponseDTO;
 import com.borak.cwb.backend.domain.enums.MediaType;
+import com.borak.cwb.backend.domain.enums.UserRole;
 import com.borak.cwb.backend.domain.jdbc.CountryJDBC;
 import com.borak.cwb.backend.domain.jdbc.CritiqueJDBC;
 import com.borak.cwb.backend.domain.jdbc.GenreJDBC;
@@ -16,8 +23,11 @@ import com.borak.cwb.backend.domain.jdbc.MediaJDBC;
 import com.borak.cwb.backend.domain.jdbc.MovieJDBC;
 import com.borak.cwb.backend.domain.jdbc.TVShowJDBC;
 import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.CommentJPA;
+import com.borak.cwb.backend.domain.jpa.CommentLikeDislikeJPA;
 import com.borak.cwb.backend.domain.jpa.CountryJPA;
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
+import com.borak.cwb.backend.domain.jpa.CritiqueLikeDislikeJPA;
 import com.borak.cwb.backend.domain.jpa.GenreJPA;
 import com.borak.cwb.backend.domain.jpa.MediaJPA;
 import com.borak.cwb.backend.domain.jpa.MovieJPA;
@@ -35,11 +45,106 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserTransformer {
 
-    @Autowired
-    private ConfigProperties config;
+    private final String MEDIA_IMAGES_BASE_URL;
+    private final String USER_IMAGES_BASE_URL;
+    private final PasswordEncoder encoder;
 
     @Autowired
-    private PasswordEncoder encoder;
+    public UserTransformer(ConfigProperties config, PasswordEncoder encoder) {
+        this.encoder = encoder;
+        this.MEDIA_IMAGES_BASE_URL = config.getMediaImagesBaseUrl();
+        this.USER_IMAGES_BASE_URL = config.getUserImagesBaseUrl();
+    }
+
+//=================================================================================================================================
+//JPA
+    public UserJPA toUserJPA(UserRegisterDTO registerForm) {
+        UserJPA user = new UserJPA();
+        user.setFirstName(registerForm.getFirstName());
+        user.setLastName(registerForm.getLastName());
+        user.setGender(registerForm.getGender());
+        user.setRole(registerForm.getRole());
+        user.setProfileName(registerForm.getProfileName());
+        if (registerForm.getProfileImage() != null) {
+            user.setProfileImage(registerForm.getProfileName() + "." + registerForm.getProfileImage().getExtension());
+        }
+        user.setUsername(registerForm.getUsername());
+        user.setPassword(encoder.encode(registerForm.getPassword()));
+        user.setEmail(registerForm.getEmail());
+        user.setCreatedAt(LocalDateTime.now());
+        user.setCountry(new CountryJPA(registerForm.getCountryId()));
+        return user;
+    }
+
+    public UserResponseDTO jpaToUserResponse(UserJPA user) {
+        UserResponseDTO response = new UserResponseDTO();
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setGender(user.getGender());
+        response.setProfileName(user.getProfileName());
+        if (user.getProfileImage() != null) {
+            response.setProfileImageUrl(USER_IMAGES_BASE_URL + user.getProfileImage());
+        }
+        response.setRole(user.getRole());
+        response.setCountry(new UserCountryResponseDTO(
+                user.getCountry().getId(),
+                user.getCountry().getName(),
+                user.getCountry().getOfficialStateName(),
+                user.getCountry().getCode()));
+
+        //set users library
+        UserLibraryResponseDTO library = new UserLibraryResponseDTO();
+        for (MediaJPA media : user.getMedias()) {
+            UserLibraryMediaResponseDTO libraryMedia = new UserLibraryMediaResponseDTO();
+            libraryMedia.setId(media.getId());
+            libraryMedia.setTitle(media.getTitle());
+            libraryMedia.setReleaseDate(media.getReleaseDate());
+            if (media.getCoverImage() != null) {
+                libraryMedia.setCoverImageUrl(MEDIA_IMAGES_BASE_URL + media.getCoverImage());
+            }
+            libraryMedia.setAudienceRating(media.getAudienceRating());
+            for (GenreJPA genre : media.getGenres()) {
+                libraryMedia.getGenres().add(new UserLibraryMediaGenreResponseDTO(genre.getId(), genre.getName()));
+            }
+            if (media instanceof MovieJPA) {
+                library.getMovies().add(libraryMedia);
+            } else {
+                library.getTvShows().add(libraryMedia);
+            }
+        }
+        response.setLibrary(library);
+
+        //set users critiques
+        if (user.getRole() == UserRole.CRITIC || user.getRole() == UserRole.ADMINISTRATOR) {
+            for (CritiqueJPA critique : user.getCritiques()) {
+                response.getCritiques().add(critique.getId());
+            }
+        }
+        if (user.getRole() == UserRole.REGULAR || user.getRole() == UserRole.ADMINISTRATOR) {
+            for (CommentJPA comment : user.getComments()) {
+                response.getComments().add(comment.getId());
+            }
+        }
+        for (CritiqueLikeDislikeJPA critiqueLikeDislike : user.getCritiqueLikeDislikes()) {
+            response.getCritiquesLikeDislikes().add(
+                    new UserCritiqueLikeDislikesDTO(
+                            critiqueLikeDislike.getId().getCritique().getId(),
+                            critiqueLikeDislike.getIsLike()
+                    )
+            );
+        }
+        for (CommentLikeDislikeJPA commentsLikeDislike : user.getCommentsLikeDislikes()) {
+            response.getCommentsLikeDislikes().add(
+                    new UserCommentLikeDislikesDTO(
+                            commentsLikeDislike.getId().getComment().getId(),
+                            commentsLikeDislike.getIsLike()
+                    )
+            );
+        }
+        return response;
+    }
+//=================================================================================================================================
+//JDBC
 
     public UserJDBC toUserJDBC(UserRegisterDTO registerForm) {
         UserJDBC user = new UserJDBC();
@@ -56,139 +161,12 @@ public class UserTransformer {
         user.setEmail(registerForm.getEmail());
         LocalDateTime nowTime = LocalDateTime.now();
         user.setCreatedAt(nowTime);
-        user.setUpdatedAt(nowTime);
         user.setCountry(new CountryJDBC(registerForm.getCountryId()));
         return user;
     }
 
-    public UserJPA toUserJPA(UserRegisterDTO registerForm) {
-        UserJPA user = new UserJPA();
-        user.setFirstName(registerForm.getFirstName());
-        user.setLastName(registerForm.getLastName());
-        user.setGender(registerForm.getGender());
-        user.setRole(registerForm.getRole());
-        user.setProfileName(registerForm.getProfileName());
-        if (registerForm.getProfileImage() != null) {
-            user.setProfileImage(registerForm.getProfileName() + "." + registerForm.getProfileImage().getExtension());
-        }
-        user.setUsername(registerForm.getUsername());
-        user.setPassword(encoder.encode(registerForm.getPassword()));
-        user.setEmail(registerForm.getEmail());
-        LocalDateTime nowTime = LocalDateTime.now();
-        user.setCreatedAt(nowTime);
-        user.setUpdatedAt(nowTime);
-        user.setCountry(new CountryJPA(registerForm.getCountryId()));
-        return user;
-    }
-
     public UserResponseDTO jdbcToUserResponse(UserJDBC userJDBC) {
-        UserResponseDTO response = new UserResponseDTO();
-        response.setFirstName(userJDBC.getFirstName());
-        response.setLastName(userJDBC.getLastName());
-        response.setProfileName(userJDBC.getProfileName());
-        if (userJDBC.getProfileImage() != null) {
-            response.setProfileImageUrl(config.getUserImagesBaseUrl() + userJDBC.getProfileImage());
-        }
-        response.setGender(userJDBC.getGender());
-        response.setRole(userJDBC.getRole());
-
-        UserResponseDTO.Country country = new UserResponseDTO.Country();
-        country.setId(userJDBC.getCountry().getId());
-        country.setName(userJDBC.getCountry().getName());
-        country.setOfficialStateName(userJDBC.getCountry().getOfficialStateName());
-        country.setCode(userJDBC.getCountry().getCode());
-        response.setCountry(country);
-
-        for (MediaJDBC media : userJDBC.getMedias()) {
-            response.getMedias().add(toMediaResponseDTO(media));
-        }
-        for (CritiqueJDBC critique : userJDBC.getCritiques()) {
-            UserResponseDTO.Critique critiqueResponse = new UserResponseDTO.Critique();
-            critiqueResponse.setDescription(critique.getDescription());
-            critiqueResponse.setRating(critique.getRating());
-            critiqueResponse.setMedia(toMediaResponseDTO(critique.getMedia()));
-            response.getCritiques().add(critiqueResponse);
-        }
-
-        return response;
-    }
-
-    public UserResponseDTO jpaToUserResponse(UserJPA user) {
-        UserResponseDTO response = new UserResponseDTO();
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setProfileName(user.getProfileName());
-        if (user.getProfileImage() != null) {
-            response.setProfileImageUrl(config.getUserImagesBaseUrl() + user.getProfileImage());
-        }
-        response.setGender(user.getGender());
-        response.setRole(user.getRole());
-
-        UserResponseDTO.Country country = new UserResponseDTO.Country();
-        country.setId(user.getCountry().getId());
-        country.setName(user.getCountry().getName());
-        country.setOfficialStateName(user.getCountry().getOfficialStateName());
-        country.setCode(user.getCountry().getCode());
-        response.setCountry(country);
-
-        for (MediaJPA media : user.getMedias()) {
-            response.getMedias().add(toMediaResponseDTO(media));
-        }
-        for (CritiqueJPA critique : user.getCritiques()) {
-            UserResponseDTO.Critique critiqueResponse = new UserResponseDTO.Critique();
-            critiqueResponse.setDescription(critique.getDescription());
-            critiqueResponse.setRating(critique.getRating());
-            critiqueResponse.setMedia(toMediaResponseDTO(critique.getId().getMedia()));
-            response.getCritiques().add(critiqueResponse);
-        }
-
-        return response;
-    }
-
-//===================================================================================================================
-//PRIVATE METHODS
-    private MediaResponseDTO toMediaResponseDTO(MediaJDBC media) {
-        MediaResponseDTO mediaResponse = new MediaResponseDTO();
-        mediaResponse.setId(media.getId());
-        mediaResponse.setTitle(media.getTitle());
-        mediaResponse.setReleaseDate(media.getReleaseDate());
-        mediaResponse.setDescription(media.getDescription());
-        mediaResponse.setAudienceRating(media.getAudienceRating());
-        mediaResponse.setCriticsRating(media.getCriticRating());
-        if (media.getCoverImage() != null) {
-            mediaResponse.setCoverImageUrl(config.getMediaImagesBaseUrl() + media.getCoverImage());
-        }
-        for (GenreJDBC genre : media.getGenres()) {
-            mediaResponse.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
-        }
-        if (media instanceof MovieJDBC) {
-            mediaResponse.setMediaType(MediaType.MOVIE);
-        } else if (media instanceof TVShowJDBC) {
-            mediaResponse.setMediaType(MediaType.TV_SHOW);
-        }
-        return mediaResponse;
-    }
-
-    private MediaResponseDTO toMediaResponseDTO(MediaJPA media) {
-        MediaResponseDTO mediaResponse = new MediaResponseDTO();
-        mediaResponse.setId(media.getId());
-        mediaResponse.setTitle(media.getTitle());
-        mediaResponse.setReleaseDate(media.getReleaseDate());
-        mediaResponse.setDescription(media.getDescription());
-        mediaResponse.setAudienceRating(media.getAudienceRating());
-        mediaResponse.setCriticsRating(media.getCriticRating());
-        if (media.getCoverImage() != null) {
-            mediaResponse.setCoverImageUrl(config.getMediaImagesBaseUrl() + media.getCoverImage());
-        }
-        for (GenreJPA genre : media.getGenres()) {
-            mediaResponse.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
-        }
-        if (media instanceof MovieJPA) {
-            mediaResponse.setMediaType(MediaType.MOVIE);
-        } else if (media instanceof TVShowJPA) {
-            mediaResponse.setMediaType(MediaType.TV_SHOW);
-        }
-        return mediaResponse;
+        throw new UnsupportedOperationException("Not supported!");
     }
 
 }

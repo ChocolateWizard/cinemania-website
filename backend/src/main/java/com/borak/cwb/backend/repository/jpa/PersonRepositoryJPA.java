@@ -5,6 +5,8 @@
 package com.borak.cwb.backend.repository.jpa;
 
 import com.borak.cwb.backend.domain.jpa.PersonJPA;
+import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Repository;
  * @author Mr. Poyo
  */
 @Repository
-public interface PersonRepositoryJPA extends JpaRepository<PersonJPA, Long>{
-    
+public interface PersonRepositoryJPA extends JpaRepository<PersonJPA, Long> {
+
+    //This method shouldn't make unnecessary count query to database
+    List<PersonJPA> findAllByOrderByIdAsc(Pageable page);
+
 }

@@ -48,6 +48,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -58,7 +59,7 @@ import static org.assertj.core.api.Assertions.fail;
 @Order(9)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MovieSecuredRoutesTest {
-    
+
     private final TestRestTemplate restTemplate;
     private final MovieTestRepository movieRepo;
     private final UserTestRepository userRepo;
@@ -66,7 +67,7 @@ public class MovieSecuredRoutesTest {
     private final FileRepository fileRepo;
     private final ConfigProperties config;
     private final TestUtil testUtil;
-    
+
     @Autowired
     public MovieSecuredRoutesTest(TestRestTemplate restTemplate, MovieTestRepository movieRepo, UserTestRepository userRepo, JwtUtils jwtUtils, FileRepository fileRepo, ConfigProperties config, TestUtil testUtil) {
         this.restTemplate = restTemplate;
@@ -77,30 +78,30 @@ public class MovieSecuredRoutesTest {
         this.config = config;
         this.testUtil = testUtil;
     }
-    
+
     private static final Map<String, Boolean> TESTS_PASSED = new HashMap<>();
     private static final String ROUTE = "/api/movies";
-    
+
     static {
         TESTS_PASSED.put("postMovie_UnauthenticatedUser_DoesNotCreateMovieReturns401", false);
         TESTS_PASSED.put("postMovie_UnauthorizedUser_DoesNotCreateMovieReturns403", false);
         TESTS_PASSED.put("postMovie_InvalidInputData_DoesNotCreateMovieReturns400", false);
         TESTS_PASSED.put("postMovie_NonexistentDependencyData_DoesNotCreateMovieReturns404", false);
         TESTS_PASSED.put("postMovie_ValidInput_CreatesMovieReturns200", false);
-        
+
         TESTS_PASSED.put("putMovie_UnauthenticatedUser_DoesNotUpdateMovieReturns401", false);
         TESTS_PASSED.put("putMovie_UnauthorizedUser_DoesNotUpdateMovieReturns403", false);
         TESTS_PASSED.put("putMovie_InvalidInputData_DoesNotUpdateMovieReturns400", false);
         TESTS_PASSED.put("putMovie_NonexistentDependencyData_DoesNotUpdateMovieReturns404", false);
         TESTS_PASSED.put("putMovie_ValidInput_UpdatesMovieReturns200", false);
-        
+
         TESTS_PASSED.put("deleteMovie_UnauthenticatedUser_DoesNotDeleteMovieReturns401", false);
         TESTS_PASSED.put("deleteMovie_UnauthorizedUser_DoesNotDeleteMovieReturns403", false);
         TESTS_PASSED.put("deleteMovie_InvalidInputData_DoesNotDeleteMovieReturns400", false);
         TESTS_PASSED.put("deleteMovie_NonexistentDependencyData_DoesNotDeleteMovieReturns404", false);
         TESTS_PASSED.put("deleteMovie_ValidInput_DeletesMovieReturns200", false);
     }
-    
+
     public static boolean didAllTestsPass() {
         for (boolean b : TESTS_PASSED.values()) {
             if (!b) {
@@ -179,16 +180,16 @@ public class MovieSecuredRoutesTest {
                 imagesAfter = getAllCoverImages();
                 assertMoviesEqual(moviesAfter, moviesBefore);
                 assertImagesEqual(imagesAfter, imagesBefore);
-                
+
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("postMovie_UnauthenticatedUser_DoesNotCreateMovieReturns401", true);
     }
-    
+
     @Test
     @Order(2)
     @DisplayName("Tests whether POST request to /api/movies with unauthorized but authenticated user did not create new movie and it returned 403")
@@ -225,10 +226,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("postMovie_UnauthorizedUser_DoesNotCreateMovieReturns403", true);
     }
-    
+
     @Test
     @Order(3)
     @DisplayName("Tests whether POST request to /api/movies with invalid movie data did not create new movie and it returned 400")
@@ -239,7 +240,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -247,7 +248,7 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (Object[] input : getBadRequestMoviesAndImages(7l, TestUtil.getRandomString(20))) {
@@ -265,10 +266,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("postMovie_InvalidInputData_DoesNotCreateMovieReturns400", true);
     }
-    
+
     @Test
     @Order(4)
     @DisplayName("Tests whether POST request to /api/movies with non-existent dependency objects did not create new movie and it returned 404")
@@ -279,7 +280,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -287,7 +288,7 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (Object[] input : getNonExistentDependencyMoviesAndImages(7l, TestUtil.getRandomString(20))) {
@@ -305,23 +306,23 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("postMovie_NonexistentDependencyData_DoesNotCreateMovieReturns404", true);
     }
-    
+
     @Test
     @Order(5)
     @DisplayName("Tests whether POST request to /api/movies with valid input did create new movie and it returned 200")
     void postMovie_ValidInput_CreatesMovieReturns200() {
         HttpEntity request;
         ResponseEntity<MovieResponseDTO> response;
-        
+
         MovieRequestDTO movieValid1 = getValidMovie(7l);
         MovieRequestDTO movieValid2 = getValidMovie(null);
-        
+
         MockMultipartFile imageValid1 = getValidCoverImage(TestUtil.getRandomString(20));
         MockMultipartFile imageValid2 = getValidCoverImage(TestUtil.getRandomString(20));
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -334,15 +335,15 @@ public class MovieSecuredRoutesTest {
         //first valid request where movieId is set
         assertThat(movieRepo.existsById(movieValid1.getId())).isFalse();
         assertThat(existsCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isFalse();
-        
+
         request = constructRequest(movieValid1, imageValid1, cookie.toString());
         response = restTemplate.exchange(ROUTE, HttpMethod.POST, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(movieValid1.getId())).isTrue();
         assertThat(existsCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
-        
+
         Optional<MovieJPA> actualDBMovie = movieRepo.findById(movieValid1.getId());
         Resource actualDBImage = fileRepo.getMediaCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(actualDBMovie).isNotNull();
@@ -358,10 +359,10 @@ public class MovieSecuredRoutesTest {
         response = restTemplate.exchange(ROUTE, HttpMethod.POST, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(response.getBody().getId())).isTrue();
         assertThat(existsCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
-        
+
         actualDBMovie = movieRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getMediaCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBMovie).isNotNull();
@@ -371,7 +372,7 @@ public class MovieSecuredRoutesTest {
         assertMoviesEqual(response.getBody(), movieValid2, coverImageUrl);
         assertMoviesEqual(actualDBMovie.get(), response.getBody());
         assertImagesEqual(actualDBImage, imageValid2);
-        
+
         TESTS_PASSED.put("postMovie_ValidInput_CreatesMovieReturns200", true);
     }
 
@@ -439,16 +440,16 @@ public class MovieSecuredRoutesTest {
                 imagesAfter = getAllCoverImages();
                 assertMoviesEqual(moviesAfter, moviesBefore);
                 assertImagesEqual(imagesAfter, imagesBefore);
-                
+
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("putMovie_UnauthenticatedUser_DoesNotUpdateMovieReturns401", true);
     }
-    
+
     @Test
     @Order(7)
     @DisplayName("Tests whether PUT request to /api/movies/{id} with unauthorized but authenticated user did not update movie and it returned 403")
@@ -483,14 +484,14 @@ public class MovieSecuredRoutesTest {
                 assertImagesEqual(imagesAfter, imagesBefore);
                 i++;
             }
-            
+
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("putMovie_UnauthorizedUser_DoesNotUpdateMovieReturns403", true);
     }
-    
+
     @Test
     @Order(8)
     @DisplayName("Tests whether PUT request to /api/movies/{id} with invalid movie data did not update movie and it returned 400")
@@ -502,7 +503,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -510,13 +511,13 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (Object[] input : getBadRequestMoviesAndImages(7l, TestUtil.getRandomString(40))) {
                 moviesBefore = getAllMovies();
                 imagesBefore = getAllCoverImages();
-                
+
                 request = constructRequest((MovieRequestDTO) input[0], (MockMultipartFile) input[1], cookie.toString());
                 response = restTemplate.exchange(ROUTE + "/" + ((MovieRequestDTO) input[0]).getId(), HttpMethod.PUT, request, String.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -544,10 +545,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("putMovie_InvalidInputData_DoesNotUpdateMovieReturns400", true);
     }
-    
+
     @Test
     @Order(9)
     @DisplayName("Tests whether PUT request to /api/movies/{id} with non-existent dependency objects did not update movie and it returned 404")
@@ -559,7 +560,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -567,7 +568,7 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (Object[] input : getNonExistentDependencyMoviesAndImages(7l, TestUtil.getRandomString(40))) {
@@ -600,10 +601,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("putMovie_NonexistentDependencyData_DoesNotUpdateMovieReturns404", true);
     }
-    
+
     @Test
     @Order(10)
     @DisplayName("Tests whether PUT request to /api/movies/{id} with valid movie data did update movie and it returned 200")
@@ -611,18 +612,18 @@ public class MovieSecuredRoutesTest {
         Assumptions.assumeTrue(TESTS_PASSED.get("postMovie_ValidInput_CreatesMovieReturns200"));
         HttpEntity request;
         ResponseEntity<MovieResponseDTO> response;
-        
+
         MovieRequestDTO movieValid1 = getValidMovie(7l);
         MovieRequestDTO movieValid2 = getValidMovie(null);
         MovieRequestDTO movieValid3 = getValidMovie(8l);
-        
+
         changeAttributes(movieValid1);
         changeAttributes(movieValid2);
         changeAttributes(movieValid3);
-        
+
         MockMultipartFile imageValid1 = getValidCoverImage(TestUtil.getRandomString(40));
         MockMultipartFile imageValid2 = getValidCoverImage(TestUtil.getRandomString(50));
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -639,19 +640,19 @@ public class MovieSecuredRoutesTest {
         Resource actualDBImage = fileRepo.getMediaCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(areMoviesEqual(actualDBMovie.get(), movieValid1)).isFalse();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isFalse();
-        
+
         request = constructRequest(movieValid1, imageValid1, cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + movieValid1.getId(), HttpMethod.PUT, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(movieValid1.getId())).isTrue();
         assertThat(existsCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()))).isTrue();
         actualDBMovie = movieRepo.findById(movieValid1.getId());
         actualDBImage = fileRepo.getMediaCoverImage(movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename()));
         assertThat(areMoviesEqual(actualDBMovie.get(), movieValid1)).isTrue();
         assertThat(areImagesEqual(actualDBImage, imageValid1)).isTrue();
-        
+
         String coverImageUrl = config.getMediaImagesBaseUrl() + movieValid1.getId() + getExtensionWithDot(imageValid1.getOriginalFilename());
         assertMoviesEqual(response.getBody(), movieValid1, coverImageUrl);
         assertMoviesEqual(actualDBMovie.get(), response.getBody());
@@ -674,10 +675,10 @@ public class MovieSecuredRoutesTest {
         response = restTemplate.exchange(ROUTE + "/" + movieValid1.getId(), HttpMethod.PUT, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(response.getBody().getId())).isTrue();
         assertThat(existsCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()))).isTrue();
-        
+
         actualDBMovie = movieRepo.findById(response.getBody().getId());
         actualDBImage = fileRepo.getMediaCoverImage(response.getBody().getId() + getExtensionWithDot(imageValid2.getOriginalFilename()));
         assertThat(actualDBMovie).isNotNull();
@@ -685,7 +686,7 @@ public class MovieSecuredRoutesTest {
         movieValid2.setId(response.getBody().getId());
         assertThat(areMoviesEqual(actualDBMovie.get(), movieValid2)).isTrue();
         assertThat(areImagesEqual(actualDBImage, imageValid2)).isTrue();
-        
+
         coverImageUrl = config.getMediaImagesBaseUrl() + movieValid2.getId() + getExtensionWithDot(imageValid2.getOriginalFilename());
         assertMoviesEqual(response.getBody(), movieValid2, coverImageUrl);
         assertMoviesEqual(actualDBMovie.get(), response.getBody());
@@ -696,20 +697,20 @@ public class MovieSecuredRoutesTest {
         actualDBMovie = movieRepo.findById(movieValid3.getId());
         assertThat(areMoviesEqual(actualDBMovie.get(), movieValid3)).isFalse();
         assertThat(existsCoverImage(actualDBMovie.get().getCoverImage())).isTrue();
-        
+
         request = constructRequest(movieValid3, null, cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + movieValid3.getId(), HttpMethod.PUT, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(movieValid3.getId())).isTrue();
         assertThat(existsCoverImage(actualDBMovie.get().getCoverImage())).isFalse();
         actualDBMovie = movieRepo.findById(movieValid3.getId());
         assertThat(areMoviesEqual(actualDBMovie.get(), movieValid3)).isTrue();
-        
+
         assertMoviesEqual(response.getBody(), movieValid3, null);
         assertMoviesEqual(actualDBMovie.get(), response.getBody());
-        
+
         TESTS_PASSED.put("putMovie_ValidInput_UpdatesMovieReturns200", true);
     }
 
@@ -777,16 +778,16 @@ public class MovieSecuredRoutesTest {
                 imagesAfter = getAllCoverImages();
                 assertMoviesEqual(moviesAfter, moviesBefore);
                 assertImagesEqual(imagesAfter, imagesBefore);
-                
+
                 i++;
             }
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("deleteMovie_UnauthenticatedUser_DoesNotDeleteMovieReturns401", true);
     }
-    
+
     @Test
     @Order(12)
     @DisplayName("Tests whether DELETE request to /api/movies/{id} with unauthorized but authenticated user did not delete movie and it returned 403")
@@ -823,10 +824,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("deleteMovie_UnauthorizedUser_DoesNotDeleteMovieReturns403", true);
     }
-    
+
     @Test
     @Order(13)
     @DisplayName("Tests whether DELETE request to /api/movies/{id} with invalid input data did not delete movie and it returned 400")
@@ -839,7 +840,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -847,7 +848,7 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (long input : new long[]{0l, -1l, -2l, -5l, -10l, -23l, Long.MIN_VALUE}) {
@@ -865,10 +866,10 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("deleteMovie_InvalidInputData_DoesNotDeleteMovieReturns400", true);
     }
-    
+
     @Test
     @Order(14)
     @DisplayName("Tests whether DELETE request to /api/movies/{id} with non-existent movie did not delete movie and it returned 404")
@@ -881,7 +882,7 @@ public class MovieSecuredRoutesTest {
         List<MovieJPA> moviesAfter;
         List<Resource> imagesBefore;
         List<Resource> imagesAfter;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -889,7 +890,7 @@ public class MovieSecuredRoutesTest {
         cookie.setPath("/api");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
-        
+
         int i = 0;
         try {
             for (long invalidId : new long[]{3l, 5l, 6l, 50l, 51l, 101l, Long.MAX_VALUE}) {
@@ -907,23 +908,23 @@ public class MovieSecuredRoutesTest {
         } catch (AssertionError e) {
             throw new AssertionError("Assertion failed at index " + i, e);
         }
-        
+
         TESTS_PASSED.put("deleteMovie_NonexistentDependencyData_DoesNotDeleteMovieReturns404", true);
     }
-    
+
     @Test
     @Order(15)
     @DisplayName("Tests whether DELETE request to /api/movies/{id} with valid movie data did delete movie and it returned 200")
     void deleteMovie_ValidInput_DeletesMovieReturns200() {
         Assumptions.assumeTrue(TESTS_PASSED.get("postMovie_ValidInput_CreatesMovieReturns200"));
         Assumptions.assumeTrue(TESTS_PASSED.get("putMovie_ValidInput_UpdatesMovieReturns200"));
-        
+
         HttpEntity request;
         ResponseEntity<MovieResponseDTO> response;
-        
+
         long movieValidId1 = 7l;
         long movieValidId2 = 8l;
-        
+
         Optional<UserJPA> user = userRepo.findByUsername("admin");
         assertThat(user).isNotNull();
         assertThat(user.isPresent()).isTrue();
@@ -937,12 +938,12 @@ public class MovieSecuredRoutesTest {
         assertThat(movieRepo.existsById(movieValidId1)).isTrue();
         Optional<MovieJPA> movieDB = movieRepo.findById(movieValidId1);
         assertThat(existsCoverImage(movieDB.get().getCoverImage())).isTrue();
-        
+
         request = constructRequest(cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + movieValidId1, HttpMethod.DELETE, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(movieValidId1)).isFalse();
         assertThat(existsCoverImage(movieDB.get().getCoverImage())).isFalse();
         assertMoviesEqual(movieDB.get(), response.getBody());
@@ -952,16 +953,16 @@ public class MovieSecuredRoutesTest {
         assertThat(movieRepo.existsById(movieValidId2)).isTrue();
         movieDB = movieRepo.findById(movieValidId2);
         assertThat(existsCoverImage(movieDB.get().getCoverImage())).isFalse();
-        
+
         request = constructRequest(cookie.toString());
         response = restTemplate.exchange(ROUTE + "/" + movieValidId2, HttpMethod.DELETE, request, MovieResponseDTO.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        
+
         assertThat(movieRepo.existsById(movieValidId2)).isFalse();
         assertThat(existsCoverImage(movieDB.get().getCoverImage())).isFalse();
         assertMoviesEqual(movieDB.get(), response.getBody());
-        
+
         TESTS_PASSED.put("deleteMovie_ValidInput_DeletesMovieReturns200", true);
     }
 //=================================================================================================================================
@@ -970,7 +971,7 @@ public class MovieSecuredRoutesTest {
     private String[] getNonExistentUsernames() {
         return new String[]{"dummy user 1", "dummy user 2", "dummy user 4", "admina", "critic1", "dummy user 6"};
     }
-    
+
     private MovieRequestDTO getValidMovie(Long movieId) {
         MovieRequestDTO movie = new MovieRequestDTO();
         movie.setId(movieId);
@@ -1050,11 +1051,11 @@ public class MovieSecuredRoutesTest {
         movie.getActors().add(a5);
         return movie;
     }
-    
+
     private MockMultipartFile getValidCoverImage(String content) {
         return new MockMultipartFile("cover_image", "movie_routes.png", "image/png", TestUtil.getBytes(content));
     }
-    
+
     private List<Object[]> getBadRequestMoviesAndImages(Long validMovieId, String validImageContent) {
         MovieRequestDTO mTitle1 = getValidMovie(validMovieId);
         MovieRequestDTO mTitle2 = getValidMovie(validMovieId);
@@ -1066,7 +1067,7 @@ public class MovieSecuredRoutesTest {
         mTitle3.setTitle(" ");
         mTitle4.setTitle("         ");
         mTitle5.setTitle(TestUtil.getRandomString(301));
-        
+
         MovieRequestDTO mDescription1 = getValidMovie(validMovieId);
         MovieRequestDTO mDescription2 = getValidMovie(validMovieId);
         MovieRequestDTO mDescription3 = getValidMovie(validMovieId);
@@ -1077,10 +1078,10 @@ public class MovieSecuredRoutesTest {
         mDescription3.setDescription(" ");
         mDescription4.setDescription("         ");
         mDescription5.setDescription(TestUtil.getRandomString(1001));
-        
+
         MovieRequestDTO mReleaseDate1 = getValidMovie(validMovieId);
         mReleaseDate1.setReleaseDate(null);
-        
+
         MovieRequestDTO mAudienceRating1 = getValidMovie(validMovieId);
         MovieRequestDTO mAudienceRating2 = getValidMovie(validMovieId);
         MovieRequestDTO mAudienceRating3 = getValidMovie(validMovieId);
@@ -1107,7 +1108,7 @@ public class MovieSecuredRoutesTest {
         mAudienceRating11.setAudienceRating(110);
         mAudienceRating12.setAudienceRating(126);
         mAudienceRating13.setAudienceRating(Integer.MAX_VALUE);
-        
+
         MovieRequestDTO mLength1 = getValidMovie(validMovieId);
         MovieRequestDTO mLength2 = getValidMovie(validMovieId);
         MovieRequestDTO mLength3 = getValidMovie(validMovieId);
@@ -1122,7 +1123,7 @@ public class MovieSecuredRoutesTest {
         mLength5.setLength(-10);
         mLength6.setLength(-25);
         mLength7.setLength(Integer.MIN_VALUE);
-        
+
         MovieRequestDTO mGenres1 = getValidMovie(validMovieId);
         MovieRequestDTO mGenres2 = getValidMovie(validMovieId);
         MovieRequestDTO mGenres3 = getValidMovie(validMovieId);
@@ -1163,7 +1164,7 @@ public class MovieSecuredRoutesTest {
                 add(-2l);
             }
         });
-        
+
         MovieRequestDTO mDir1 = getValidMovie(validMovieId);
         MovieRequestDTO mDir2 = getValidMovie(validMovieId);
         MovieRequestDTO mDir3 = getValidMovie(validMovieId);
@@ -1204,7 +1205,7 @@ public class MovieSecuredRoutesTest {
                 add(-2l);
             }
         });
-        
+
         MovieRequestDTO mWri1 = getValidMovie(validMovieId);
         MovieRequestDTO mWri2 = getValidMovie(validMovieId);
         MovieRequestDTO mWri3 = getValidMovie(validMovieId);
@@ -1245,7 +1246,7 @@ public class MovieSecuredRoutesTest {
                 add(-2l);
             }
         });
-        
+
         MovieRequestDTO mAct1 = getValidMovie(validMovieId);
         MovieRequestDTO mAct2 = getValidMovie(validMovieId);
         MovieRequestDTO mAct3 = getValidMovie(validMovieId);
@@ -1498,13 +1499,13 @@ public class MovieSecuredRoutesTest {
         MockMultipartFile pom = getValidCoverImage(validImageContent);
         MockMultipartFile invalidCoverImage = new MockMultipartFile(pom.getName(), pom.getOriginalFilename(), pom.getContentType(), new byte[8388998]);
         inputs.add(new Object[]{getValidMovie(validMovieId), invalidCoverImage});
-        
+
         invalidCoverImage = new MockMultipartFile(pom.getName(), pom.getOriginalFilename(), pom.getContentType(), new byte[0]);
         inputs.add(new Object[]{getValidMovie(validMovieId), invalidCoverImage});
-        
+
         return inputs;
     }
-    
+
     private List<Object[]> getNonExistentDependencyMoviesAndImages(Long validMovieId, String validImageContent) {
         MovieRequestDTO mGenres1 = getValidMovie(validMovieId);
         MovieRequestDTO mGenres2 = getValidMovie(validMovieId);
@@ -1527,7 +1528,7 @@ public class MovieSecuredRoutesTest {
                 add(1l);
             }
         });
-        
+
         MovieRequestDTO mDir1 = getValidMovie(validMovieId);
         MovieRequestDTO mDir2 = getValidMovie(validMovieId);
         MovieRequestDTO mDir3 = getValidMovie(validMovieId);
@@ -1549,7 +1550,7 @@ public class MovieSecuredRoutesTest {
                 add(140l);
             }
         });
-        
+
         MovieRequestDTO mWri1 = getValidMovie(validMovieId);
         MovieRequestDTO mWri2 = getValidMovie(validMovieId);
         MovieRequestDTO mWri3 = getValidMovie(validMovieId);
@@ -1571,7 +1572,7 @@ public class MovieSecuredRoutesTest {
                 add(140l);
             }
         });
-        
+
         MovieRequestDTO mAct1 = getValidMovie(validMovieId);
         MovieRequestDTO mAct2 = getValidMovie(validMovieId);
         MovieRequestDTO mAct3 = getValidMovie(validMovieId);
@@ -1617,7 +1618,7 @@ public class MovieSecuredRoutesTest {
                 }));
             }
         });
-        
+
         return new ArrayList<>() {
             {
                 //non-existent genres
@@ -1639,7 +1640,7 @@ public class MovieSecuredRoutesTest {
             }
         };
     }
-    
+
     private HttpEntity<MultiValueMap<String, Object>> constructRequest(MovieRequestDTO movie, MockMultipartFile coverImage, String cookie) throws AssertionError {
         HttpHeaders requestHeader = new HttpHeaders();
         HttpHeaders movieHeader = new HttpHeaders();
@@ -1647,7 +1648,7 @@ public class MovieSecuredRoutesTest {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         HttpEntity<MovieRequestDTO> movieBody;
         HttpEntity<Resource> imageBody;
-        
+
         if (cookie != null) {
             requestHeader.set(HttpHeaders.COOKIE, cookie);
         }
@@ -1660,15 +1661,15 @@ public class MovieSecuredRoutesTest {
                 imageHeader.setContentType(MediaType.valueOf(coverImage.getContentType()));
                 imageBody = new HttpEntity<>(coverImage.getResource(), imageHeader);
                 body.add("cover_image", imageBody);
-                
+
             } catch (Exception ex) {
                 throw new AssertionError("Failed to set cover_image part of multipart form data of HttpEntity request", ex);
             }
         }
-        
+
         return new HttpEntity<>(body, requestHeader);
     }
-    
+
     private HttpEntity constructRequest(String cookie) throws AssertionError {
         HttpHeaders requestHeader = new HttpHeaders();
         if (cookie != null) {
@@ -1683,7 +1684,7 @@ public class MovieSecuredRoutesTest {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(expected).isNotNull().isNotEmpty();
         assertThat(actual.size() == expected.size()).isTrue();
-        
+
         for (int i = 0; i < actual.size(); i++) {
             assertThat(actual.get(i)).isNotNull();
             assertThat(actual.get(i).getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.get(i).getId());
@@ -1693,17 +1694,19 @@ public class MovieSecuredRoutesTest {
             assertThat(actual.get(i).getDescription()).isEqualTo(expected.get(i).getDescription());
             assertThat(actual.get(i).getAudienceRating()).isEqualTo(expected.get(i).getAudienceRating());
             assertThat(actual.get(i).getLength()).isEqualTo(expected.get(i).getLength());
-            assertThat(actual.get(i).getCriticRating()).isEqualTo(expected.get(i).getCriticRating());
-            
+            assertThat(actual.get(i).getCriticsRating()).isEqualTo(expected.get(i).getCriticsRating());
+            assertThat(actual.get(i).getCreatedAt()).isEqualTo(expected.get(i).getCreatedAt());
+            assertThat(actual.get(i).getUpdatedAt()).isEqualTo(expected.get(i).getUpdatedAt());
+
             assertThat(actual.get(i).getGenres()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getGenres().size() == expected.get(i).getGenres().size()).isTrue();
-            
+
             for (int j = 0; j < actual.get(i).getGenres().size(); j++) {
                 assertThat(actual.get(i).getGenres().get(j)).isNotNull();
                 assertThat(actual.get(i).getGenres().get(j).getId()).isEqualTo(expected.get(i).getGenres().get(j).getId());
                 assertThat(actual.get(i).getGenres().get(j).getName()).isEqualTo(expected.get(i).getGenres().get(j).getName());
             }
-            
+
             assertThat(actual.get(i).getDirectors()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getDirectors().size() == expected.get(i).getDirectors().size()).isTrue();
             for (int j = 0; j < actual.get(i).getDirectors().size(); j++) {
@@ -1714,7 +1717,7 @@ public class MovieSecuredRoutesTest {
                 assertThat(actual.get(i).getDirectors().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getGender());
                 assertThat(actual.get(i).getDirectors().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getDirectors().get(j).getPerson().getProfilePhoto());
             }
-            
+
             assertThat(actual.get(i).getWriters()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getWriters().size() == expected.get(i).getWriters().size()).isTrue();
             for (int j = 0; j < actual.get(i).getWriters().size(); j++) {
@@ -1725,13 +1728,13 @@ public class MovieSecuredRoutesTest {
                 assertThat(actual.get(i).getWriters().get(j).getPerson().getGender()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getGender());
                 assertThat(actual.get(i).getWriters().get(j).getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getWriters().get(j).getPerson().getProfilePhoto());
             }
-            
+
             assertThat(actual.get(i).getActings()).isNotNull().isNotEmpty();
             assertThat(actual.get(i).getActings().size() == expected.get(i).getActings().size()).isTrue();
             for (int j = 0; j < actual.get(i).getActings().size(); j++) {
                 assertThat(actual.get(i).getActings().get(j)).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getStarring()).isEqualTo(expected.get(i).getActings().get(j).getStarring());
-                
+
                 assertThat(actual.get(i).getActings().get(j).getActor()).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getActor().getPersonId()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPersonId());
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getFirstName()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getFirstName());
@@ -1739,10 +1742,10 @@ public class MovieSecuredRoutesTest {
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getGender()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getGender());
                 assertThat(actual.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.get(i).getActings().get(j).getActor().getPerson().getProfilePhoto());
                 assertThat(actual.get(i).getActings().get(j).getActor().getStar()).isEqualTo(expected.get(i).getActings().get(j).getActor().getStar());
-                
+
                 assertThat(actual.get(i).getActings().get(j).getMedia()).isNotNull();
                 assertThat(actual.get(i).getActings().get(j).getMedia() == actual.get(i)).isTrue();
-                
+
                 assertThat(actual.get(i).getActings().get(j).getRoles()).isNotNull().isNotEmpty();
                 assertThat(actual.get(i).getActings().get(j).getRoles().size() == expected.get(i).getActings().get(j).getRoles().size()).isTrue();
                 for (int k = 0; k < actual.get(i).getActings().get(j).getRoles().size(); k++) {
@@ -1750,45 +1753,70 @@ public class MovieSecuredRoutesTest {
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId()).isNotNull();
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing()).isNotNull();
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getActing() == actual.get(i).getActings().get(j)).isTrue();
-                    
-                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getId()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId().getId());
+
+                    assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getId().getOrderNumber()).isEqualTo(expected.get(i).getActings().get(j).getRoles().get(k).getId().getOrderNumber());
                     assertThat(actual.get(i).getActings().get(j).getRoles().get(k).getName()).isEqualTo(actual.get(i).getActings().get(j).getRoles().get(k).getName());
                 }
             }
-            
+
             assertThat(actual.get(i).getCritiques()).isNotNull();
             assertThat(actual.get(i).getCritiques().size() == expected.get(i).getCritiques().size()).isTrue();
             for (int j = 0; j < actual.get(i).getCritiques().size(); j++) {
                 assertThat(actual.get(i).getCritiques().get(j)).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic()).isNotNull();
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getFirstName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getFirstName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getLastName()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getLastName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getGender()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getGender());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getRole()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getRole());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileName());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getProfileImage());                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUsername()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUsername());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getPassword()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getPassword());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getEmail()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getEmail());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCreatedAt());
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getUpdatedAt());
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
-                assertThat(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getId().getCritic().getCountry().getId());                
-                
-                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia()).isNotNull();
-                assertThat(actual.get(i).getCritiques().get(j).getId().getMedia() == actual.get(i)).isTrue();
-                
+                assertThat(actual.get(i).getCritiques().get(j).getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getId());
+                assertThat(actual.get(i).getCritiques().get(j).getUser()).isNotNull();
+
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getId());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getFirstName()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getFirstName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getLastName()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getLastName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getGender()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getGender());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getRole()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getRole());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getProfileName()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getUser().getProfileName());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getProfileImage()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getProfileImage());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getUsername()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getUsername());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getPassword()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getPassword());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getEmail()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getEmail());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCreatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getCreatedAt());
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getUpdatedAt()).isEqualTo(expected.get(i).getCritiques().get(j).getUser().getUpdatedAt());
+
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCountry()).isNotNull();
+                assertThat(expected.get(i).getCritiques().get(j).getUser().getCountry()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getUser().getCountry().getId()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getUser().getCountry().getId());
+
+                assertThat(actual.get(i).getCritiques().get(j).getMedia()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getMedia() == actual.get(i)).isTrue();
+
                 assertThat(actual.get(i).getCritiques().get(j).getDescription()).isNotEmpty().isEqualTo(expected.get(i).getCritiques().get(j).getDescription());
                 assertThat(actual.get(i).getCritiques().get(j).getRating()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getRating());
+                assertThat(actual.get(i).getCritiques().get(j).getCreatedAt()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getCreatedAt());
+
+                assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().size()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().size());
+                for (int k = 0; k < actual.get(i).getCritiques().get(j).getLikeDislikes().size(); k++) {
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getUser().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getUser().getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getCritique().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getId().getCritique().getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getLikeDislikes().get(k).getIsLike()).isEqualTo(expected.get(i).getCritiques().get(j).getLikeDislikes().get(k).getIsLike());
+                }
+
+                assertThat(actual.get(i).getCritiques().get(j).getComments()).isNotNull();
+                assertThat(actual.get(i).getCritiques().get(j).getComments().size()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().size());
+                for (int k = 0; k < actual.get(i).getCritiques().get(j).getComments().size(); k++) {
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getId());
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getContent()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getContent());
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getCreatedAt()).isNotNull().isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getCreatedAt());
+
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k)).isNotNull();
+                    assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size());
+                    for (int u = 0; u < actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().size(); u++) {
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getUser().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getUser().getId());
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getComment().getId()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getId().getComment().getId());
+                        assertThat(actual.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getIsLike()).isEqualTo(expected.get(i).getCritiques().get(j).getComments().get(k).getLikeDislikes().get(u).getIsLike());
+                    }
+                }
             }
-            
         }
     }
-    
+
     private void assertMoviesEqual(MovieResponseDTO actual, MovieRequestDTO expected, String expectedCoverImageUrl) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
@@ -1799,29 +1827,29 @@ public class MovieSecuredRoutesTest {
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getLength()).isEqualTo(expected.getLength());
         assertThat(actual.getCriticsRating()).isNull();
-        
+
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
-        
+
         for (int i = 0; i < actual.getGenres().size(); i++) {
             assertThat(actual.getGenres().get(i)).isNotNull();
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i));
         }
-        
+
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
             assertThat(actual.getDirectors().get(i)).isNotNull();
             assertThat(actual.getDirectors().get(i).getId()).isNotNull().isEqualTo(expected.getDirectors().get(i));
         }
-        
+
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
             assertThat(actual.getWriters().get(i)).isNotNull();
             assertThat(actual.getWriters().get(i).getId()).isNotNull().isEqualTo(expected.getWriters().get(i));
         }
-        
+
         assertThat(actual.getActors()).isNotNull().isNotEmpty();
         assertThat(actual.getActors().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActors().size(); i++) {
@@ -1838,7 +1866,7 @@ public class MovieSecuredRoutesTest {
         }
         assertThat(actual.getCritiques()).isNotNull().isEmpty();
     }
-    
+
     private void assertMoviesEqual(MovieJPA actual, MovieResponseDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(actual.getId()).isNotNull().isGreaterThan(0).isEqualTo(expected.getId());
@@ -1852,8 +1880,8 @@ public class MovieSecuredRoutesTest {
         assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
         assertThat(actual.getAudienceRating()).isEqualTo(expected.getAudienceRating());
         assertThat(actual.getLength()).isEqualTo(expected.getLength());
-        assertThat(actual.getCriticRating()).isNull();
-        
+        assertThat(actual.getCriticsRating()).isNull();
+
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
@@ -1861,7 +1889,7 @@ public class MovieSecuredRoutesTest {
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i).getId());
             assertThat(actual.getGenres().get(i).getName()).isNotNull().isEqualTo(expected.getGenres().get(i).getName());
         }
-        
+
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
@@ -1877,7 +1905,7 @@ public class MovieSecuredRoutesTest {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getDirectors().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getDirectors().get(i).getProfilePhotoUrl());
             }
         }
-        
+
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
@@ -1892,9 +1920,9 @@ public class MovieSecuredRoutesTest {
             } else {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getWriters().get(i).getPerson().getProfilePhoto()).isEqualTo(expected.getWriters().get(i).getProfilePhotoUrl());
             }
-            
+
         }
-        
+
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
@@ -1911,20 +1939,20 @@ public class MovieSecuredRoutesTest {
             } else {
                 assertThat(config.getPersonImagesBaseUrl() + actual.getActings().get(i).getActor().getPerson().getProfilePhoto()).isEqualTo(expected.getActors().get(i).getProfilePhotoUrl());
             }
-            
+
             assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getOrderNumber()).isNotNull().isEqualTo(expected.getActors().get(i).getRoles().get(j).getId());
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j).getName());
             }
         }
         assertThat(actual.getCritiques()).isNotNull().isEmpty();
-        
+
     }
-    
+
     private void assertMoviesEqual(MovieJPA actual, MovieRequestDTO expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
@@ -1934,48 +1962,48 @@ public class MovieSecuredRoutesTest {
         assertThat(actual.getReleaseDate()).isNotNull().isEqualTo(expected.getReleaseDate());
         assertThat(actual.getAudienceRating()).isNotNull().isEqualTo(expected.getAudienceRating());
         assertThat(actual.getLength()).isNotNull().isEqualTo(expected.getLength());
-        
+
         assertThat(actual.getGenres()).isNotNull().isNotEmpty();
         assertThat(actual.getGenres().size()).isEqualTo(expected.getGenres().size());
         for (int i = 0; i < actual.getGenres().size(); i++) {
             assertThat(actual.getGenres().get(i)).isNotNull();
             assertThat(actual.getGenres().get(i).getId()).isNotNull().isEqualTo(expected.getGenres().get(i));
         }
-        
+
         assertThat(actual.getDirectors()).isNotNull().isNotEmpty();
         assertThat(actual.getDirectors().size()).isEqualTo(expected.getDirectors().size());
         for (int i = 0; i < actual.getDirectors().size(); i++) {
             assertThat(actual.getDirectors().get(i)).isNotNull();
             assertThat(actual.getDirectors().get(i).getPersonId()).isNotNull().isEqualTo(expected.getDirectors().get(i));
         }
-        
+
         assertThat(actual.getWriters()).isNotNull().isNotEmpty();
         assertThat(actual.getWriters().size()).isEqualTo(expected.getWriters().size());
         for (int i = 0; i < actual.getWriters().size(); i++) {
             assertThat(actual.getWriters().get(i)).isNotNull();
             assertThat(actual.getWriters().get(i).getPersonId()).isNotNull().isEqualTo(expected.getWriters().get(i));
         }
-        
+
         assertThat(actual.getActings()).isNotNull().isNotEmpty();
         assertThat(actual.getActings().size()).isEqualTo(expected.getActors().size());
         for (int i = 0; i < actual.getActings().size(); i++) {
             assertThat(actual.getActings().get(i)).isNotNull();
             assertThat(actual.getActings().get(i).getActor()).isNotNull();
             assertThat(actual.getActings().get(i).getActor().getPersonId()).isNotNull().isEqualTo(expected.getActors().get(i).getId());
-            
+
             assertThat(actual.getActings().get(i).getStarring()).isNotNull().isEqualTo(expected.getActors().get(i).getStarring());
             assertThat(actual.getActings().get(i).getRoles()).isNotNull().isNotEmpty();
             assertThat(actual.getActings().get(i).getRoles().size()).isEqualTo(expected.getActors().get(i).getRoles().size());
             for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                 assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
                 assertThat(actual.getActings().get(i).getRoles().get(j).getId()).isNotNull();
-                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(j + 1);
+                assertThat(actual.getActings().get(i).getRoles().get(j).getId().getOrderNumber()).isNotNull().isEqualTo(j + 1);
                 assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotEmpty().isEqualTo(expected.getActors().get(i).getRoles().get(j));
             }
         }
         assertThat(actual.getCritiques()).isNotNull().isEmpty();
     }
-    
+
     private void assertImagesEqual(List<Resource> actual, List<Resource> expected) throws AssertionError {
         assertThat(actual).isNotNull().isNotEmpty();
         assertThat(expected).isNotNull().isNotEmpty();
@@ -1994,7 +2022,7 @@ public class MovieSecuredRoutesTest {
             }
         }
     }
-    
+
     private void assertImagesEqual(Resource actual, MockMultipartFile expected) throws AssertionError {
         assertThat(actual).isNotNull();
         assertThat(expected).isNotNull();
@@ -2016,7 +2044,7 @@ public class MovieSecuredRoutesTest {
             return false;
         }
     }
-    
+
     private boolean areMoviesEqual(MovieJPA actual, MovieRequestDTO expected) {
         try {
             assertMoviesEqual(actual, expected);
@@ -2025,7 +2053,7 @@ public class MovieSecuredRoutesTest {
             return false;
         }
     }
-    
+
     private boolean existsCoverImage(String filename) {
         if (filename != null) {
             try {
@@ -2037,19 +2065,19 @@ public class MovieSecuredRoutesTest {
         }
         return false;
     }
-    
+
     private String getExtensionWithDot(String filename) throws IllegalArgumentException {
         return "." + MyImage.extractNameAndExtension(filename)[1];
     }
-    
+
     private List<Resource> getAllCoverImages() {
         return testUtil.getAllMediaCoverImages();
     }
-    
+
     private List<MovieJPA> getAllMovies() {
         return movieRepo.findAll();
     }
-    
+
     private void changeAttributes(MovieRequestDTO movie) {
         movie.setTitle("Dummy PUT title");
         movie.setDescription("Dummy PUT description");
@@ -2139,5 +2167,5 @@ public class MovieSecuredRoutesTest {
             }
         });
     }
-    
+
 }

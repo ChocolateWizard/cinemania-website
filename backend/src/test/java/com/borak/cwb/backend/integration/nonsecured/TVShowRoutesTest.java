@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -49,10 +50,6 @@ public class TVShowRoutesTest {
         TESTS_PASSED.put("getAllTVShowsWithDetailsPaginated_Test", false);
         TESTS_PASSED.put("getTVShowWithGenres_Test", false);
         TESTS_PASSED.put("getTVShowWithDetails_Test", false);
-        TESTS_PASSED.put("getTVShowDirectors_Test", false);
-        TESTS_PASSED.put("getTVShowWriters_Test", false);
-        TESTS_PASSED.put("getTVShowActors_Test", false);
-        TESTS_PASSED.put("getTVShowActorsWithRoles_Test", false);
     }
 
     public static boolean didAllTestsPass() {
@@ -218,108 +215,6 @@ public class TVShowRoutesTest {
         TESTS_PASSED.put("getTVShowWithDetails_Test", true);
     }
 
-    @Test
-    @Order(7)
-    @DisplayName("Tests GET /api/tv/{id}/directors")
-    void getTVShowDirectors_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getTVShowDirectorsRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getTVShowDirectorsRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getTVShowDirectorsRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getTVShowJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getTVShowDirectors_Test", true);
-    }
-
-    @Test
-    @Order(8)
-    @DisplayName("Tests GET /api/tv/{id}/writers")
-    void getTVShowWriters_Test() {
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getTVShowWritersRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getTVShowWritersRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getTVShowWritersRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getTVShowJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getTVShowWriters_Test", true);
-    }
-
-    @Test
-    @Order(9)
-    @DisplayName("Tests GET /api/tv/{id}/actors")
-    void getTVShowActors_Test() {
-
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getTVShowActorsRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getTVShowActorsRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getTVShowActorsRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getTVShowJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getTVShowActors_Test", true);
-    }
-
-    @Test
-    @Order(10)
-    @DisplayName("Tests GET /api/tv/{id}/actors/roles")
-    void getTVShowActorsWithRoles_Test() {
-
-        ResponseEntity<String> response;
-        int i = 0;
-        for (String req : getTVShowActorsRolesRequestInvalidResponse400()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-        i = 0;
-        for (String req : getTVShowActorsRolesRequestValidResponse404()) {
-            response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i++, req).isEqualTo(HttpStatus.NOT_FOUND);
-        }
-        i = 0;
-        for (Pair<Integer, String> reqres : getTVShowActorsRolesRequestValidResponseNonEmpty200()) {
-            response = restTemplate.getForEntity(ROUTE + reqres.getR(), String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, reqres.getR()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody()).as("Value i=%d, and url=%s", i++, reqres.getR()).isEqualTo(jsonReader.getTVShowJson(reqres.getL()));
-        }
-
-        TESTS_PASSED.put("getTVShowActorsWithRoles_Test", true);
-    }
-
 //=================================================================================================================================
 //PRIVATE METHODS
 //=================================================================================================================================
@@ -329,7 +224,10 @@ public class TVShowRoutesTest {
             "?page=0&size=1",
             "?page=-1&size=1",
             "?page=1&size=0",
-            "?page=1&size=-1"
+            "?page=1&size=-1",
+            "?page=1&size=101",
+            "?page=1&size=102",
+            "?page=1&size=201"
         };
     }
 
@@ -359,7 +257,10 @@ public class TVShowRoutesTest {
             "/popular?page=0&size=1",
             "/popular?page=-1&size=1",
             "/popular?page=1&size=0",
-            "/popular?page=1&size=-1"
+            "/popular?page=1&size=-1",
+            "/popular?page=1&size=101",
+            "/popular?page=1&size=102",
+            "/popular?page=1&size=201"
         };
     }
 
@@ -389,7 +290,10 @@ public class TVShowRoutesTest {
             "/current?page=0&size=1",
             "/current?page=-1&size=1",
             "/current?page=1&size=0",
-            "/current?page=1&size=-1"
+            "/current?page=1&size=-1",
+            "/current?page=1&size=101",
+            "/current?page=1&size=102",
+            "/current?page=1&size=201"
         };
     }
 
@@ -415,7 +319,10 @@ public class TVShowRoutesTest {
             "/details?page=0&size=1",
             "/details?page=-1&size=1",
             "/details?page=1&size=0",
-            "/details?page=1&size=-1"
+            "/details?page=1&size=-1",
+            "/details?page=1&size=101",
+            "/details?page=1&size=102",
+            "/details?page=1&size=201"
         };
     }
 
@@ -490,108 +397,5 @@ public class TVShowRoutesTest {
         };
     }
 //---------------------------------------------------------------------------------------------------------------------------------
-//tv/{id}/directors   
-
-    private String[] getTVShowDirectorsRequestInvalidResponse400() {
-        return new String[]{
-            "/0/directors",
-            "/-1/directors"
-        };
-    }
-
-    private String[] getTVShowDirectorsRequestValidResponse404() {
-        return new String[]{
-            "/1/directors",
-            "/2/directors",
-            "/4/directors",
-            "/20/directors"
-        };
-    }
-
-    private Pair<Integer, String>[] getTVShowDirectorsRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(25, "/3/directors"),
-            new Pair(26, "/5/directors"),
-            new Pair(27, "/6/directors")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//tv/{id}/writers   
-    private String[] getTVShowWritersRequestInvalidResponse400() {
-        return new String[]{
-            "/0/writers",
-            "/-1/writers"
-        };
-    }
-
-    private String[] getTVShowWritersRequestValidResponse404() {
-        return new String[]{
-            "/1/writers",
-            "/2/writers",
-            "/4/writers",
-            "/20/writers"
-        };
-    }
-
-    private Pair<Integer, String>[] getTVShowWritersRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(28, "/3/writers"),
-            new Pair(29, "/5/writers"),
-            new Pair(30, "/6/writers")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//tv/{id}/actors
-    private String[] getTVShowActorsRequestInvalidResponse400() {
-        return new String[]{
-            "/0/actors",
-            "/-1/actors"
-        };
-    }
-
-    private String[] getTVShowActorsRequestValidResponse404() {
-        return new String[]{
-            "/1/actors",
-            "/2/actors",
-            "/4/actors",
-            "/20/actors"
-        };
-    }
-
-    private Pair<Integer, String>[] getTVShowActorsRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(31, "/3/actors"),
-            new Pair(32, "/5/actors"),
-            new Pair(33, "/6/actors")
-        };
-    }
-
-//---------------------------------------------------------------------------------------------------------------------------------
-//tv/{id}/actors/roles   
-    private String[] getTVShowActorsRolesRequestInvalidResponse400() {
-        return new String[]{
-            "/0/actors/roles",
-            "/-1/actors/roles"
-        };
-    }
-
-    private String[] getTVShowActorsRolesRequestValidResponse404() {
-        return new String[]{
-            "/1/actors/roles",
-            "/2/actors/roles",
-            "/4/actors/roles",
-            "/20/actors/roles"
-        };
-    }
-
-    private Pair<Integer, String>[] getTVShowActorsRolesRequestValidResponseNonEmpty200() {
-        return new Pair[]{
-            new Pair(34, "/3/actors/roles"),
-            new Pair(35, "/5/actors/roles"),
-            new Pair(36, "/6/actors/roles")
-        };
-    }
 
 }

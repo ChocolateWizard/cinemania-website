@@ -49,6 +49,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -781,20 +782,79 @@ public class AuthRoutesTest {
         for (int i = 0; i < actual.getCritiques().size(); i++) {
             assertThat(actual.getCritiques().get(i)).isNotNull();
             assertThat(expected.getCritiques().get(i)).isNotNull();
-            assertThat(actual.getCritiques().get(i).getId()).isNotNull();
-            assertThat(expected.getCritiques().get(i).getId()).isNotNull();
 
-            assertThat(actual.getCritiques().get(i).getId().getCritic()).isNotNull();
-            assertThat(expected.getCritiques().get(i).getId().getCritic()).isNotNull();
-            assertThat(actual.getCritiques().get(i).getId().getMedia()).isNotNull();
-            assertThat(expected.getCritiques().get(i).getId().getMedia()).isNotNull();
+            assertThat(actual.getCritiques().get(i).getUser()).isNotNull();
+            assertThat(expected.getCritiques().get(i).getUser()).isNotNull();
+            assertThat(actual.getCritiques().get(i).getMedia()).isNotNull();
+            assertThat(expected.getCritiques().get(i).getMedia()).isNotNull();
 
-            assertThat(actual.getCritiques().get(i).getId().getCritic().getId()).isEqualTo(expected.getCritiques().get(i).getId().getCritic().getId());
-            assertThat(actual.getCritiques().get(i).getId().getCritic().getId()).isEqualTo(actual.getId());
-            assertThat(actual.getCritiques().get(i).getId().getMedia().getId()).isEqualTo(expected.getCritiques().get(i).getId().getMedia().getId());
+            assertThat(actual.getCritiques().get(i).getId()).isNotNull().isEqualTo(expected.getCritiques().get(i).getId());
+            assertThat(actual.getCritiques().get(i).getUser().getId()).isEqualTo(expected.getCritiques().get(i).getUser().getId());
+            assertThat(actual.getCritiques().get(i).getUser().getId()).isEqualTo(actual.getId());
+            assertThat(actual.getCritiques().get(i).getMedia().getId()).isEqualTo(expected.getCritiques().get(i).getMedia().getId());
             assertThat(actual.getCritiques().get(i).getDescription()).isEqualTo(expected.getCritiques().get(i).getDescription());
             assertThat(actual.getCritiques().get(i).getRating()).isEqualTo(expected.getCritiques().get(i).getRating());
+            assertThat(actual.getCritiques().get(i).getCreatedAt()).isNotNull().isEqualTo(expected.getCritiques().get(i).getCreatedAt());
         }
+        assertThat(actual.getComments()).isNotNull();
+        assertThat(expected.getComments()).isNotNull();
+        assertThat(actual.getComments().size()).isEqualTo(expected.getComments().size());
+        for (int i = 0; i < actual.getComments().size(); i++) {
+            assertThat(actual.getComments().get(i)).isNotNull();
+            assertThat(expected.getComments().get(i)).isNotNull();
+
+            assertThat(actual.getComments().get(i).getUser()).isNotNull();
+            assertThat(expected.getComments().get(i).getUser()).isNotNull();
+            assertThat(actual.getComments().get(i).getUser().getId()).isNotNull().isEqualTo(expected.getComments().get(i).getUser().getId());
+            assertThat(actual.getComments().get(i).getUser().getId()).isNotNull().isEqualTo(actual.getId());
+
+            assertThat(actual.getComments().get(i).getId()).isNotNull().isEqualTo(expected.getComments().get(i).getId());
+            assertThat(actual.getComments().get(i).getContent()).isNotBlank().isEqualTo(expected.getComments().get(i).getContent());
+            assertThat(actual.getComments().get(i).getCreatedAt()).isNotNull().isEqualTo(expected.getComments().get(i).getCreatedAt());
+        }
+
+        assertThat(actual.getCritiqueLikeDislikes()).isNotNull();
+        assertThat(expected.getCritiqueLikeDislikes()).isNotNull();
+        assertThat(actual.getCritiqueLikeDislikes().size()).isEqualTo(expected.getCritiqueLikeDislikes().size());
+        for (int i = 0; i < actual.getCritiqueLikeDislikes().size(); i++) {
+            assertThat(actual.getCritiqueLikeDislikes().get(i)).isNotNull();
+            assertThat(expected.getCritiqueLikeDislikes().get(i)).isNotNull();
+
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId()).isNotNull();
+            assertThat(expected.getCritiqueLikeDislikes().get(i).getId()).isNotNull();
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId().getUser()).isNotNull();
+            assertThat(expected.getCritiqueLikeDislikes().get(i).getId().getUser()).isNotNull();
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId().getUser().getId()).isNotNull().isEqualTo(expected.getCritiqueLikeDislikes().get(i).getId().getUser().getId());
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId().getUser().getId()).isNotNull().isEqualTo(actual.getId());
+
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId().getCritique()).isNotNull();
+            assertThat(expected.getCritiqueLikeDislikes().get(i).getId().getCritique()).isNotNull();
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getId().getCritique().getId()).isNotNull().isEqualTo(expected.getCritiqueLikeDislikes().get(i).getId().getCritique().getId());
+
+            assertThat(actual.getCritiqueLikeDislikes().get(i).getIsLike()).isNotNull().isEqualTo(expected.getCritiqueLikeDislikes().get(i).getIsLike());
+        }
+        
+        assertThat(actual.getCommentsLikeDislikes()).isNotNull();
+        assertThat(expected.getCommentsLikeDislikes()).isNotNull();
+        assertThat(actual.getCommentsLikeDislikes().size()).isEqualTo(expected.getCommentsLikeDislikes().size());
+        for (int i = 0; i < actual.getCommentsLikeDislikes().size(); i++) {
+            assertThat(actual.getCommentsLikeDislikes().get(i)).isNotNull();
+            assertThat(expected.getCommentsLikeDislikes().get(i)).isNotNull();
+
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId()).isNotNull();
+            assertThat(expected.getCommentsLikeDislikes().get(i).getId()).isNotNull();
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId().getUser()).isNotNull();
+            assertThat(expected.getCommentsLikeDislikes().get(i).getId().getUser()).isNotNull();
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId().getUser().getId()).isNotNull().isEqualTo(expected.getCommentsLikeDislikes().get(i).getId().getUser().getId());
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId().getUser().getId()).isNotNull().isEqualTo(actual.getId());
+
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId().getComment()).isNotNull();
+            assertThat(expected.getCommentsLikeDislikes().get(i).getId().getComment()).isNotNull();
+            assertThat(actual.getCommentsLikeDislikes().get(i).getId().getComment().getId()).isNotNull().isEqualTo(expected.getCommentsLikeDislikes().get(i).getId().getComment().getId());
+
+            assertThat(actual.getCommentsLikeDislikes().get(i).getIsLike()).isNotNull().isEqualTo(expected.getCommentsLikeDislikes().get(i).getIsLike());
+        }
+
     }
 
     private void assertUsersEqual(UserJPA actual, UserRegisterDTO expected) throws AssertionError {

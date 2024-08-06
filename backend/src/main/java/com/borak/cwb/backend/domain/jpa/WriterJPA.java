@@ -31,8 +31,7 @@ import java.util.Objects;
 public class WriterJPA implements Serializable {
 
     @Id
-    @Basic(optional = false)
-    @NotNull
+    @NotNull(message = "Person id must not be null")
     @Column(name = "person_id")
     private Long personId;
 

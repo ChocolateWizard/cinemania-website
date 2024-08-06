@@ -45,7 +45,7 @@ public class ActingJPA implements Serializable {
     @JoinColumn(name = "actor_id", referencedColumnName = "person_id", nullable = false)
     private ActorJPA actor;
 
-    @NotNull
+    @NotNull(message = "Starring status must not be null")
     @Column(name = "is_starring", nullable = false)
     private Boolean starring;
 

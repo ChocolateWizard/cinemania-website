@@ -54,7 +54,7 @@ public class ActingTransformer {
         response.setStar(acting.getActor().getStar());
         response.setStarring(acting.getStarring());
         for (ActingRoleJPA role : acting.getRoles()) {
-            response.getRoles().add(new ActorResponseDTO.Role(role.getId().getId(), role.getName()));
+            response.getRoles().add(new ActorResponseDTO.Role(role.getId().getOrderNumber(), role.getName()));
         }
         return response;
     }

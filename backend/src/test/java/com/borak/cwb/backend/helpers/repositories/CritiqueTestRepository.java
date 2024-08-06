@@ -5,6 +5,8 @@
 package com.borak.cwb.backend.helpers.repositories;
 
 import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
+import com.borak.cwb.backend.domain.jpa.MediaJPA;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import com.borak.cwb.backend.repository.jpa.CritiqueRepositoryJPA;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,14 @@ public class CritiqueTestRepository {
 
     public boolean exists(CritiqueJPA critique) {
         return repo.existsById(critique.getId());
+    }
+
+    public boolean existsByUserAndMedia(UserJPA user, MediaJPA media) {
+        return repo.existsByUserAndMedia(user, media);
+    }
+
+    public Optional<CritiqueJPA> findByUserAndMedia(UserJPA user, MediaJPA media) {
+        return repo.findByUserAndMedia(user, media);
     }
 
 }

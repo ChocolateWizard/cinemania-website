@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
+public class PersonServiceJDBC {
 
     @Autowired
     private IPersonRepository<PersonJDBC, Long> personRepo;
@@ -46,13 +46,11 @@ public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
     private PersonWrapperTransformer personWrapperTransformer;
 
 //=====================================================================================
-    @Override
     public ResponseEntity getAllPersonsPaginated(int page, int size) {
         List<PersonJDBC> persons = personRepo.findAllPaginated(page, size);
         return new ResponseEntity(personTransformer.jdbcToPersonResponse(persons), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity deletePersonById(long id) {
         Optional<PersonWrapperJDBC> wrapper = personWrapperRepo.findByIdWithRelations(id);
         if (wrapper.isEmpty()) {
@@ -65,7 +63,6 @@ public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
         return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(wrapper.get()), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity postPerson(PersonRequestDTO personClient) {
         if (personClient.getProfessions() != null) {
             for (PersonRequestDTO.Profession profession : personClient.getProfessions()) {
@@ -107,7 +104,6 @@ public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
         return new ResponseEntity<>(personWrapperTransformer.jdbcToPersonResponse(person.get()), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity putPerson(PersonRequestDTO request) {
         if (!personRepo.existsById(request.getId())) {
             throw new ResourceNotFoundException("Person with id: " + request.getId() + " does not exist in database!");
@@ -165,13 +161,11 @@ public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
 
     }
 
-    @Override
     public ResponseEntity getAllPersonsWithDetailsPaginated(int page, int size) {
         List<PersonWrapperJDBC> persons = personWrapperRepo.findAllWithRelationsPaginated(page, size);
         return new ResponseEntity(personWrapperTransformer.jdbcToPersonResponse(persons), HttpStatus.OK);
     }
 
-    @Override
     public ResponseEntity getPersonWithProfessions(Long id) {
         Optional<PersonWrapperJDBC> person = personWrapperRepo.findById(id);
         if (person.isPresent()) {
@@ -180,7 +174,6 @@ public class PersonServiceJDBC implements IPersonService<PersonRequestDTO> {
         throw new ResourceNotFoundException("No person found with id: " + id);
     }
 
-    @Override
     public ResponseEntity getPersonWithDetails(Long id) {
         Optional<PersonWrapperJDBC> person = personWrapperRepo.findByIdWithRelations(id);
         if (person.isPresent()) {

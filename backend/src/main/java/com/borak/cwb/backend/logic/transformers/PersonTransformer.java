@@ -20,21 +20,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class PersonTransformer {
 
-    @Autowired
-    private ConfigProperties config;
+    private final String PERSON_IMAGES_BASE_URL;
 
-    public PersonResponseDTO jdbcToPersonResponse(PersonJDBC person) {
-        PersonResponseDTO response = new PersonResponseDTO();
-        response.setId(person.getId());
-        response.setFirstName(person.getFirstName());
-        response.setLastName(person.getLastName());
-        response.setGender(person.getGender());
-        if (person.getProfilePhoto() != null) {
-            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getProfilePhoto());
-        }
-        return response;
+    @Autowired
+    public PersonTransformer(ConfigProperties config) {
+        this.PERSON_IMAGES_BASE_URL = config.getPersonImagesBaseUrl();
     }
 
+//=================================================================================================================================
+//JPA
     public PersonResponseDTO jpaToPersonResponse(PersonJPA person) {
         PersonResponseDTO response = new PersonResponseDTO();
         response.setId(person.getId());
@@ -42,24 +36,39 @@ public class PersonTransformer {
         response.setLastName(person.getLastName());
         response.setGender(person.getGender());
         if (person.getProfilePhoto() != null) {
-            response.setProfilePhotoUrl(config.getPersonImagesBaseUrl() + person.getProfilePhoto());
+            response.setProfilePhotoUrl(PERSON_IMAGES_BASE_URL + person.getProfilePhoto());
         }
         return response;
     }
-
-    //=========================================================================================================
-    public List<PersonResponseDTO> jdbcToPersonResponse(List<PersonJDBC> persons) {
-        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
-        for (PersonJDBC person : persons) {
-            list.add(jdbcToPersonResponse(person));
-        }
-        return list;
-    }
+//-----------------------------------------------------------------------------------------
 
     public List<PersonResponseDTO> jpaToPersonResponse(List<PersonJPA> persons) {
         List<PersonResponseDTO> list = new ArrayList<>(persons.size());
         for (PersonJPA person : persons) {
             list.add(jpaToPersonResponse(person));
+        }
+        return list;
+    }
+
+//=================================================================================================================================
+//JDBC
+    public PersonResponseDTO jdbcToPersonResponse(PersonJDBC person) {
+        PersonResponseDTO response = new PersonResponseDTO();
+        response.setId(person.getId());
+        response.setFirstName(person.getFirstName());
+        response.setLastName(person.getLastName());
+        response.setGender(person.getGender());
+        if (person.getProfilePhoto() != null) {
+            response.setProfilePhotoUrl(PERSON_IMAGES_BASE_URL + person.getProfilePhoto());
+        }
+        return response;
+    }
+
+//------------------------------------------------------------------------------------------
+    public List<PersonResponseDTO> jdbcToPersonResponse(List<PersonJDBC> persons) {
+        List<PersonResponseDTO> list = new ArrayList<>(persons.size());
+        for (PersonJDBC person : persons) {
+            list.add(jdbcToPersonResponse(person));
         }
         return list;
     }

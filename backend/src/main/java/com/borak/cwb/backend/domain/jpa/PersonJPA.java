@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -35,30 +36,37 @@ public class PersonJPA implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "First name must not be empty")
+    @Size(max = 100, message = "First name must be less than or equal to 100 characters")
     @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "Last name must not be empty")
+    @Size(max = 100, message = "Last name must be less than or equal to 100 characters")
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "Gender must not be null")
     @Column(name = "gender", nullable = false, length = 1)
     private Gender gender;
 
-    @Size(max = 30)
+    @Size(max = 30, message = "Profile photo must be less than or equal to 30 characters")
     @Column(name = "profile_photo", length = 30)
     private String profilePhoto;
 
+    @NotNull(message = "Created at must not be null")
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = true)
+    private LocalDateTime updatedAt;
+
     @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
-    private DirectorJPA directorInfo;
+    private DirectorJPA director;
     @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
-    private WriterJPA writerInfo;
+    private WriterJPA writer;
     @OneToOne(optional = true, fetch = FetchType.LAZY, mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ActorJPA actorInfo;
+    private ActorJPA actor;
 
     public PersonJPA() {
     }
@@ -82,15 +90,28 @@ public class PersonJPA implements Serializable {
         this.profilePhoto = profilePhoto;
     }
 
-    public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhoto, DirectorJPA directorInfo, WriterJPA writerInfo, ActorJPA actorInfo) {
+    public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhoto, DirectorJPA director, WriterJPA writer, ActorJPA actor) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
         this.profilePhoto = profilePhoto;
-        this.directorInfo = directorInfo;
-        this.writerInfo = writerInfo;
-        this.actorInfo = actorInfo;
+        this.director = director;
+        this.writer = writer;
+        this.actor = actor;
+    }
+
+    public PersonJPA(Long id, String firstName, String lastName, Gender gender, String profilePhoto, LocalDateTime createdAt, LocalDateTime updatedAt, DirectorJPA director, WriterJPA writer, ActorJPA actor) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.profilePhoto = profilePhoto;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.director = director;
+        this.writer = writer;
+        this.actor = actor;
     }
 
     public Long getId() {
@@ -133,35 +154,51 @@ public class PersonJPA implements Serializable {
         this.profilePhoto = profilePhoto;
     }
 
+    public DirectorJPA getDirector() {
+        return director;
+    }
+
+    public void setDirector(DirectorJPA director) {
+        this.director = director;
+    }
+
+    public WriterJPA getWriter() {
+        return writer;
+    }
+
+    public void setWriter(WriterJPA writer) {
+        this.writer = writer;
+    }
+
+    public ActorJPA getActor() {
+        return actor;
+    }
+
+    public void setActor(ActorJPA actor) {
+        this.actor = actor;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
-    }
-
-    public DirectorJPA getDirectorInfo() {
-        return directorInfo;
-    }
-
-    public void setDirectorInfo(DirectorJPA directorInfo) {
-        this.directorInfo = directorInfo;
-    }
-
-    public WriterJPA getWriterInfo() {
-        return writerInfo;
-    }
-
-    public void setWriterInfo(WriterJPA writerInfo) {
-        this.writerInfo = writerInfo;
-    }
-
-    public ActorJPA getActorInfo() {
-        return actorInfo;
-    }
-
-    public void setActorInfo(ActorJPA actorInfo) {
-        this.actorInfo = actorInfo;
     }
 
     @Override

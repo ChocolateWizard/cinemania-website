@@ -10,6 +10,7 @@ import com.borak.cwb.backend.logic.services.movie.IMovieService;
 import com.borak.cwb.backend.logic.services.validation.DomainValidationService;
 import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,42 +37,58 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class MovieController {
 
-    @Autowired
-    private IMovieService movieService;
+    private final IMovieService movieService;
+    private final DomainValidationService domainValidator;
 
     @Autowired
-    private DomainValidationService domainValidator;
+    public MovieController(IMovieService movieService, DomainValidationService domainValidator) {
+        this.movieService = movieService;
+        this.domainValidator = domainValidator;
+    }
 
-    //=========================GET MAPPINGS==================================  
+//=================================================================================================================================
+//GET
     @GetMapping
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getMovies(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return movieService.getAllMoviesWithGenresPaginated(page, size);
     }
 
     @GetMapping(path = "/popular")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getMoviesPopular(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return movieService.getAllMoviesWithGenresPopularPaginated(page, size);
     }
 
     @GetMapping(path = "/current")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getMoviesCurrent(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return movieService.getAllMoviesWithGenresCurrentPaginated(page, size);
     }
 
     @GetMapping(path = "/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity getMoviesDetails(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return movieService.getAllMoviesWithDetailsPaginated(page, size);
     }
 
@@ -87,29 +104,8 @@ public class MovieController {
         return movieService.getMovieWithDetails(id);
     }
 
-    @GetMapping(path = "/{id}/directors")
-    public ResponseEntity getMovieByIdDirectors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieDirectors(id);
-    }
-
-    @GetMapping(path = "/{id}/writers")
-    public ResponseEntity getMovieByIdWriters(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieWriters(id);
-    }
-
-    @GetMapping(path = "/{id}/actors")
-    @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getMovieByIdActors(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieActors(id);
-    }
-
-    @GetMapping(path = "/{id}/actors/roles")
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity getMovieByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {
-        return movieService.getMovieActorsWithRoles(id);
-    }
-
-    //=========================POST MAPPINGS==================================
+//=================================================================================================================================
+//POST
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity postMovie(@RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
@@ -120,7 +116,8 @@ public class MovieController {
         return movieService.postMovie(movie);
     }
 
-    //=========================PUT MAPPINGS===================================
+//=================================================================================================================================
+//PUT
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity putMovie(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id, @RequestPart("movie") MovieRequestDTO movie, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
@@ -132,7 +129,8 @@ public class MovieController {
         return movieService.putMovie(movie);
     }
 
-    //=========================DELETE MAPPINGS================================
+//=================================================================================================================================
+//DELETE
     @DeleteMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity deleteMovieById(@PathVariable @Min(value = 1, message = "Movie id must be greater than or equal to 1") long id) {

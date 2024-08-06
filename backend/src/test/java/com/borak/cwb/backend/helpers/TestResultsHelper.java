@@ -139,7 +139,6 @@ public final class TestResultsHelper {
     public static boolean didMovieSecuredRoutesRequiredTestsPass() {
         boolean[] testsPassed = new boolean[]{
             AuthRoutesTest.didAllTestsPass(),
-            CritiqueSecuredRoutesTest.didAllTestsPass(),
             UserSecuredRoutesTest.didAllTestsPass()
         };
         for (boolean isPassed : testsPassed) {
@@ -214,8 +213,7 @@ public final class TestResultsHelper {
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
             PersonRoutesTest.didAllTestsPass(),            
-            AuthRoutesTest.didAllTestsPass(),
-            CritiqueSecuredRoutesTest.didAllTestsPass(),
+            AuthRoutesTest.didAllTestsPass(),           
             MovieSecuredRoutesTest.didAllTestsPass(),
             PersonSecuredRoutesTest.didAllTestsPass(),
             TVShowSecuredRoutesTest.didAllTestsPass(),
@@ -247,8 +245,7 @@ public final class TestResultsHelper {
             MediaRoutesTest.didAllTestsPass(),
             MovieRoutesTest.didAllTestsPass(),
             PersonRoutesTest.didAllTestsPass(),          
-            AuthRoutesTest.didAllTestsPass(),
-            CritiqueSecuredRoutesTest.didAllTestsPass(),
+            AuthRoutesTest.didAllTestsPass(),           
             MovieSecuredRoutesTest.didAllTestsPass(),
             PersonSecuredRoutesTest.didAllTestsPass(),
             TVShowSecuredRoutesTest.didAllTestsPass(),

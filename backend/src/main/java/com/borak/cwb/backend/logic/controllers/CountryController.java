@@ -19,10 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "api/countries")
 public class CountryController {
 
-    @Autowired
-    private ICountryService countryService;
+    private final ICountryService countryService;
 
-    //=========================GET MAPPINGS==================================  
+    @Autowired
+    public CountryController(ICountryService countryService) {
+        this.countryService = countryService;
+    }
+
+//=================================================================================================================================
+//GET
     @GetMapping
     public ResponseEntity getCountries() {
         return countryService.getAll();

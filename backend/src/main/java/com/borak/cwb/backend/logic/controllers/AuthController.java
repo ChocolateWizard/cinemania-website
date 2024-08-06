@@ -29,14 +29,21 @@ import com.borak.cwb.backend.logic.services.auth.IAuthService;
 @Validated
 public class AuthController {
 
-    @Autowired
-    private IAuthService<UserRegisterDTO, UserLoginDTO> userService;
+    private final IAuthService<UserRegisterDTO, UserLoginDTO> userService;
+    private final DomainValidationService domainValidator;
 
     @Autowired
-    private DomainValidationService domainValidator;
+    public AuthController(IAuthService<UserRegisterDTO, UserLoginDTO> userService, DomainValidationService domainValidator) {
+        this.userService = userService;
+        this.domainValidator = domainValidator;
+    }
 
+//=================================================================================================================================
+//POST
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestPart(name = "user") UserRegisterDTO registerForm, @RequestPart(name = "profile_image", required = false) MultipartFile profileImage) {
+    public ResponseEntity register(
+            @Valid @RequestPart(name = "user") UserRegisterDTO registerForm,
+            @RequestPart(name = "profile_image", required = false) MultipartFile profileImage) {
         domainValidator.validate(registerForm, profileImage);
         if (profileImage != null) {
             registerForm.setProfileImage(new MyImage(profileImage));
@@ -45,12 +52,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO loginRequest) {
+    public ResponseEntity login(@Valid @RequestBody UserLoginDTO loginRequest) {
         return userService.login(loginRequest);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity logout() {
         return userService.logout();
     }
 

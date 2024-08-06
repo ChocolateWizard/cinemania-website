@@ -31,17 +31,17 @@ public class CountryJPA implements Serializable {
     private Long id;
 
     @NotBlank(message = "Name must not be empty")
-    @Size(max = 300)
+    @Size(max = 300, message = "Name must be less than or equal to 300 characters")
     @Column(name = "name", nullable = false, length = 300)
     private String name;
 
     @NotBlank(message = "Official state name must not be empty")
-    @Size(max = 300)
+    @Size(max = 300, message = "Official state name must be less than or equal to 300 characters")
     @Column(name = "official_state_name", nullable = false, length = 300)
     private String officialStateName;
 
     @NotBlank(message = "Code must not be empty")
-    @Size(max = 2)
+    @Size(min = 2, max = 2, message = "Code must be 2 characters long")
     @Column(name = "code", nullable = false, length = 2, unique = true)
     private String code;
 

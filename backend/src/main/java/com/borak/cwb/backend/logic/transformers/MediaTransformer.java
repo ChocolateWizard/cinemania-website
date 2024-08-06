@@ -62,7 +62,7 @@ public class MediaTransformer {
         response.setDescription(media.getDescription());
         response.setReleaseDate(media.getReleaseDate());
         response.setAudienceRating(media.getAudienceRating());
-        response.setCriticsRating(media.getCriticRating());
+        response.setCriticsRating(media.getCriticsRating());
         for (GenreJPA genre : media.getGenres()) {
             response.getGenres().add(new MediaResponseDTO.Genre(genre.getId(), genre.getName()));
         }

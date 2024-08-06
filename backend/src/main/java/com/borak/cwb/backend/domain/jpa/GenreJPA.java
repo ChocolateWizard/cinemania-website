@@ -31,9 +31,8 @@ public class GenreJPA implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Basic(optional = false)
-    @Size(max = 300)
+    @NotBlank(message = "Name must not be empty")
+    @Size(max = 300,message = "Name must be less than or equal to 300 characters")
     @Column(name = "name", nullable = false, length = 300)
     private String name;
 

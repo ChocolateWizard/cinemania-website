@@ -18,14 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "api/genres")
 public class GenreController {
-    
-    @Autowired
-    private IGenreService genreService;
 
-    //=========================GET MAPPINGS==================================  
+    private final IGenreService genreService;
+
+    @Autowired
+    public GenreController(IGenreService genreService) {
+        this.genreService = genreService;
+    }
+
+//=================================================================================================================================
+//GET
     @GetMapping
     public ResponseEntity getGenres() {
         return genreService.getAll();
     }
-    
+
 }

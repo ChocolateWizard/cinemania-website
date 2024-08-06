@@ -24,14 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class UserServiceJDBC implements IUserService<Long> {
+public class UserServiceJDBC {
 
     @Autowired
     private IUserRepository<UserJDBC, Long, MediaJDBC, Long> userRepo;
     @Autowired
     private IMediaRepository<MediaJDBC, Long> mediaRepo;
 
-    @Override
     public ResponseEntity postMediaIntoLibrary(Long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");
@@ -44,7 +43,6 @@ public class UserServiceJDBC implements IUserService<Long> {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @Override
     public ResponseEntity deleteMediaFromLibrary(Long mediaId) {
         if (!mediaRepo.existsById(mediaId)) {
             throw new ResourceNotFoundException("Media with id: " + mediaId + " does not exist in database!");

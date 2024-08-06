@@ -285,13 +285,13 @@ insert  into `genre`(`id`,`name`) values
 
 /*Data for the table `media` */
 
-insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`audience_rating`,`critic_rating`) values 
-(1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,NULL),
-(2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,NULL),
-(3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,NULL),
-(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,NULL),
-(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,NULL),
-(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,NULL);
+insert  into `media`(`id`,`title`,`release_date`,`cover_image`,`description`,`audience_rating`,`created_at`) values 
+(1,'Mulholland Drive','2001-05-16','1.jpg','After a car wreck on the winding Mulholland Drive renders a woman amnesiac, she and a perky Hollywood-hopeful search for clues and answers across Los Angeles in a twisting venture beyond dreams and reality.',79,'2024-01-25 15:49:36'),
+(2,'Inland Empire','2006-09-06','2.jpg','As an actress begins to adopt the persona of her character in a film, her world becomes nightmarish and surreal.',68,'2024-02-25 14:49:36'),
+(3,'Arcane','2021-11-06','3.jpg','Set in Utopian Piltover and the oppressed underground of Zaun, the story follows the origins of two iconic League Of Legends champions and the power that will tear them apart.',90,'2024-03-25 14:49:36'),
+(4,'The Lighthouse','2019-05-19',NULL,'Two lighthouse keepers try to maintain their sanity while living on a remote and mysterious New England island in the 1890s.',74,'2024-04-25 14:49:36'),
+(5,'Lost','2004-09-22',NULL,'The survivors of a plane crash are forced to work together in order to survive on a seemingly deserted tropical island.',83,'2024-05-25 14:49:36'),
+(6,'South Park','1997-08-13','6.jpg','Follows the misadventures of four irreverent grade-schoolers in the quiet, dysfunctional town of South Park, Colorado.',87,'2024-06-25 14:49:36');
 
 /*Data for the table `movie` */
 
@@ -309,57 +309,57 @@ insert  into `tv_show`(`media_id`,`number_of_seasons`) values
 
 /*Data for the table `person` */
 
-insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`) values 
-(1,'David','Lynch','M','1.jpg'),
-(2,'Naomi','Watts','F','2.jpg'),
-(3,'Laura','Harring','F','3.jpg'),
-(4,'Justin','Theroux','M','4.jpg'),
-(5,'Patrick','Fischler','M','5.jpg'),
-(6,'Jeanne','Bates','F','6.jpg'),
-(7,'Karolina','Gruszka','F','7.jpg'),
-(8,'Krzysztof','Majchrzak','M','8.jpg'),
-(9,'Grace','Zabriskie','F','9.jpg'),
-(10,'Laura','Dern','F','10.jpg'),
-(11,'Harry Dean','Stanton','M','11.jpg'),
-(12,'Peter J.','Lucas','M','12.jpg'),
-(13,'Hailee','Steinfeld','F','13.jpg'),
-(14,'Pascal','Charrue','M','14.jpg'),
-(15,'Arnaud','Delord','M','15.jpg'),
-(16,'Mollie Bickley','St. John','F',NULL),
-(17,'Ash','Brannon','M','17.jpg'),
-(18,'David','Dunne','M',NULL),
-(19,'Christian','Linke','M','19.jpg'),
-(20,'Kevin','Alejandro','M','20.jpg'),
-(21,'Jason','Spisak','M','21.jpg'),
-(22,'Ella','Purnell','F','22.jpg'),
-(23,'Katie','Leung','F','23.jpg'),
-(24,'Harry','Lloyd','M','24.jpg'),
-(25,'Mick','Wingert','M','25.jpg'),
-(26,'Robert','Eggers','M','26.jpg'),
-(27,'Max','Eggers','M','27.jpg'),
-(28,'Robert','Pattinson','M','28.jpg'),
-(29,'Willem','Dafoe','M','29.jpg'),
-(30,'Valeriia','Karaman','F','30.jpg'),
-(31,'Jeffrey J.','Abrams','M','31.jpg'),
-(32,'Jeffrey','Lieber','M',NULL),
-(33,'Damon','Lindelof','M','33.jpg'),
-(34,'Carlton','Cuse','M',NULL),
-(35,'Jorge','Garcia','M','35.jpg'),
-(36,'Josh','Holloway','M','36.jpg'),
-(37,'Yunjin','Kim','F','37.jpg'),
-(38,'Evangeline','Lilly','F','38.jpg'),
-(39,'Terry','O\'Quinn','M','39.jpg'),
-(40,'Matthew','Fox','M','40.jpg'),
-(41,'Daniel','Dae Kim','M','41.jpg'),
-(42,'Naveen','Andrews','M','42.jpg'),
-(43,'Emilie','de Ravin','F','43.jpg'),
-(44,'Dominic','Monaghan','M',NULL),
-(45,'Michael','Emerson','M','45.jpg'),
-(46,'Trey','Parker','M','46.jpg'),
-(47,'Matt','Stone','M','47.jpg'),
-(48,'Brian','Graden','M','48.jpg'),
-(49,'Isaac','Hayes','M','49.jpg'),
-(50,'Mona','Marshall','F',NULL);
+insert  into `person`(`id`,`first_name`,`last_name`,`gender`,`profile_photo`,`created_at`,`updated_at`) values 
+(1,'David','Lynch','M','1.jpg','2024-01-01 14:49:36',NULL),
+(2,'Naomi','Watts','F','2.jpg','2024-01-01 14:49:37',NULL),
+(3,'Laura','Harring','F','3.jpg','2024-01-01 14:49:38',NULL),
+(4,'Justin','Theroux','M','4.jpg','2024-01-01 14:49:39',NULL),
+(5,'Patrick','Fischler','M','5.jpg','2024-01-01 14:49:40',NULL),
+(6,'Jeanne','Bates','F','6.jpg','2024-01-01 14:49:41',NULL),
+(7,'Karolina','Gruszka','F','7.jpg','2024-01-01 14:49:42',NULL),
+(8,'Krzysztof','Majchrzak','M','8.jpg','2024-01-01 14:49:43',NULL),
+(9,'Grace','Zabriskie','F','9.jpg','2024-01-01 14:49:44',NULL),
+(10,'Laura','Dern','F','10.jpg','2024-01-01 14:49:45',NULL),
+(11,'Harry Dean','Stanton','M','11.jpg','2024-01-01 14:49:46',NULL),
+(12,'Peter J.','Lucas','M','12.jpg','2024-01-01 14:49:47',NULL),
+(13,'Hailee','Steinfeld','F','13.jpg','2024-01-01 14:49:48',NULL),
+(14,'Pascal','Charrue','M','14.jpg','2024-01-01 14:49:49',NULL),
+(15,'Arnaud','Delord','M','15.jpg','2024-01-01 14:49:50',NULL),
+(16,'Mollie Bickley','St. John','F',NULL,'2024-01-01 14:49:51',NULL),
+(17,'Ash','Brannon','M','17.jpg','2024-01-01 14:49:52',NULL),
+(18,'David','Dunne','M',NULL,'2024-01-01 14:49:53',NULL),
+(19,'Christian','Linke','M','19.jpg','2024-01-01 14:49:54',NULL),
+(20,'Kevin','Alejandro','M','20.jpg','2024-01-01 14:49:55',NULL),
+(21,'Jason','Spisak','M','21.jpg','2024-01-01 14:49:56',NULL),
+(22,'Ella','Purnell','F','22.jpg','2024-01-01 14:49:57',NULL),
+(23,'Katie','Leung','F','23.jpg','2024-01-01 14:49:58',NULL),
+(24,'Harry','Lloyd','M','24.jpg','2024-01-01 14:49:59',NULL),
+(25,'Mick','Wingert','M','25.jpg','2024-01-01 14:50:01',NULL),
+(26,'Robert','Eggers','M','26.jpg','2024-01-01 14:50:02',NULL),
+(27,'Max','Eggers','M','27.jpg','2024-01-01 14:50:03',NULL),
+(28,'Robert','Pattinson','M','28.jpg','2024-01-01 14:50:04',NULL),
+(29,'Willem','Dafoe','M','29.jpg','2024-01-01 14:50:05',NULL),
+(30,'Valeriia','Karaman','F','30.jpg','2024-01-01 14:50:06',NULL),
+(31,'Jeffrey J.','Abrams','M','31.jpg','2024-01-01 14:50:07',NULL),
+(32,'Jeffrey','Lieber','M',NULL,'2024-01-01 14:50:08',NULL),
+(33,'Damon','Lindelof','M','33.jpg','2024-01-01 14:50:09',NULL),
+(34,'Carlton','Cuse','M',NULL,'2024-01-01 14:50:10',NULL),
+(35,'Jorge','Garcia','M','35.jpg','2024-01-01 14:50:11',NULL),
+(36,'Josh','Holloway','M','36.jpg','2024-01-01 14:50:12',NULL),
+(37,'Yunjin','Kim','F','37.jpg','2024-01-01 14:50:13',NULL),
+(38,'Evangeline','Lilly','F','38.jpg','2024-01-01 14:50:14',NULL),
+(39,'Terry','O\'Quinn','M','39.jpg','2024-01-01 14:50:15',NULL),
+(40,'Matthew','Fox','M','40.jpg','2024-01-01 14:50:16',NULL),
+(41,'Daniel','Dae Kim','M','41.jpg','2024-01-01 14:50:17',NULL),
+(42,'Naveen','Andrews','M','42.jpg','2024-01-01 14:50:18',NULL),
+(43,'Emilie','de Ravin','F','43.jpg','2024-01-01 14:50:19',NULL),
+(44,'Dominic','Monaghan','M',NULL,'2024-01-01 14:50:20',NULL),
+(45,'Michael','Emerson','M','45.jpg','2024-01-01 14:50:21',NULL),
+(46,'Trey','Parker','M','46.jpg','2024-01-01 14:50:22',NULL),
+(47,'Matt','Stone','M','47.jpg','2024-01-01 14:50:23',NULL),
+(48,'Brian','Graden','M','48.jpg','2024-01-01 14:50:24',NULL),
+(49,'Isaac','Hayes','M','49.jpg','2024-01-01 14:50:25',NULL),
+(50,'Mona','Marshall','F',NULL,'2024-01-01 14:50:26',NULL);
 
 /*Data for the table `director` */
 
@@ -474,7 +474,7 @@ insert  into `acting`(`id`,`media_id`,`actor_id`,`is_starring`) values
 
 /*Data for the table `acting_role` */
 
-insert  into `acting_role`(`acting_id`,`id`,`name`) values 
+insert  into `acting_role`(`acting_id`,`order_number`,`name`) values 
 (1,1,'Betty Elms'),
 (1,2,'Diane Selwyn'),
 (2,1,'Rita'),
@@ -622,23 +622,63 @@ insert  into `media_writers`(`media_id`,`writer_id`) values
 
 
 /*Data for the table `user` */
-insert  into `user`(`id`,`first_name`,`last_name`,`gender`,`profile_name`,`profile_image`,`username`,`email`,`password`,`role`,`created_at`,`updated_at`,`country_id`) values 
-(1,'Admin','Admin','O','Admin',NULL,'admin','admin@gmail.com','$2a$10$lLpAEM3iq6LLKhfBID8YhOcd8DCLj9HYO5VeMXcIFlM0C/myvjsnW','ADMINISTRATOR',STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-01-25 14:49:36', '%Y-%m-%d %H:%i:%s'),198),
-(2,'Regular','Regular','M','Regular','Regular.jpg','regular','regular@gmail.com','$2a$10$psEbqp2bRsmgxpVQ.Wj/hOH5Czj8ce9MQ05vz9BS21xJr0A4HEIRi','REGULAR',STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2024-02-28 14:49:36', '%Y-%m-%d %H:%i:%s'),15),
-(3,'Critic','Critic','F','Critic','Critic.jpg','critic','critic@gmail.com','$2a$10$BigpH6HHGlSn1//5rsIqhOCJOJ/TSHxtXQc7X43VJAStjayk9Hwh6','CRITIC',STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),STR_TO_DATE('2023-11-25 14:49:36', '%Y-%m-%d %H:%i:%s'),57);
+insert  into `user`(`id`,`first_name`,`last_name`,`gender`,`profile_name`,`profile_image`,`username`,`email`,`password`,`role`,`created_at`,`country_id`) values 
+(1,'Admin','Admin','O','Admin',NULL,'admin','admin@gmail.com','$2a$10$lLpAEM3iq6LLKhfBID8YhOcd8DCLj9HYO5VeMXcIFlM0C/myvjsnW','ADMINISTRATOR','2024-01-02 14:49:36',198),
+(2,'Regular','Regular','M','Regular','Regular.jpg','regular','regular@gmail.com','$2a$10$psEbqp2bRsmgxpVQ.Wj/hOH5Czj8ce9MQ05vz9BS21xJr0A4HEIRi','REGULAR','2024-02-05 14:49:36',15),
+(3,'Critic','Critic','F','Critic','Critic.jpg','critic','critic@gmail.com','$2a$10$BigpH6HHGlSn1//5rsIqhOCJOJ/TSHxtXQc7X43VJAStjayk9Hwh6','CRITIC','2023-11-25 14:49:36',57);
 
 /*Data for the table `user_media` */
 insert  into `user_media`(`user_id`,`media_id`) values
 (2,1),(2,2),(2,5),(1,1),(1,3),(1,4);
 
 /*Data for the table `critique` */
-insert into `critique`(`user_critic_id`,`media_id`,`description`,`rating`) values
-(3,1,'Very nice movie. Kind of unexpected end that left me confused. Overall very nice!',87),
-(3,2,'Very similar to other movies of David Lynch but i felt like it lasted way longer than it should have',70),
-(3,6,'Comedy gold and perhapts one of the best satirical shows',89),
-(1,1,'Very nice movie',95),
-(1,4,'Good and mysterious movie. Left me puzzled at the end',80),
-(1,5,'Starts off good, but falls of in the end',75);
+
+insert  into `critique`(`id`,`user_id`,`media_id`,`description`,`rating`,`created_at`) values 
+(1,3,1,'Very nice movie. Kind of unexpected end that left me confused. Overall very nice!',87,'2024-07-25 14:49:36'),
+(2,3,2,'Very similar to other movies of David Lynch but i felt like it lasted way longer than it should have',70,'2024-07-25 14:49:40'),
+(3,3,6,'Comedy gold and perhapts one of the best satirical shows',89,'2024-07-25 14:49:45'),
+(4,1,1,'Very nice movie',95,'2024-07-25 14:49:50'),
+(5,1,4,'Good and mysterious movie. Left me puzzled at the end',80,'2024-07-25 14:49:55'),
+(6,1,5,'Starts off good, but falls of in the end',75,'2024-07-25 14:49:59');
+
+
+/*Data for the table `critique_like_dislike` */
+
+insert  into `critique_like_dislike`(`user_id`,`critique_id`,`is_like`) values 
+(1,1,1),
+(1,2,1),
+(1,3,0),
+(1,4,1),
+(2,2,1),
+(2,3,1),
+(2,4,0),
+(2,6,0);
+
+
+/*Data for the table `comment` */
+
+insert  into `comment`(`id`,`user_id`,`critique_id`,`content`,`created_at`) values 
+(6,2,1,'I believe the ending and the story were self-explanatory','2024-08-01 17:25:02'),
+(7,2,2,'Agree, but the ending was very creepy','2024-08-01 17:25:48'),
+(8,2,6,'What happens in the end?','2024-08-02 17:26:20'),
+(9,2,4,'You could have wrote more','2024-08-01 17:27:14'),
+(10,1,3,'They fell off in recent seasons','2024-08-03 17:37:39'),
+(11,1,5,'This critique is amazing!','2024-08-03 17:38:12'),
+(12,1,2,'It\'s kinda long','2024-08-03 17:38:44'),
+(13,1,1,'Agree. One of Lynch best works','2024-08-04 17:39:10');
+
+/*Data for the table `comment_like_dislike` */
+
+insert  into `comment_like_dislike`(`user_id`,`comment_id`,`is_like`) values 
+(1,6,1),
+(1,7,1),
+(1,9,1),
+(1,11,0),
+(1,13,1),
+(2,9,1),
+(2,10,0),
+(2,11,0),
+(2,13,0);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

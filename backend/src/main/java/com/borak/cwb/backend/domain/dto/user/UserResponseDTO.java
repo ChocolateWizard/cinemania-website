@@ -23,9 +23,14 @@ import java.util.List;
     "gender",
     "profileName",
     "profileImageUrl",
+    "role",
     "country",
-    "medias",
-    "critiques"})
+    "library",
+    "critiques",
+    "comments",
+    "critiquesLikeDislikes",
+    "commentsLikeDislikes"
+})
 public class UserResponseDTO implements DTO {
 
     @JsonProperty(value = "first_name")
@@ -44,16 +49,23 @@ public class UserResponseDTO implements DTO {
 
     private UserRole role;
 
-    private Country country;
+    private UserCountryResponseDTO country;
 
-    private List<MediaResponseDTO> medias = new ArrayList<>();
+    private UserLibraryResponseDTO library;
 
-    private List<Critique> critiques = new ArrayList<>();
+    private List<Long> critiques = new ArrayList<>();
+    private List<Long> comments = new ArrayList<>();
+
+    @JsonProperty(value = "critique_like_dislikes")
+    private List<UserCritiqueLikeDislikesDTO> critiquesLikeDislikes = new ArrayList<>();
+
+    @JsonProperty(value = "comment_like_dislikes")
+    private List<UserCommentLikeDislikesDTO> commentsLikeDislikes = new ArrayList<>();
 
     public UserResponseDTO() {
     }
 
-    public UserResponseDTO(String firstName, String lastName, Gender gender, String profileName, String profileImageUrl, UserRole role, Country country) {
+    public UserResponseDTO(String firstName, String lastName, Gender gender, String profileName, String profileImageUrl, UserRole role, UserCountryResponseDTO country, UserLibraryResponseDTO library) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -61,111 +73,7 @@ public class UserResponseDTO implements DTO {
         this.profileImageUrl = profileImageUrl;
         this.role = role;
         this.country = country;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
-    }
-
-    public static class Country {
-
-        private Long id;
-
-        private String name;
-
-        private String officialStateName;
-
-        private String code;
-
-        public Country() {
-        }
-
-        public Country(Long id, String name, String officialStateName, String code) {
-            this.id = id;
-            this.name = name;
-            this.officialStateName = officialStateName;
-            this.code = code;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getOfficialStateName() {
-            return officialStateName;
-        }
-
-        public void setOfficialStateName(String officialStateName) {
-            this.officialStateName = officialStateName;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-    }
-
-    public static class Critique {
-
-        private MediaResponseDTO media;
-
-        private String description;
-
-        private Integer rating;
-
-        public Critique() {
-        }
-
-        public Critique(MediaResponseDTO media, String description, Integer rating) {
-            this.media = media;
-            this.description = description;
-            this.rating = rating;
-        }
-
-        public MediaResponseDTO getMedia() {
-            return media;
-        }
-
-        public void setMedia(MediaResponseDTO media) {
-            this.media = media;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public Integer getRating() {
-            return rating;
-        }
-
-        public void setRating(Integer rating) {
-            this.rating = rating;
-        }
-
+        this.library = library;
     }
 
     public String getFirstName() {
@@ -208,36 +116,60 @@ public class UserResponseDTO implements DTO {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public Country getCountry() {
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public UserCountryResponseDTO getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(UserCountryResponseDTO country) {
         this.country = country;
     }
 
-    public List<MediaResponseDTO> getMedias() {
-        return medias;
+    public UserLibraryResponseDTO getLibrary() {
+        return library;
     }
 
-    public void setMedias(List<MediaResponseDTO> medias) {
-        if (medias == null) {
-            this.medias = new ArrayList<>();
-        } else {
-            this.medias = medias;
-        }
+    public void setLibrary(UserLibraryResponseDTO library) {
+        this.library = library;
     }
 
-    public List<Critique> getCritiques() {
+    public List<Long> getCritiques() {
         return critiques;
     }
 
-    public void setCritiques(List<Critique> critiques) {
-        if (critiques == null) {
-            this.critiques = new ArrayList<>();
-        } else {
-            this.critiques = critiques;
-        }
+    public void setCritiques(List<Long> critiques) {
+        this.critiques = critiques;
+    }
+
+    public List<Long> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Long> comments) {
+        this.comments = comments;
+    }
+
+    public List<UserCritiqueLikeDislikesDTO> getCritiquesLikeDislikes() {
+        return critiquesLikeDislikes;
+    }
+
+    public void setCritiquesLikeDislikes(List<UserCritiqueLikeDislikesDTO> critiquesLikeDislikes) {
+        this.critiquesLikeDislikes = critiquesLikeDislikes;
+    }
+
+    public List<UserCommentLikeDislikesDTO> getCommentsLikeDislikes() {
+        return commentsLikeDislikes;
+    }
+
+    public void setCommentsLikeDislikes(List<UserCommentLikeDislikesDTO> commentsLikeDislikes) {
+        this.commentsLikeDislikes = commentsLikeDislikes;
     }
 
 }

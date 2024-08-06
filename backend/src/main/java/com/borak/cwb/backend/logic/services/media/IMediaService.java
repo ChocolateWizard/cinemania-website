@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
  */
 public interface IMediaService {
 
-    public ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title,
+    ResponseEntity getAllMediasByTitleWithGenresPaginated(int page, int size, String title,
             List<Long> genreIds,
             SortOption sortByAudienceRating, SortOption sortByReleaseDate, Integer releaseYear, MediaType mediaType);
 

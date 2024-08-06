@@ -5,6 +5,8 @@
 package com.borak.cwb.backend.helpers.repositories;
 
 import com.borak.cwb.backend.domain.jpa.ActingJPA;
+import com.borak.cwb.backend.domain.jpa.CommentJPA;
+import com.borak.cwb.backend.domain.jpa.CritiqueJPA;
 import com.borak.cwb.backend.domain.jpa.TVShowJPA;
 import com.borak.cwb.backend.repository.jpa.TVShowRepositoryJPA;
 import java.util.List;
@@ -39,7 +41,12 @@ public class TVShowTestRepository {
             show.get().getGenres().size();
             show.get().getDirectors().size();
             show.get().getWriters().size();
-            show.get().getCritiques().size();
+            for (CritiqueJPA critique : show.get().getCritiques()) {
+                critique.getLikeDislikes().size();
+                for (CommentJPA comment : critique.getComments()) {
+                    comment.getLikeDislikes().size();
+                }
+            }
             show.get().getActings().size();
             for (ActingJPA acting : show.get().getActings()) {
                 acting.getRoles().size();
@@ -47,7 +54,7 @@ public class TVShowTestRepository {
         }
         return show;
     }
-    
+
     public List<TVShowJPA> findAll() {
         List<TVShowJPA> shows = repo.findAll();
         //initialize lazy attributes
@@ -55,7 +62,12 @@ public class TVShowTestRepository {
             show.getGenres().size();
             show.getDirectors().size();
             show.getWriters().size();
-            show.getCritiques().size();
+            for (CritiqueJPA critique : show.getCritiques()) {
+                critique.getLikeDislikes().size();
+                for (CommentJPA comment : critique.getComments()) {
+                    comment.getLikeDislikes().size();
+                }
+            }
             show.getActings().size();
             for (ActingJPA acting : show.getActings()) {
                 acting.getRoles().size();

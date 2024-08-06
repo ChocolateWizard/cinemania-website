@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 //@Service
 //@Transactional
-public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO, Long> {
+public class CritiqueServiceJDBC  {
 
     @Autowired
     private ICritiqueRepository<CritiqueJDBC, Long> critiqueRepo;
@@ -36,7 +36,7 @@ public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO,
     @Autowired
     private CritiqueTransformer critiqueTransformer;
 
-    @Override
+
     public ResponseEntity postCritique(CritiqueRequestDTO critiqueRequest) {
         if (!mediaRepo.existsById(critiqueRequest.getMediaId())) {
             throw new ResourceNotFoundException("Media with id: " + critiqueRequest.getMediaId() + " does not exist in database!");
@@ -50,7 +50,7 @@ public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO,
         return new ResponseEntity(HttpStatus.RESET_CONTENT);
     }
 
-    @Override
+
     public ResponseEntity putCritique(CritiqueRequestDTO critiqueRequest) {
         if (!mediaRepo.existsById(critiqueRequest.getMediaId())) {
             throw new ResourceNotFoundException("Media with id: " + critiqueRequest.getMediaId() + " does not exist in database!");
@@ -64,7 +64,7 @@ public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO,
         return new ResponseEntity(HttpStatus.RESET_CONTENT);
     }
 
-    @Override
+
     public ResponseEntity deleteCritique(Long id) {
         if (!mediaRepo.existsById(id)) {
             throw new ResourceNotFoundException("Media with id: " + id + " does not exist in database!");
@@ -76,6 +76,36 @@ public class CritiqueServiceJDBC implements ICritiqueService<CritiqueRequestDTO,
         }
         critiqueRepo.delete(critique);
         return new ResponseEntity(HttpStatus.RESET_CONTENT);
+    }
+
+
+    public ResponseEntity postCritiqueLike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public ResponseEntity postCritiqueDislike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public ResponseEntity putCritiqueLike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public ResponseEntity putCritiqueDislike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public ResponseEntity deleteCritiqueLike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+
+    public ResponseEntity deleteCritiqueDislike(Long critiqueId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

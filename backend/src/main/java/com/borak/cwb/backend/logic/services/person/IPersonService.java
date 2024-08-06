@@ -10,21 +10,22 @@ import org.springframework.http.ResponseEntity;
 /**
  *
  * @author Mr. Poyo
+ * @param <D> person request object
  */
 public interface IPersonService<D extends DTO> {
 
     public ResponseEntity getAllPersonsPaginated(int page, int size);
 
-    public ResponseEntity deletePersonById(long id);
+    public ResponseEntity getAllPersonsWithDetailsPaginated(int page, int size);
+
+    public ResponseEntity getPersonWithProfessions(long id);
+
+    public ResponseEntity getPersonWithDetails(long id);
 
     public ResponseEntity postPerson(D person);
 
     public ResponseEntity putPerson(D person);
 
-    public ResponseEntity getAllPersonsWithDetailsPaginated(int page, int size);
-
-    public ResponseEntity getPersonWithProfessions(Long id);
-
-    public ResponseEntity getPersonWithDetails(Long id);
+    public ResponseEntity deletePersonById(long id);
 
 }

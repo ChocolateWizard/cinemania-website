@@ -10,6 +10,7 @@ import com.borak.cwb.backend.logic.services.person.IPersonService;
 import com.borak.cwb.backend.logic.services.validation.DomainValidationService;
 import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,26 +37,36 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class PersonController {
 
-    @Autowired
-    private IPersonService personService;
+    private final IPersonService personService;
+    private final DomainValidationService domainValidator;
 
     @Autowired
-    private DomainValidationService domainValidator;
+    public PersonController(IPersonService personService, DomainValidationService domainValidator) {
+        this.personService = personService;
+        this.domainValidator = domainValidator;
+    }
 
-    //=========================GET MAPPINGS==================================  
+//=================================================================================================================================
+//GET
     @GetMapping
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getPersons(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return personService.getAllPersonsPaginated(page, size);
     }
 
     @GetMapping(path = "/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity getPersonsDetails(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return personService.getAllPersonsWithDetailsPaginated(page, size);
     }
 
@@ -71,10 +82,13 @@ public class PersonController {
         return personService.getPersonWithDetails(id);
     }
 
-    //=========================POST MAPPINGS==================================
+//=================================================================================================================================
+//POST
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity postPerson(@RequestPart("person") PersonRequestDTO person, @RequestPart(name = "profile_photo", required = false) MultipartFile profilePhoto) {
+    public ResponseEntity postPerson(
+            @RequestPart("person") PersonRequestDTO person,
+            @RequestPart(name = "profile_photo", required = false) MultipartFile profilePhoto) {
         domainValidator.validate(person, profilePhoto, RequestMethod.POST);
         if (profilePhoto != null) {
             person.setProfilePhoto(new MyImage(profilePhoto));
@@ -82,10 +96,15 @@ public class PersonController {
         return personService.postPerson(person);
     }
 
-    //=========================PUT MAPPINGS===================================
+//=================================================================================================================================
+//PUT
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity putPerson(@PathVariable @Min(value = 1, message = "Person id must be greater than or equal to 1") long id, @RequestPart("person") PersonRequestDTO person, @RequestPart(name = "profile_photo", required = false) MultipartFile profilePhoto) {
+    public ResponseEntity putPerson(
+            @PathVariable
+            @Min(value = 1, message = "Person id must be greater than or equal to 1") long id,
+            @RequestPart("person") PersonRequestDTO person,
+            @RequestPart(name = "profile_photo", required = false) MultipartFile profilePhoto) {
         person.setId(id);
         domainValidator.validate(person, profilePhoto, RequestMethod.PUT);
         if (profilePhoto != null) {
@@ -94,10 +113,13 @@ public class PersonController {
         return personService.putPerson(person);
     }
 
-    //=========================DELETE MAPPINGS================================
+//=================================================================================================================================
+//DELETE
     @DeleteMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity deletePersonById(@PathVariable @Min(value = 1, message = "Person id must be greater than or equal to 1") long id) {
+    public ResponseEntity deletePersonById(
+            @PathVariable
+            @Min(value = 1, message = "Person id must be greater than or equal to 1") long id) {
         return personService.deletePersonById(id);
     }
 

@@ -50,6 +50,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import org.junit.jupiter.api.Disabled;
 
 /**
  *
@@ -2297,9 +2298,9 @@ public class PersonSecuredRoutesTest {
 
     private void checkValues(PersonJPA actual, PersonJPA expected) {
         checkPersonInfo(actual, expected);
-        checkDirector(actual.getDirectorInfo(), expected.getDirectorInfo());
-        checkWriter(actual.getWriterInfo(), expected.getWriterInfo());
-        checkActor(actual.getActorInfo(), expected.getActorInfo());
+        checkDirector(actual.getDirector(), expected.getDirector());
+        checkWriter(actual.getWriter(), expected.getWriter());
+        checkActor(actual.getActor(), expected.getActor());
     }
 
     private void checkPersonInfo(PersonJPA actual, PersonJPA expected) {
@@ -2310,6 +2311,8 @@ public class PersonSecuredRoutesTest {
         assertThat(actual.getLastName()).isNotNull().isEqualTo(expected.getLastName());
         assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
         assertThat(actual.getProfilePhoto()).isEqualTo(expected.getProfilePhoto());
+        assertThat(actual.getCreatedAt()).isEqualTo(expected.getCreatedAt());
+        assertThat(actual.getUpdatedAt()).isEqualTo(expected.getUpdatedAt());
     }
 
     private void checkDirector(DirectorJPA actual, DirectorJPA expected) {
@@ -2333,7 +2336,7 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getMedias().get(i).getReleaseDate()).isEqualTo(expected.getMedias().get(i).getReleaseDate());
                 assertThat(actual.getMedias().get(i).getCoverImage()).isEqualTo(expected.getMedias().get(i).getCoverImage());
                 assertThat(actual.getMedias().get(i).getAudienceRating()).isEqualTo(expected.getMedias().get(i).getAudienceRating());
-                assertThat(actual.getMedias().get(i).getCriticRating()).isEqualTo(expected.getMedias().get(i).getCriticRating());
+                assertThat(actual.getMedias().get(i).getCriticsRating()).isEqualTo(expected.getMedias().get(i).getCriticsRating());
 
             }
         }
@@ -2360,7 +2363,7 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getMedias().get(i).getReleaseDate()).isEqualTo(expected.getMedias().get(i).getReleaseDate());
                 assertThat(actual.getMedias().get(i).getCoverImage()).isEqualTo(expected.getMedias().get(i).getCoverImage());
                 assertThat(actual.getMedias().get(i).getAudienceRating()).isEqualTo(expected.getMedias().get(i).getAudienceRating());
-                assertThat(actual.getMedias().get(i).getCriticRating()).isEqualTo(expected.getMedias().get(i).getCriticRating());
+                assertThat(actual.getMedias().get(i).getCriticsRating()).isEqualTo(expected.getMedias().get(i).getCriticsRating());
 
             }
 
@@ -2389,7 +2392,7 @@ public class PersonSecuredRoutesTest {
                 assertThat(actual.getActings().get(i).getMedia().getReleaseDate()).isEqualTo(expected.getActings().get(i).getMedia().getReleaseDate());
                 assertThat(actual.getActings().get(i).getMedia().getCoverImage()).isEqualTo(expected.getActings().get(i).getMedia().getCoverImage());
                 assertThat(actual.getActings().get(i).getMedia().getAudienceRating()).isEqualTo(expected.getActings().get(i).getMedia().getAudienceRating());
-                assertThat(actual.getActings().get(i).getMedia().getCriticRating()).isEqualTo(expected.getActings().get(i).getMedia().getCriticRating());
+                assertThat(actual.getActings().get(i).getMedia().getCriticsRating()).isEqualTo(expected.getActings().get(i).getMedia().getCriticsRating());
 
                 assertThat(actual.getActings().get(i).getActor()).isNotNull();
                 assertThat(actual.getActings().get(i).getActor() == actual).isTrue();
@@ -2400,7 +2403,7 @@ public class PersonSecuredRoutesTest {
                 for (int j = 0; j < actual.getActings().get(i).getRoles().size(); j++) {
                     assertThat(actual.getActings().get(i).getRoles().get(j)).isNotNull();
                     assertThat(actual.getActings().get(i).getRoles().get(j).getId().getActing() == actual.getActings().get(i)).isTrue();
-                    assertThat(actual.getActings().get(i).getRoles().get(j).getId().getId()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getId().getId());
+                    assertThat(actual.getActings().get(i).getRoles().get(j).getId().getOrderNumber()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getId().getOrderNumber());
                     assertThat(actual.getActings().get(i).getRoles().get(j).getName()).isNotNull().isEqualTo(expected.getActings().get(i).getRoles().get(j).getName());
                 }
             }
@@ -2490,64 +2493,64 @@ public class PersonSecuredRoutesTest {
             assertThat(config.getPersonImagesBaseUrl() + actual.getProfilePhoto()).isEqualTo(expected.getProfilePhotoUrl());
         }
         int numberOfProfessions = 0;
-        if (actual.getDirectorInfo() != null) {
+        if (actual.getDirector() != null) {
             numberOfProfessions++;
         }
-        if (actual.getWriterInfo() != null) {
+        if (actual.getWriter() != null) {
             numberOfProfessions++;
         }
-        if (actual.getActorInfo() != null) {
+        if (actual.getActor() != null) {
             numberOfProfessions++;
         }
         assertThat(expected.getProfessions()).isNotNull();
         assertThat(numberOfProfessions).isEqualTo(expected.getProfessions().size());
         for (int i = 0; i < expected.getProfessions().size(); i++) {
             if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Director) {
-                assertThat(actual.getDirectorInfo()).isNotNull();
-                assertThat(actual.getDirectorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
-                assertThat(actual.getDirectorInfo().getMedias()).isNotNull();
+                assertThat(actual.getDirector()).isNotNull();
+                assertThat(actual.getDirector().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getDirector().getMedias()).isNotNull();
                 assertThat(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getDirectorInfo().getMedias().size()).isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getDirectorInfo().getMedias().size(); j++) {
-                    assertThat(actual.getDirectorInfo().getMedias().get(j)).isNotNull();
+                assertThat(actual.getDirector().getMedias().size()).isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getDirector().getMedias().size(); j++) {
+                    assertThat(actual.getDirector().getMedias().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getDirectorInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getDirector().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Writer) {
-                assertThat(actual.getWriterInfo()).isNotNull();
-                assertThat(actual.getWriterInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
-                assertThat(actual.getWriterInfo().getMedias()).isNotNull();
+                assertThat(actual.getWriter()).isNotNull();
+                assertThat(actual.getWriter().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getWriter().getMedias()).isNotNull();
                 assertThat(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getWriterInfo().getMedias().size()).isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getWriterInfo().getMedias().size(); j++) {
-                    assertThat(actual.getWriterInfo().getMedias().get(j)).isNotNull();
+                assertThat(actual.getWriter().getMedias().size()).isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getWriter().getMedias().size(); j++) {
+                    assertThat(actual.getWriter().getMedias().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getWriterInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getWriter().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonResponseDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonResponseDTO.Actor) {
-                assertThat(actual.getActorInfo()).isNotNull();
-                assertThat(actual.getActorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getActor()).isNotNull();
+                assertThat(actual.getActor().getPersonId()).isNotNull().isEqualTo(actual.getId());
                 assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar()).isNotNull();
-                assertThat(actual.getActorInfo().getStar()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar());
-                assertThat(actual.getActorInfo().getActings()).isNotNull();
+                assertThat(actual.getActor().getStar()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).isStar());
+                assertThat(actual.getActor().getActings()).isNotNull();
                 assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getActorInfo().getActings().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getActorInfo().getActings().size(); j++) {
-                    assertThat(actual.getActorInfo().getActings().get(j)).isNotNull();
+                assertThat(actual.getActor().getActings().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getActor().getActings().size(); j++) {
+                    assertThat(actual.getActor().getActings().get(j)).isNotNull();
                     assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getMedia()).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
-                    assertThat(actual.getActorInfo().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
-                    assertThat(actual.getActorInfo().getActings().get(j).getRoles()).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getMedia()).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
+                    assertThat(actual.getActor().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
+                    assertThat(actual.getActor().getActings().get(j).getRoles()).isNotNull();
                     assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles()).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getRoles().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
-                    for (int k = 0; k < actual.getActorInfo().getActings().get(j).getRoles().size(); k++) {
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k)).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getRoles().size()).isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
+                    for (int k = 0; k < actual.getActor().getActings().get(j).getRoles().size(); k++) {
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k)).isNotNull();
                         assertThat(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k)).isNotNull();
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getId().getId()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getId());
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getName());
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getId().getOrderNumber()).isNotNull().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getId());
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonResponseDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k).getName());
                     }
                 }
             } else {
@@ -2566,13 +2569,13 @@ public class PersonSecuredRoutesTest {
         assertThat(actual.getLastName()).isNotBlank().isEqualTo(expected.getLastName());
         assertThat(actual.getGender()).isNotNull().isEqualTo(expected.getGender());
         int numberOfProfessions = 0;
-        if (actual.getDirectorInfo() != null) {
+        if (actual.getDirector() != null) {
             numberOfProfessions++;
         }
-        if (actual.getWriterInfo() != null) {
+        if (actual.getWriter() != null) {
             numberOfProfessions++;
         }
-        if (actual.getActorInfo() != null) {
+        if (actual.getActor() != null) {
             numberOfProfessions++;
         }
         assertThat(expected.getProfessions()).isNotNull();
@@ -2580,53 +2583,53 @@ public class PersonSecuredRoutesTest {
         for (int i = 0; i < expected.getProfessions().size(); i++) {
             if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Director) {
                 assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("director");
-                assertThat(actual.getDirectorInfo()).isNotNull();
-                assertThat(actual.getDirectorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
-                assertThat(actual.getDirectorInfo().getMedias()).isNotNull();
+                assertThat(actual.getDirector()).isNotNull();
+                assertThat(actual.getDirector().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getDirector().getMedias()).isNotNull();
                 assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getDirectorInfo().getMedias().size()).isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getDirectorInfo().getMedias().size(); j++) {
-                    assertThat(actual.getDirectorInfo().getMedias().get(j)).isNotNull();
+                assertThat(actual.getDirector().getMedias().size()).isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getDirector().getMedias().size(); j++) {
+                    assertThat(actual.getDirector().getMedias().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getDirectorInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getDirector().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Director) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Writer) {
                 assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("writer");
-                assertThat(actual.getWriterInfo()).isNotNull();
-                assertThat(actual.getWriterInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
-                assertThat(actual.getWriterInfo().getMedias()).isNotNull();
+                assertThat(actual.getWriter()).isNotNull();
+                assertThat(actual.getWriter().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getWriter().getMedias()).isNotNull();
                 assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getWriterInfo().getMedias().size()).isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getWriterInfo().getMedias().size(); j++) {
-                    assertThat(actual.getWriterInfo().getMedias().get(j)).isNotNull();
+                assertThat(actual.getWriter().getMedias().size()).isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getWriter().getMedias().size(); j++) {
+                    assertThat(actual.getWriter().getMedias().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getWriterInfo().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
+                    assertThat(actual.getWriter().getMedias().get(j).getId()).isNotNull().isEqualTo(((PersonRequestDTO.Writer) expected.getProfessions().get(i)).getWorkedOn().get(j));
                 }
 
             } else if (expected.getProfessions().get(i) instanceof PersonRequestDTO.Actor) {
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getName()).isNotBlank().isEqualTo("actor");
-                assertThat(actual.getActorInfo()).isNotNull();
-                assertThat(actual.getActorInfo().getPersonId()).isNotNull().isEqualTo(actual.getId());
+                assertThat(actual.getActor()).isNotNull();
+                assertThat(actual.getActor().getPersonId()).isNotNull().isEqualTo(actual.getId());
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar()).isNotNull();
-                assertThat(actual.getActorInfo().getStar()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar());
-                assertThat(actual.getActorInfo().getActings()).isNotNull();
+                assertThat(actual.getActor().getStar()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).isStar());
+                assertThat(actual.getActor().getActings()).isNotNull();
                 assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn()).isNotNull();
-                assertThat(actual.getActorInfo().getActings().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
-                for (int j = 0; j < actual.getActorInfo().getActings().size(); j++) {
-                    assertThat(actual.getActorInfo().getActings().get(j)).isNotNull();
+                assertThat(actual.getActor().getActings().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().size());
+                for (int j = 0; j < actual.getActor().getActings().size(); j++) {
+                    assertThat(actual.getActor().getActings().get(j)).isNotNull();
                     assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j)).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getMedia()).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
-                    assertThat(actual.getActorInfo().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
-                    assertThat(actual.getActorInfo().getActings().get(j).getRoles()).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getMedia()).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getMedia().getId()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getMediaId());
+                    assertThat(actual.getActor().getActings().get(j).getStarring()).isNotNull().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).isStarring());
+                    assertThat(actual.getActor().getActings().get(j).getRoles()).isNotNull();
                     assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles()).isNotNull();
-                    assertThat(actual.getActorInfo().getActings().get(j).getRoles().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
-                    for (int k = 0; k < actual.getActorInfo().getActings().get(j).getRoles().size(); k++) {
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k)).isNotNull();
+                    assertThat(actual.getActor().getActings().get(j).getRoles().size()).isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().size());
+                    for (int k = 0; k < actual.getActor().getActings().get(j).getRoles().size(); k++) {
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k)).isNotNull();
                         assertThat(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k)).isNotNull();
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getId().getId()).isNotNull().isEqualTo(k + 1);
-                        assertThat(actual.getActorInfo().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k));
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getId().getOrderNumber()).isNotNull().isEqualTo(k + 1);
+                        assertThat(actual.getActor().getActings().get(j).getRoles().get(k).getName()).isNotBlank().isEqualTo(((PersonRequestDTO.Actor) expected.getProfessions().get(i)).getWorkedOn().get(j).getRoles().get(k));
                     }
                 }
             } else {

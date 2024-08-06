@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -154,7 +155,7 @@ public class PersonRoutesTest {
         i = 0;
         for (String req : getPersonDetailsRequestValidResponse404()) {
             response = restTemplate.getForEntity(ROUTE + req, String.class);
-            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.NOT_FOUND);           
+            assertThat(response.getStatusCode()).as("Value i=%d, and url=%s", i, req).isEqualTo(HttpStatus.NOT_FOUND);
         }
         i = 0;
         for (Pair<Integer, String> reqres : getPersonDetailsRequestValidResponseNonEmpty200()) {
@@ -175,7 +176,10 @@ public class PersonRoutesTest {
             "?page=0&size=1",
             "?page=-1&size=1",
             "?page=1&size=0",
-            "?page=1&size=-1"
+            "?page=1&size=-1",
+            "?page=1&size=101",
+            "?page=1&size=102",
+            "?page=1&size=201"
         };
     }
 
@@ -208,7 +212,10 @@ public class PersonRoutesTest {
             "/details?page=0&size=1",
             "/details?page=-1&size=1",
             "/details?page=1&size=0",
-            "/details?page=1&size=-1"
+            "/details?page=1&size=-1",
+            "/details?page=1&size=101",
+            "/details?page=1&size=102",
+            "/details?page=1&size=201"
         };
     }
 

@@ -10,6 +10,7 @@ import com.borak.cwb.backend.logic.services.tv.ITVShowService;
 import com.borak.cwb.backend.logic.services.validation.DomainValidationService;
 import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -36,42 +37,58 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class TVShowController {
 
-    @Autowired
-    private ITVShowService tvShowService;
+    private final ITVShowService tvShowService;
+    private final DomainValidationService domainValidator;
 
     @Autowired
-    private DomainValidationService domainValidator;
+    public TVShowController(ITVShowService tvShowService, DomainValidationService domainValidator) {
+        this.tvShowService = tvShowService;
+        this.domainValidator = domainValidator;
+    }
 
-    //=========================GET MAPPINGS==================================  
+//=================================================================================================================================
+//GET
     @GetMapping
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getTVShows(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return tvShowService.getAllTVShowsWithGenresPaginated(page, size);
     }
 
     @GetMapping(path = "/popular")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getTVShowsPopular(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return tvShowService.getAllTVShowsWithGenresPopularPaginated(page, size);
     }
 
     @GetMapping(path = "/current")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity getTVShowsCurrent(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return tvShowService.getAllTVShowsWithGenresCurrentPaginated(page, size);
     }
 
     @GetMapping(path = "/details")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity getTVShowsDetails(
-            @RequestParam(name = "page", defaultValue = "1", required = false) @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
-            @RequestParam(name = "size", defaultValue = "10", required = false) @Min(value = 1, message = "Size number has to be greater than or equal to 1") int size) {
+            @RequestParam(name = "page", defaultValue = "1", required = false)
+            @Min(value = 1, message = "Page number has to be greater than or equal to 1") int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false)
+            @Min(value = 1, message = "Size number has to be greater than or equal to 1")
+            @Max(value = 100, message = "Size number has to be less than or equal to 100") int size) {
         return tvShowService.getAllTVShowsWithDetailsPaginated(page, size);
     }
 
@@ -87,29 +104,8 @@ public class TVShowController {
         return tvShowService.getTVShowWithDetails(id);
     }
 
-    @GetMapping(path = "/{id}/directors")
-    public ResponseEntity getTVShowByIdDirectors(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
-        return tvShowService.getTVShowDirectors(id);
-    }
-
-    @GetMapping(path = "/{id}/writers")
-    public ResponseEntity getTVShowByIdWriters(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
-        return tvShowService.getTVShowWriters(id);
-    }
-
-    @GetMapping(path = "/{id}/actors")
-    @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity getTVShowByIdActors(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
-        return tvShowService.getTVShowActors(id);
-    }
-
-    @GetMapping(path = "/{id}/actors/roles")
-    @JsonView(JsonVisibilityViews.Heavy.class)
-    public ResponseEntity getTVShowByIdActorsWithRoles(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
-        return tvShowService.getTVShowActorsWithRoles(id);
-    }
-
-    //=========================POST MAPPINGS==================================
+//=================================================================================================================================
+//POST
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity postTVShow(@RequestPart("tv_show") TVShowRequestDTO tvShow, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
@@ -120,7 +116,8 @@ public class TVShowController {
         return tvShowService.postTVShow(tvShow);
     }
 
-    //=========================PUT MAPPINGS===================================
+//=================================================================================================================================
+//PUT
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity putTVShow(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id, @RequestPart("tv_show") TVShowRequestDTO tvShow, @RequestPart(name = "cover_image", required = false) MultipartFile coverImage) {
@@ -132,7 +129,8 @@ public class TVShowController {
         return tvShowService.putTVShow(tvShow);
     }
 
-    //=========================DELETE MAPPINGS================================
+//=================================================================================================================================
+//DELETE
     @DeleteMapping(path = "/{id}")
     @JsonView(JsonVisibilityViews.Heavy.class)
     public ResponseEntity deleteTVShowById(@PathVariable @Min(value = 1, message = "TV show id must be greater than or equal to 1") long id) {
