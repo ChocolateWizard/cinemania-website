@@ -1,107 +1,101 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { fetchCurrentShows, fetchPopularShows } from "../../../utils/Api";
+import { fetchShowsForShowsPage } from "../../../utils/Api";
 
 import CardLoader from "../../helpers/loaders/cardLoader/CardLoader";
 import CardCarousel from "../../cards/carousel/CardCarousel";
 import MediaCard from "../../cards/MediaCard";
 
+const carouselData = [
+  {
+    id: 1,
+    label: "Action & Adventure",
+    fetchURL:
+      "/api/medias/search?page=1&size=10&genreIds=2" +
+      "&sortByReleaseDate=desc&mediaType=tv_show",
+  },
+  {
+    id: 2,
+    label: "Animation",
+    fetchURL:
+      "/api/medias/search?page=1&size=10&genreIds=4" +
+      "&sortByReleaseDate=desc&mediaType=tv_show",
+  },
+  {
+    id: 3,
+    label: "Comedy",
+    fetchURL:
+      "/api/medias/search?page=1&size=10&genreIds=5,8" +
+      "&sortByReleaseDate=desc&mediaType=tv_show",
+  },
+  {
+    id: 4,
+    label: "Kids",
+    fetchURL:
+      "/api/medias/search?page=1&size=10&genreIds=13" +
+      "&sortByReleaseDate=desc&mediaType=tv_show",
+  },
+];
+
 export default function ShowsPage() {
-  const [currentShows, setCurrentShows] = useState([]);
-  const [popularShows, setPopularShows] = useState([]);
-  const [loadingCurrentShows, setLoadingCurrentShows] = useState(true);
-  const [loadingPopularShows, setLoadingPopularShows] = useState(true);
-  const [errorCurrentShows, setErrorCurrentShows] = useState(null);
-  const [errorPopularShows, setErrorPopularShows] = useState(null);
+  return (
+    <div className="container mx-auto px-4 pt-16 pb-24 space-y-24">
+      {carouselData.map((data) => {
+        return (
+          <ShowsOfGenre key={data.id} label={data.label} url={data.fetchURL} />
+        );
+      })}
+    </div>
+  );
+}
+
+function ShowsOfGenre({ label, url }) {
+  const [shows, setShows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoadingCurrentShows(true);
-    setLoadingPopularShows(true);
-
-    fetchCurrentShows(1, 10)
+    fetchShowsForShowsPage(url)
       .then((response) => {
-        if (response.status == 200) {
-          response.data.map((show) => {
-            show.media_type = "tv_show";
-          });
-          setCurrentShows(response.data);
+        if (response.data.length == 0) {
+          setError("No shows found");
         } else {
-          console.log(response.data);
-          setErrorCurrentShows(response.data);
+          setShows(response.data);
         }
       })
       .catch((err) => {
         console.error(err);
-        setErrorCurrentShows(err);
+        setError("Could not load shows");
       })
       .finally(() => {
-        setLoadingCurrentShows(false);
-      });
-
-    fetchPopularShows(1, 10)
-      .then((response) => {
-        if (response.status == 200) {
-          response.data.map((show) => {
-            show.media_type = "tv_show";
-          });
-          setPopularShows(response.data);
-        } else {
-          console.error(response.data);
-          setErrorPopularShows(response.data);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setErrorPopularShows(err);
-      })
-      .finally(() => {
-        setLoadingPopularShows(false);
+        setLoading(false);
       });
   }, []);
 
-  const ShowCardsList = ({
-    dataArray,
-    errorMessage,
-    loading,
-    CardComponent,
-  }) => {
-    if (loading == true) {
-      return <CardLoader />;
-    }
-    if (dataArray.length === 0) {
-      return (
-        <h2 className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
-          {errorMessage}
-        </h2>
-      );
-    }
-    return <CardCarousel dataArray={dataArray} CardComponent={CardComponent} />;
-  };
-
   return (
-    <div className="container mx-auto px-4 pt-16">
-      <div>
-        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
-          Current
-        </h2>
-        <ShowCardsList
-          dataArray={currentShows}
-          errorMessage={"Could not load current shows"}
-          loading={loadingCurrentShows}
-          CardComponent={MediaCard}
-        />
-      </div>
-      <div className="py-24">
-        <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
-          Popular
-        </h2>
-        <ShowCardsList
-          dataArray={popularShows}
-          errorMessage={"Could not load popular shows"}
-          loading={loadingPopularShows}
-          CardComponent={MediaCard}
-        />
-      </div>
+    <div>
+      <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
+        {label}
+      </h2>
+      <ShowsCardsCarousel
+        dataArray={shows}
+        errorMessage={error}
+        loading={loading}
+      />
     </div>
   );
+}
+
+function ShowsCardsCarousel({ dataArray, errorMessage, loading }) {
+  if (loading == true) {
+    return <CardLoader />;
+  }
+  if (errorMessage != null) {
+    return (
+      <h2 className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
+        {errorMessage}
+      </h2>
+    );
+  }
+  return <CardCarousel dataArray={dataArray} CardComponent={MediaCard} />;
 }

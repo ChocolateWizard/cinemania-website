@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { fetchPopularMovies, fetchPopularShows } from "../../utils/Api";
 
@@ -15,95 +15,81 @@ export default function Home() {
   const [errorShows, setErrorShows] = useState(null);
 
   useEffect(() => {
-    setLoadingMovies(true);
-    setLoadingShows(true);
-
-    //fetch popular movies from api. Method returns promise
     fetchPopularMovies(1, 10)
       .then((response) => {
-        if (response.status == 200) {
+        if (response.data.length == 0) {
+          setErrorMovies("No movies found");
+        } else {
           response.data.map((movie) => {
             movie.media_type = "movie";
           });
           setMovies(response.data);
-        } else {
-          console.error(response.data);
-          setErrorMovies(response.data);
         }
       })
       .catch((err) => {
         console.error(err);
-        setErrorMovies(err);
+        setErrorMovies("Could not load popular movies");
       })
       .finally(() => {
         setLoadingMovies(false);
       });
 
-    //fetch popular shows from api. Method returns promise
     fetchPopularShows(1, 10)
       .then((response) => {
-        if (response.status == 200) {
+        if (response.data.length == 0) {
+          setErrorShows("No tv shows found");
+        } else {
           response.data.map((show) => {
             show.media_type = "tv_show";
           });
           setShows(response.data);
-        } else {
-          console.error(response.data);
-          setErrorShows(response.data);
         }
       })
       .catch((err) => {
         console.error(err);
-        setErrorShows(err);
+        setErrorShows("Could not load popular shows");
       })
       .finally(() => {
         setLoadingShows(false);
       });
   }, []);
 
-  const RenderCardsList = ({
-    dataArray,
-    errorMessage,
-    loading,
-    CardComponent,
-  }) => {
-    if (loading == true) {
-      return <CardLoader />;
-    }
-    if (dataArray.length === 0) {
-      return (
-        <h2 className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
-          {errorMessage}
-        </h2>
-      );
-    }
-    return <CardCarousel dataArray={dataArray} CardComponent={CardComponent} />;
-  };
-
   return (
-    <div className="container mx-auto px-4 pt-16">
+    <div className="container mx-auto px-4 pt-16 pb-24 space-y-24">
       <div>
         <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Popular movies
         </h2>
         <RenderCardsList
           dataArray={movies}
-          errorMessage={"Could not load popular movies"}
+          errorMessage={errorMovies}
           loading={loadingMovies}
-          CardComponent={MediaCard}
         />
       </div>
-      <div className="py-24">
+      <div>
         <h2 className="uppercase tracking-wider text-mellon-primary-default text-lg font-semibold">
           Popular shows
         </h2>
         <RenderCardsList
           dataArray={shows}
-          errorMessage={"Could not load popular shows"}
+          errorMessage={errorShows}
           loading={loadingShows}
-          CardComponent={MediaCard}
         />
       </div>
     </div>
   );
+}
+
+function RenderCardsList({ dataArray, errorMessage, loading }) {
+  if (loading == true) {
+    return <CardLoader />;
+  }
+  if (errorMessage != null) {
+    return (
+      <h2 className="mt-5 uppercase tracking-wider text-onyx-primary-30 text-lg font-bold">
+        {errorMessage}
+      </h2>
+    );
+  }
+  return <CardCarousel dataArray={dataArray} CardComponent={MediaCard} />;
 }

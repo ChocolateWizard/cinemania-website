@@ -8,12 +8,6 @@ export function fetchPopularMovies(page, size) {
 export function fetchPopularShows(page, size) {
   return axios.get(BASE_URL + `/api/tv/popular?page=${page}&size=${size}`);
 }
-export function fetchCurrentMovies(page, size) {
-  return axios.get(BASE_URL + `/api/movies/current?page=${page}&size=${size}`);
-}
-export function fetchCurrentShows(page, size) {
-  return axios.get(BASE_URL + `/api/tv/current?page=${page}&size=${size}`);
-}
 export function fetchMovieDetails(id) {
   return axios.get(BASE_URL + `/api/movies/${id}/details`);
 }
@@ -33,7 +27,12 @@ export function fetchMediaForSearchResults(page, size, title) {
     BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
   );
 }
-
+export function fetchMoviesForMoviesPage(url) {
+  return axios.get(BASE_URL + url);
+}
+export function fetchShowsForShowsPage(url) {
+  return axios.get(BASE_URL + url);
+}
 export function register(data) {
   return axios.post(BASE_URL + `/api/auth/register`, data, {
     withCredentials: true,
@@ -77,4 +76,3 @@ export function deleteCritique(id) {
     withCredentials: true,
   });
 }
-
