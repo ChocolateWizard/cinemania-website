@@ -22,9 +22,9 @@ export function fetchMediaForSearchbar(page, size, title) {
     BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
   );
 }
-export function fetchMediaForSearchResults(page, size, title) {
+export function fetchMediaForSearchResults(url) {
   return axios.get(
-    BASE_URL + `/api/medias/search?page=${page}&size=${size}&title=${title}`
+    BASE_URL + url
   );
 }
 export function fetchMoviesForMoviesPage(url) {

@@ -9,11 +9,20 @@ export default function SearchResults() {
   const [loading, setLoading] = useState(true);
   const [media, setMedia] = useState([]);
   const title = useSearchParams()[0].get("title");
+  const genreId = useSearchParams()[0].get("genreId");
+  const mediaType = useSearchParams()[0].get("mediaType");
 
   useEffect(() => {
     setLoading(true);
     if (title) {
-      fetchMediaForSearchResults(1, 30, title)
+      var url = `/api/medias/search?page=1&size=30&title=${title}`;
+      if (genreId) {
+        url = url + `&genreIds=${genreId}`;
+      }
+      if (mediaType) {
+        url = url + `&mediaType=${mediaType}`;
+      }
+      fetchMediaForSearchResults(url)
         .then((res) => {
           setMedia(res.data);
         })
@@ -27,7 +36,7 @@ export default function SearchResults() {
       setMedia([]);
       setLoading(false);
     }
-  }, [title]);
+  }, [title, genreId, mediaType]);
 
   if (loading) {
     return <CardLoader />;

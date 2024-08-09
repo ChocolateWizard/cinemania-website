@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -19,9 +19,64 @@ import LoginPage from "./components/login/LoginPage";
 import RegisterPage from "./components/register/RegisterPage";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import NoImageSVG from "./components/helpers/svg/NoImageSVG";
+import SearchOptions from "./components/search/SearchOptions";
+import Searchbar from "./components/header/Searchbar";
+
+//different options for comboboxes in search filter options to customize searching of media
+const searchOptions = {
+  mediaTypes: [
+    { value: "all", label: "All" },
+    { value: "movie", label: "Movie" },
+    { value: "tv_show", label: "TV Show" },
+  ],
+  genres: [
+    {
+      value: "all",
+      label: "All",
+    },
+    {
+      value: "1",
+      label: "Action",
+    },
+    {
+      value: "3",
+      label: "Adventure",
+    },
+    {
+      value: "4",
+      label: "Animation",
+    },
+    {
+      value: "5",
+      label: "Comedy",
+    },
+    {
+      value: "8",
+      label: "Drama",
+    },
+    {
+      value: "12",
+      label: "Horror",
+    },
+    {
+      value: "15",
+      label: "Mystery",
+    },
+    {
+      value: "24",
+      label: "Thriller",
+    },
+  ],
+};
 
 function App() {
+  //sets if search filter options panel is open or closed
+  const [searchOptionsVisible, setSearchOptionsVisible] = useState(false);
+  const [searchOption, setSearchOption] = useState({
+    mediaType: "all",
+    genre: "all",
+  });
+
   return (
     <GlobalProvider>
       <div className="min-h-screen">
@@ -39,8 +94,27 @@ function App() {
           transition={Slide}
         />
         <Router>
-          <Header />
+          <Header>
+            <Searchbar
+              searchOption={searchOption}
+              searchOptionsVisible={searchOptionsVisible}
+              changeSearchOptionsVisibility={() => {
+                setSearchOptionsVisible(!searchOptionsVisible);
+              }}
+            />
+          </Header>
           <main>
+            <SearchOptions
+              visible={searchOptionsVisible}
+              setMediaType={(value) => {
+                setSearchOption({ ...searchOption, mediaType: value });
+              }}
+              setGenre={(value) => {
+                setSearchOption({ ...searchOption, genre: value });
+              }}
+              options={searchOptions}
+              defaultOption={searchOption}
+            />
             <Routes>
               <Route path="/" exact element={<Home />} />
               <Route path="/movies" exact element={<MoviesPage />} />

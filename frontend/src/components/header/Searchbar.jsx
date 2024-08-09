@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { fetchMediaForSearchbar } from "../../utils/Api";
 import { useNavigate } from "react-router-dom";
 import SearchSVG from "../helpers/svg/SearchSVG";
+import ArrowRightSVG from "../helpers/svg/ArrowRightSVG";
 
-export default function Searchbar() {
+export default function Searchbar({
+  searchOption,
+  searchOptionsVisible,
+  changeSearchOptionsVisibility,
+}) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [media, setMedia] = useState([]);
@@ -34,7 +39,14 @@ export default function Searchbar() {
   //enter pressed in searchbar
   function onSubmit(e) {
     e.preventDefault();
-    navigate(`/search?title=${query.trim()}`);
+    var url = `/search?title=${query.trim()}`;
+    if (searchOption.genre !== "all") {
+      url = url + `&genreId=${searchOption.genre}`;
+    }
+    if (searchOption.mediaType !== "all") {
+      url = url + `&mediaType=${searchOption.mediaType}`;
+    }
+    navigate(url);
   }
 
   return (
@@ -42,7 +54,7 @@ export default function Searchbar() {
       <form onSubmit={onSubmit}>
         <input
           type="text"
-          className="bg-onyx-contrast text-onyx-tint rounded-full w-full md:w-64 pr-4 pl-8 py-1 focus:outline-none focus:ring-[3px] focus:ring-mellon-primary-default"
+          className="bg-onyx-contrast text-onyx-tint rounded-full w-full md:w-64 pr-8 pl-8 py-1 focus:outline-none focus:ring-[3px] focus:ring-mellon-primary-default"
           placeholder="Search"
           value={query}
           onChange={onChange}
@@ -53,6 +65,19 @@ export default function Searchbar() {
         height="16"
         className="absolute top-2 left-2 fill-onyx-primary-40"
       />
+      {/* Search options button */}
+      <button
+        onClick={changeSearchOptionsVisibility}
+        className="absolute top-1.5 right-2.5"
+      >
+        <ArrowRightSVG
+          width="20"
+          height="20"
+          className={`fill-onyx-primary-40 transform duration-500 ${
+            searchOptionsVisible ? "-rotate-[270deg]" : "-rotate-90"
+          }`}
+        />
+      </button>
     </div>
   );
 }

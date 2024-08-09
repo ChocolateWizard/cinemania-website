@@ -1,9 +1,16 @@
 import React from "react";
 import { Select as LibSel, Option } from "@material-tailwind/react";
 
-export default function Select({ placeholder, data, error, disabled, setter }) {
+export default function Select({
+  className,
+  placeholder,
+  data,
+  error,
+  disabled,
+  setter,
+}) {
   return (
-    <div className="flex flex-col w-full">
+    <div className={`flex flex-col w-full ${className}`}>
       <LibSel
         label={placeholder}
         disabled={disabled}
@@ -15,7 +22,7 @@ export default function Select({ placeholder, data, error, disabled, setter }) {
         ) : (
           data.map((d, index) => {
             return (
-              <Option key={index} value={`${d.value}`}>
+              <Option  key={index} value={`${d.value}`}>
                 {d.label}
               </Option>
             );

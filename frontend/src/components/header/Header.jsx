@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import Searchbar from "./Searchbar";
 import { GlobalContext } from "../../context/GlobalState";
 import SiteLogoSVG from "../helpers/svg/SiteLogoSVG";
 import Person2SVG from "../helpers/svg/Person2SVG";
 import UserDropdownMenu from "./UserDropdownMenu";
 
-export default function Header() {
+export default function Header({ children }) {
   const { sessionData } = useContext(GlobalContext);
 
   return (
@@ -55,7 +54,7 @@ export default function Header() {
           <li>
             <ul className="flex flex-col md:flex-row h-full">
               <li className="flex justify-center items-center">
-                <Searchbar />
+                {children}
               </li>
               <UserMenu sessionData={sessionData} />
             </ul>
