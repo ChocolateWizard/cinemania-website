@@ -3,27 +3,23 @@ import CastCollection from "../person/actor/collection/CastCollection";
 import CritiqueCollection from "../critique/CritiqueCollection";
 
 export default function DetailsTabs({ id, actors, critiques }) {
-  const [castShown, setCastShown] = useState(true);
-  const [critiquesShown, setCritiquesShown] = useState(false);
+  const [tabsShown, setTabsShows] = useState({
+    cast: true,
+    critiques: false,
+  });
 
   function showCastTab() {
-    setCritiquesShown(false);
-    setCastShown(true);
+    setTabsShows({
+      cast: true,
+      critiques: false,
+    });
   }
   function showCritiquesTab() {
-    setCastShown(false);
-    setCritiquesShown(true);
+    setTabsShows({
+      cast: false,
+      critiques: true,
+    });
   }
-
-  //===========================================================================================================================
-  const TabContent = () => {
-    if (castShown) {
-      return <CastCollection actors={actors} />;
-    }
-    if (critiquesShown) {
-      return <CritiqueCollection id={id} critiques={critiques} />;
-    }
-  };
 
   return (
     <div className="flex flex-col">
@@ -32,7 +28,7 @@ export default function DetailsTabs({ id, actors, critiques }) {
           <h2
             className={
               "text-4xl ml-4 font-semibold hover:text-mellon-primary-default " +
-              (castShown ? "text-mellon-primary-default" : "")
+              (tabsShown.cast ? "text-mellon-primary-default" : "")
             }
           >
             Cast
@@ -42,14 +38,28 @@ export default function DetailsTabs({ id, actors, critiques }) {
           <h2
             className={
               "text-4xl ml-4 font-semibold hover:text-mellon-primary-default " +
-              (critiquesShown ? "text-mellon-primary-default" : "")
+              (tabsShown.critiques ? "text-mellon-primary-default" : "")
             }
           >
             Critiques
           </h2>
         </button>
       </div>
-      <TabContent />
+      <TabContent
+        tabsShown={tabsShown}
+        actors={actors}
+        critiques={critiques}
+        id={id}
+      />
     </div>
   );
+}
+
+function TabContent({ tabsShown, actors, critiques, id }) {
+  if (tabsShown.cast) {
+    return <CastCollection actors={actors} />;
+  }
+  if (tabsShown.critiques) {
+    return <CritiqueCollection id={id} critiques={critiques} />;
+  }
 }
