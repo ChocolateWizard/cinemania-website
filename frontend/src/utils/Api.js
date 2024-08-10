@@ -8,12 +8,18 @@ export function fetchPopularMovies(page, size) {
 export function fetchPopularShows(page, size) {
   return axios.get(BASE_URL + `/api/tv/popular?page=${page}&size=${size}`);
 }
-export function fetchMovieDetails(id) {
-  return axios.get(BASE_URL + `/api/movies/${id}/details`);
+export function fetchMediaDetails(id, mediaType) {
+  switch (mediaType) {
+    case "movie":
+      return axios.get(BASE_URL + `/api/movies/${id}/details`);
+    case "tv_show":
+      return axios.get(BASE_URL + `/api/tv/${id}/details`);
+    default:
+      console.error("Unknown media type");
+      return null;
+  }
 }
-export function fetchShowDetails(id) {
-  return axios.get(BASE_URL + `/api/tv/${id}/details`);
-}
+
 export function fetchCountries() {
   return axios.get(BASE_URL + `/api/countries`);
 }
@@ -23,9 +29,7 @@ export function fetchMediaForSearchbar(page, size, title) {
   );
 }
 export function fetchMediaForSearchResults(url) {
-  return axios.get(
-    BASE_URL + url
-  );
+  return axios.get(BASE_URL + url);
 }
 export function fetchMoviesForMoviesPage(url) {
   return axios.get(BASE_URL + url);

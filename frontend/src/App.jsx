@@ -4,8 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Header from "./components/header/Header";
 import Home from "./components/home/Home";
-import MovieDetails from "./components/movie/details/MovieDetails";
-import ShowDetails from "./components/show/details/ShowDetails";
 import PageNotFound from "./components/pageNotFound/PageNotFound";
 import Footer from "./components/footer/Footer";
 import MoviesPage from "./components/movie/page/MoviesPage";
@@ -21,6 +19,7 @@ import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SearchOptions from "./components/search/SearchOptions";
 import Searchbar from "./components/header/Searchbar";
+import MediaDetails from "./components/media/MediaDetails";
 
 //different options for comboboxes in search filter options to customize searching of media
 const searchOptions = {
@@ -146,8 +145,8 @@ function App() {
                   </AuthRouteGuard>
                 }
               />
-              <Route path="/movie/:id" element={<MovieDetails />} />
-              <Route path="/show/:id" element={<ShowDetails />} />
+              <Route path="/movie/:id" element={<MediaDetails mediaType={"movie"} />} />
+              <Route path="/show/:id" element={<MediaDetails mediaType={"tv_show"} />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/page-not-found" element={<PageNotFound />} />
               <Route path="/*" element={<PageNotFound />} />
