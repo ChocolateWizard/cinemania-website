@@ -5,8 +5,10 @@
 package com.borak.cwb.backend.domain.dto.critique;
 
 import com.borak.cwb.backend.domain.dto.DTO;
+import com.borak.cwb.backend.logic.transformers.views.JsonVisibilityViews;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  *
@@ -17,8 +19,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "profileImageUrl"})
 public class CritiqueUserResponseDTO implements DTO {
 
+    @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "profile_name")
     private String profileName;
+    
+    @JsonView(JsonVisibilityViews.Lite.class)
     @JsonProperty(value = "profile_image_url")
     private String profileImageUrl;
 

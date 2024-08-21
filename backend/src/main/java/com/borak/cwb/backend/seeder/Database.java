@@ -33,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -117,9 +118,9 @@ public class Database {
 
     }
 
-    void storeAllPersons(List<PersonWrapperDB> persons) throws Exception {
+    void storeAllPersons(List<PersonWrapperDB> persons, LocalDateTime createdAt) throws Exception {
         String sqlP = """
-                INSERT INTO person(id,first_name,last_name,gender) VALUES(?,?,?,?);
+                INSERT INTO person(id,first_name,last_name,gender,created_at) VALUES(?,?,?,?,?);
                 """;
         String sqlD = """
                 INSERT INTO director(person_id) VALUES(?);
@@ -144,6 +145,7 @@ public class Database {
                 ps.setString(2, persons.get(i).getPerson().getFirstName());
                 ps.setString(3, persons.get(i).getPerson().getLastName());
                 ps.setString(4, String.valueOf(persons.get(i).getPerson().getGender().getSymbol()));
+                ps.setTimestamp(5, Timestamp.valueOf(createdAt));
             }
 
             @Override
@@ -192,9 +194,9 @@ public class Database {
         );
     }
 
-    void storeAllMovies(List<MovieDB> movies) throws Exception {
+    void storeAllMovies(List<MovieDB> movies, LocalDateTime createdAt) throws Exception {
         String sqlMe = """
-                INSERT INTO media(id,title,release_date,description,audience_rating) VALUES(?,?,?,?,?);
+                INSERT INTO media(id,title,release_date,description,audience_rating,created_at) VALUES(?,?,?,?,?,?);
                 """;
         String sqlMo = """
                 INSERT INTO movie(media_id,length) VALUES(?,?);
@@ -212,7 +214,7 @@ public class Database {
                 INSERT INTO acting(media_id,actor_id,is_starring) VALUES(?,?,?);
                 """;
         String sqlMeActRo = """
-                INSERT INTO acting_role(acting_id,id,name) 
+                INSERT INTO acting_role(acting_id,order_number,name) 
                 VALUES((SELECT acting.id 
                       FROM acting 
                       WHERE acting.media_id=? AND acting.actor_id=?),?,?);
@@ -258,7 +260,7 @@ public class Database {
                 for (ActingRoleDB role : acting.getRoles()) {
                     dataR[iR][0] = movie.getId();
                     dataR[iR][1] = acting.getActor().getId();
-                    dataR[iR][2] = role.getId();
+                    dataR[iR][2] = role.getOrderNumber();
                     dataR[iR][3] = role.getName();
                     iR++;
                 }
@@ -272,6 +274,7 @@ public class Database {
                 ps.setDate(3, Date.valueOf(movies.get(i).getReleaseDate()));
                 ps.setString(4, movies.get(i).getDescription());
                 ps.setInt(5, movies.get(i).getAudienceRating());
+                ps.setTimestamp(6, Timestamp.valueOf(createdAt));
             }
 
             @Override
@@ -366,9 +369,9 @@ public class Database {
 
     }
 
-    void storeAllShows(List<TVShowDB> shows) throws Exception {
+    void storeAllShows(List<TVShowDB> shows, LocalDateTime createdAt) throws Exception {
         String sqlMe = """
-                INSERT INTO media(id,title,release_date,description,audience_rating) VALUES(?,?,?,?,?);
+                INSERT INTO media(id,title,release_date,description,audience_rating,created_at) VALUES(?,?,?,?,?,?);
                 """;
         String sqlMo = """
                 INSERT INTO tv_show(media_id,number_of_seasons) VALUES(?,?);
@@ -386,7 +389,7 @@ public class Database {
                 INSERT INTO acting(media_id,actor_id,is_starring) VALUES(?,?,?);
                 """;
         String sqlMeActRo = """
-                INSERT INTO acting_role(acting_id,id,name) 
+                INSERT INTO acting_role(acting_id,order_number,name) 
                 VALUES((SELECT acting.id 
                       FROM acting 
                       WHERE acting.media_id=? AND acting.actor_id=?),?,?);
@@ -432,7 +435,7 @@ public class Database {
                 for (ActingRoleDB role : acting.getRoles()) {
                     dataR[iR][0] = show.getId();
                     dataR[iR][1] = acting.getActor().getId();
-                    dataR[iR][2] = role.getId();
+                    dataR[iR][2] = role.getOrderNumber();
                     dataR[iR][3] = role.getName();
                     iR++;
                 }
@@ -446,6 +449,7 @@ public class Database {
                 ps.setDate(3, Date.valueOf(shows.get(i).getReleaseDate()));
                 ps.setString(4, shows.get(i).getDescription());
                 ps.setInt(5, shows.get(i).getAudienceRating());
+                ps.setTimestamp(6, Timestamp.valueOf(createdAt));
             }
 
             @Override
@@ -540,12 +544,12 @@ public class Database {
 
     }
 
-    void storeAllUsers(List<UserDB> users) throws Exception {
+    void storeAllUsers(List<UserDB> users, LocalDateTime createdAt) throws Exception {
         String sql = """
                INSERT INTO user(id,
                first_name,last_name,gender,profile_name,profile_image,
-               username,email,password,role,created_at,updated_at,country_id       
-               ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);
+               username,email,password,role,created_at,country_id       
+               ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);
                """;
         jdbc.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
@@ -564,9 +568,8 @@ public class Database {
                 ps.setString(8, users.get(i).getEmail());
                 ps.setString(9, users.get(i).getPassword());
                 ps.setString(10, users.get(i).getRole().toString());
-                ps.setTimestamp(11, Timestamp.valueOf(users.get(i).getCreatedAt()));
-                ps.setTimestamp(12, Timestamp.valueOf(users.get(i).getUpdatedAt()));
-                ps.setLong(13, users.get(i).getCountry().getId());
+                ps.setTimestamp(11, Timestamp.valueOf(createdAt));
+                ps.setLong(12, users.get(i).getCountry().getId());
             }
 
             @Override

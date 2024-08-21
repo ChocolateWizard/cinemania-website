@@ -16,7 +16,8 @@
     <properties>
         <java.version>21</java.version>
         <io.jsonwebtoken.version>0.12.6</io.jsonwebtoken.version>
-        <org.flywaydb.version>10.13.0</org.flywaydb.version>
+        <!--<org.flywaydb.version>10.13.0</org.flywaydb.version>-->
+         <org.flywaydb.version>10.17.1</org.flywaydb.version>
         <org.apache.httpclient5.version>5.3.1</org.apache.httpclient5.version>
         <blazebit.version>1.6.11</blazebit.version>
     </properties>

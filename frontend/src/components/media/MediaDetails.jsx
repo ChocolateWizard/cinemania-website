@@ -1,21 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { GlobalContext } from "../../context/GlobalState";
 import { fetchMediaDetails } from "../../utils/Api";
 import {
   concatDirectorNames,
   concatGenreNames,
   concatWriterNames,
 } from "../../utils/Util";
-import CardLoader from "../../components/helpers/loaders/cardLoader/CardLoader";
-import DetailsTabs from "../../components/tabs/DetailsTabs";
-import NoImageSVG from "../../components/helpers/svg/NoImageSVG";
-import { useParams } from "react-router-dom";
-import { GlobalContext } from "../../context/GlobalState";
-import StarSVG from "../../components/helpers/svg/StarSVG";
-import WatchlistButton from "../../components/watchlist/WatchlistButton";
+import CardLoader from "../helpers/loaders/cardLoader/CardLoader";
+import DetailsTabs from "./DetailsTabs";
+import NoImageSVG from "../helpers/svg/NoImageSVG";
+import StarSVG from "../helpers/svg/StarSVG";
+import WatchlistButton from "../watchlist/WatchlistButton";
 
 export default function MediaDetails({ mediaType }) {
   const { id } = useParams();
   const [media, setMedia] = useState(null);
+  const [critiques, setCritiques] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,7 +25,9 @@ export default function MediaDetails({ mediaType }) {
   useEffect(() => {
     fetchMediaDetails(id, mediaType)
       .then((res) => {
+        res.data.media_type = mediaType;
         setMedia(res.data);
+        setCritiques(res.data.critiques);
       })
       .catch((err) => {
         console.error(err);
@@ -34,6 +37,138 @@ export default function MediaDetails({ mediaType }) {
         setLoading(false);
       });
   }, []);
+
+  function addCritique(newCritique) {
+    setCritiques([newCritique, ...critiques]);
+  }
+  function removeCritique(critiqueId) {
+    setCritiques(critiques.filter((c) => c.id !== critiqueId));
+  }
+  function addComment(critiqueId, newComment) {
+    setCritiques((prevCritiques) =>
+      prevCritiques.map((critique) =>
+        critique.id === critiqueId
+          ? {
+              ...critique,
+              comments: [newComment, ...critique.comments],
+            }
+          : critique
+      )
+    );
+  }
+
+  function removeComment(critiqueId, commentId) {
+    setCritiques((prevCritiques) =>
+      prevCritiques.map((critique) =>
+        critique.id === critiqueId
+          ? {
+              ...critique,
+              comments: critique.comments.filter(
+                (comment) => comment.id !== commentId
+              ),
+            }
+          : critique
+      )
+    );
+  }
+  function addCritiqueLikeDislike(critiqueId, isLike) {
+    setCritiques((prevCritiques) => {
+      return prevCritiques.map((critique) => {
+        if (critique.id === critiqueId) {
+          // Create a copy of the critique with updated likes/dislikes
+          return {
+            ...critique,
+            number_of_likes: isLike
+              ? critique.number_of_likes + 1
+              : critique.number_of_likes,
+            number_of_dislikes: !isLike
+              ? critique.number_of_dislikes + 1
+              : critique.number_of_dislikes,
+          };
+        }
+        return critique; // Return unchanged critique if the id doesn't match
+      });
+    });
+  }
+  function removeCritiqueLikeDislike(critiqueId, isLike) {
+    setCritiques((prevCritiques) => {
+      return prevCritiques.map((critique) => {
+        if (critique.id === critiqueId) {
+          // Create a copy of the critique with updated likes/dislikes
+          return {
+            ...critique,
+            number_of_likes: isLike
+              ? critique.number_of_likes - 1
+              : critique.number_of_likes,
+            number_of_dislikes: !isLike
+              ? critique.number_of_dislikes - 1
+              : critique.number_of_dislikes,
+          };
+        }
+        return critique; // Return unchanged critique if the id doesn't match
+      });
+    });
+  }
+  function addCommentLikeDislike(critiqueId, commentId, isLike) {
+    setCritiques((prevCritiques) => {
+      return prevCritiques.map((critique) => {
+        if (critique.id === critiqueId) {
+          // Find and update the specific comment within the critique
+          const updatedComments = critique.comments.map((comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                number_of_likes: isLike
+                  ? comment.number_of_likes + 1
+                  : comment.number_of_likes,
+                number_of_dislikes: !isLike
+                  ? comment.number_of_dislikes + 1
+                  : comment.number_of_dislikes,
+              };
+            }
+            return comment; // Return unchanged comment if the id doesn't match
+          });
+
+          // Return the updated critique with the updated comments
+          return {
+            ...critique,
+            comments: updatedComments,
+          };
+        }
+        return critique; // Return unchanged critique if the id doesn't match
+      });
+    });
+  }
+  function removeCommentLikeDislike(critiqueId, commentId, isLike) {
+    setCritiques((prevCritiques) => {
+      return prevCritiques.map((critique) => {
+        if (critique.id === critiqueId) {
+          // Find and update the specific comment within the critique
+          const updatedComments = critique.comments.map((comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                number_of_likes: isLike
+                  ? comment.number_of_likes - 1
+                  : comment.number_of_likes,
+                number_of_dislikes: !isLike
+                  ? comment.number_of_dislikes - 1
+                  : comment.number_of_dislikes,
+              };
+            }
+            return comment; // Return unchanged comment if the id doesn't match
+          });
+
+          // Return the updated critique with the updated comments
+          return {
+            ...critique,
+            comments: updatedComments,
+          };
+        }
+        return critique; // Return unchanged critique if the id doesn't match
+      });
+    });
+  }
 
   //=======================================================================================
   if (loading) {
@@ -64,7 +199,14 @@ export default function MediaDetails({ mediaType }) {
               <span className="mx-2">|</span>
               <StarSVG width="16" height="16" className="fill-blue-400" />
               <span className="ml-1">
-                {media.critics_rating ? media.critics_rating : "N/A "}%
+                {critiques.length !== 0
+                  ? `${
+                      critiques.reduce(
+                        (sum, critique) => sum + critique.rating,
+                        0
+                      ) / critiques.length
+                    }%`
+                  : "N/A"}
               </span>
               <span className="mx-2">|</span>
               <span>{media.release_date}</span>
@@ -88,9 +230,17 @@ export default function MediaDetails({ mediaType }) {
 
       <div className="border-b border-onyx-tint">
         <DetailsTabs
-          id={media.id}
+          mediaId={media.id}
           actors={media.actors}
-          critiques={media.critiques}
+          critiques={critiques}
+          addCritiqueCallback={addCritique}
+          removeCritiqueCallback={removeCritique}
+          addCommentCallback={addComment}
+          removeCommentCallback={removeComment}
+          addCritiqueLikeDislikeCallback={addCritiqueLikeDislike}
+          removeCritiqueLikeDislikeCallback={removeCritiqueLikeDislike}
+          addCommentLikeDislikeCallback={addCommentLikeDislike}
+          removeCommentLikeDislikeCallback={removeCommentLikeDislike}
         />
       </div>
     </section>
@@ -108,7 +258,7 @@ function CoverImage({ url }) {
   );
 }
 
-function MovieLength({media, mediaType}) {
+function MovieLength({ media, mediaType }) {
   return mediaType === "tv_show" ? null : (
     <>
       <span>

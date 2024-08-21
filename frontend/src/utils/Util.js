@@ -47,6 +47,16 @@ export function concatActorRoleNames(roles, delimiter, number) {
   return rs;
 }
 
-
+//checks if any commentId from commentIds array is present as an id in comments array
+//if true returns that id
+//returns null if none found
+export function findMatchingId(commentIds, comments) {
+  for (let commentId of commentIds) {
+    if (comments.some(comment => comment.id === commentId)) {
+      return commentId;
+    }
+  }
+  return null;
+}
 
 

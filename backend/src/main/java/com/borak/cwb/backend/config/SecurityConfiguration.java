@@ -113,10 +113,7 @@ public class SecurityConfiguration {
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "api/critiques"
-                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
-                        .requestMatchers(HttpMethod.PUT,
-                                "api/critiques/*"
-                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
+                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())                       
                         .requestMatchers(HttpMethod.DELETE,
                                 "api/critiques/*"
                         ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
@@ -130,7 +127,6 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT,
                                 "api/critiques/*/likes",
                                 "api/critiques/*/dislikes",
-                                "api/critiques/*/comments",
                                 "api/critiques/*/comments/*/likes",
                                 "api/critiques/*/comments/*/dislikes"
                         ).hasAnyAuthority(UserRole.REGULAR.toString(), UserRole.ADMINISTRATOR.toString())

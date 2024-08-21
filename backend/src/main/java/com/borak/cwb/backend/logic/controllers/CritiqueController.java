@@ -31,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(path = "api/critiques")
 @Validated
 public class CritiqueController {
-
+    
     private final ICritiqueService critiqueService;
     private final DomainValidationService domainValidator;
-
+    
     @Autowired
     public CritiqueController(ICritiqueService critiqueService, DomainValidationService domainValidator) {
         this.critiqueService = critiqueService;
@@ -51,109 +51,112 @@ public class CritiqueController {
         domainValidator.validate(critiqueRequest, RequestMethod.POST);
         return critiqueService.postCritique(critiqueRequest);
     }
-
+    
     @PostMapping(path = "/{critiqueID}/likes")
     public ResponseEntity postCritiqueLike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
         return critiqueService.postCritiqueLike(critiqueID);
     }
-
-    @PostMapping(path = "/{id}/dislikes")
-    public ResponseEntity postCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.postCritiqueDislike(id);
+    
+    @PostMapping(path = "/{critiqueID}/dislikes")
+    public ResponseEntity postCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.postCritiqueDislike(critiqueID);
     }
-
-    @PostMapping(path = "/{id}/comments")
+    
+    @PostMapping(path = "/{critiqueID}/comments")
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity postCritiqueComment(@RequestBody CritiqueCommentRequestDTO commentRequest) {
+    public ResponseEntity postCritiqueComment(
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @RequestBody CritiqueCommentRequestDTO commentRequest) {
+        commentRequest.setCritiqueId(critiqueID);
         domainValidator.validate(commentRequest);
         return critiqueService.postCritiqueComment(commentRequest);
     }
-
-    @PostMapping(path = "/{critiqueId}/comments/{commentId}/likes")
+    
+    @PostMapping(path = "/{critiqueID}/comments/{commentID}/likes")
     public ResponseEntity postCritiqueCommentLike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.postCritiqueCommentLike(critiqueId, commentId);
+        return critiqueService.postCritiqueCommentLike(critiqueID, commentID);
     }
-
-    @PostMapping(path = "/{critiqueId}/comments/{commentId}/dislikes")
+    
+    @PostMapping(path = "/{critiqueID}/comments/{commentID}/dislikes")
     public ResponseEntity postCritiqueCommentDislike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.postCritiqueCommentDislike(critiqueId, commentId);
+        return critiqueService.postCritiqueCommentDislike(critiqueID, commentID);
     }
 
 //=================================================================================================================================
 //PUT
-    @PutMapping(path = "/{id}/likes")
-    public ResponseEntity putCritiqueLike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.putCritiqueLike(id);
+    @PutMapping(path = "/{critiqueID}/likes")
+    public ResponseEntity putCritiqueLike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.putCritiqueLike(critiqueID);
     }
-
-    @PutMapping(path = "/{id}/dislikes")
-    public ResponseEntity putCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.putCritiqueDislike(id);
+    
+    @PutMapping(path = "/{critiqueID}/dislikes")
+    public ResponseEntity putCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.putCritiqueDislike(critiqueID);
     }
-
-    @PutMapping(path = "/{critiqueId}/comments/{commentId}/likes")
+    
+    @PutMapping(path = "/{critiqueID}/comments/{commentID}/likes")
     public ResponseEntity putCritiqueCommentLike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.putCritiqueCommentLike(critiqueId, commentId);
+        return critiqueService.putCritiqueCommentLike(critiqueID, commentID);
     }
-
-    @PutMapping(path = "/{critiqueId}/comments/{commentId}/dislikes")
+    
+    @PutMapping(path = "/{critiqueID}/comments/{commentID}/dislikes")
     public ResponseEntity putCritiqueCommentDislike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.putCritiqueCommentDislike(critiqueId, commentId);
+        return critiqueService.putCritiqueCommentDislike(critiqueID, commentID);
     }
 
 //=================================================================================================================================
 //DELETE
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/{critiqueID}")
     @JsonView(JsonVisibilityViews.Lite.class)
-    public ResponseEntity deleteCritique(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.deleteCritique(id);
+    public ResponseEntity deleteCritique(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.deleteCritique(critiqueID);
     }
-
-    @DeleteMapping(path = "/{id}/likes")
-    public ResponseEntity deleteCritiqueLike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.deleteCritiqueLike(id);
+    
+    @DeleteMapping(path = "/{critiqueID}/likes")
+    public ResponseEntity deleteCritiqueLike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.deleteCritiqueLike(critiqueID);
     }
-
-    @DeleteMapping(path = "/{id}/dislikes")
-    public ResponseEntity deleteCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long id) {
-        return critiqueService.deleteCritiqueDislike(id);
+    
+    @DeleteMapping(path = "/{critiqueID}/dislikes")
+    public ResponseEntity deleteCritiqueDislike(@PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID) {
+        return critiqueService.deleteCritiqueDislike(critiqueID);
     }
-
-    @DeleteMapping(path = "/{critiqueId}/comments/{commentId}")
+    
+    @DeleteMapping(path = "/{critiqueID}/comments/{commentID}")
     @JsonView(JsonVisibilityViews.Lite.class)
     public ResponseEntity deleteCritiqueComment(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.deleteCritiqueComment(critiqueId, commentId);
+        return critiqueService.deleteCritiqueComment(critiqueID, commentID);
     }
-
-    @DeleteMapping(path = "/{critiqueId}/comments/{commentId}/likes")
+    
+    @DeleteMapping(path = "/{critiqueID}/comments/{commentID}/likes")
     public ResponseEntity deleteCritiqueCommentLike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.deleteCritiqueCommentLike(critiqueId, commentId);
+        return critiqueService.deleteCritiqueCommentLike(critiqueID, commentID);
     }
-
-    @DeleteMapping(path = "/{critiqueId}/comments/{commentId}/dislikes")
+    
+    @DeleteMapping(path = "/{critiqueID}/comments/{commentID}/dislikes")
     public ResponseEntity deleteCritiqueCommentDislike(
-            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueId,
-            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentId
+            @PathVariable @Min(value = 1, message = "Critique id must be greater than or equal to 1") long critiqueID,
+            @PathVariable @Min(value = 1, message = "Comment id must be greater than or equal to 1") long commentID
     ) {
-        return critiqueService.deleteCritiqueCommentDislike(critiqueId, commentId);
+        return critiqueService.deleteCritiqueCommentDislike(critiqueID, commentID);
     }
-
+    
 }

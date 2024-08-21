@@ -11,7 +11,7 @@ package com.borak.cwb.backend.seeder.domain.db;
 public class ActingRoleDB {
 
     private ActingDB acting;
-    private Long id;
+    private Long orderNumber;
     private String name;
 
     public ActingRoleDB() {
@@ -22,9 +22,9 @@ public class ActingRoleDB {
         this.name = name;
     }
 
-    public ActingRoleDB(ActingDB acting, Long id, String name) {
+    public ActingRoleDB(ActingDB acting, Long orderNumber, String name) {
         this.acting = acting;
-        this.id = id;
+        this.orderNumber = orderNumber;
         this.name = name;
     }
 
@@ -36,12 +36,12 @@ public class ActingRoleDB {
         this.acting = acting;
     }
 
-    public Long getId() {
-        return id;
+    public Long getOrderNumber() {
+        return orderNumber;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOrderNumber(Long orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public String getName() {

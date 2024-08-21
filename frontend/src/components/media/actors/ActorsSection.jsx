@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import ActorCard from "../card/ActorCard";
+import ActorCard from "./ActorCard";
 
 const defaultMaxNumActorsShown = 5;
 
-export default function CastCollection({ actors }) {
+export default function ActorsSection({ actors }) {
   const [dataState, setDataState] = useState({
     maxNumActorsShown: defaultMaxNumActorsShown,
     showOptionVisible: actors?.length > defaultMaxNumActorsShown ? true : false,

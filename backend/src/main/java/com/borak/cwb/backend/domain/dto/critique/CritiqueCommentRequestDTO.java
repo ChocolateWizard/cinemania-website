@@ -5,9 +5,8 @@
 package com.borak.cwb.backend.domain.dto.critique;
 
 import com.borak.cwb.backend.domain.dto.DTO;
-import jakarta.validation.constraints.Min;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -16,8 +15,7 @@ import jakarta.validation.constraints.Size;
  */
 public class CritiqueCommentRequestDTO implements DTO {
 
-    @NotNull
-    @Min(value = 1, message = "Critique id must be greater than or equal to 1")
+    @JsonIgnore
     private Long critiqueId;
     
     @NotBlank

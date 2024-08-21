@@ -185,8 +185,8 @@ public final class MovieTransformer {
                         numOfDislikes++;
                     }
                 }
-                commRes.setNumberOfLikes(numberOfLikes);
-                commRes.setNumberOfDislikes(numberOfDislikes);
+                commRes.setNumberOfLikes(numOfLikes);
+                commRes.setNumberOfDislikes(numOfDislikes);
                 critResp.getComments().add(commRes);
             }
             response.getCritiques().add(critResp);

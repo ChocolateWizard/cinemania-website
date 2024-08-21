@@ -147,18 +147,19 @@ public class Datastore {
     }
 
     void persistData() throws Exception {
+        LocalDateTime createdAt = LocalDateTime.now();
         log.info("----------->Removing all table data...");
         database.removeAllTableData();
         log.info("----------->Storing genres table data...");
         database.storeAllGenres(genres);
         log.info("----------->Storing persons table data...");
-        database.storeAllPersons(persons);
+        database.storeAllPersons(persons, createdAt);
         log.info("----------->Storing movies table data...");
-        database.storeAllMovies(movies);
+        database.storeAllMovies(movies, createdAt);
         log.info("----------->Storing tv shows table data...");
-        database.storeAllShows(shows);
+        database.storeAllShows(shows, createdAt);
         log.info("----------->Storing user table data...");
-        database.storeAllUsers(users);
+        database.storeAllUsers(users, createdAt);
         log.info("----------->Removing all images...");
         database.removeAllImages();
         List<MediaDB> medias = new ArrayList<>();

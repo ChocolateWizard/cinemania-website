@@ -77,7 +77,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 
     @Override
     public ResponseEntity postCritiqueLike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -96,7 +96,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 
     @Override
     public ResponseEntity postCritiqueDislike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -171,7 +171,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 //PUT  
     @Override
     public ResponseEntity putCritiqueLike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -190,7 +190,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 
     @Override
     public ResponseEntity putCritiqueDislike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -262,7 +262,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 
     @Override
     public ResponseEntity deleteCritiqueLike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -284,7 +284,7 @@ public class CritiqueServiceJPA implements ICritiqueService<CritiqueRequestDTO, 
 
     @Override
     public ResponseEntity deleteCritiqueDislike(Long critiqueId) {
-        if (critiqueRepo.existsById(critiqueId)) {
+        if (!critiqueRepo.existsById(critiqueId)) {
             throw new ResourceNotFoundException("Critique with id: " + critiqueId + " does not exist in database!");
         }
         SecurityUser loggedUser = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

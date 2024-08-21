@@ -1,7 +1,7 @@
 import React from "react";
 
-import { concatActorRoleNames } from "../../../../utils/Util";
-import PersonSVG from "../../../helpers/svg/PersonSVG";
+import { concatActorRoleNames } from "../../../utils/Util";
+import PersonSVG from "../../helpers/svg/PersonSVG";
 
 export default function ActorCard({ actor }) {
   return (
