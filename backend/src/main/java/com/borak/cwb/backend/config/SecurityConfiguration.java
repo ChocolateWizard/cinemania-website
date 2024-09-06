@@ -9,11 +9,13 @@ import com.borak.cwb.backend.logic.security.AuthEntryPointJwt;
 import com.borak.cwb.backend.logic.security.AuthTokenFilter;
 import com.borak.cwb.backend.logic.security.MyUserDetailsService;
 import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,10 +37,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
+    
     @Autowired
     private MyUserDetailsService userDetailsService;
-
+    
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
@@ -47,57 +49,44 @@ public class SecurityConfiguration {
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+    
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
+        
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-
+        
         return authProvider;
     }
-
+    
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    //this tells spring security to ignore provided path. Its not advised to do it like this
-    //but it works
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring().requestMatchers("/images/**");
-//    }
     //CORS configuration
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOriginPatterns(Arrays.asList("http://localhost:[*]"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Cookie"));
+        
+        config.setAllowedOrigins(List.of("http://localhost:8090"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type", "Cookie"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600l);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-//this is if you wish to set up your own cors filter
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        return new CorsFilter(corsConfigurationSource());
-//    }
-
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
+        http.csrf(csrf -> csrf.disable()).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth
@@ -113,7 +102,7 @@ public class SecurityConfiguration {
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "api/critiques"
-                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())                       
+                        ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
                         .requestMatchers(HttpMethod.DELETE,
                                 "api/critiques/*"
                         ).hasAnyAuthority(UserRole.CRITIC.toString(), UserRole.ADMINISTRATOR.toString())
@@ -159,13 +148,12 @@ public class SecurityConfiguration {
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 );
-
+        
         http.authenticationProvider(authenticationProvider());
-
+        
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//                .addFilterBefore(corsFilter(), AuthTokenFilter.class);
-
+        
         return http.build();
     }
-
+    
 }

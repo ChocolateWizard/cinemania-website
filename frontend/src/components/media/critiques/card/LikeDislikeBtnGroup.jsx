@@ -9,7 +9,7 @@ import {
   deleteCritiqueDislike,
 } from "../../../../utils/Api";
 import LikeSVG from "../../../helpers/svg/LikeSVG";
-import DislikeSVG from "../../../components/helpers/svg/DislikeSVG";
+import DislikeSVG from "../../../helpers/svg/DislikeSVG";
 import { toast } from "react-toastify";
 
 export default function LikeDislikeBtnGroup({

@@ -6,6 +6,8 @@ package com.borak.cwb.backend.domain;
 
 import com.borak.cwb.backend.domain.enums.Gender;
 import com.borak.cwb.backend.domain.enums.UserRole;
+import com.borak.cwb.backend.domain.jdbc.UserJDBC;
+import com.borak.cwb.backend.domain.jpa.UserJPA;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +53,46 @@ public class SecurityUser implements UserDetails {
     public SecurityUser(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public SecurityUser(UserJPA user) {
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.gender = user.getGender();
+        this.profileName = user.getProfileName();
+        this.profileImage = user.getProfileImage();
+        this.role = user.getRole();
+        this.email = user.getEmail();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
+        this.country = new SecurityUser.Country(
+                user.getCountry().getId(),
+                user.getCountry().getName(),
+                user.getCountry().getOfficialStateName(),
+                user.getCountry().getCode());
+    }
+
+    public SecurityUser(UserJDBC user) {
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.gender = user.getGender();
+        this.profileName = user.getProfileName();
+        this.profileImage = user.getProfileImage();
+        this.role = user.getRole();
+        this.email = user.getEmail();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
+        this.country = new SecurityUser.Country(
+                user.getCountry().getId(),
+                user.getCountry().getName(),
+                user.getCountry().getOfficialStateName(),
+                user.getCountry().getCode());
     }
 
     @Override

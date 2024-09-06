@@ -4,11 +4,11 @@
 
 Before you begin, ensure you have met the following requirements:
 
-- You have installed Java 17.
-- You have MySQL Server 8.0 or higher.
-- You have Apache Maven 3.9.3 or higher.
+- You have installed Java 21.
+- You have MySQL Server 8.4 or higher.
+- You have Apache Maven 3.9.8 or higher.
 - Your MySQL DBMS has two databases - one for production and another one for testing purposes.
-- You have installed Node.js 20.11.1.
+- You have installed Node.js 20.15.0.
 
 ## Setting Up
 
@@ -41,7 +41,3 @@ If you wish to see how it all looks, run the backend first either in the IDE wit
 ## Stopping the Application
 
 If you wish to stop the backend from running, just type `Ctrl+C` in the same command prompt where the backend is running. Similarly for the frontend - if you wish to stop the frontend from running, type `q+Enter` in the same command prompt where the frontend is running.
-
-## Available API routes
-
-If you wish to see the documentation of all available backend API routes, you can do so by running backend, and typing `http://localhost:8080/api/docs` in your browser of choise
